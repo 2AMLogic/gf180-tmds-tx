@@ -44,19 +44,18 @@ The gf180mcu I/O library ships a general-purpose 5 V wide-range GPIO library
 and no high-speed cell, so the driver and its ESD protection are custom
 pad-ring work. Treat that as the block's central risk, not a detail.
 
-## Target specification (DRAFT — engineering to ratify, see issue #1)
+## Target specification
 
-| Parameter | Target | Stretch |
-|---|---|---|
-| Lanes | 3 data + 1 clock | — |
-| Rate per lane | 742.5 Mbps (720p60) | 1.485 Gbps (1080p60) |
-| Electrical | DC-coupled, 50 Ω to 3.3 V, ~10 mA sink | — |
-| Serialization | 10:1, custom CML final stages | — |
-| Signoff | DRC + LVS clean, pad ring included | — |
+The ratified spec — parameter table, numeric PLL interface (reference
+frequency, output frequencies, jitter budget), and pad-cell/ESD decision
+record — lives in [`spec/tmds-tx.md`](spec/tmds-tx.md). See
+[`spec/README.md`](spec/README.md) for the decision-record convention. This
+README does not keep its own copy of the numbers, to avoid a driftable
+second source of truth.
 
 Maturity ladder: spec ratified → encoder verified → driver simulated across
 PVT → pad cell DRC-clean → assembled and LVS-clean → shuttle seat → measured
-silicon. **Current position: pre-spec.**
+silicon. **Current position: spec ratified.**
 
 ## Repo layout
 
