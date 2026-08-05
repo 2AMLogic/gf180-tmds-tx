@@ -172,6 +172,16 @@ matter of layout matching rather than of two different circuits agreeing.
 Analog signoff runs the full cross product {5 process} × {3 temperature} ×
 {3 supply} = 45 corners unless a recorded result justifies a subset.
 
+**Tool friction filed while establishing the above** (repo `CLAUDE.md`
+protocol): [`klayout-tools#537`](https://github.com/2AMLogic/klayout-tools/issues/537)
+— `klt pdk cells` reports no device flavor and only one of the three
+characterized supplies for the gf180mcu standard-cell libraries, so
+`--supply 3.3` exits non-zero on a configuration that is in fact supported;
+and [`klayout-tools#538`](https://github.com/2AMLogic/klayout-tools/issues/538)
+— no way to enumerate a PDK's SPICE corners or to learn that a corner leaves a
+device family at typical. Both facts had to be established by reading PDK
+files directly.
+
 ## 6. PLL interface — what this block requires from the sibling block
 
 Ratified by [0005](decisions/0005-pll-interface-and-jitter-budget.md).
@@ -395,6 +405,6 @@ ratified number, not a licence to change one.
 |---|---|---|
 | O-1 | The **0.25 UI** source jitter allowance (§6.3) and the **75 ps** minimum rise time and **400–600 mV** swing window (§2) are taken from the commonly-applied DVI 1.0 electrical requirements but were **not** checked against the DVI 1.0 document, which is not available in this environment. | The §6.3 budget scales linearly with the UI allowance. If the true figure is tighter, every allocation shrinks proportionally and §6.4's PLL number tightens with it. Verify before tape-out; a change requires a decision record. |
 | O-2 | C_PAD (§7) is hand-computed from model cards, not extracted. | If the extraction exceeds 2.0 pF, [0006](decisions/0006-pad-cell-and-esd-strategy.md) §7's ratified contingency applies — and still requires a new decision record to invoke. |
-| O-3 | The 6 V devices have no ngspice process corners (§5). | Any result depending on a 6 V device's process spread is unprovable with the open PDK. Mitigated by keeping 6 V devices out of current- and speed-determining roles; the residual is the output cascode. |
+| O-3 | The 6 V devices have no ngspice process corners (§5). | Any result depending on a 6 V device's process spread is unprovable with the open PDK. Mitigated by keeping 6 V devices out of current- and speed-determining roles; the residual is the output cascode. Filed upstream as [`2AMLogic/klayout-tools#538`](https://github.com/2AMLogic/klayout-tools/issues/538) — `klt` cannot enumerate corners or warn that one leaves a device family at typical, which is how this nearly went unnoticed. |
 | O-4 | The 45 ps serializer-path and 30 ps driver-path DJ allocations (§6.3) are budgets, not simulated results. | They are targets for the driver and serializer issues to meet. If either is exceeded, the overrun comes out of margin, not out of the PLL requirement. |
 | O-5 | HBM/CDM levels cannot be verified by `klt drc` or `klt lvs`. | The ESD claim in §7 rests on reusing the PDK's own qualified structure, which is why [0006](decisions/0006-pad-cell-and-esd-strategy.md) adapts rather than redraws. No ESD simulation capability is claimed. |
