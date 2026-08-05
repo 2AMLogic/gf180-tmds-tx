@@ -1,0 +1,10 @@
+* Golden reference netlist for the minimal custom TMDS pad cell.
+* Intent: one isolated bond-pad net (PAD) and one isolated substrate/guard-
+* ring tap net (VSUB), electrically separate, no active devices yet -- see
+* spec/pad-ring-esd.md Sec. 6 for why LVS could not actually be run against
+* this (2AMLogic/klayout-tools#543 blocks extraction of a deviceless
+* top-level circuit entirely, so `klt extract` on gf180_tmds_pad_min.gds
+* returns 0 nets/0 pins for the layout side -- there is nothing to compare
+* this reference netlist against yet).
+.SUBCKT gf180_tmds_pad_min PAD VSUB
+.ENDS

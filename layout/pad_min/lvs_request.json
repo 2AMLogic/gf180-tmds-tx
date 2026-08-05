@@ -1,0 +1,10 @@
+{
+  "layout": {
+    "netlist": "gf180_tmds_pad_min.spice",
+    "top": "gf180_tmds_pad_min"
+  },
+  "reference": {
+    "netlist": "reference.spice",
+    "top": "gf180_tmds_pad_min"
+  }
+}

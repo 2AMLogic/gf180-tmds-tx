@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "file": "gf180_tmds_pad_min.gds",
+  "deck": "gf180mcu",
+  "top": "gf180_tmds_pad_min",
+  "dbu_um": 0.001,
+  "netlist_path": "gf180_tmds_pad_min.spice",
+  "netlist_sha256": "5cd9718bcef57ef07d8e9e8aeb6fb25ff042ce3d05c9e9f3a5e4206d02a431ab",
+  "status": "extracted",
+  "device_count": 0,
+  "net_count": 0,
+  "pin_count": 0,
+  "device_counts": {},
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor"
+  ],
+  "devices": [],
+  "nets": [],
+  "warnings": [],
+  "black_box_regions": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+    },
+    "input": {
+      "content_hash": "sha256:608da71bc004de2fb80f5fece54cb8d410d91a1f90b7940e6024b88cb44fa758"
+    }
+  },
+  "parasitics": null
+}
