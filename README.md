@@ -63,6 +63,7 @@ silicon. **Current position: spec ratified.**
 spec/          ratified spec + decision records
 rtl/           encoder and serializer sources
 verification/  cocotb testbenches
+flow/          synthesis and place-and-route recipes (Yosys, OpenROAD), via klt
 design/        analog schematics (driver, CML stages)
 sim/           testbenches + PVT corner results (ngspice)
 layout/        GDS + DRC/LVS reports, including the pad cell
