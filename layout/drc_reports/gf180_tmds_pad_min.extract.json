@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "file": "gds/gf180_tmds_pad_min.gds",
+  "deck": "gf180mcu",
+  "top": "gf180_tmds_pad_min",
+  "dbu_um": 0.001,
+  "netlist_path": "gds/gf180_tmds_pad_min.spice",
+  "netlist_sha256": "276ecfa16c28095855fb7a25ecb7012f78e48f27ca7cf1043f12a39b1188c6d4",
+  "status": "extracted",
+  "device_count": 1,
+  "net_count": 3,
+  "pin_count": 3,
+  "device_counts": {
+    "nfet": 1
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [
+    {
+      "layer": 37,
+      "datatype": 0,
+      "shapes": 1
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS",
+        "g": "VSS",
+        "d": "PAD",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.4,
+        "w_um": 2.0
+      }
+    }
+  ],
+  "nets": [
+    {
+      "name": "PAD",
+      "pin": true,
+      "device_count": 1
+    },
+    {
+      "name": "VSS",
+      "pin": true,
+      "device_count": 2
+    },
+    {
+      "name": "vsubs",
+      "pin": true,
+      "device_count": 1
+    }
+  ],
+  "warnings": [],
+  "black_box_regions": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+    },
+    "input": {
+      "content_hash": "sha256:35bb3a6684254def78caa13cafe759cf430f2106943d2223a12778eb3d6bdc2d"
+    }
+  },
+  "parasitics": null
+}

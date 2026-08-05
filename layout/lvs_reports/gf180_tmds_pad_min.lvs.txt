@@ -1,0 +1,17 @@
+layout: ../gds/gf180_tmds_pad_min.gds
+reference: gf180_tmds_pad_min.ref.spice
+top: gf180_tmds_pad_min
+engine: klayout
+status: match
+mismatches: 3
+  nets: layout=3  reference=3  matched=3
+  devices: layout=1  reference=1  matched=1
+  pins: layout=3  reference=3  matched=3
+
+category_counts:
+  device.body_unverified: 1
+  topology: 2
+
+[warning] device.body_unverified  (layout)  1 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, "Coverage")
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch

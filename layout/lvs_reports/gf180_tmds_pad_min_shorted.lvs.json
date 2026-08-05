@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "../gds/gf180_tmds_pad_min_shorted.gds",
+  "reference": "gf180_tmds_pad_min.ref.spice",
+  "top": "gf180_tmds_pad_min_shorted",
+  "status": "mismatch",
+  "mismatch_count": 9,
+  "category_counts": {
+    "device.body_unverified": 1,
+    "device.unmatched": 1,
+    "net.unmatched": 5,
+    "topology": 2
+  },
+  "counts": {
+    "nets": {
+      "layout": 2,
+      "reference": 3,
+      "matched": 0
+    },
+    "devices": {
+      "layout": 1,
+      "reference": 1,
+      "matched": 0
+    },
+    "pins": {
+      "layout": 2,
+      "reference": 3,
+      "matched": 5
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "1723640fe09030ee74eae91fb897558795d56243b8b6033006d3c79a8687065d",
+    "reference_sha256": "9206dfa65c8d1cc5f2b5ffadfeb82b99261d1bc6bb4caa8a668e0d916b61a9b2",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+    },
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "device.body_unverified",
+      "severity": "warning",
+      "description": "1 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, \"Coverage\")",
+      "side": "layout",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "$1",
+        "reference": "1",
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "layout net has no reference counterpart",
+      "side": "layout",
+      "net": {
+        "layout": "PAD,VSS",
+        "reference": null
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "layout net has no reference counterpart",
+      "side": "layout",
+      "net": {
+        "layout": "vsubs",
+        "reference": null
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "reference net has no layout counterpart",
+      "side": "reference",
+      "net": {
+        "layout": null,
+        "reference": "PAD"
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "reference net has no layout counterpart",
+      "side": "reference",
+      "net": {
+        "layout": null,
+        "reference": "VSS"
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "reference net has no layout counterpart",
+      "side": "reference",
+      "net": {
+        "layout": null,
+        "reference": "VSUBS"
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    }
+  ],
+  "net_correspondence": []
+}

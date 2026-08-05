@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "../gds/gf180_tmds_pad_min.gds",
+  "reference": "gf180_tmds_pad_min.ref.spice",
+  "top": "gf180_tmds_pad_min",
+  "status": "match",
+  "mismatch_count": 3,
+  "category_counts": {
+    "device.body_unverified": 1,
+    "topology": 2
+  },
+  "counts": {
+    "nets": {
+      "layout": 3,
+      "reference": 3,
+      "matched": 3
+    },
+    "devices": {
+      "layout": 1,
+      "reference": 1,
+      "matched": 1
+    },
+    "pins": {
+      "layout": 3,
+      "reference": 3,
+      "matched": 3
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "35bb3a6684254def78caa13cafe759cf430f2106943d2223a12778eb3d6bdc2d",
+    "reference_sha256": "9206dfa65c8d1cc5f2b5ffadfeb82b99261d1bc6bb4caa8a668e0d916b61a9b2",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+    },
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "device.body_unverified",
+      "severity": "warning",
+      "description": "1 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, \"Coverage\")",
+      "side": "layout",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "PAD",
+      "reference": "PAD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    },
+    {
+      "layout": "vsubs",
+      "reference": "VSUBS",
+      "pin": true
+    }
+  ]
+}
