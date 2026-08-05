@@ -1,0 +1,4 @@
+{
+  "layout": {"file": "../gds/gf180_tmds_pad_min.gds", "deck": "gf180mcu"},
+  "reference": {"netlist": "gf180_tmds_pad_min.ref.spice", "top": "gf180_tmds_pad_min"}
+}
