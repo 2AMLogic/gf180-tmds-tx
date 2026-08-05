@@ -38,7 +38,7 @@ charge pump, etc.) is entirely out of scope for this repository.
 | Requirement | Value |
 |---|---|
 | Reference input | 27.000 MHz, single-ended CMOS, ±100 ppm |
-| Bit-rate clock output (720p60 target) | 742.5 MHz (= 27.000 MHz × 11/4) |
+| Bit-rate clock output (720p60 target) | 742.5 MHz (= 27.000 MHz × 110/4) |
 | Bit-rate clock output (480p fallback) | 270 MHz (= 27.000 MHz × 10) |
 | Pixel-rate clock output (720p60 target) | 74.25 MHz (= bit-rate clock ÷ 10) |
 | Pixel-rate clock output (480p fallback) | 27.000 MHz (= bit-rate clock ÷ 10) |
