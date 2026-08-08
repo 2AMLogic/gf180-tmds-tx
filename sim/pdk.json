@@ -1,0 +1,19 @@
+{
+  "_comment": [
+    "Committed PDK defaults for this repo. Environment variables win over this",
+    "file, and sim/pdk.local.json (git-ignored) wins over both.",
+    "  variant       gf180mcu flavor directory to use (A/B/C/D differ in metal stack)",
+    "  search_roots  extra directories that CONTAIN variant dirs, searched before",
+    "                the built-in list (~/.volare, /usr/share/pdk, ...)",
+    "",
+    "variant is pinned to gf180mcuD because that is the variant spec/tmds-tx.md's",
+    "ratified decision records (DR-0002, DR-0005) cite. This is a PIN, not a",
+    "resolution of the gf180mcuC-vs-gf180mcuD discrepancy against this repo's",
+    "existing layout evidence (spec/pad-ring-esd-survey.md, layout/ from #2, which",
+    "was produced against gf180mcuC) -- that discrepancy is an open question owned",
+    "by #9 and is intentionally NOT ruled on here. See sim/README.md's 'PDK",
+    "variant' section."
+  ],
+  "variant": "gf180mcuD",
+  "search_roots": []
+}

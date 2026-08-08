@@ -1,0 +1,64 @@
+* smoke-cml-pair -- harness acceptance testbench (NOT a design deliverable)
+*
+* Netlist FRAGMENT. The harness supplies the title, .include of the gf180mcu
+* models, the corner .lib sections, .temp, the .control block (analyses +
+* measure) and .end. Parameters provided by the harness (see
+* sim/harness/README.md): vdd_val/vdd_nom, temp_c, and -- because this
+* testbench's manifest declares a `rates_mbps` axis -- rate_val (Mbps/lane
+* for this grid point).
+*
+* Purpose: prove the harness's transient/rate-axis machinery end to end
+* (sim/README.md, issue #8) with the DR-0002 load topology -- a bare 3.3 V
+* NMOS (nfet_03v3) differential pair, tail current source, 50 ohm per-leg
+* termination to the supply rail -- and NO other design content. This is a
+* harness smoke test, not the CML driver (that is issue #11's job): device
+* sizing and bias here are chosen only to get the pair fully switching, not
+* to hit any spec target.
+*
+* Stimulus: a fixed-amplitude, fixed-edge-rate (20 ps) differential square
+* wave at 1/rate_val (the worst-case, maximum-transition-density TMDS
+* pattern -- alternating '10101...' is the highest-ISI-stress bit sequence a
+* DC-balanced 8b/10b-style code can present, so it is a legitimate stand-in
+* for "deliberately worst-case" per sim/README.md's stimulus convention).
+* The convention also names a `prbs7`-pattern option for a real
+* pseudo-random bit sequence; this smoke testbench exercises only the
+* worst-case pattern; a PRBS driver testbench is deferred to issue #11
+* (the real CML driver design), which is where a genuine multi-edge
+* eye/jitter statistic first has a real driver+load to measure.
+*
+* Gate bias/swing (1.0 V / 2.6 V, common-mode 1.8 V) was picked empirically
+* against nfet_03v3 (w=40u l=0.28u carries ~10 mA at Vgs~2.1 V, confirmed by
+* a diode-connected DC op-point check against the installed gf180mcuD
+* models) so the tail current fully commutates between the two legs at
+* every PVT corner in the mandated matrix, rather than partially splitting
+* (which would produce a physically-invalid negative source voltage on this
+* device family's grounded bulk -- see the DR-0002 topology note above).
+
+.param tbit_s = '1e-6/rate_val'
+
+vdd vdd 0 dc {vdd_val}
+itail tail 0 dc 10m
+
+vinp inp 0 PULSE(1.0 2.6 0 20p 20p '{tbit_s/2 - 20p}' '{tbit_s}')
+vinn inn 0 PULSE(2.6 1.0 0 20p 20p '{tbit_s/2 - 20p}' '{tbit_s}')
+
+xmp outp inp tail 0 nfet_03v3 w=40u l=0.28u
+xmn outn inn tail 0 nfet_03v3 w=40u l=0.28u
+
+* DR-0002: 50 ohm per-leg termination to the 3.3 V rail.
+rp vdd outp 50
+rn vdd outn 50
+* Small fixed parasitic load per leg -- not a pad/ESD capacitance claim
+* (that is issue #12's job), just enough to keep the transient solver's
+* local truncation error estimate well-behaved at every corner.
+cp outp 0 0.1p
+cn outn 0 0.1p
+
+* Differential probe: a 1x VCVS onto a 1 ohm-to-ground node gives a real
+* ngspice vector (`v(vdiff)`) for `meas`'s TRIG/TARG expressions -- ngspice's
+* `v(a,b)` two-terminal probe syntax parses in `print`/`let` but was found
+* NOT to parse inside `meas` TRIG/TARG expressions (confirmed against the
+* installed ngspice-46 while developing this testbench); this is the
+* documented workaround, not a design element.
+edif vdiff vdiffref outp outn 1
+rdiffref vdiffref 0 1
