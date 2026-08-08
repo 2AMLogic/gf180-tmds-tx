@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  tmds-encoder-verification:
+    name: TMDS encoder (RTL + cocotb bench + negative control)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog and Yosys
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog yosys
+          iverilog -V
+          yosys -V
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install cocotb
+        run: pip install -r verification/tmds_encoder/requirements.txt
+
+      - name: Yosys elaboration smoke check (no vendor extensions)
+        run: |
+          yosys -p "read_verilog rtl/tmds_encoder.v; hierarchy -check -top tmds_encoder; check"
+
+      - name: Run verification bench (real DUT) and negative control (broken DUT)
+        # runner.py asserts BOTH legs: the real DUT must pass every test, and
+        # the broken DUT (negative_control/tmds_encoder_broken.v) must FAIL
+        # the same, unmodified test suite -- see verification/README.md.
+        run: python3 verification/tmds_encoder/runner.py
