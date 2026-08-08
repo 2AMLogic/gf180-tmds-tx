@@ -5,7 +5,7 @@
   "scripts": {
     "worktree:return": "./.loom/scripts/worktree-return.sh",
     "check:ci": "bash .github/scripts/lint.sh",
-    "check:all": "bash .github/scripts/lint.sh",
+    "check:all": "bash .github/scripts/lint.sh && python3 -m unittest discover -s sim/tests -v",
     "test": "python3 -m unittest discover -s sim/tests -v",
     "sim:env": "python3 sim/run_corners.py --check-env",
     "sim:list": "python3 sim/run_corners.py --list",
