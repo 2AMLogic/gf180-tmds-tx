@@ -1,0 +1,46 @@
+{
+  "name": "smoke-cml-pair",
+  "description": "Harness acceptance test: transient/eye measurement + bit-rate axis plumbing, against a bare 3.3 V NMOS (nfet_03v3) differential pair with the DR-0002 load topology (10 mA tail, 50 ohm/leg to the 3.3 V rail). Not a design deliverable -- issue #11 designs the real CML driver.",
+  "claim": "None -- harness self-verification, not a spec claim. Proves the transient/rate-axis machinery (tran analysis composition, rate_val parameter plumbing at both spec/tmds-tx.md #1 operating points, raw ngspice `meas` threshold-crossing measurements, and the transient-solver-settings record fields) actually takes effect, so later records against ratified spec lines can be trusted.",
+  "netlist": "smoke_cml_pair.spice",
+  "corners": ["mos"],
+  "rates_mbps": [742.5, 270.0],
+  "transient": {
+    "tstep_s": 2e-12,
+    "tstop_s": 20e-9,
+    "tmax_s": 2e-12,
+    "reltol": 1e-6,
+    "abstol": 1e-9,
+    "vntol": 1e-6,
+    "pattern": "worst-case-101010"
+  },
+  "analyses": [
+    "tran 2e-12 20e-9 0 2e-12"
+  ],
+  "measure": {
+    "swing_diff_v": "vecmax(abs(v(outp)-v(outn)))",
+    "vcm_v": "mean((v(outp)+v(outn))/2)",
+    "trise_10_90": "TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1",
+    "tfall_10_90": "TRIG v(vdiff) VAL=0.4 FALL=1 TARG v(vdiff) VAL=-0.4 FALL=1"
+  },
+  "checks": {
+    "swing_diff_v": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing target 400-600 mV; measured as the peak |outp-outn| excursion"
+    },
+    "vcm_v": {
+      "min": 2.5,
+      "max": 3.7,
+      "description": "DR-0002 common-mode target 2.8-3.3 V at nominal 3.3 V supply; widened here to 2.5-3.7 V because common-mode tracks vdd_val directly through the 50 ohm pull-up and this smoke run sweeps the mandated +/-10% supply axis -- this is a harness-plumbing sanity bound, not a DR-0002 compliance claim (that is issue #11's job at the real driver's operating point)"
+    },
+    "trise_10_90": {
+      "max": 200e-12,
+      "description": "sanity bound only (this smoke pair's bandwidth is not a spec claim) -- proves the meas-based rise-time measurement actually resolves a sub-UI edge at 742.5 Mbps (UI = 1.347 ns)"
+    },
+    "tfall_10_90": {
+      "max": 200e-12,
+      "description": "sanity bound only, mirrors trise_10_90"
+    }
+  }
+}
