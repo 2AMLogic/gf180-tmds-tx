@@ -1,0 +1,51 @@
+v {xschem version=3.4.7 file_version=1.2
+
+* Symbol for the one-lane DVI-mode TMDS CML output driver (issue #11).
+*
+* Ports, in .subckt order:
+*   OUTP OUTN   open-drain outputs; the receiver's 50 ohm/leg termination to
+*               its own 3.3 V AVCC rail is OUTSIDE this cell (DR-0002).
+*   INP  INN    differential full-rate data from the DR-0003 custom 2:1
+*               final multiplexer. Reduced-swing, 3.3 V-domain, no level
+*               shifter; the swing/common-mode window this cell requires of
+*               that stage is stated in design/cml-driver-sizing.md.
+*   IBIAS       bias *current* input (nominal 500 uA sunk into this pin);
+*               mirrored 1:20 onto the tail device inside the cell. The
+*               reference that generates it is a follow-on cell.
+*   VSS         cell ground; also the bulk tie for every device.
+*
+* There is deliberately no VDD port: the stage is open-drain, so the only
+* rails it touches are VSS and the receiver-side termination rail.
+}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"
+}
+V {}
+S {}
+E {}
+L 4 -80 -80 80 -80 {}
+L 4 80 -80 80 80 {}
+L 4 80 80 -80 80 {}
+L 4 -80 80 -80 -80 {}
+L 4 -80 -40 -75 -40 {}
+L 4 -80 0 -75 0 {}
+L 4 -80 40 -75 40 {}
+L 4 75 -40 80 -40 {}
+L 4 75 0 80 0 {}
+L 4 0 75 0 80 {}
+B 5 77.5 -42.5 82.5 -37.5 {name=OUTP dir=out}
+B 5 77.5 -2.5 82.5 2.5 {name=OUTN dir=out}
+B 5 -82.5 -42.5 -77.5 -37.5 {name=INP dir=in}
+B 5 -82.5 -2.5 -77.5 2.5 {name=INN dir=in}
+B 5 -82.5 37.5 -77.5 42.5 {name=IBIAS dir=inout}
+B 5 -2.5 77.5 2.5 82.5 {name=VSS dir=inout}
+T {@name} -80 -95 0 0 0.3 0.3 {}
+T {cml_driver} -45 -8 0 0 0.4 0.4 {}
+T {OUTP} 70 -44 0 1 0.25 0.25 {}
+T {OUTN} 70 -4 0 1 0.25 0.25 {}
+T {INP} -70 -44 0 0 0.25 0.25 {}
+T {INN} -70 -4 0 0 0.25 0.25 {}
+T {IBIAS} -70 36 0 0 0.25 0.25 {}
+T {VSS} 5 60 0 0 0.25 0.25 {}

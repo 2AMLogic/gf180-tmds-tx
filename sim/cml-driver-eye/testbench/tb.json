@@ -1,0 +1,158 @@
+{
+  "name": "cml-driver-eye",
+  "description": "One lane of the CML output driver (design/cml_driver.sch) against the DR-0002 load -- 50 ohm/leg to the receiver's 3.3 V termination rail -- swept over pad capacitance 0/1/2 pF in-deck, at both spec/tmds-tx.md #1 operating points, across the full PVT matrix. Measures DR-0002's swing and common-mode rows, this stage's contribution to #2's <= 0.15 UI p-p jitter allocation, worst-case device stress against the 3.3 V devices' rated limit, and (unbounded by the ratified spec, reported for #9) 10-90 % rise/fall, tail-current draw and single-ended output resistance.",
+  "claim": "spec/tmds-tx.md#dr-0002 -- single-ended swing 400-600 mV and common mode 2.8-3.3 V into 50 ohm/leg with a ~10 mA tail, plus the Vgs/Vgd/Vds margin against the 3.3 V core devices' rated limit that DR-0002 explicitly deferred to the driver design work -- and spec/tmds-tx.md #2's remaining-jitter row, this stage's <= 0.15 UI peak-to-peak allocation, at both #1 operating points (742.5 Mbps/lane target, 270 Mbps/lane fallback).",
+  "netlist": "cml_driver_eye.spice",
+  "dut": "sim/cml-driver-eye/testbench/cml_driver_dut.spice",
+  "corners": ["mos"],
+  "rates_mbps": [742.5, 270.0],
+  "transient": {
+    "tstep_s": 10e-12,
+    "tstop_s": 61e-9,
+    "tmax_s": 20e-12,
+    "reltol": 1e-6,
+    "abstol": 1e-9,
+    "vntol": 1e-6,
+    "pattern": "mixed-run-length-16b (1111111110101010, MSB first at t=0): a nine-bit run followed by maximum-transition-density alternation, so both the settled-history and the worst-case-ISI edge cases are excited by one pattern"
+  },
+  "analyses": [
+    "tran 10e-12 61e-9 0 20e-12"
+  ],
+  "measure": {
+    "ui_ref": "TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=1",
+    "spa_in": "TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 FALL=3",
+    "spb_in": "TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=2",
+
+    "spa_c0": "TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 FALL=3",
+    "spb_c0": "TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 RISE=2",
+    "trise_c0": "TRIG v(vd_c0) VAL=-0.4 RISE=1 TARG v(vd_c0) VAL=0.4 RISE=1",
+    "tfall_c0": "TRIG v(vd_c0) VAL=0.4 FALL=2 TARG v(vd_c0) VAL=-0.4 FALL=2",
+    "dj_ui_c0": "(max(max(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0)-min(min(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0))/m_ui_ref",
+    "swing_c0": "vecmax(v(outp_c0)*v(winc))-vecmin(v(outp_c0)+10*(1-v(winc)))",
+    "vpp_c0": "vecmax(v(outp_c0)*v(win))-vecmin(v(outp_c0)+10*(1-v(win)))",
+    "vcm_c0": "(vecmax(v(outp_c0)*v(winc))+vecmin(v(outp_c0)+10*(1-v(winc)))+vecmax(v(outn_c0)*v(winc))+vecmin(v(outn_c0)+10*(1-v(winc))))/4",
+
+    "spa_c1": "TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 FALL=3",
+    "spb_c1": "TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 RISE=2",
+    "trise_c1": "TRIG v(vd_c1) VAL=-0.4 RISE=1 TARG v(vd_c1) VAL=0.4 RISE=1",
+    "tfall_c1": "TRIG v(vd_c1) VAL=0.4 FALL=2 TARG v(vd_c1) VAL=-0.4 FALL=2",
+    "dj_ui_c1": "(max(max(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0)-min(min(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0))/m_ui_ref",
+    "swing_c1": "vecmax(v(outp_c1)*v(winc))-vecmin(v(outp_c1)+10*(1-v(winc)))",
+    "vpp_c1": "vecmax(v(outp_c1)*v(win))-vecmin(v(outp_c1)+10*(1-v(win)))",
+    "vcm_c1": "(vecmax(v(outp_c1)*v(winc))+vecmin(v(outp_c1)+10*(1-v(winc)))+vecmax(v(outn_c1)*v(winc))+vecmin(v(outn_c1)+10*(1-v(winc))))/4",
+
+    "spa_c2": "TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 FALL=3",
+    "spb_c2": "TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 RISE=2",
+    "trise_c2": "TRIG v(vd_c2) VAL=-0.4 RISE=1 TARG v(vd_c2) VAL=0.4 RISE=1",
+    "tfall_c2": "TRIG v(vd_c2) VAL=0.4 FALL=2 TARG v(vd_c2) VAL=-0.4 FALL=2",
+    "dj_ui_c2": "(max(max(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0)-min(min(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0))/m_ui_ref",
+    "swing_c2": "vecmax(v(outp_c2)*v(winc))-vecmin(v(outp_c2)+10*(1-v(winc)))",
+    "vpp_c2": "vecmax(v(outp_c2)*v(win))-vecmin(v(outp_c2)+10*(1-v(win)))",
+    "vcm_c2": "(vecmax(v(outp_c2)*v(winc))+vecmin(v(outp_c2)+10*(1-v(winc)))+vecmax(v(outn_c2)*v(winc))+vecmin(v(outn_c2)+10*(1-v(winc))))/4",
+
+    "spa_cmis": "TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 FALL=3",
+    "spb_cmis": "TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 RISE=2",
+    "dj_ui_cmis": "(max(max(m_spa_cmis-m_spa_in,m_spb_cmis-m_spb_in),0)-min(min(m_spa_cmis-m_spa_in,m_spb_cmis-m_spb_in),0))/m_ui_ref",
+    "swing_cmis": "vecmax(v(outp_cmis)*v(winc))-vecmin(v(outp_cmis)+10*(1-v(winc)))",
+
+    "swing_avcclo": "vecmax(v(outp_vlo)*v(winc))-vecmin(v(outp_vlo)+10*(1-v(winc)))",
+    "vcm_avcclo": "(vecmax(v(outp_vlo)*v(winc))+vecmin(v(outp_vlo)+10*(1-v(winc)))+vecmax(v(outn_vlo)*v(winc))+vecmin(v(outn_vlo)+10*(1-v(winc))))/4",
+    "swing_avcchi": "vecmax(v(outp_vhi)*v(winc))-vecmin(v(outp_vhi)+10*(1-v(winc)))",
+    "vcm_avcchi": "(vecmax(v(outp_vhi)*v(winc))+vecmin(v(outp_vhi)+10*(1-v(winc)))+vecmax(v(outn_vhi)*v(winc))+vecmin(v(outn_vhi)+10*(1-v(winc))))/4",
+
+    "vgs_sw_max": "vecmax((v(inp)-v(xvhi.tail))*v(win))",
+    "vgd_sw_max": "vecmax(abs(v(inp)-v(outp_vhi))*v(win))",
+    "vds_sw_max": "vecmax((v(outp_vhi)-v(xvhi.tail))*v(win))",
+    "vgs_tail_max": "vecmax(v(ib_vhi)*v(win))",
+    "vds_tail_max": "vecmax(v(xvhi.tail)*v(win))",
+
+    "swing_dc": "vecmax(v(outn_z))-vecmax(v(outp_z))",
+    "vcm_dc": "(vecmax(v(outn_z))+vecmax(v(outp_z)))/2",
+    "ioff_dc": "(vecmax(v(avcc))-vecmax(v(outn_z)))/50",
+    "itail_dc": "((vecmax(v(avcc))-vecmax(v(outp_z)))+(vecmax(v(avcc))-vecmax(v(outn_z))))/50",
+    "icell_dc": "vecmax(i(vsens_z))",
+    "ro_leg": "(vecmax(v(outp_zb))-vecmax(v(outp_za)))/(vecmax(i(vforce_za))-vecmax(i(vforce_zb)))"
+  },
+  "checks": {
+    "swing_c0": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV, 0 pF pad. Measured on one leg as (max high level - min low level) over the mid-bit sampling comb (central 40 % of each bit) of the maximum-transition-density section only: the DC-settled nine-bit run is excluded, so this is the dynamic eye height a receiver slices, not the DC swing (reported separately as swing_dc) and not the switching peak-to-peak excursion (reported separately as vpp_c0)."
+    },
+    "swing_c1": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV, 1 pF pad"
+    },
+    "swing_c2": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV at DR-0005's full 2 pF pad-capacitance budget"
+    },
+    "vcm_c0": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V, 0 pF pad; (Vhigh+Vlow)/2 averaged over both legs, at the nominal 3.3 V receiver termination rail DR-0002's absolute window is referenced to (avcc -10 %/+10 % sensitivity is reported separately as vcm_avcclo/vcm_avcchi)"
+    },
+    "vcm_c1": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V, 1 pF pad"
+    },
+    "vcm_c2": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V at DR-0005's full 2 pF pad-capacitance budget"
+    },
+    "dj_ui_c0": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row: this stage's <= 0.15 UI peak-to-peak allocation, 0 pF pad. Deterministic jitter only (ISI + rise/fall asymmetry), measured as the peak-to-peak spread of the input-to-output crossing delay over the pattern's edge set and normalised by the measured UI; the input is jitter-free by construction, so the whole spread is contributed here. Random jitter is not a transient quantity and is not included -- see the record."
+    },
+    "dj_ui_c1": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row, 1 pF pad"
+    },
+    "dj_ui_c2": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row at DR-0005's full 2 pF pad-capacitance budget"
+    },
+    "dj_ui_cmis": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row with a deliberate 1 pF leg-to-leg pad-capacitance mismatch (2 pF on OUTP, 1 pF on OUTN) -- half of DR-0005's whole budget as imbalance. Graded against the same allocation because a pad ring that lands inside DR-0005's budget but mismatched must still close the jitter row; this is the row that turns 'the legs must match' into a number for the pad/ESD work."
+    },
+    "swing_cmis": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 swing under the same 1 pF leg-to-leg pad mismatch"
+    },
+    "vgs_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device Vgs against the 3.3 V core devices' rated terminal voltage. 3.63 V (nominal + 10 %) is adopted as the rated ceiling -- the same envelope this repo's own mandated PVT matrix already treats as the supply extreme (sim/harness/corners.py DEFAULT_SUPPLY_TOLERANCE), and the standard reliability convention for a device family whose own characterization bias is Vgs=Vds=3.3V nominal (GF180MCU PDK Electrical Specifications Sec.1.0, 'Low Voltage Devices (3.3V)', https://gf180mcu-pdk.readthedocs.io/en/latest/analog/spice/elec_specs/elec_specs_1.html -- Idsat characterized at |Vds|=|Vgs|=3.3V; no separate absolute-maximum-rating table ships with the volare distribution). The device's hard breakdown ceiling is far above this: the same table's punch-through voltage BVDSS is 7-9 V (NCH) / -6.5 to -8.5 V (PCH), so 3.63 V is a rated-operating margin choice, not a proximity-to-breakdown one. Measured on the avcc +10 % copy, the worst-case termination rail."
+    },
+    "vgd_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device |Vgd| against the same 3.63 V rated limit -- the binding stress row, since the off device's gate sits at the multiplexer's low level while its drain is pulled to the termination rail"
+    },
+    "vds_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device Vds against the same 3.63 V rated limit"
+    },
+    "vgs_tail_max": {
+      "max": 3.63,
+      "description": "Tail/mirror-device Vgs (the shared bias node) against the same 3.63 V rated limit"
+    },
+    "vds_tail_max": {
+      "max": 3.63,
+      "description": "Tail-device Vds (the tail node) against the same 3.63 V rated limit; also the switching devices' source-bulk reverse bias, since every bulk is tied to VSS"
+    },
+    "itail_dc": {
+      "min": 8e-3,
+      "max": 12e-3,
+      "description": "Tail current from the ideal 500 uA reference through the cell's 1:20 mirror. The 8-12 mA window is the tail-current tolerance this cell requires of the follow-on bias network, derived in design/cml-driver-sizing.md from DR-0002's 400-600 mV swing window; checking it here makes that derived requirement a graded row rather than a note."
+    },
+    "ui_ref": {
+      "min_spread_pct": 50.0,
+      "description": "Harness-integrity check, not a design claim: the measured unit interval must differ by more than 50 % across the grid, which it can only do if rate_val actually reached the stimulus. A flat ui_ref would mean the bit-rate axis silently failed to apply and every jitter number was normalised by the wrong UI."
+    }
+  }
+}
