@@ -1,0 +1,16 @@
+** sch_path: /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-11/design/cml_driver.sch
+**.subckt cml_driver OUTP OUTN INP INN IBIAS VSS
+*.ipin INP
+*.ipin INN
+*.opin OUTP
+*.opin OUTN
+*.iopin IBIAS
+*.iopin VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+**.ends
+.end

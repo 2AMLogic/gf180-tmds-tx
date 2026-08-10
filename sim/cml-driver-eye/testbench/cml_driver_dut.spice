@@ -1,0 +1,41 @@
+* cml_driver_dut.spice -- DUT fragment for sim/cml-driver-eye/
+*
+* Derived from design/netlist/cml_driver.spice (xschem-generated from
+* design/cml_driver.sch) by:
+*   1. stripping the trailing `.end` directive and the machine-local
+*      `sch_path` comment xschem prepends -- the harness's DUT fragment rule
+*      (sim/harness/README.md): a DUT file may not carry
+*      .control/.endc/.end/.lib/.temp. Same recipe as
+*      2AMLogic/gf180-gate-driver's design/netlist/output_stage.spice ->
+*      sim/output-stage-drive/testbench/output_stage_dut.spice.
+*   2. un-commenting the `**.subckt cml_driver ... **.ends` markers xschem
+*      writes as documentation-only comments (it netlists the TOP schematic
+*      flat, on the assumption a top-level sheet is a single-instance
+*      testbench, not a reusable cell). This testbench instantiates the
+*      driver 8 times (three pad-capacitance points, a leg-mismatch probe,
+*      two termination-rail sensitivity points, and three DC/output-
+*      resistance copies -- see cml_driver_eye.spice), so it genuinely needs
+*      a callable `.subckt`, not eight copies of a flat deck. This is the
+*      one deviation from the gate-driver DUT recipe; everything else is
+*      identical.
+* NOT hand-edited beyond that -- regenerate from design/netlist/cml_driver.spice
+* if the schematic changes:
+*   tail -n +2 design/netlist/cml_driver.spice | grep -v '^\.end$' \
+*     | sed -E 's/^\*\*\.(subckt|ends)/.\1/' \
+*     > sim/cml-driver-eye/testbench/cml_driver_dut.spice
+* (then re-add this header).
+*
+.subckt cml_driver OUTP OUTN INP INN IBIAS VSS
+*.ipin INP
+*.ipin INN
+*.opin OUTP
+*.opin OUTN
+*.iopin IBIAS
+*.iopin VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
