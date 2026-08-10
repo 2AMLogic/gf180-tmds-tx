@@ -362,7 +362,7 @@ matrix. **No `spec/` change was needed** — every DR-0002 target is met with
 margin, so no shortfall record or decision-record issue is required by this
 result.
 
-Record: `sim/cml-driver-eye/records/<record-id>.md` (see that file for the
+Record: [`sim/cml-driver-eye/records/20260810-041436-a2c358b.md`](../sim/cml-driver-eye/records/20260810-041436-a2c358b.md) (see that file for the
 complete 90-row per-corner table, the append-only evidence trail, and the
 full Environment/provenance section — testbench, DUT netlist, and PDK/tool
 versions). Testbench: `sim/cml-driver-eye/testbench/cml_driver_eye.spice`,

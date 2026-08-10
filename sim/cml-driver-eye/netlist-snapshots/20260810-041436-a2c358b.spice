@@ -1,0 +1,321 @@
+* Frozen netlist snapshot for record 20260810-041436-a2c358b
+* source     : sim/cml-driver-eye/testbench/cml_driver_eye.spice
+* sha256     : d198d115e83d9c9189ae73b5c27cadf607e6e1fe7fef68a3109516c742da6c51
+* This is a verbatim copy taken at record time. Do not edit.
+* cml-driver-eye -- one lane of the CML output driver against the DR-0002 load
+*
+* Netlist FRAGMENT. The harness supplies the title, the .include of the
+* gf180mcu models, the corner .lib sections, .temp, the .include of the DUT
+* (design/netlist/cml_driver.spice, named by tb.json's "dut" key), the
+* .control block (analyses + measurements) and .end. Parameters provided by
+* the harness (sim/harness/README.md): vdd_val/vdd_nom, temp_c and -- because
+* this testbench's manifest declares a `rates_mbps` axis -- rate_val
+* (Mbps/lane for this grid point).
+*
+* ---------------------------------------------------------------------------
+* WHICH RAIL THE MANDATED +/-10 % SUPPLY AXIS IS APPLIED TO
+* ---------------------------------------------------------------------------
+* The driver is open-drain (DR-0002): it has no positive rail of its own. Two
+* distinct 3.3 V rails touch this experiment and they are NOT the same rail:
+*
+*   vdd_val  -- the on-chip 3.3 V core rail this block owns. It powers the
+*               DR-0003 custom 2:1 final multiplexer, so it sets the
+*               differential input levels this cell is driven from. The
+*               harness's mandated +/-10 % supply axis is applied HERE, to
+*               the rail this block is responsible for: `vih`/`vil` below
+*               are fixed fractions of vdd_val, so a 10 % low rail delivers
+*               a 10 % smaller gate drive and the steering margin is
+*               genuinely stressed at every corner.
+*
+*   avcc     -- the RECEIVER's termination rail, in the sink device on the
+*               far side of the link, pulled up through the 50 ohm/leg
+*               termination (DR-0002). It is a different power domain in a
+*               different device; it is held at its nominal 3.3 V for the
+*               DR-0002 swing/common-mode rows, because DR-0002's 2.8-3.3 V
+*               common-mode window is an ABSOLUTE window and the output
+*               common mode tracks avcc 1:1 by construction
+*               (vcm = avcc - I_tail*R/2). Two extra copies below (`_vlo`,
+*               `_vhi`) run the same driver at avcc -10 %/+10 % so that
+*               sensitivity is measured and reported rather than assumed --
+*               see the record and design/cml-driver-sizing.md. The `_vhi`
+*               copy is also where worst-case device stress is measured,
+*               since the highest termination rail is the worst case for
+*               Vds/Vgd on the switching devices.
+*
+* ---------------------------------------------------------------------------
+* INPUT MODEL (an assumption this cell's results are conditional on)
+* ---------------------------------------------------------------------------
+* The DR-0003 custom 2:1 final multiplexer is a separate cell and a follow-on
+* issue. It is modelled here as an ideal differential source with:
+*
+*   - single-ended levels vih = 0.85*vdd_val, vil = 0.55*vdd_val
+*     (2.805 V / 1.815 V at the nominal rail), i.e. a single-ended swing of
+*     0.30*vdd_val ~ 1.0 V p-p and a common mode of 0.70*vdd_val ~ 2.31 V,
+*     scaling with its own supply as a resistively-loaded 3.3 V-domain stage
+*     does;
+*   - a 80 ps linear edge (the ramp between those levels), at BOTH bit rates
+*     -- the multiplexer is designed for the 742.5 Mbps target and is not
+*     assumed to slow down at the 270 Mbps fallback;
+*   - zero source impedance and zero jitter, so every picosecond of jitter
+*     measured at the output is contributed by this stage.
+*
+* design/cml-driver-sizing.md states this as a requirement levied on the
+* multiplexer, with the margin behind each number.
+*
+* ---------------------------------------------------------------------------
+* STIMULUS (sim/README.md's stimulus convention)
+* ---------------------------------------------------------------------------
+* `mixed-run-length-16b`: a 16-bit repeating pattern, MSB first at t = 0,
+*
+*     1 1 1 1 1 1 1 1 1 0 1 0 1 0 1 0
+*
+* i.e. a nine-bit run followed by maximum-transition-density alternation.
+* The alternating section is the worst-case ISI stimulus a DC-balanced
+* 8b/10b-style code can present (sim/README.md's `worst-case-101010`); the
+* nine-bit run in front of it adds the low-transition-density history that
+* makes data-dependent jitter measurable at all -- the first edge after the
+* run leaves a fully settled level, every edge in the alternating section
+* does not. Pattern-dependent edge displacement between those two cases is
+* exactly the deterministic jitter this stage contributes, and it is why this
+* testbench does not use a plain square wave. (sim/README.md also names a
+* `prbs7` option; a 127-bit PRBS needs ~127 UI of transient per rate and
+* buys nothing here, because with an ideal jitter-free input the jitter this
+* stage adds is deterministic -- ISI plus rise/fall asymmetry -- and both are
+* excited by the pattern above. Random jitter is not a transient-simulation
+* quantity at all; see the record's caveat.)
+*
+* Every transition ramps over `tedge` starting at an exact multiple of the
+* bit period, so the input's own differential zero crossings sit on the ideal
+* bit grid. The measurement references the OUTPUT crossings against the
+* INPUT crossings of the same edge index, so the ideal grid never has to be
+* reconstructed from a formula.
+
+.param tbit_s   = '1e-6/rate_val'
+.param avcc_nom = 3.3
+.param rterm    = 50
+.param iref     = 500u
+.param vih      = '0.85*vdd_val'
+.param vil      = '0.55*vdd_val'
+.param tedge    = 80p
+
+* Measurement windows. Both cover bits 10..15 of the first pattern period --
+* the steady-state maximum-transition-density section only. Both deliberately
+* exclude the nine-bit run, where the output settles all the way to its DC
+* levels: a window containing that run would report the DC swing and flatter
+* every bandwidth-limited corner.
+*
+*   win  -- the whole alternating section. Used for peak-to-peak excursion
+*           (vpp_*) and for device stress, where the transition instants must
+*           NOT be excluded: gate-drain feedthrough during an edge pushes the
+*           drain slightly past its settled level, and that excursion is part
+*           of the stress the device actually sees.
+*   winc -- a comb, high only over the central 40 % of each bit (0.3..0.7 UI).
+*           Used for the DR-0002 swing and common-mode rows: those are levels
+*           a receiver slices, so they are measured in the sampling window,
+*           not at the peak of a switching spike.
+.param twin_a = '10.2*tbit_s'
+.param twin_b = '15.8*tbit_s'
+
+* Static output level forced on the conducting leg of the two `_za`/`_zb`
+* copies, for the two-point output-resistance extraction below.
+.param vz_a = 2.60
+.param vz_b = 3.00
+
+* ---- rails ---------------------------------------------------------------
+vavcc   avcc   0 dc {avcc_nom}
+vavcclo avcclo 0 dc '0.9*avcc_nom'
+vavcchi avcchi 0 dc '1.1*avcc_nom'
+
+* ---- stimulus ------------------------------------------------------------
+vinp inp 0 PWL(0 '{vih}'
++ '{9*tbit_s}'  '{vih}' '{9*tbit_s+tedge}'  '{vil}'
++ '{10*tbit_s}' '{vil}' '{10*tbit_s+tedge}' '{vih}'
++ '{11*tbit_s}' '{vih}' '{11*tbit_s+tedge}' '{vil}'
++ '{12*tbit_s}' '{vil}' '{12*tbit_s+tedge}' '{vih}'
++ '{13*tbit_s}' '{vih}' '{13*tbit_s+tedge}' '{vil}'
++ '{14*tbit_s}' '{vil}' '{14*tbit_s+tedge}' '{vih}'
++ '{15*tbit_s}' '{vih}' '{15*tbit_s+tedge}' '{vil}'
++ '{16*tbit_s-tedge}' '{vil}' '{16*tbit_s}' '{vih}'
++ r=0 td=0)
+vinn inn 0 PWL(0 '{vil}'
++ '{9*tbit_s}'  '{vil}' '{9*tbit_s+tedge}'  '{vih}'
++ '{10*tbit_s}' '{vih}' '{10*tbit_s+tedge}' '{vil}'
++ '{11*tbit_s}' '{vil}' '{11*tbit_s+tedge}' '{vih}'
++ '{12*tbit_s}' '{vih}' '{12*tbit_s+tedge}' '{vil}'
++ '{13*tbit_s}' '{vil}' '{13*tbit_s+tedge}' '{vih}'
++ '{14*tbit_s}' '{vih}' '{14*tbit_s+tedge}' '{vil}'
++ '{15*tbit_s}' '{vil}' '{15*tbit_s+tedge}' '{vih}'
++ '{16*tbit_s-tedge}' '{vih}' '{16*tbit_s}' '{vil}'
++ r=0 td=0)
+
+* Static input levels for the DC copies (`_z`, `_za`, `_zb`): permanently
+* steered to the INP side, so the conducting device is the one on OUTP.
+vinpz inpz 0 dc '{vih}'
+vinnz innz 0 dc '{vil}'
+
+* Differential input probe. ngspice's two-terminal v(a,b) probe syntax parses
+* in print/let but NOT inside a `meas` TRIG/TARG expression (confirmed
+* against ngspice-46 while developing sim/smoke-cml-pair); a 1x VCVS onto a
+* real node is the documented workaround, not a design element. This node is
+* the ideal-bit-grid reference every jitter measurement is taken against.
+einref inref 0 inp inn 1
+
+* Measurement-window gates: 0 outside the window, 1 inside. These exist so a
+* `vecmax`/`vecmin` level measurement can be windowed from inside a control
+* block, which has no access to the (rate-dependent) `.param` bounds.
+vwin win 0 PWL(0 0 '{twin_a}' 0 '{twin_a+1p}' 1 '{twin_b}' 1 '{twin_b+1p}' 0)
+vwinc winc 0 PWL(0 0
++ '{10.3*tbit_s}' 0 '{10.3*tbit_s+1p}' 1 '{10.7*tbit_s}' 1 '{10.7*tbit_s+1p}' 0
++ '{11.3*tbit_s}' 0 '{11.3*tbit_s+1p}' 1 '{11.7*tbit_s}' 1 '{11.7*tbit_s+1p}' 0
++ '{12.3*tbit_s}' 0 '{12.3*tbit_s+1p}' 1 '{12.7*tbit_s}' 1 '{12.7*tbit_s+1p}' 0
++ '{13.3*tbit_s}' 0 '{13.3*tbit_s+1p}' 1 '{13.7*tbit_s}' 1 '{13.7*tbit_s+1p}' 0
++ '{14.3*tbit_s}' 0 '{14.3*tbit_s+1p}' 1 '{14.7*tbit_s}' 1 '{14.7*tbit_s+1p}' 0
++ '{15.3*tbit_s}' 0 '{15.3*tbit_s+1p}' 1 '{15.7*tbit_s}' 1 '{15.7*tbit_s+1p}' 0)
+
+* ---------------------------------------------------------------------------
+* Driver copies. Every copy is the SAME cml_driver cell
+* (design/netlist/cml_driver.spice) with the same ideal 500 uA bias
+* reference; they differ only in pad capacitance and termination rail, so a
+* difference between two copies in one log is a difference caused by that
+* load, measured at the identical PVT point.
+*
+* Pad capacitance is swept in-deck rather than as a harness axis so that all
+* three loads are measured at the identical corner, temperature, supply and
+* bit rate in one ngspice invocation. `_c0` carries no explicit pad
+* capacitance at all (the "0 pF" point is the cell's own drain parasitics
+* against the 50 ohm termination); `_c1`/`_c2` add DR-0005's 1 pF and its
+* full 2 pF budget.
+* ---------------------------------------------------------------------------
+
+* ---- 0 pF pad ------------------------------------------------------------
+xc0 outp_c0 outn_c0 inp inn ib_c0 0 cml_driver
+ib_c0src 0 ib_c0 dc {iref}
+rp_c0 avcc outp_c0 {rterm}
+rn_c0 avcc outn_c0 {rterm}
+ediff_c0 vd_c0 0 outn_c0 outp_c0 1
+
+* ---- 1 pF pad ------------------------------------------------------------
+xc1 outp_c1 outn_c1 inp inn ib_c1 0 cml_driver
+ib_c1src 0 ib_c1 dc {iref}
+rp_c1 avcc outp_c1 {rterm}
+rn_c1 avcc outn_c1 {rterm}
+cp_c1 outp_c1 0 1p
+cn_c1 outn_c1 0 1p
+ediff_c1 vd_c1 0 outn_c1 outp_c1 1
+
+* ---- 2 pF pad (DR-0005's full budget) ------------------------------------
+xc2 outp_c2 outn_c2 inp inn ib_c2 0 cml_driver
+ib_c2src 0 ib_c2 dc {iref}
+rp_c2 avcc outp_c2 {rterm}
+rn_c2 avcc outn_c2 {rterm}
+cp_c2 outp_c2 0 2p
+cn_c2 outn_c2 0 2p
+ediff_c2 vd_c2 0 outn_c2 outp_c2 1
+
+* ---- leg-to-leg pad mismatch: 2 pF on OUTP, 1 pF on OUTN -----------------
+* Jitter sensitivity probe, not a nominal configuration. With perfectly
+* matched legs a differential pair's finite bandwidth cancels at the
+* differential zero crossing -- the two legs' ISI is antisymmetric -- so a
+* matched-load jitter number says nothing about how much load MISMATCH the
+* pad/ESD structure may have. This copy carries a deliberate 1 pF (i.e. 50 %
+* of DR-0005's whole budget) leg-to-leg imbalance so the sensitivity
+* d(jitter)/d(pad mismatch) is measured rather than assumed, and so the
+* pad-ring work has a matching requirement to design to.
+xcmis outp_cmis outn_cmis inp inn ib_cmis 0 cml_driver
+ib_cmissrc 0 ib_cmis dc {iref}
+rp_cmis avcc outp_cmis {rterm}
+rn_cmis avcc outn_cmis {rterm}
+cp_cmis outp_cmis 0 2p
+cn_cmis outn_cmis 0 1p
+ediff_cmis vd_cmis 0 outn_cmis outp_cmis 1
+
+* ---- termination-rail sensitivity: avcc -10 %, 1 pF pad ------------------
+xvlo outp_vlo outn_vlo inp inn ib_vlo 0 cml_driver
+ib_vlosrc 0 ib_vlo dc {iref}
+rp_vlo avcclo outp_vlo {rterm}
+rn_vlo avcclo outn_vlo {rterm}
+cp_vlo outp_vlo 0 1p
+cn_vlo outn_vlo 0 1p
+
+* ---- termination-rail sensitivity: avcc +10 %, 1 pF pad ------------------
+* Also the worst-case device-stress copy: the highest termination rail is the
+* highest drain voltage the switching devices ever see.
+xvhi outp_vhi outn_vhi inp inn ib_vhi 0 cml_driver
+ib_vhisrc 0 ib_vhi dc {iref}
+rp_vhi avcchi outp_vhi {rterm}
+rn_vhi avcchi outn_vhi {rterm}
+cp_vhi outp_vhi 0 1p
+cn_vhi outn_vhi 0 1p
+
+* ---- static copy: DC swing, steering completeness, supply draw -----------
+* `vsens_z` is a 0 V source used as an ammeter in the cell's ground return,
+* so the whole-cell (= tail) current is a real branch current.
+xz outp_z outn_z inpz innz ib_z vss_z cml_driver
+ib_zsrc 0 ib_z dc {iref}
+vsens_z vss_z 0 dc 0
+rp_z avcc outp_z {rterm}
+rn_z avcc outn_z {rterm}
+
+* ---- static copies for the output-resistance extraction ------------------
+* The conducting leg's drain is forced to two voltages inside the output's
+* own operating range; the single-ended output resistance looking back into
+* that leg is dV/dI between the two. Extracting it from the 50 ohm-loaded
+* copies instead would mean resolving a ~0.05 % change in a 50 ohm parallel
+* combination, which is not a measurement.
+xza outp_za outn_za inpz innz ib_za 0 cml_driver
+ib_zasrc 0 ib_za dc {iref}
+vforce_za outp_za 0 dc {vz_a}
+rn_za avcc outn_za {rterm}
+
+xzb outp_zb outn_zb inpz innz ib_zb 0 cml_driver
+ib_zbsrc 0 ib_zb dc {iref}
+vforce_zb outp_zb 0 dc {vz_b}
+rn_zb avcc outn_zb {rterm}
+
+* ---------------------------------------------------------------
+* DUT netlist included by this testbench (schematic)
+* source     : sim/cml-driver-eye/testbench/cml_driver_dut.spice
+* sha256     : 31f70faa38776fffc7635b6a78770cbc51f93dc29a78674161a1faaf2f4ffacb
+* ---------------------------------------------------------------
+
+* cml_driver_dut.spice -- DUT fragment for sim/cml-driver-eye/
+*
+* Derived from design/netlist/cml_driver.spice (xschem-generated from
+* design/cml_driver.sch) by:
+*   1. stripping the trailing `.end` directive and the machine-local
+*      `sch_path` comment xschem prepends -- the harness's DUT fragment rule
+*      (sim/harness/README.md): a DUT file may not carry
+*      .control/.endc/.end/.lib/.temp. Same recipe as
+*      2AMLogic/gf180-gate-driver's design/netlist/output_stage.spice ->
+*      sim/output-stage-drive/testbench/output_stage_dut.spice.
+*   2. un-commenting the `**.subckt cml_driver ... **.ends` markers xschem
+*      writes as documentation-only comments (it netlists the TOP schematic
+*      flat, on the assumption a top-level sheet is a single-instance
+*      testbench, not a reusable cell). This testbench instantiates the
+*      driver 8 times (three pad-capacitance points, a leg-mismatch probe,
+*      two termination-rail sensitivity points, and three DC/output-
+*      resistance copies -- see cml_driver_eye.spice), so it genuinely needs
+*      a callable `.subckt`, not eight copies of a flat deck. This is the
+*      one deviation from the gate-driver DUT recipe; everything else is
+*      identical.
+* NOT hand-edited beyond that -- regenerate from design/netlist/cml_driver.spice
+* if the schematic changes:
+*   tail -n +2 design/netlist/cml_driver.spice | grep -v '^\.end$' \
+*     | sed -E 's/^\*\*\.(subckt|ends)/.\1/' \
+*     > sim/cml-driver-eye/testbench/cml_driver_dut.spice
+* (then re-add this header).
+*
+.subckt cml_driver OUTP OUTN INP INN IBIAS VSS
+*.ipin INP
+*.ipin INN
+*.opin OUTP
+*.opin OUTN
+*.iopin IBIAS
+*.iopin VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
