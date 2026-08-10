@@ -104,7 +104,11 @@ two legs of a differential pair, into the receiver's 50 Ω per-leg
 termination to a 3.3 V rail — giving a single-ended swing target of ~500 mV
 (400–600 mV working range) and a common-mode target of 2.8–3.3 V (headroom-
 limited by the driver's own output impedance, not simply equal to the
-supply rail). The driver's output devices are gf180mcu's **3.3 V core
+supply rail). **The 2.8–3.3 V common-mode figure is a nominal-supply
+(3.3 V) target** — see DR-0006 for the explicit supply-tracking tolerance
+that qualifies it across this repo's mandated ±10 % supply-corner PVT
+sweep; the swing target is unaffected and remains a flat absolute window
+at every corner. The driver's output devices are gf180mcu's **3.3 V core
 devices** (`nfet_03v3` / `pfet_03v3` in the vendored PDK's SPICE model set,
 confirmed present in `libs.tech/ngspice/sm141064.ngspice`, gf180mcuD /
 open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` as checked out via
@@ -292,3 +296,92 @@ re-analysis, or relax the ESD target with an explicit handling-procedure
 justification) rather than silently proceeding on an invalidated number.
 
 **Status**: Accepted — provisional pending #2.
+
+### DR-0006: DR-0002's common-mode window is a nominal-supply target, with an explicit supply-tracking tolerance
+
+**Context**: DR-0002 states a common-mode target of 2.8–3.3 V with no
+stated supply-tolerance qualifier. Issue #11's driver evidence
+(`design/cml-driver-sizing.md` §7/§8, backed by
+`sim/cml-driver-eye/records/20260810-041436-a2c358b.md`) confirms the
+target is met cleanly at nominal AVCC = 3.3 V — common mode measured
+3.041–3.054 V across the full PVT matrix, comfortably inside 2.8–3.3 V —
+but is structurally crossed at the ±10 % supply corners this repo's own
+PVT matrix (per CLAUDE.md's "PVT corners on every recorded analog result")
+already mandates characterizing: at AVCC = 2.97 V (−10 %), common mode
+reaches as low as **2.711 V** (below the 2.8 V floor); at AVCC = 3.63 V
+(+10 %), it reaches as high as **3.384 V** (above the 3.3 V ceiling) — both
+re-extracted directly from the record's `vcm_avcclo`/`vcm_avcchi` columns
+across all 90 corner rows (`min`/`max` over the whole PVT×rate grid).
+
+This is not a sizing defect the driver design can fix. DR-0002's own
+topology — DC-coupled, open-drain, 50 Ω/leg *to the receiver's own AVCC
+rail* — pins the "off" leg's output essentially to `AVCC` itself at every
+corner: `common_mode ≈ AVCC − (I_tail × R_leg) / 2`, confirmed directly by
+`design/cml-driver-sizing.md` §8's AVCC-sensitivity characterization.
+Whatever `AVCC` is doing, the common-mode output tracks it almost 1:1,
+independent of tail-current or switch-pair sizing — no device-sizing
+choice inside a DR-0002-compliant driver decouples common mode from the
+supply rail it is terminated to.
+
+**Decision**: DR-0002's 2.8–3.3 V common-mode window is ratified as a
+**nominal-supply (AVCC = 3.3 V) figure**, not a flat absolute window that
+must independently hold at every supply corner. The qualified requirement
+is: common mode = 2.8–3.3 V **at nominal AVCC = 3.3 V**, tracking the
+receiver-side termination rail at approximately 1:1 (per the relationship
+above) across this repo's mandated ±10 % supply-corner sweep — an explicit
+supply-tracking derating, not an independently re-litigated absolute
+window. This is a durable characterization of the driver's fixed
+open-drain-to-rail topology (any DR-0002-compliant driver design shows the
+same tracking, not just this specific cell's sizing), so it belongs in the
+decision record rather than only in `design/cml-driver-sizing.md`'s
+per-design evidence.
+
+Reading the target this way, rather than widening the absolute window (the
+alternative considered and rejected below), is chosen because a widened
+absolute window would not actually describe the physics: the common-mode
+output is not "somewhere in a wider range" independent of supply — it is
+`AVCC` minus a small, well-characterized offset, at every corner. Stating
+the target as nominal-plus-tracking is the more precise, and more
+useful-to-a-downstream-receiver-design, characterization; a flat widened
+window would obscure that the corner-to-corner spread is fully explained
+by (and proportional to) supply variation, not an independent source of
+common-mode uncertainty.
+
+**Alternatives considered**: Widening DR-0002's 2.8–3.3 V window to a flat
+absolute range containing the full ±10 % supply-corner swing (e.g.
+~2.5–3.7 V, matching the bound `sim/smoke-cml-pair`'s own widened sanity
+check already used) was considered and rejected. It would technically
+close the compliance gap, but at the cost of a looser, less physically
+meaningful target than a DVI/HDMI-class receiver may actually expect, and
+it would obscure the 1:1 AVCC-tracking relationship that fully explains
+the corner-to-corner spread — a downstream receiver design reading a flat
+2.5–3.7 V window would have no way to tell that the real per-corner
+uncertainty, once AVCC is fixed, is a few millivolts (§7's 3.041–3.054 V
+range at nominal supply), not hundreds of millivolts.
+
+**Consequences**:
+- `design/cml-driver-sizing.md` §7's "Overall: PASS... No `spec/` change
+  was needed" line is corrected to reference this decision record — that
+  line evaluated only the nominal-supply sweep (`vcm_c0`/`vcm_c1`/`vcm_c2`,
+  varying pad capacitance at AVCC = 3.3 V), not §8's AVCC ±10 % supply-
+  corner data, so "no `spec/` change was needed" was inaccurate once the
+  full evidence set is considered. §8's AVCC-sensitivity common-mode rows
+  are now spec-bound-but-derated (governed by this decision record), not
+  "not spec-bound."
+- This does **not** relax the swing target (400–600 mV) or any other
+  DR-0002 clause — swing is set by `I_tail × R_leg`, not directly by
+  `AVCC`, and stays within its own flat absolute window across the same
+  ±10 % sweep (§7/§8's `swing_avcclo`/`swing_avcchi` rows: 0.480–0.519 V,
+  inside 400–600 mV at every corner).
+- Future driver-adjacent designs (a different pad-ring revision, a
+  different receiver-side termination assumption) must re-derive the
+  nominal-AVCC common-mode figure against whatever supply that revision
+  actually uses — 2.8–3.3 V is anchored to AVCC = 3.3 V specifically, not
+  a supply-independent constant.
+- If issue #9's proposed DR-0009 ("Operating conditions and the verifiable
+  spec rows") lands and separately ratifies an operating-conditions
+  decision covering this same question, that record should reference or
+  supersede this one rather than leave two independently-ratified
+  descriptions of the same tracking relationship.
+
+**Status**: Accepted.

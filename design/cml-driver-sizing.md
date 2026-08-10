@@ -358,9 +358,20 @@ and passed independently, per the acceptance criteria's explicit
 requirement.
 
 **Overall: PASS**, all rows, both rates, all three pad-cap points, full PVT
-matrix. **No `spec/` change was needed** — every DR-0002 target is met with
-margin, so no shortfall record or decision-record issue is required by this
-result.
+matrix — but that matrix sweeps process/temperature/pad-capacitance at
+**nominal AVCC = 3.3 V** only; it does not by itself say anything about the
+±10 % supply-corner sweep reported in §8. Once §8's AVCC ±10 % sensitivity
+data is checked against DR-0002's common-mode target, the target as
+originally stated (a flat 2.8–3.3 V window with no supply qualifier) is
+crossed at both supply extremes. **A `spec/` change was needed**: see
+**DR-0006** in `spec/tmds-tx.md` §4, which ratifies the 2.8–3.3 V
+common-mode window as a nominal-AVCC-3.3 V figure with an explicit
+supply-tracking tolerance across the ±10 % sweep. Against DR-0006's
+qualified requirement, every row in this table (nominal-supply,
+`vcm_c0`/`vcm_c1`/`vcm_c2`) and every row in §8's AVCC-sensitivity data
+still PASS — the earlier "no `spec/` change was needed" framing addressed
+only the nominal-supply sweep in this table, not §8's supply-corner data,
+and has been corrected here.
 
 Record: [`sim/cml-driver-eye/records/20260810-041436-a2c358b.md`](../sim/cml-driver-eye/records/20260810-041436-a2c358b.md) (see that file for the
 complete 90-row per-corner table, the append-only evidence trail, and the
@@ -370,11 +381,13 @@ versions). Testbench: `sim/cml-driver-eye/testbench/cml_driver_eye.spice`,
 `design/netlist/cml_driver.spice`, see that file's own header for the
 regeneration recipe): `sim/cml-driver-eye/testbench/cml_driver_dut.spice`.
 
-## 8. Additional characterization (not spec-bound, reported per issue #9)
+## 8. Additional characterization (not spec-bound except where noted, reported per issue #9)
 
 Per this issue's instruction to report rows the ratified spec does not yet
 bound (since issue #9 proposes some of them as DR-0009), so a future
-decision record can cite evidence rather than a textbook:
+decision record can cite evidence rather than a textbook. One row below —
+the `AVCC` common-mode sensitivity — is no longer "not spec-bound": DR-0006
+(`spec/tmds-tx.md` §4) now governs it directly, per issue #19.
 
 - **10–90 % rise/fall**: §5's table (40.5–59.3 ps at 0 pF, up to 205.9–251.6
   ps at 2 pF).
@@ -387,12 +400,22 @@ decision record can cite evidence rather than a textbook:
   matrix — always >= 220x the 50 ohm external termination, confirming the
   cell's own output impedance never meaningfully loads the DR-0002 termination
   or shifts the dominant pole computed in §5.
-- **Termination-rail (`AVCC`) sensitivity**: swing and common-mode at `AVCC`
-  -10 %/+10 % (`swing_avcclo`/`swing_avcchi`, `vcm_avcclo`/`vcm_avcchi`),
-  reported in the record — common mode tracks `AVCC` essentially 1:1
-  (`vcm = AVCC - I_tail x R_leg / 2`, as DR-0002's own topology note
-  predicts), swing stays within the 400–600 mV window across the same
-  +/-10 % sweep.
+- **Termination-rail (`AVCC`) sensitivity — spec-bound, per DR-0006**
+  (previously reported here as "not spec-bound"; corrected per issue #19):
+  swing and common-mode at `AVCC` -10 %/+10 % (`swing_avcclo`/
+  `swing_avcchi`, `vcm_avcclo`/`vcm_avcchi`), reported in the record.
+  Common mode tracks `AVCC` essentially 1:1 (`vcm = AVCC - I_tail x R_leg /
+  2`, as DR-0002's own topology note predicts) — measured **2.711–2.725 V**
+  at `AVCC` = 2.97 V and **3.370–3.384 V** at `AVCC` = 3.63 V across the
+  full PVT matrix (re-extracted `min`/`max` of `vcm_avcclo`/`vcm_avcchi`).
+  Per DR-0006, DR-0002's 2.8–3.3 V common-mode window is a
+  nominal-`AVCC`=3.3 V figure with this measured tracking as the explicit
+  supply-tolerance qualifier — **PASS** against DR-0006's qualified
+  requirement (this data crosses DR-0002's original flat-window reading,
+  which is exactly why DR-0006 was needed; see §7). Swing stays within the
+  400–600 mV window across the same +/-10 % sweep, unaffected — swing
+  tracks `I_tail x R_leg`, not `AVCC`, per DR-0002's unchanged swing
+  clause.
 
 ## 9. Non-goals (explicit, per this issue's scope)
 
