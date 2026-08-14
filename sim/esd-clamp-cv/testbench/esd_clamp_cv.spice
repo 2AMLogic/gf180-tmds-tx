@@ -1,0 +1,82 @@
+* GGNMOS ESD-clamp small-signal capacitance at the PAD node (issue #12).
+*
+* Twelve independent branches: six device sizes x two DC bias states. Each
+* branch is its own AC voltage source driving its own instance of the
+* clamp device straight to VSS (gate=source=body=0), so all twelve are
+* electrically independent within one ngspice invocation -- no crosstalk,
+* one PVT grid point measures the whole curve.
+*
+* Device family / model-card mapping (see design/esd-capacitance-budget.md
+* "Establishing the simulatable device"): the real pad cell's extracted
+* netlist (layout/gds/gf180_tmds_pad_min.spice) calls klt's internal LVS
+* device-class label "nfet" -- not an ngspice-citable model card. This
+* testbench maps that to the PDK's `nfet_03v3` subckt
+* (libs.tech/ngspice/sm141064.ngspice), the 3.3 V core NMOS model, because
+* the cell as drawn (layout/scripts/gen_pad_min.py) carries no Dualgate
+* layer -- i.e. it is built from 3.3V-core-device layers wired as a GGNMOS,
+* not a real 5V/6V ESD-implant device. `design/netlist/cml_driver.spice`
+* (issue #11) already uses this same model card at a comparable L, so this
+* is a reused, not a new, mapping decision.
+*
+* -- "base": the device exactly as drawn today (L=0.4u W=2u, single
+*    finger) -- AS/AD/PS/PD taken verbatim from
+*    layout/lvs/gf180_tmds_pad_min.ref.spice (AS=2P AD=2P PS=6U PD=6U).
+* -- "w2".."w444": the same topology re-sized at the PDK's own ESD.pl
+*    gate-length floor (L=0.8u, spec/pad-ring-esd-survey.md Sec.2) and a
+*    range of total widths spanning the HBM sizing estimate in the design
+*    doc (222-444 um). AS/AD/PS/PD scale linearly with total width from
+*    the same per-um source/drain diffusion depth (1 um) the drawn cell
+*    uses -- i.e. AS=AD=W*1u, PS=PD=2*(W+1u) -- treating the total width as
+*    one equivalent non-fingered diffusion strip rather than modelling a
+*    specific real finger layout (see the design doc for why this is
+*    neither a clear upper nor lower bound against a real interdigitated
+*    layout, and is not itself a layout deliverable).
+* -- `nf` (finger count) is chosen only to keep each finger's *modelled*
+*    width at 2 um, inside the single BSIM4 bin (nfet_03v3.9, L
+*    [0.5,1.2)u x W [1.2,10)u) every device in this sweep falls into --
+*    avoids a bin-boundary artifact in the curve and avoids exceeding the
+*    model's own characterized width range (`wmax`=100u at any bin,
+*    sm141064.ngspice), not a proposed real finger count.
+*
+* Bias: DC=0 is the "easy to quote" reference; DC='vdd_val' reuses the
+* harness's own supply-tolerance axis (2.97/3.30/3.63 V) as the TMDS
+* operating-bias proxy (DR-0002/DR-0006's 2.8-3.3 V common-mode window),
+* so one PVT grid run captures both bias points at every corner -- see
+* sim/README.md and the design doc for why this is a legitimate reuse of
+* the existing axis rather than a second sweep.
+
+* -- as-drawn (L=0.4u, W=2u) --
+Vpad_base_0v pad_base_0v 0 DC=0 AC=1
+Xclamp_base_0v pad_base_0v 0 0 0 nfet_03v3 w=2u l=0.4u nf=1 as=2p ad=2p ps=6u pd=6u
+Vpad_base_opv pad_base_opv 0 DC='vdd_val' AC=1
+Xclamp_base_opv pad_base_opv 0 0 0 nfet_03v3 w=2u l=0.4u nf=1 as=2p ad=2p ps=6u pd=6u
+
+* -- ESD.pl-floor gate length (L=0.8u), W=2u --
+Vpad_w2_0v pad_w2_0v 0 DC=0 AC=1
+Xclamp_w2_0v pad_w2_0v 0 0 0 nfet_03v3 w=2u l=0.8u nf=1 as=2p ad=2p ps=6u pd=6u
+Vpad_w2_opv pad_w2_opv 0 DC='vdd_val' AC=1
+Xclamp_w2_opv pad_w2_opv 0 0 0 nfet_03v3 w=2u l=0.8u nf=1 as=2p ad=2p ps=6u pd=6u
+
+* -- L=0.8u, W=20u (nf=10, 2u/finger) --
+Vpad_w20_0v pad_w20_0v 0 DC=0 AC=1
+Xclamp_w20_0v pad_w20_0v 0 0 0 nfet_03v3 w=20u l=0.8u nf=10 as=20p ad=20p ps=42u pd=42u
+Vpad_w20_opv pad_w20_opv 0 DC='vdd_val' AC=1
+Xclamp_w20_opv pad_w20_opv 0 0 0 nfet_03v3 w=20u l=0.8u nf=10 as=20p ad=20p ps=42u pd=42u
+
+* -- L=0.8u, W=100u (nf=50, 2u/finger) --
+Vpad_w100_0v pad_w100_0v 0 DC=0 AC=1
+Xclamp_w100_0v pad_w100_0v 0 0 0 nfet_03v3 w=100u l=0.8u nf=50 as=100p ad=100p ps=202u pd=202u
+Vpad_w100_opv pad_w100_opv 0 DC='vdd_val' AC=1
+Xclamp_w100_opv pad_w100_opv 0 0 0 nfet_03v3 w=100u l=0.8u nf=50 as=100p ad=100p ps=202u pd=202u
+
+* -- L=0.8u, W=222u (nf=111, 2u/finger) -- 6 mA/um HBM-density estimate --
+Vpad_w222_0v pad_w222_0v 0 DC=0 AC=1
+Xclamp_w222_0v pad_w222_0v 0 0 0 nfet_03v3 w=222u l=0.8u nf=111 as=222p ad=222p ps=446u pd=446u
+Vpad_w222_opv pad_w222_opv 0 DC='vdd_val' AC=1
+Xclamp_w222_opv pad_w222_opv 0 0 0 nfet_03v3 w=222u l=0.8u nf=111 as=222p ad=222p ps=446u pd=446u
+
+* -- L=0.8u, W=444u (nf=222, 2u/finger) -- 3 mA/um HBM-density estimate --
+Vpad_w444_0v pad_w444_0v 0 DC=0 AC=1
+Xclamp_w444_0v pad_w444_0v 0 0 0 nfet_03v3 w=444u l=0.8u nf=222 as=444p ad=444p ps=890u pd=890u
+Vpad_w444_opv pad_w444_opv 0 DC='vdd_val' AC=1
+Xclamp_w444_opv pad_w444_opv 0 0 0 nfet_03v3 w=444u l=0.8u nf=222 as=444p ad=444p ps=890u pd=890u

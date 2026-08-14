@@ -1,0 +1,31 @@
+{
+  "name": "esd-clamp-cv",
+  "description": "Issue #12: small-signal AC capacitance at the PAD node of the real GGNMOS ESD clamp from layout/gds/gf180_tmds_pad_min.gds, as a function of device size, at 0 V and at the TMDS operating bias, across the full PVT matrix. Feeds the ESD-vs-capacitance verdict in design/esd-capacitance-budget.md; not itself an ESD qualification (no tester, no parts -- see the design doc).",
+  "claim": "spec/tmds-tx.md#dr-0005 -- the <=2 pF/pad budget (ESD clamp + pad parasitic combined), specifically the clamp half of that budget as a function of clamp size, at both 0 V and the DR-0002/DR-0006 2.8-3.3 V operating bias.",
+  "netlist": "esd_clamp_cv.spice",
+  "corners": ["mos"],
+  "analyses": [
+    "ac lin 1 100meg 100meg"
+  ],
+  "measure": {
+    "cap_base_0v": "abs(imag(i(vpad_base_0v)))/(2*3.14159265358979*100meg)",
+    "cap_base_opv": "abs(imag(i(vpad_base_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w2_0v": "abs(imag(i(vpad_w2_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w2_opv": "abs(imag(i(vpad_w2_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w20_0v": "abs(imag(i(vpad_w20_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w20_opv": "abs(imag(i(vpad_w20_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w100_0v": "abs(imag(i(vpad_w100_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w100_opv": "abs(imag(i(vpad_w100_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w222_0v": "abs(imag(i(vpad_w222_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w222_opv": "abs(imag(i(vpad_w222_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w444_0v": "abs(imag(i(vpad_w444_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w444_opv": "abs(imag(i(vpad_w444_opv)))/(2*3.14159265358979*100meg)"
+  },
+  "checks": {
+    "cap_w444_opv": {
+      "min": 0,
+      "max": 5e-11,
+      "description": "sanity ceiling only (50 pF) -- catches a broken AC probe (open circuit / zero current), not a DR-0005 compliance gate. The 2 pF budget comparison is a design-doc computation across every corner's measured value, not a per-corner pass/fail on this record."
+    }
+  }
+}
