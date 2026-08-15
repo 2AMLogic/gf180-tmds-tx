@@ -31,11 +31,13 @@ per-finger extraction back into the one device each schematic line states):
   MT    (tail, m=20)      nf=10, m=20  W=400u  L=0.5u   -> fingers=200, l_um=0.5
   MB    (bias ref, m=1)   nf=10, m=1   W=20u   L=0.5u   -> fingers=10,  l_um=0.5
 
-`gate_contact=true` + `finger_topology="parallel"` (mos_array params) draw a
-real strapped multi-finger device (source rail / drain rail / gate comb,
+`gate_contact=true` on a single-unit (`rows=1, cols=1`) `mos_array` call draws
+a real strapped multi-finger device (source rail / drain rail / gate comb,
 all contacted) rather than the bare, uncontactable series stripes the
-generator's pre-#777 default drew -- see `klt gen --list`'s own
-`finger_topology` description.
+generator's pre-#497 default drew. `mos_array`'s `topology` param
+('array'/'common_centroid') only matters for multi-position grids and is
+irrelevant here; there is no separate finger-topology toggle -- see `klt gen
+--list`'s own `gate_contact` description.
 
 Floorplan hazard found during bring-up (worth recording since it is a
 klayout-tools friction item, not a design defect -- filed generically per

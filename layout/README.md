@@ -52,9 +52,10 @@ The differential switch pair (M1/M2) + tail current source (MT) + 1:20
 bias-mirror reference device (MB) from the sized schematic
 (`design/cml_driver.sch` / `design/netlist/cml_driver.spice`, issue #11),
 laid out via `klt gen`'s `mos_array` generator (one folded multi-finger NMOS
-per schematic device — `gate_contact` + `finger_topology="parallel"` for a
-real strapped source-rail/drain-rail/gate-comb device, not the bare
-uncontactable stripes the generator's pre-strapping default draws) composed
+per schematic device — `gate_contact=True` on a single-unit (`rows=1,
+cols=1`) call for a real strapped source-rail/drain-rail/gate-comb device,
+not the bare uncontactable stripes the generator's pre-strapping default
+draws) composed
 into one circuit with `klt gen-compose`. Unlike `gf180_tmds_pad_min` (which
 predates `klt gen`'s generator family and draws every shape by hand), this
 is the first cell in this repo built through that generator machinery — see
@@ -71,11 +72,10 @@ internal rails together — worked around here with an explicit
 **Scope**: core driver cell only — ESD/pad-ring integration is explicitly
 out of scope for this cell (downstream work, per the issue).
 
-**Toolchain note**: `mos_array`'s `gate_contact`/`finger_topology` params
-this generator relies on landed in klayout-tools after the `v0.2.0` PyPI tag
-(e.g. `gate_contact`: klayout-tools#497) — a `klt` built only from the
-released `v0.2.0` package (`klt gen mos_array --list` shows no
-`gate_contact`/`finger_topology` params) cannot regenerate this cell.
+**Toolchain note**: `mos_array`'s `gate_contact` param this generator relies
+on landed in klayout-tools after the `v0.2.0` PyPI tag (klayout-tools#497) —
+a `klt` built only from the released `v0.2.0` package (`klt gen mos_array
+--list` shows no `gate_contact` param) cannot regenerate this cell.
 Reproducing the commands below needs a `klt` built from a post-`v0.2.0`
 klayout-tools checkout (`uv tool install --from <checkout path>
 klayout-tools --force` against a `klayout-tools` clone at or after that
