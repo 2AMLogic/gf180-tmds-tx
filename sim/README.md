@@ -305,6 +305,46 @@ rise-fall measurements plus the transient solver settings actually used.
 See `sim/smoke-cml-pair/records/` for the current record and
 `sim/smoke-cml-pair/testbench/tb.json` for the manifest that produces it.
 
+## Post-layout re-runs: same testbench, `--dut` swapped
+
+A post-layout record is only comparable to its schematic-level predecessor
+if *nothing else changed*. So a post-layout re-run does not get its own
+experiment directory, its own testbench, or its own measurement set — it
+re-runs the existing experiment with the DUT netlist swapped:
+
+```bash
+python3 sim/run_corners.py cml-driver-eye \
+    --dut layout/sim/cml_driver_core_dut.spice \
+    --supersedes <schematic-record-id>
+```
+
+The harness classifies provenance from the DUT's own path — anything under
+`layout/` records itself as `extracted`, with no flag to forget — and folds
+the DUT into the record's `netlist-snapshots/` copy, so the record freezes
+the exact circuit it measured. Two obligations follow, and both are on the
+record's author, not the harness:
+
+- **State the extraction's coverage explicitly.** `extracted` is not one
+  thing. A device-level, LVS-clean extraction and a full parasitic-RC
+  extraction are different claims, and a reader cannot tell them apart from
+  the provenance label. The record's **Claim** field must say which — and
+  name what is *not* modelled (parasitic R/C, `NRD`/`NRS`, substrate
+  resistance, anything outside the extracted cell).
+- **Report the delta, and explain it.** That is what **Supersedes** is for
+  here (it points at the schematic record; it does not assert the schematic
+  record was wrong). `sim/compare_records.py <experiment> <baseline-id>
+  <candidate-id>` computes the worst absolute and relative per-corner delta
+  for every shared measurement, plus any verdict change, so the comparison
+  is machine-computed rather than transcribed by eye. The explanation of
+  those deltas is human-authored prose and belongs in
+  `measurements/characterization.md`.
+
+The worked example is `sim/cml-driver-eye`'s record
+`20260815-072956-34e5253` (issue #34) against its schematic-level
+predecessor `20260810-041436-a2c358b`, analysed in
+`measurements/characterization.md` § "DR-0002, post-layout (extracted)
+corroboration".
+
 ## Cold-start reproducibility audit (2026-08-14, issue #25)
 
 Presence of a testbench is not freshness of its claim, so this audit actually
