@@ -91,6 +91,8 @@ drc_reports/                            klt drc (+ klt extract) reports (text + 
 lvs_reports/                            klt lvs reports (text + json), both cells
 lvs/cml_driver_core.ref.spice           hand-written reference netlist for LVS
 lvs/cml_driver_core.lvs_request*.json   klt lvs request documents
+scripts/gen_cml_driver_core_dut.py      extracted netlist -> simulatable DUT fragment (issue #34)
+sim/cml_driver_core_dut.spice           the DUT fragment sim/cml-driver-eye's post-layout records use
 ```
 
 Regenerate and re-run signoff:
@@ -120,3 +122,58 @@ wired directly to VSS instead of left independent) correctly reports
 `status: mismatch` (a `net.merged` finding) against the same reference,
 confirming the LVS check actually distinguishes connected from
 disconnected.
+
+### Post-layout simulation of this cell (issue #34)
+
+`gds/cml_driver_core.spice` is an **LVS signoff artifact, not a simulatable
+deck**: every device is an `M`-card naming klt's own extraction-deck class
+label `nfet`, which is not a model any PDK ships (gf180mcu ships its
+primitive MOS as a `.subckt nfet_03v3`), and the extracted cell boundary
+carries an extra deck-synthesized body pin (`vsubs`) plus the promoted
+internal node `TAIL`.
+
+`scripts/gen_cml_driver_core_dut.py` mechanically derives a simulatable DUT
+fragment from it — model binding, the `vsubs`→`VSS` body tie, and a wrapper
+presenting the schematic cell boundary — so that `sim/cml-driver-eye`'s
+testbench runs unchanged against either netlist:
+
+```bash
+python3 layout/scripts/gen_cml_driver_core_dut.py   # writes layout/sim/cml_driver_core_dut.spice
+python3 layout/scripts/gen_cml_driver_core_dut.py --check   # CI: committed output is not stale
+python3 sim/run_corners.py cml-driver-eye --dut layout/sim/cml_driver_core_dut.spice
+```
+
+Nothing in that fragment is hand-written: `sim/tests/test_extracted_dut.py`
+re-derives it, and independently asserts the translated netlist against
+`lvs/cml_driver_core.ref.spice` (folded per-finger widths, 1:20 mirror
+ratio, matched differential pair, body net, wrapper pin order) — the class
+of mistake that would otherwise converge in ngspice and produce
+plausible-looking numbers.
+
+**What that netlist does not model**: it is a *schematic-equivalent*
+extraction — devices and connectivity, no interconnect parasitics
+(`klt extract --parasitics` was not used for the committed netlist) and no
+NRD/NRS diffusion sheet counts. The evidence record taken against it states
+this explicitly; see `measurements/characterization.md`.
+
+**Tool gap (friction protocol)**: `klt extract --pdk <variant>` performs the
+same model binding itself, but the `klt` **0.2.0** this repo has installed
+**drops the per-device `AS`/`AD`/`PS`/`PD`** that the deck-class `M`-card
+form carries — verified on this cell, 2026-08-15:
+
+```
+# klt extract --deck gf180mcu                (committed as gds/cml_driver_core.spice)
+M$1 TAIL IBIAS VSS vsubs nfet      L=0.5U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+# klt extract --deck gf180mcu --pdk gf180mcuD
+X$1 TAIL IBIAS VSS vsubs nfet_03v3 L=0.5U W=2U
+```
+
+`nfet_03v3` declares `as=0 ad=0 ps=0 pd=0` defaults, so a `--pdk` netlist
+simulates with **no junction capacitance at all** — silently, since it
+converges. This is already filed and fixed upstream
+([klayout-tools#695](https://github.com/2AMLogic/klayout-tools/issues/695),
+closed 2026-08-11), after the `v0.2.0` PyPI tag; no new filing was made.
+Until this repo's `klt` moves past that tag, the generator here rewrites the
+`AS`/`AD`/`PS`/`PD`-bearing form itself rather than using `--pdk`, and
+`sim/tests/test_extracted_dut.py` asserts every simulated device carries
+non-zero junction area and perimeter so the gap cannot silently reappear.
