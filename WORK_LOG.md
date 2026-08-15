@@ -7,6 +7,10 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #75** (closed): Dedupe RECORD_ID_RE regex: sim/harness/evidence_lint.py vs sim/compare_records.py
+- **PR #79**: refactor(sim): import RECORD_ID_RE from evidence_lint in compare_records
+- **Issue #73** (closed): Remove dead code: unused Pdk.klayout_dir property in sim/harness/pdk.py
+- **PR #76**: refactor(sim): remove dead Pdk.klayout_dir property
 - **Issue #69** (closed): Remove dead code: unused device_log_header and corner_id_rate_mbps helpers
 - **PR #71**: refactor(sim): drop unused device_log_header and corner_id_rate_mbps
 - **Issue #65** (closed): T1/bronze checklist re-read against current evidence (2026-08-15)

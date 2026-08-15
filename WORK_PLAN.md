@@ -29,7 +29,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#73**: Remove dead code: unused Pdk.klayout_dir property in sim/harness/pdk.py
+_None._
 
 ## PRs Awaiting Review
 
@@ -64,7 +64,7 @@ _None._
 | Operator merge-risk holds | 0 |
 | Urgent | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 0 |
