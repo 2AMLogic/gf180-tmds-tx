@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #48** (closed): Remove dead device_corner_id() and unused PvtPoint.index in sim/harness/corners.py
+- **PR #51**: refactor(sim): remove dead device_corner_id() and unused PvtPoint.index
 - **Issue #45** (closed): Dedupe _fmt() scalar formatter in sim/harness/cli.py and report.py
 - **PR #44**: refactor(harness): dedupe _fmt() in cli.py by reusing report._fmt
 - **Issue #43** (closed): Dedupe _fmt() across sim/harness/cli.py and sim/harness/report.py
