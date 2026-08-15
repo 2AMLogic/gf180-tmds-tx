@@ -1,0 +1,44 @@
+* Reference (schematic-equivalent) netlist for cml_driver_core (issue #22),
+* checked against design/netlist/cml_driver.spice (issue #11's sized
+* schematic). Plain-element form per klt lvs's schematic-equivalent contract
+* (docs/cli/lvs.md "Netlist form"): an M-card naming the klt-curated device
+* class "nfet" directly, not the nfet_03v3 PDK subcircuit call the sized
+* netlist uses.
+*
+* Two deliberate translations from design/netlist/cml_driver.spice, both
+* required by klt's own documented contract/deck limitations, not design
+* changes:
+*
+*  1. Folded W/L, no nf/m. docs/cli/lvs.md's reference.form=subckt-call
+*     conversion path explicitly REJECTS nf/m > 1 ("flatten it -- one device
+*     per drawn gate -- in the schematic netlist first"). Each line below
+*     instead states the device's TOTAL folded width directly (nf*w_per_finger,
+*     m folded into nf for MT) -- exactly what klt extract's per-finger
+*     devices reduce to once `klt lvs --options combine_devices=true` folds
+*     them (docs/cli/gen.md's mos_array section: "fingers transistors ...
+*     which klt lvs's options.combine_devices folds into that single
+*     device"). See design/cml-driver-sizing.md section 1.3 for nf/m and the
+*     2 um/finger unit cell this folds against:
+*       M1/M2  nf=64        W=128u L=0.28u  (unchanged, m=1)
+*       MT     nf=10 m=20 -> 200 fingers -> W=400u L=0.5u
+*       MB     nf=10 m=1  -> 10 fingers  -> W=20u  L=0.5u
+*
+*  2. Bulk = vsubs, not VSS. gf180mcu has no distinct substrate/tap layer
+*     (docs/cli/extract.md "Coverage"); klt's gf180mcu extraction deck ties
+*     every NMOS body to one deck-synthesized global net ("vsubs") via
+*     connect_global, regardless of drawn geometry -- the same tool
+*     limitation gf180_tmds_pad_min.ref.spice (issue #2) already documents
+*     and works around the same way. The sized schematic's own B=VSS
+*     (bulk tied to the real ground net -- "no isolated well is used or
+*     needed for an NMOS-only cell", design/cml-driver-sizing.md section 0)
+*     is the physically-intended tie; VSS is *separately* wired here as a
+*     real routed net (MT's and MB's source terminals) matching the layout,
+*     and the body-vs-VSS gap between "vsubs" and "VSS" surfaces as klt
+*     lvs's own documented device.body_unverified warning (severity:
+*     warning, never changes status) rather than a real defect.
+.SUBCKT cml_driver_core OUTP OUTN INP INN IBIAS VSS vsubs
+M1 OUTP INP TAIL vsubs nfet L=0.28U W=128U
+M2 OUTN INN TAIL vsubs nfet L=0.28U W=128U
+MT TAIL IBIAS VSS vsubs nfet L=0.5U W=400U
+MB IBIAS IBIAS VSS vsubs nfet L=0.5U W=20U
+.ENDS cml_driver_core

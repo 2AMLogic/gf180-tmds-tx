@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "../gds/cml_driver_core_shorted.gds",
+  "reference": "cml_driver_core.ref.spice",
+  "top": "cml_driver_core_shorted",
+  "parameter_tolerance": null,
+  "status": "mismatch",
+  "mismatch_count": 5,
+  "category_counts": {
+    "device.body_unverified": 1,
+    "device.unmatched": 1,
+    "net.merged": 1,
+    "topology": 2
+  },
+  "counts": {
+    "nets": {
+      "layout": 7,
+      "reference": 8,
+      "matched": 4
+    },
+    "devices": {
+      "layout": 4,
+      "reference": 4,
+      "matched": 3
+    },
+    "pins": {
+      "layout": 7,
+      "reference": 7,
+      "matched": 8
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "070f60f31776bc915e5e25779c391056c7c29efd62d37cc3f8b2302e84ebdbc2",
+    "reference_sha256": "45abd1d26d4a28b9872a44ac5d491aaf6b5f28c81fc2beddb3436b9b867989a4",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:457480f180361a41effd843a89ff899ef33adac2859675d52f7b38ac819a9b9d"
+    },
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "device.body_unverified",
+      "severity": "warning",
+      "description": "4 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, \"Coverage\")",
+      "side": "layout",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "$201",
+        "reference": "1",
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "net.merged",
+      "severity": "error",
+      "description": "multiple reference nets were collapsed into one layout net",
+      "side": "reference",
+      "net": {
+        "layout": null,
+        "reference": "OUTP"
+      },
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
+    {
+      "layout": "INN",
+      "reference": "INN",
+      "pin": true
+    },
+    {
+      "layout": "INP",
+      "reference": "INP",
+      "pin": true
+    },
+    {
+      "layout": "OUTN",
+      "reference": "OUTN",
+      "pin": true
+    }
+  ]
+}
