@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #69** (closed): Remove dead code: unused device_log_header and corner_id_rate_mbps helpers
+- **PR #71**: refactor(sim): drop unused device_log_header and corner_id_rate_mbps
 - **Issue #65** (closed): T1/bronze checklist re-read against current evidence (2026-08-15)
 - **Issue #62** (closed): Consolidate duplicated _fmt() scalar formatter: sim/compare_records.py vs sim/harness/report.py
 - **PR #63**: refactor(sim): consolidate compare_records._fmt into harness.report._fmt
