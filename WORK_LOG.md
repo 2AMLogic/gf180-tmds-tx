@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #34** (closed): [Epic #17] Post-layout simulation: re-run the spec suite against the layout-extracted CML driver netlist
+- **PR #52**: feat(sim): sweep the CML driver's PVT matrix on the extracted netlist
 - **Issue #48** (closed): Remove dead device_corner_id() and unused PvtPoint.index in sim/harness/corners.py
 - **PR #51**: refactor(sim): remove dead device_corner_id() and unused PvtPoint.index
 - **Issue #45** (closed): Dedupe _fmt() scalar formatter in sim/harness/cli.py and report.py
