@@ -380,10 +380,17 @@ def build_record(
 
 
 def _fmt(value) -> str:
-    """Human-readable scalar for the Markdown record."""
+    """Human-readable scalar for the Markdown record.
+
+    Both ``None`` (this module's own "missing" sentinel) and NaN (the
+    sentinel ``sim/compare_records.py`` uses for unparseable/missing table
+    cells) render as ``"n/a"``.
+    """
     if value is None:
         return "n/a"
     if isinstance(value, float):
+        if value != value:  # NaN
+            return "n/a"
         if value != 0 and (abs(value) < 1e-3 or abs(value) >= 1e5):
             return f"{value:.6e}"
         return f"{value:.6g}"
