@@ -7,6 +7,7 @@ selected.
 
 ### 2026-08-15
 
+- **PR #41**: refactor: dedupe parse_measurements in sim/cml-driver-mismatch/run_mc.py
 - **PR #37**: docs(guide): route docs-guide worktree recovery through docs-worktree.sh
 - **PR #31**: feat(layout): lay out the CML driver core cell and sign off DRC/LVS (issue #22)
 - **PR #33**: docs(measurements): note esd-clamp-cv's dirty-tree caveat in characterization.md
@@ -14,6 +15,7 @@ selected.
 - **PR #29**: docs(measurements): add block characterization report aggregating sim evidence
 - **PR #28**: docs(sim): record cold-start reproducibility audit for existing experiments
 - **PR #27**: docs: refresh README status line and maturity ladder to reflect landed design/pad-ring evidence
+- **Issue #39** (closed): Remove duplicated parse_measurements/_MEAS_RE in sim/cml-driver-mismatch/run_mc.py
 - **Issue #35** (closed): Guard trigger review: force-op:detached blocks Guide role's ad hoc docs-guide worktree reset
 - **Issue #22** (closed): [Epic #17] Lay out the CML driver core cell and sign off DRC/LVS against the sized schematic
 - **Issue #30** (closed): characterization.md: note esd-clamp-cv's dirty-tree caveat like smoke-cml-pair's
