@@ -1,0 +1,21 @@
+layout: ../gds/cml_driver_core_shorted.gds
+reference: cml_driver_core.ref.spice
+top: cml_driver_core_shorted
+engine: klayout
+status: mismatch
+mismatches: 5
+  nets: layout=7  reference=8  matched=4
+  devices: layout=4  reference=4  matched=3
+  pins: layout=7  reference=7  matched=8
+
+category_counts:
+  device.body_unverified: 1
+  device.unmatched: 1
+  net.merged: 1
+  topology: 2
+
+[warning] device.body_unverified  (layout)  4 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, "Coverage")
+[error] device.unmatched  (reference)  device has no counterpart on the other side
+[error] net.merged  (reference)  multiple reference nets were collapsed into one layout net
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch

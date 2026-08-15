@@ -1,0 +1,6184 @@
+{
+  "schema_version": 2,
+  "file": "gds/cml_driver_core_shorted.gds",
+  "deck": "gf180mcu",
+  "top": "cml_driver_core_shorted",
+  "dbu_um": 0.001,
+  "netlist_path": "gds/cml_driver_core_shorted.spice",
+  "netlist_sha256": "92e726240dc94040e4e39395e02128bd1e1de9f5df4b6be28e9feba9cdff104b",
+  "status": "extracted",
+  "device_count": 338,
+  "net_count": 7,
+  "pin_count": 7,
+  "device_counts": {
+    "nfet": 338
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [],
+  "device_recognition_only_layers": [],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$10",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$100",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.84,
+        "ps_um": 2.42,
+        "pd_um": 4.84
+      }
+    },
+    {
+      "name": "$101",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.42,
+        "ps_um": 4.84,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$102",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$103",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$104",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$105",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$106",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$107",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$108",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$109",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$11",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$110",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$111",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$112",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$113",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$114",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$115",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$116",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$117",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$118",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$119",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$12",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$120",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$121",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$122",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$123",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$124",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$125",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$126",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$127",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$128",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$129",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$13",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$130",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$131",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$132",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$133",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$134",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$135",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$136",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$137",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$138",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$139",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$14",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$140",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$141",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$142",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$143",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$144",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$145",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$146",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$147",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$148",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$149",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$15",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$150",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$151",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$152",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$153",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$154",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$155",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$156",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$157",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$158",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$159",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$16",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$160",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$161",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$162",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$163",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$164",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$165",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$166",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$167",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$168",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$169",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$17",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$170",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$171",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$172",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$173",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$174",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$175",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$176",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$177",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$178",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$179",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$18",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$180",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$181",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$182",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$183",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$184",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$185",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$186",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$187",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$188",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$189",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$19",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$190",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$191",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$192",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$193",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$194",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$195",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$196",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$197",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$198",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$199",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$2",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$20",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$200",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$201",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.42,
+        "ps_um": 4.84,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$202",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$203",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$204",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$205",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$206",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$207",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$208",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$209",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$21",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$210",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$211",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$212",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$213",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$214",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$215",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$216",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$217",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$218",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$219",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$22",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$220",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$221",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$222",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$223",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$224",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$225",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$226",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$227",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$228",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$229",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$23",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$230",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$231",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$232",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$233",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$234",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$235",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$236",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$237",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$238",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$239",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$24",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$240",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$241",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$242",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$243",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$244",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$245",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$246",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$247",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$248",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$249",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$25",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$250",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$251",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$252",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$253",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$254",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$255",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$256",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$257",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$258",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$259",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$26",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$260",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$261",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$262",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$263",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INP",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$264",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "INP",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.84,
+        "ps_um": 2.42,
+        "pd_um": 4.84
+      }
+    },
+    {
+      "name": "$265",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "IBIAS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.42,
+        "ps_um": 4.84,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$266",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$267",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "IBIAS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$268",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$269",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "IBIAS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$27",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$270",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$271",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "IBIAS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$272",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$273",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "IBIAS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$274",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.84,
+        "ps_um": 2.42,
+        "pd_um": 4.84
+      }
+    },
+    {
+      "name": "$275",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.42,
+        "ps_um": 4.84,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$276",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$277",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$278",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$279",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$28",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$280",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$281",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$282",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$283",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$284",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$285",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$286",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$287",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$288",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$289",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$29",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$290",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$291",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$292",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$293",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$294",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$295",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$296",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$297",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$298",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$299",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$3",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$30",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$300",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$301",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$302",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$303",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$304",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$305",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$306",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$307",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$308",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$309",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$31",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$310",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$311",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$312",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$313",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$314",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$315",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$316",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$317",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$318",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$319",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$32",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$320",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$321",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$322",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$323",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$324",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$325",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$326",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$327",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$328",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$329",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$33",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$330",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$331",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$332",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$333",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$334",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$335",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$336",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$337",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "INN",
+        "d": "OUTN",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$338",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTN",
+        "g": "INN",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.28,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.84,
+        "ps_um": 2.42,
+        "pd_um": 4.84
+      }
+    },
+    {
+      "name": "$34",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$35",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$36",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$37",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$38",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$39",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$4",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$40",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$41",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$42",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$43",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$44",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$45",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$46",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$47",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$48",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$49",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$5",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$50",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$51",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$52",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$53",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$54",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$55",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$56",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$57",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$58",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$59",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$6",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$60",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$61",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$62",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$63",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$64",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$65",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$66",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$67",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$68",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$69",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$7",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$70",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$71",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$72",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$73",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$74",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$75",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$76",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$77",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$78",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$79",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$8",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$80",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$81",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$82",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$83",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$84",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$85",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$86",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$87",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$88",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$89",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$9",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$90",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$91",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$92",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$93",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$94",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$95",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$96",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$97",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$98",
+      "class": "nfet",
+      "nets": {
+        "s": "TAIL",
+        "g": "IBIAS",
+        "d": "OUTP|VSS",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$99",
+      "class": "nfet",
+      "nets": {
+        "s": "OUTP|VSS",
+        "g": "IBIAS",
+        "d": "TAIL",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.42,
+        "pd_um": 2.42
+      }
+    }
+  ],
+  "nets": [
+    {
+      "name": "IBIAS",
+      "pin": true,
+      "device_count": 220
+    },
+    {
+      "name": "INN",
+      "pin": true,
+      "device_count": 64
+    },
+    {
+      "name": "INP",
+      "pin": true,
+      "device_count": 64
+    },
+    {
+      "name": "OUTN",
+      "pin": true,
+      "device_count": 64
+    },
+    {
+      "name": "OUTP|VSS",
+      "pin": true,
+      "device_count": 274
+    },
+    {
+      "name": "TAIL",
+      "pin": true,
+      "device_count": 328
+    },
+    {
+      "name": "vsubs",
+      "pin": true,
+      "device_count": 338
+    }
+  ],
+  "warnings": [
+    "net 'OUTP|VSS' merges 2 distinct labels (OUTP, VSS) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section."
+  ],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [
+    {
+      "net": "OUTP|VSS",
+      "labels": [
+        "OUTP",
+        "VSS"
+      ]
+    }
+  ],
+  "voltage_domain_warnings": [],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [],
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:457480f180361a41effd843a89ff899ef33adac2859675d52f7b38ac819a9b9d"
+    },
+    "input": {
+      "content_hash": "sha256:070f60f31776bc915e5e25779c391056c7c29efd62d37cc3f8b2302e84ebdbc2"
+    }
+  },
+  "parasitics": null
+}

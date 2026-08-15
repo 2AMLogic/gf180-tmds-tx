@@ -1,0 +1,5 @@
+{
+  "layout": {"file": "../gds/cml_driver_core_shorted.gds", "deck": "gf180mcu", "top": "cml_driver_core_shorted"},
+  "reference": {"netlist": "cml_driver_core.ref.spice", "top": "cml_driver_core"},
+  "options": {"combine_devices": true}
+}
