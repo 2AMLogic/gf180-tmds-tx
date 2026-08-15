@@ -29,7 +29,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#55**: Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py
+_None._
 
 ## PRs Awaiting Review
 
@@ -47,7 +47,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#55**: Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
@@ -64,10 +64,10 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Urgent | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 1 |
+| Curated | 0 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
