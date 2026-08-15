@@ -84,16 +84,20 @@ following gaps are stated by name rather than left as silent omissions:
    documented as not the final TMDS driver pad. Laying out the driver core
    and re-running the PVT matrix against the extracted netlist (schematic-
    vs-extracted delta, per `sim/README.md`'s **Supersedes** convention) is
-   tracked separately (the sibling layout issue in this epic phase) and has
-   not landed as of this document.
+   tracked separately by **issue #22** ("Lay out the CML driver core cell
+   and sign off DRC/LVS against the sized schematic"), the sibling layout
+   issue in this same Epic #17 phase, and has not landed as of this
+   document.
 3. **Monte Carlo evidence.** No record in `sim/` today carries a
    **Statistical convention** field with a seed, sample count, and a
    deterministic negative control — every record in §1 is a corner-matrix
    claim (`Statistical convention: N/A`), not a distribution claim. The T1
    evidence ladder requires Monte Carlo mismatch evidence, combined with
    (not replacing) the existing process-corner sweep, for the driver's
-   swing/common-mode. This is tracked separately (the sibling Monte Carlo
-   issue in this epic phase) and has not landed as of this document.
+   swing/common-mode. This is tracked separately by **issue #23** ("Add
+   Monte Carlo mismatch evidence for the CML driver's swing/common-mode"),
+   the sibling Monte Carlo issue in this same Epic #17 phase, and has not
+   landed as of this document.
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all — in particular, the encoder/serializer digital domain
