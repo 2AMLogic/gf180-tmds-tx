@@ -1274,6 +1274,34 @@ absolute path as its only stdout line. **Every path in Steps 2-5 below is
 `"$DOCS_WT/<file>"`** — a bare `WORK_LOG.md` resolves against the main checkout
 and will be denied.
 
+**#35 BUG, DO NOT REINTRODUCE: never hand-roll a `git reset`/`git clean` against
+`$DOCS_WT`.** If this worktree ever needs to be reset mid-tick — stray local
+changes, an unexpected detached HEAD, or any other "start this slot clean"
+need — **re-run `docs-worktree.sh` again** (it is idempotent; see "Reusing
+docs worktree" in its own header) rather than improvising a recovery command.
+An agent once substituted:
+
+```bash
+# DO NOT DO THIS — blocked by design, not a tool bug
+git -C "$DOCS_WT" reset --hard HEAD~1 --quiet
+git -C "$DOCS_WT" clean -qfd -e .loom-managed
+```
+
+`guard-destructive-generic.sh`'s detached/unresolved-branch check correctly
+flagged this (`force-op:detached`, 3x in a 9-second retry window, #35) — the
+`$DOCS_WT` branch is frequently detached between resets, and `HEAD~1` discards
+an actual local commit, not just uncommitted changes, on a **persistent,
+reused-every-tick** worktree. That block should stay in place; it is not the
+thing to route around. `docs-worktree.sh` already contains the vetted,
+guard-safe reset for this exact slot — a bare `git -C "$WORKTREE_PATH" reset
+--hard --quiet HEAD` (no-op ref move, discards only uncommitted changes)
+followed by `git clean -qfd -e .loom-managed` — and runs it automatically
+whenever the slot already exists (see the "Reusing docs worktree" branch of
+its `if [[ -d "$WORKTREE_PATH" ]]` check). Calling `docs-worktree.sh` again is
+therefore both the guard-safe *and* the idempotent way to get a clean
+`$DOCS_WT`; there is never a reason to invoke `git reset`/`git clean` on it
+directly from this role's prose or from an ad hoc Bash call.
+
 ### State Tracking
 
 Derive high-water marks **from the committed documents themselves**, not from a
