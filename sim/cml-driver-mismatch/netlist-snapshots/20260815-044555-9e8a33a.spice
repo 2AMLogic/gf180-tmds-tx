@@ -1,0 +1,70 @@
+* cml-driver-mismatch -- DC/op-point swing and common-mode of one lane of
+* the CML output driver (design/cml_driver.sch), under gf180mcu local
+* device mismatch, against the DR-0002 load (50 ohm/leg to the receiver's
+* 3.3 V termination rail, ~10 mA tail).
+*
+* Netlist FRAGMENT: composed into a full deck by
+* sim/cml-driver-mismatch/run_mc.py (NOT sim/harness/runner.py -- this
+* experiment sweeps a Monte Carlo sample axis the shared PVT harness has no
+* concept of; see that script's module docstring for why it is a bespoke,
+* self-contained composer rather than an extension of the shared harness).
+* The composer hands this fragment `vdd_val` (this block's own 3.3 V core
+* rail, unused here since the differential pair is driven to its static
+* rail-to-rail levels, not swept) and the three mismatch-scale parameters
+* `par_pair_val`/`par_tail_val`/`par_mirror_val` (sim/cml-driver-mismatch/
+* testbench/cml_driver_dut_mismatch.spice's par_pair/par_tail/par_mirror).
+*
+* ---------------------------------------------------------------------------
+* WHY A DC OPERATING POINT, NOT THE TRANSIENT EYE
+* ---------------------------------------------------------------------------
+* This experiment's claim is DR-0002's swing/common-mode window specifically
+* (not the transient eye/jitter claim sim/cml-driver-eye already carries).
+* cml_driver_eye.spice's own comment records vcm = avcc - I_tail*R/2: the
+* output swing and common mode are set by the *statically* steered driver's
+* tail current against the termination resistor, not by the transient
+* switching behaviour. A cheap `.op` measurement of the fully-steered driver
+* (one input rail-to-rail differential, current settled) is therefore a
+* faithful, much cheaper vehicle for a Monte Carlo *sample count* than a
+* full transient run per sample would be -- this experiment trades transient
+* fidelity (already covered by cml-driver-eye's deterministic PVT sweep) for
+* the sample count a statistical claim needs. This is the same "_z" static
+* configuration cml_driver_eye.spice itself uses for its own swing_dc/vcm_dc
+* rows, just promoted here to the thing being swept over samples.
+*
+* ---------------------------------------------------------------------------
+* WHICH DEVICES CARRY THE MISMATCH THIS CLAIM IS SENSITIVE TO
+* ---------------------------------------------------------------------------
+* In this fully-steered DC state one input-pair device is hard ON (carrying
+* the tail current) and the other is hard OFF; DR-0002's swing/vcm numbers
+* are therefore set almost entirely by the TAIL CURRENT -- the XMT/XMB
+* 1:20 current-mirror pair -- not by the input pair's own Vth (a few mV of
+* input-pair Vth mismatch barely perturbs an already-saturated pass
+* transistor's current). The DUT fragment (cml_driver_dut_mismatch.spice)
+* mismatch-enables all four transistors for completeness, but XMT/XMB
+* mismatch is the dominant, physically-expected contributor to swing/vcm
+* spread -- see that file's header and the record's discussion.
+*
+* ---------------------------------------------------------------------------
+* STATIC STEERING
+* ---------------------------------------------------------------------------
+.param avcc_nom = 3.3
+.param rterm    = 50
+.param iref     = 500u
+.param vih      = '0.85*vdd_val'
+.param vil      = '0.55*vdd_val'
+
+vavcc  avcc 0 dc {avcc_nom}
+vinpz  inpz 0 dc '{vih}'
+vinnz  innz 0 dc '{vil}'
+
+* Permanently steered to the INP side: the conducting device is on OUTP,
+* mirroring sim/cml-driver-eye/testbench/cml_driver_eye.spice's `_z` copy
+* exactly (same steering, same load, same bias reference), so this
+* experiment's mismatch=0 reference point is comparable to that record's
+* swing_dc/vcm_dc rows.
+xdut outp outn inpz innz ib vss_s cml_driver_mc
++ par_pair='par_pair_val' par_tail='par_tail_val' par_mirror='par_mirror_val'
+ibsrc 0 ib dc {iref}
+vsens vss_s 0 dc 0
+rp avcc outp {rterm}
+rn avcc outn {rterm}
