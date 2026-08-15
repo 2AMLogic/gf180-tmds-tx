@@ -12,12 +12,17 @@ process x temperature x supply (x rate) grid -- one ngspice invocation per
 *deterministic* point. A Monte Carlo mismatch claim needs a different axis
 entirely: N independent, randomly-seeded samples *per* process corner, plus
 a deterministic negative control that must fail. `sim/harness/report.py`'s
-"Device-level evidence plumbing" section (`device_log_header`,
-`write_device_corner_log`, `write_device_netlist_snapshot`,
-`device_write_record`) exists for exactly this shape of experiment -- reused
-here unmodified -- while PDK discovery (`sim/harness/pdk.py`) and the five
-process corners' `.lib` section bundles (`sim/harness/corners.py`) are
-reused unmodified too. Nothing in `sim/harness/` is edited by this issue.
+"Device-level evidence plumbing" section (`write_device_corner_log`,
+`write_device_netlist_snapshot`, `device_write_record`) exists for exactly
+this shape of experiment -- reused here unmodified -- while PDK discovery
+(`sim/harness/pdk.py`) and the five process corners' `.lib` section bundles
+(`sim/harness/corners.py`) are reused unmodified too. Nothing in
+`sim/harness/` is edited by this issue. The corner-log provenance banner and
+the deck composer (`compose_deck`) are, by design, built here rather than
+shared: this experiment's banner records fields no PVT-grid run has (the
+per-sample seed, the `sw_stat_mismatch` switch, and the injected
+`par_pair`/`par_tail`/`par_mirror` values), and its deck is a Monte Carlo
+`.op` deck rather than one point of the harness's PVT grid.
 
 ## What is measured, and why a DC operating point
 
