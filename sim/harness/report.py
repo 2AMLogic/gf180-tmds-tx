@@ -684,8 +684,7 @@ def device_log_header(
     """Provenance banner prepended to a device-level corner log.
 
     ``supply`` is fixed at ``n/a`` because a device-level testbench has no
-    supply rail to sweep -- the same fact ``corners.device_corner_id`` spells
-    ``nosupply`` in the corner-id.
+    supply rail to sweep.
     """
     return (
         "* ====================================================================\n"

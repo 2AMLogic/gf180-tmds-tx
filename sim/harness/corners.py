@@ -49,7 +49,7 @@ grammar is unchanged from the source harness in that case.
 from __future__ import annotations
 
 import itertools
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 # Default PVT axes. CLAUDE.md mandates these on every recorded result.
 DEFAULT_TEMPERATURES_C: tuple[float, ...] = (-40.0, 27.0, 125.0)
@@ -202,7 +202,6 @@ class PvtPoint:
     temp_c: float
     vdd: float
     rate_mbps: float | None = None
-    index: int = field(default=0, compare=False)
 
     @property
     def corner_id(self) -> str:
@@ -262,37 +261,9 @@ def build_grid(
             temp_c=float(temp),
             vdd=float(vdd),
             rate_mbps=(None if rate is None else float(rate)),
-            index=i,
         )
-        for i, (corner, temp, vdd, rate) in enumerate(
-            itertools.product(corners, temperatures, supplies, rate_values)
+        for corner, temp, vdd, rate in itertools.product(
+            corners, temperatures, supplies, rate_values
         )
     ]
     return points
-
-
-def device_corner_id(section: str, temp_c: float, supply: str = "nosupply") -> str:
-    """``<section>_<temp>c_<supply>`` -- the corner-id grammar's two-terminal
-    device-testbench form documented in ``sim/README.md``.
-
-    ``PvtPoint.corner_id`` always names a *bundle* corner (``tt``, ``ss``, ...)
-    and always carries a real supply voltage, because a circuit-level bench
-    has a supply rail to sweep. A device-level testbench that exercises one
-    model family directly (a bare resistor, a diode-connected BJT, a
-    source-referred MOS extraction) has neither: it selects a single
-    ``.lib`` section by name (``res_ff``, ``bjt_typical``, ...) and usually has
-    no supply node at all, which ``sim/README.md``'s corner-id grammar spells
-    with the literal ``supply`` token ``nosupply`` -- see its ``<supply>``
-    production. This is that naming rule, factored out so every
-    ``sim/device-*/`` testbench mints ids the same way instead of each
-    reimplementing it. Ported unchanged from `2AMLogic/gf180-bandgap`; no
-    device-level testbench exists in this repo yet, but the helper is kept so
-    a future one does not reinvent the naming rule.
-
-    ``supply`` may also carry a named auxiliary sweep node instead of the
-    literal ``nosupply`` -- e.g. ``nwell2p97v`` for a well-tie sensitivity
-    check that is not part of the main PVT grid -- which is why it is a
-    parameter rather than hardcoded.
-    """
-    temp = f"{temp_c:g}".replace(".", "p")
-    return f"{section}_{temp}c_{supply}"
