@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #55** (closed): Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py
+- **PR #58**: refactor(harness): dedupe _git() shell-out between report.py and evidence_lint.py
 - **Issue #34** (closed): [Epic #17] Post-layout simulation: re-run the spec suite against the layout-extracted CML driver netlist
 - **PR #52**: feat(sim): sweep the CML driver's PVT matrix on the extracted netlist
 - **Issue #48** (closed): Remove dead device_corner_id() and unused PvtPoint.index in sim/harness/corners.py
