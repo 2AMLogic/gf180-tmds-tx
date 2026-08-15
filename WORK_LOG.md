@@ -7,6 +7,7 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #65** (closed): T1/bronze checklist re-read against current evidence (2026-08-15)
 - **Issue #62** (closed): Consolidate duplicated _fmt() scalar formatter: sim/compare_records.py vs sim/harness/report.py
 - **PR #63**: refactor(sim): consolidate compare_records._fmt into harness.report._fmt
 - **Issue #55** (closed): Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py
