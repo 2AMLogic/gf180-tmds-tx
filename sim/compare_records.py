@@ -33,9 +33,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SIM_DIR = REPO_ROOT / "sim"
 sys.path.insert(0, str(SIM_DIR))
 
+from harness.evidence_lint import RECORD_ID_RE as _RECORD_ID_RE  # noqa: E402
 from harness.report import _fmt  # noqa: E402
-
-_RECORD_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{7,40}$")
 
 
 class RecordError(RuntimeError):
