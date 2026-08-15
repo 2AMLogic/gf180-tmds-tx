@@ -29,7 +29,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#34**: [Epic #17] Post-layout simulation: re-run the spec suite against the layout-extracted CML driver netlist
+- **#55**: Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py
 
 ## PRs Awaiting Review
 
@@ -47,7 +47,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#34**: [Epic #17] Post-layout simulation: re-run the spec suite against the layout-extracted CML driver netlist *(curated)*
+- **#55**: Dedupe _git() shell-out helper across sim/harness/evidence_lint.py and report.py *(curated)*
 
 ## Proposed (Architect / Hermit)
 
