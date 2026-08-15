@@ -674,40 +674,13 @@ def write_record(record: dict, experiment_dir: Path) -> Path:
 # not go through the ``tb.json``/``PvtPoint``-grid contract the functions
 # above serve (they would sweep DC tables, run Monte Carlo, or interpolate at
 # a current criterion), so they compose and run their own decks. What they
-# would share with each other is the *evidence* plumbing: the corner-log
-# comment header, where a corner log is written, and freezing the deck as a
-# record's netlist snapshot. Kept here, ported unchanged from
-# `2AMLogic/gf180-bandgap`, so a future device-level experiment does not
-# reinvent it.
+# would share with each other is the *evidence* plumbing below: where a
+# corner log is written, and freezing the deck as a record's netlist
+# snapshot. The corner-log comment header is deliberately *not* shared --
+# each device-level experiment composes its own banner, because the fields
+# worth recording differ per experiment (a Monte Carlo run records its seed
+# and mismatch switches; a DC sweep does not).
 # --------------------------------------------------------------------------
-
-
-def device_log_header(
-    pdk: Pdk,
-    deck: Path,
-    section: str,
-    temp_c: float,
-    record: str,
-    stamp: _dt.datetime,
-    ngspice: str,
-) -> str:
-    """Provenance banner prepended to a device-level corner log.
-
-    ``supply`` is fixed at ``n/a`` because a device-level testbench has no
-    supply rail to sweep.
-    """
-    return (
-        "* ====================================================================\n"
-        f"* record-id : {record}\n"
-        f"* testbench : {deck.name}\n"
-        f"* corner    : {section}\n"
-        f"* temp      : {temp_c:g} C\n"
-        "* supply    : n/a (no supply rail in this device-level testbench)\n"
-        f"* pdk       : {pdk.variant} ({pdk.path})\n"
-        f"* ngspice   : {ngspice}\n"
-        f"* run (UTC) : {stamp:%Y-%m-%dT%H:%M:%SZ}\n"
-        "* ====================================================================\n"
-    )
 
 
 def write_device_corner_log(

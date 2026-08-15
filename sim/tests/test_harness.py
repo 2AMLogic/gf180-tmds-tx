@@ -94,10 +94,6 @@ class EvidenceLintCornerIdTests(unittest.TestCase):
         self.assertEqual(lint_mod.decode_rate_token("742p5mbps"), 742.5)
         self.assertEqual(lint_mod.decode_rate_token("270mbps"), 270.0)
 
-    def test_corner_id_rate_mbps(self):
-        self.assertEqual(lint_mod.corner_id_rate_mbps("tt_27c_3.30v_742p5mbps"), 742.5)
-        self.assertIsNone(lint_mod.corner_id_rate_mbps("tt_27c_3.30v"))
-
 
 class _Field:
     """Minimal stand-in for evidence_lint.RecordField in these unit tests."""

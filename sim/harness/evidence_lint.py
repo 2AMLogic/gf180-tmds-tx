@@ -242,12 +242,6 @@ def decode_rate_token(token: str) -> float:
     return float(token[: -len("mbps")].replace("p", "."))
 
 
-def corner_id_rate_mbps(corner_id: str) -> float | None:
-    """The rate this ``corner_id`` names, or ``None`` if it names none."""
-    _, rate_token = _split_rate_token(corner_id)
-    return None if rate_token is None else decode_rate_token(rate_token)
-
-
 def parse_corner_id(corner_id: str) -> str | None:
     """``None`` if ``corner_id`` parses, else why it does not.
 
