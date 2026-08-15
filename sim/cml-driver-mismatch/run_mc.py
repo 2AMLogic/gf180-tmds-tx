@@ -70,7 +70,6 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import hashlib
-import re
 import statistics
 import subprocess
 import sys
@@ -93,7 +92,7 @@ from harness.report import (  # noqa: E402
     write_device_corner_log,
     write_device_netlist_snapshot,
 )
-from harness.runner import NGSPICE, ngspice_version  # noqa: E402
+from harness.runner import NGSPICE, ngspice_version, parse_measurements  # noqa: E402
 
 EXPERIMENT_DIR = SIM_DIR / "cml-driver-mismatch"
 TESTBENCH_DIR = EXPERIMENT_DIR / "testbench"
@@ -129,20 +128,6 @@ NEG_CTRL_PAR_TAIL = 1e-4
 
 DR0002_SWING_MIN, DR0002_SWING_MAX = 0.4, 0.6
 DR0002_VCM_MIN, DR0002_VCM_MAX = 2.8, 3.3
-
-_MEAS_RE = re.compile(r"^\s*m_(\w+)\s*=\s*([-+]?[0-9.]+(?:[eE][-+]?[0-9]+)?)")
-
-
-def parse_measurements(text: str) -> dict[str, float]:
-    found: dict[str, float] = {}
-    for line in text.splitlines():
-        match = _MEAS_RE.match(line)
-        if match:
-            try:
-                found[match.group(1)] = float(match.group(2))
-            except ValueError:  # pragma: no cover - regex already constrains this
-                continue
-    return found
 
 
 @dataclass
