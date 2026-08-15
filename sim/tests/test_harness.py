@@ -16,6 +16,8 @@ still behaves identically to the source harness.
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -324,6 +326,70 @@ class MatrixConformanceRateAxisTests(unittest.TestCase):
         )
         conformance = report_mod.matrix_conformance(tb, points)
         self.assertTrue(conformance["full"], conformance["missing"])
+
+
+class GitProvenanceTests(unittest.TestCase):
+    """Smoke coverage for ``report.git_provenance``/``working_tree_dirty``.
+
+    These wrap ``evidence_lint._git`` (issue #55's dedup target) and had no
+    dedicated tests before that refactor; this locks in the pre-refactor
+    behavior on a real git checkout plus the non-git-directory fallback.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.git("init", "--quiet")
+        self.git("config", "user.email", "test@example.invalid")
+        self.git("config", "user.name", "test")
+        (self.root / "README.md").write_text("seed\n")
+        # Pre-track the evidence directory itself (empty via .gitkeep) so a
+        # later *new file inside it* is reported by git as an individual
+        # untracked path, not folded into a single "new directory" line --
+        # matching how sim/README.md's evidence tree is actually populated
+        # incrementally by successive runs.
+        evidence_dir = self.root / "sim" / "output-voltage-tc" / "records"
+        evidence_dir.mkdir(parents=True)
+        (evidence_dir / ".gitkeep").write_text("")
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "-m", "seed")
+
+    def git(self, *args: str):
+        return subprocess.run(
+            ("git", *args),
+            cwd=str(self.root),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+
+    def test_git_provenance_reports_clean_tree_at_head(self):
+        expected_commit = self.git("rev-parse", "HEAD").stdout.strip()
+        prov = report_mod.git_provenance(self.root)
+        self.assertEqual(prov["commit"], expected_commit)
+        self.assertEqual(prov["short"], expected_commit[:7])
+        self.assertFalse(prov["dirty"])
+        self.assertNotEqual(prov["branch"], "unknown")
+
+    def test_working_tree_dirty_true_for_a_tracked_edit(self):
+        (self.root / "README.md").write_text("changed\n")
+        self.assertTrue(report_mod.working_tree_dirty(self.root))
+
+    def test_working_tree_dirty_false_when_only_evidence_paths_changed(self):
+        evidence_dir = self.root / "sim" / "output-voltage-tc" / "records"
+        (evidence_dir / "new-record.md").write_text("# new record\n")
+        self.assertFalse(report_mod.working_tree_dirty(self.root))
+
+    def test_git_provenance_falls_back_to_unknown_outside_a_git_checkout(self):
+        outside = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, outside, True)
+        prov = report_mod.git_provenance(outside)
+        self.assertEqual(prov["commit"], "unknown")
+        self.assertEqual(prov["short"], "unknown")
+        self.assertEqual(prov["branch"], "unknown")
+        self.assertFalse(prov["dirty"])
 
 
 if __name__ == "__main__":
