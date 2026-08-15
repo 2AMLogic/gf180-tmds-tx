@@ -7,6 +7,7 @@ selected.
 
 ### 2026-08-15
 
+- **Issue #45** (closed): Dedupe _fmt() scalar formatter in sim/harness/cli.py and report.py
 - **PR #44**: refactor(harness): dedupe _fmt() in cli.py by reusing report._fmt
 - **Issue #43** (closed): Dedupe _fmt() across sim/harness/cli.py and sim/harness/report.py
 - **PR #41**: refactor: dedupe parse_measurements in sim/cml-driver-mismatch/run_mc.py
