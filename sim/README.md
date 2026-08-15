@@ -304,3 +304,61 @@ full mandated PVT matrix at both `rates_mbps` (742.5 and 270 Mbps/lane) —
 rise-fall measurements plus the transient solver settings actually used.
 See `sim/smoke-cml-pair/records/` for the current record and
 `sim/smoke-cml-pair/testbench/tb.json` for the manifest that produces it.
+
+## Cold-start reproducibility audit (2026-08-14, issue #25)
+
+Presence of a testbench is not freshness of its claim, so this audit actually
+re-ran every experiment directory that existed at the time — `smoke-cml-pair`,
+`cml-driver-eye`, `esd-clamp-cv` — from a clean checkout (`git status`
+clean, no local edits), using only the invocation documented in
+[`sim/harness/README.md`](harness/README.md)'s "Quick start"
+(`python3 sim/run_corners.py <slug>`), against the PDK the machine already had
+provisioned per the "Prerequisites" table there.
+
+**Result: all three reproduce cleanly. No gap was found**, so none needed
+fixing:
+
+| Experiment | Points | Result | Spot-checked against recorded evidence |
+|---|---|---|---|
+| `smoke-cml-pair` | 90/90 (full PVT × rate grid) | PASS | `tt_-40c_2.97v_742p5mbps`: `swing_diff_v`/`vcm_v` bit-for-bit match the `records/20260808-032312-430859a.md` row |
+| `cml-driver-eye` | 90/90 (full PVT × rate grid) | PASS | same corner: `ui_ref`/`swing_c0`/`vcm_c0` bit-for-bit match `records/20260810-041436-a2c358b.md` |
+| `esd-clamp-cv` | 45/45 (full PVT grid) | PASS | `tt_-40c_2.97v`: `cap_base_0v`/`cap_base_opv` bit-for-bit match `records/20260814-193222-dd48630.md` |
+
+Specifically checked:
+
+- **PDK revision**: `sim/pdk.json` pins `gf180mcuD` @ open_pdks
+  `c6d73a35f524070e85faff4a6a9eef49553ebc2b`. `python3 sim/run_corners.py
+  --check-env` resolved that exact variant/revision on the audit machine
+  (`~/.volare/gf180mcuD`), and every existing record's own **Environment**
+  section cites the same open_pdks hash (on different machines/paths —
+  `/Users/rwalters/.volare` for `smoke-cml-pair`/`esd-clamp-cv`,
+  `/home/ubuntu/.volare` for `cml-driver-eye` — which is exactly the point of
+  pinning the revision rather than a path: the hash matched everywhere it was
+  checked).
+- **No undocumented manual steps**: each experiment ran end-to-end from the
+  single documented command with no repo edits, path fixes, or hand-run
+  intermediate steps.
+- **No stale paths**: every testbench fragment (`testbench/*.spice`) is
+  self-contained — no hardcoded path outside the fragment itself — and the
+  harness resolves the PDK, not the testbench.
+- **`sim/check_records.py`** and the harness's own unit tests
+  (`python3 -m pytest sim/tests`) both pass against the tree unchanged by this
+  audit.
+
+These re-runs used `--no-write` (`sim/harness/README.md`'s documented
+debugging mode) rather than minting new records: the goal was confirming the
+*existing* records reproduce, not adding new evidence for its own sake, and a
+per-corner spot-check (above) against each experiment's current record
+confirms the reproduction is exact, not merely "the deck still runs." This is
+consistent with the append-only convention above — nothing under `records/`,
+`netlist-snapshots/`, or `corners/` was added, edited, or deleted by this
+audit.
+
+Two of the three pre-existing records (`smoke-cml-pair`, `esd-clamp-cv`) are
+self-flagged in their own **Netlist provenance** field as taken against a
+dirty working tree at recording time; that caveat was already on the record
+before this audit and is a property of *when the original record was minted*,
+not of whether today's clean-checkout re-run reproduces it — which it does.
+Nothing about it required a fix here; it is called out because a reader
+diffing this note against those records should not read "reproduces cleanly"
+as also meaning "was originally recorded against a clean tree."
