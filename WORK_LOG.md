@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-15
 
+- **PR #44**: refactor(harness): dedupe _fmt() in cli.py by reusing report._fmt
+- **Issue #43** (closed): Dedupe _fmt() across sim/harness/cli.py and sim/harness/report.py
 - **PR #41**: refactor: dedupe parse_measurements in sim/cml-driver-mismatch/run_mc.py
 - **PR #37**: docs(guide): route docs-guide worktree recovery through docs-worktree.sh
 - **PR #31**: feat(layout): lay out the CML driver core cell and sign off DRC/LVS (issue #22)
