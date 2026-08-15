@@ -31,6 +31,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SIM_DIR = REPO_ROOT / "sim"
+sys.path.insert(0, str(SIM_DIR))
+
+from harness.report import _fmt  # noqa: E402
 
 _RECORD_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{7,40}$")
 
@@ -105,16 +108,6 @@ def provenance(path: Path) -> str:
     if not match:
         return "(unstated)"
     return match.group(1).split("—")[0].strip()
-
-
-def _fmt(value: float) -> str:
-    if value != value:  # NaN
-        return "n/a"
-    if value == 0:
-        return "0"
-    if abs(value) >= 1e-3 and abs(value) < 1e5:
-        return f"{value:.6g}"
-    return f"{value:.6e}"
 
 
 def compare(
