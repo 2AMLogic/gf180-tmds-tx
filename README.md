@@ -5,7 +5,15 @@ open PDK — serializer plus current-mode line driver — designed by AI agents
 driving [klayout-tools](https://github.com/2AMLogic/klayout-tools), xschem +
 ngspice on the analog side and Yosys/OpenROAD on the digital side.
 
-**Status: just opened, specification phase.** Nothing is designed yet.
+**Status: spec ratified, first design and pad-ring evidence landed.** The
+TMDS encoder RTL is verified (`rtl/`, `verification/`). The CML output
+driver's schematic is captured, sized, and PVT-swept against the ratified
+spec's electrical targets (`design/`, `sim/cml-driver-eye/`). A minimal
+custom pad cell — proving the DRC/LVS flow at the pad boundary, not yet the
+final driver pad — is DRC-clean and LVS-matched, and its ESD-clamp
+capacitance has been measured against the spec's budget (`layout/`,
+`sim/esd-clamp-cv/`). The driver has not yet been laid out, DRC/LVS'd, or
+assembled with the pad cell.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -55,7 +63,12 @@ second source of truth.
 
 Maturity ladder: spec ratified → encoder verified → driver simulated across
 PVT → pad cell DRC-clean → assembled and LVS-clean → shuttle seat → measured
-silicon. **Current position: spec ratified.**
+silicon. **Current position: spec ratified, encoder verified, and the CML
+driver schematic simulated across the full PVT matrix — the pad-ring flow
+has separately been proven DRC-clean/LVS-matched on a minimal proof-of-flow
+cell, but the driver itself has not yet been laid out or assembled with the
+pad, so the "pad cell DRC-clean" and later rungs remain open for the actual
+block.**
 
 ## Repo layout
 
