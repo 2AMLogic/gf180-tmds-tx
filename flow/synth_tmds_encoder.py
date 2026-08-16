@@ -192,6 +192,41 @@ def assert_fully_mapped(counts: dict[str, int]) -> None:
         raise SynthError("netlist contains no cell instances at all -- synthesis produced nothing")
 
 
+#: Known-benign Yosys/ABC warnings, matched by regex, with the explanation
+#: this driver records rather than leaving unexplained (per issue #82's
+#: acceptance criteria). Extend this list, don't silently ignore a new
+#: warning -- an unrecognized one is reported verbatim in the record with a
+#: "not yet explained" flag instead of being dropped.
+_KNOWN_WARNINGS: list[tuple[re.Pattern[str], str]] = [
+    (
+        re.compile(r"^Warning: Detected \d+ multi-output cells"),
+        "ABC's liberty reader noting the library has multi-output cells (e.g. "
+        "the full-adder `gf180mcu_fd_sc_mcu9t5v0__addf_1`, S+CO on one instance) "
+        "it can use during mapping -- informational, about the *library*, not "
+        "this design. This netlist does not instantiate any multi-output cell "
+        "(see the cell breakdown below); confirmed by grepping the written "
+        "netlist for `addf`/`subf`/`fah`/`fas` cell types (none present).",
+    ),
+]
+
+
+def extract_warnings(log_text: str) -> list[str]:
+    """Every distinct ``Warning: ...`` line in the captured log, in order."""
+    seen: list[str] = []
+    for line in log_text.splitlines():
+        line = line.strip()
+        if line.startswith("Warning:") and line not in seen:
+            seen.append(line)
+    return seen
+
+
+def explain_warning(warning: str) -> str:
+    for pattern, explanation in _KNOWN_WARNINGS:
+        if pattern.match(warning):
+            return explanation
+    return "NOT YET EXPLAINED -- investigate before trusting this record."
+
+
 def render_record(
     *,
     rid: str,
@@ -201,6 +236,7 @@ def render_record(
     yosys_v: str,
     counts: dict[str, int],
     dirty: bool,
+    warnings: list[str],
     log_path: Path,
     ys_path: Path,
 ) -> str:
@@ -209,6 +245,12 @@ def render_record(
     comb_cells = total_cells - seq_cells
     breakdown = "\n".join(f"  - `{t}`: {n}" for t, n in sorted(counts.items()))
     sha = _git("rev-parse", "HEAD") or "unknown"
+    if warnings:
+        warnings_block = "\n".join(
+            f"  - `{w}` -- {explain_warning(w)}" for w in warnings
+        )
+    else:
+        warnings_block = "  - none observed"
     return f"""\
 # Record {rid}
 
@@ -237,6 +279,13 @@ def render_record(
   `cell_counts`/`assert_fully_mapped` in `flow/synth_tmds_encoder.py`). Cell
   breakdown:
 {breakdown}
+- **Warnings**: every distinct `Warning:` line the run's log contains, explained rather
+  than left as noise (per issue #82's "no synthesis warnings left unexplained"
+  acceptance criterion; note the captured log can end early on this repo's
+  `yowasp-yosys` install after ABC's liberty-load stage even though the run itself
+  completes successfully -- see `flow/README.md`'s "yowasp-yosys" gotcha -- so this
+  list is a lower bound, not a guarantee no further warning was printed):
+{warnings_block}
 - **Reproducibility**: working tree {"DIRTY (uncommitted changes outside flow/tmds_encoder/ at run time -- re-run against a clean checkout before trusting this record)" if dirty else "clean"} at commit `{sha}`.
 - **Links**:
   - RTL source: `rtl/tmds_encoder.v`
@@ -253,6 +302,15 @@ def main() -> int:
         "--no-record",
         action="store_true",
         help="run synthesis and write the netlist, but skip minting an evidence record",
+    )
+    parser.add_argument(
+        "--allow-unexplained-warnings",
+        action="store_true",
+        help=(
+            "don't fail on a Warning: line this script doesn't recognize -- record it "
+            "as 'NOT YET EXPLAINED' instead of refusing to mint a record. Use only to "
+            "investigate a new warning; add it to _KNOWN_WARNINGS afterward."
+        ),
     )
     args = parser.parse_args()
 
@@ -297,6 +355,16 @@ def main() -> int:
     total = sum(counts.values())
     print(f"OK: {total} cell instances, 0 unmapped -- netlist written to {NETLIST_PATH}")
 
+    warnings = extract_warnings(log_path.read_text())
+    unexplained = [w for w in warnings if explain_warning(w).startswith("NOT YET EXPLAINED")]
+    if unexplained and not args.allow_unexplained_warnings:
+        print("ERROR: unexplained synthesis warning(s) -- add an entry to _KNOWN_WARNINGS", file=sys.stderr)
+        for w in unexplained:
+            print(f"  {w}", file=sys.stderr)
+        return 1
+    for w in warnings:
+        print(f"WARNING: {w}")
+
     if not args.no_record:
         RECORDS_DIR.mkdir(parents=True, exist_ok=True)
         record_path = RECORDS_DIR / f"{rid}.md"
@@ -312,6 +380,7 @@ def main() -> int:
                 yosys_v=yosys_version(),
                 counts=counts,
                 dirty=working_tree_dirty(),
+                warnings=warnings,
                 log_path=log_path,
                 ys_path=ys_path,
             )
