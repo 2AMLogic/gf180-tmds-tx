@@ -401,6 +401,15 @@ class RecordExists(RuntimeError):
     """Refused to overwrite an existing append-only record."""
 
 
+def _refuse_if_exists(path: Path, message: str) -> None:
+    """Shared append-only guard: raise :class:`RecordExists` if ``path`` is
+    already there. Every evidence writer below calls this before it writes,
+    so "mint a new record-id instead of clobbering" is enforced in one place.
+    """
+    if path.exists():
+        raise RecordExists(message)
+
+
 def write_netlist_snapshot(tb: Testbench, experiment_dir: Path, record_id: str) -> Path:
     """Freeze the DUT netlist for this record.
 
@@ -411,8 +420,7 @@ def write_netlist_snapshot(tb: Testbench, experiment_dir: Path, record_id: str) 
     out_dir = experiment_dir / SNAPSHOT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{record_id}.spice"
-    if path.exists():
-        raise RecordExists(f"{path} already exists; append-only evidence is never rewritten")
+    _refuse_if_exists(path, f"{path} already exists; append-only evidence is never rewritten")
     header = "\n".join(
         [
             f"* Frozen netlist snapshot for record {record_id}",
@@ -659,10 +667,9 @@ def write_record(record: dict, experiment_dir: Path) -> Path:
     out_dir = experiment_dir / RECORDS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{record['record_id']}.md"
-    if path.exists():
-        raise RecordExists(
-            f"{path} already exists; records are append-only -- mint a new record-id"
-        )
+    _refuse_if_exists(
+        path, f"{path} already exists; records are append-only -- mint a new record-id"
+    )
     path.write_text(render_record(record, experiment_dir.name))
     return path
 
@@ -702,6 +709,9 @@ def write_device_netlist_snapshot(snapshot_dir: Path, record: str, deck: Path) -
     """
     snapshot_dir.mkdir(parents=True, exist_ok=True)
     path = snapshot_dir / f"{record}.spice"
+    _refuse_if_exists(
+        path, f"{path} already exists; append-only evidence is never rewritten"
+    )
     shutil.copyfile(deck, path)
     return path
 
@@ -716,10 +726,10 @@ def device_write_record(records_dir: Path, record: str, body: str) -> Path:
     """
     records_dir.mkdir(parents=True, exist_ok=True)
     path = records_dir / f"{record}.md"
-    if path.exists():
-        raise RuntimeError(
-            f"refusing to overwrite existing record {path} -- sim/ is append-only; "
-            "a re-run must mint a new record ID"
-        )
+    _refuse_if_exists(
+        path,
+        f"refusing to overwrite existing record {path} -- sim/ is append-only; "
+        "a re-run must mint a new record ID",
+    )
     path.write_text(body, encoding="utf-8")
     return path

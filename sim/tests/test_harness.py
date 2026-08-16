@@ -388,5 +388,24 @@ class GitProvenanceTests(unittest.TestCase):
         self.assertFalse(prov["dirty"])
 
 
+class DeviceEvidenceAppendOnlyTests(unittest.TestCase):
+    """Issue #95: ``write_device_netlist_snapshot`` must refuse a collision
+    instead of silently overwriting via ``shutil.copyfile``.
+    """
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.snapshot_dir = self.tmp / "netlist-snapshots"
+        self.deck = self.tmp / "deck.spice"
+        self.deck.write_text("* deck\n")
+
+    def test_write_device_netlist_snapshot_refuses_a_collision(self):
+        record = "20260101-000000-abc1234"
+        report_mod.write_device_netlist_snapshot(self.snapshot_dir, record, self.deck)
+        with self.assertRaises(report_mod.RecordExists):
+            report_mod.write_device_netlist_snapshot(self.snapshot_dir, record, self.deck)
+
+
 if __name__ == "__main__":
     unittest.main()
