@@ -7,6 +7,12 @@ selected.
 
 ### 2026-08-16
 
+- **PR #101**: flow: run multi-corner setup/hold STA on the tmds_encoder gate-level netlist
+- **Issue #83** (closed): Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
+- **PR #99**: fix: remove unused import os in gate_level_sim_tmds_encoder.py
+- **Issue #96** (closed): Remove dead code: unused 'os' import in flow/gate_level_sim_tmds_encoder.py
+- **PR #98**: refactor: dedupe append-only guard across report.py's evidence writers
+- **Issue #95** (closed): Dedupe append-only guard across report.py's 4 evidence writers; closes a silent-overwrite gap in write_device_netlist_snapshot
 - **PR #93**: flow: extract back-annotated SDF and re-verify gate-level netlist against it
 - **Issue #85** (closed): Digital: post-layout verification with back-annotated SDF (T1 item 7, digital)
 - **PR #92**: flow: place-and-route tmds_encoder to a gf180mcu digital block-level GDS
