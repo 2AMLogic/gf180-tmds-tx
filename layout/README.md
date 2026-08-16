@@ -177,3 +177,79 @@ Until this repo's `klt` moves past that tag, the generator here rewrites the
 `AS`/`AD`/`PS`/`PD`-bearing form itself rather than using `--pdk`, and
 `sim/tests/test_extracted_dut.py` asserts every simulated device carries
 non-zero junction area and perimeter so the gap cannot silently reappear.
+
+## `tmds_encoder` — digital block-level place-and-route (issue #84)
+
+The digital partition's block-level layout: `flow/pnr_tmds_encoder.py`
+place-and-routes the gate-level netlist issue #82 synthesized
+(`flow/tmds_encoder/netlist/tmds_encoder.synth.v`) against the gf180mcu
+`gf180mcu_fd_sc_mcu9t5v0` standard-cell library via OpenROAD (floorplan,
+tap/endcap, power distribution network, placement, routing, filler), then
+merges the routed DEF into a final GDS in-process via the `klayout` PyPI
+package's `klayout.db` module. See that module's own docstring for the full
+recipe, and `flow/tmds_encoder/records/*.md` for the append-only evidence
+record convention (same as `flow/README.md`'s synthesis records).
+
+```
+flow/pnr_tmds_encoder.py                driver (OpenROAD P&R + in-process GDS merge)
+flow/tmds_encoder/pnr/tmds_encoder.def  routed DEF
+layout/gds/tmds_encoder.gds             the merged block-level GDS
+layout/gds/tmds_encoder.spice           klt extract's plain (transistor-level) netlist
+layout/gds/tmds_encoder.lvs_extracted.spice   klt extract --abstract-cells netlist (LVS side)
+layout/lvs/tmds_encoder.ref.spice       LVS reference, mechanically derived from the
+                                         synthesized netlist (layout/scripts/gen_tmds_encoder_ref.py)
+layout/lvs/tmds_encoder.lvs_request.json      klt lvs request document
+layout/scripts/gen_tmds_encoder_ref.py  reference-netlist generator
+layout/scripts/filter_pnr_utility_cells.py    optional utility-cell filter (not used in the
+                                         primary flow below -- see its own docstring)
+drc_reports/tmds_encoder.drc.{json,txt}       klt drc reports
+lvs_reports/tmds_encoder.lvs.{json,txt}       klt lvs reports
+```
+
+Regenerate (requires OpenROAD on `PATH`, run via the pinned `openroad/orfs`
+Docker image -- see `flow/README.md`'s "Pinned toolchain" -- plus the
+`klayout` PyPI package for the GDS merge step):
+
+```bash
+python3 flow/pnr_tmds_encoder.py
+klt drc --deck gf180mcu layout/gds/tmds_encoder.gds --format json > layout/drc_reports/tmds_encoder.drc.json
+klt extract --deck gf180mcu layout/gds/tmds_encoder.gds --top tmds_encoder \
+  --abstract-cells 'gf180mcu_fd_sc_mcu9t5v0__*' -o layout/gds/tmds_encoder.lvs_extracted.spice
+python3 layout/scripts/gen_tmds_encoder_ref.py \
+  --netlist flow/tmds_encoder/netlist/tmds_encoder.synth.v \
+  --subckt-headers-from layout/gds/tmds_encoder.lvs_extracted.spice \
+  -o layout/lvs/tmds_encoder.ref.spice
+klt lvs layout/lvs/tmds_encoder.lvs_request.json --format json > layout/lvs_reports/tmds_encoder.lvs.json
+```
+
+**Scope**: place-and-route only, per issue #84 -- no clock-tree synthesis
+and no timing-closure claim (issue #83 owns static timing analysis). This
+does not integrate with the analog pad ring (#86's scope, separate for the
+analog partition).
+
+**Current signoff status**: **DRC violations** (188, all `mim.space.1`) and
+**LVS mismatch** (10 topology mismatches; nets/pins otherwise match fully)
+-- both fully attributed and explained, not silently worked around:
+
+- The DRC violations are consistent with
+  [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033):
+  the curated gf180mcu deck's `mim.space.1` rule is a general
+  Metal4-to-Metal4 spacing check (its own violation `description` says so)
+  applied indiscriminately to ordinary Metal4 PDN/routing geometry, not just
+  real MiM capacitor plates -- this design has zero capacitor devices.
+- The LVS mismatches are the 9 P&R-inserted filler/tap/endcap standard-cell
+  *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`, `__filltie`, `__endcap`, plus
+  one top-level rollup) that carry no logic and that the pre-P&R reference
+  netlist has no counterpart for, by construction (see
+  `layout/scripts/filter_pnr_utility_cells.py`'s docstring).
+
+**Two real, upstream DEF->GDS-merge defects were found and fixed while
+building this driver** (not worked around) -- a DBU mismatch between
+OpenROAD-flow-scripts' bundled gf180 KLayout tech file and this design's own
+tech LEF that silently dropped most via-cut geometry, and a second,
+related DBU-mismatch corruption when merging the standard-cell GDS library
+afterward. See `flow/pnr_tmds_encoder.py`'s "GDS streamout" docstring
+section for the full root-cause finding and the klayout-tools issues filed
+([#1029](https://github.com/2AMLogic/klayout-tools/issues/1029),
+[#1031](https://github.com/2AMLogic/klayout-tools/issues/1031) (superseded),
+[#1032](https://github.com/2AMLogic/klayout-tools/issues/1032)).

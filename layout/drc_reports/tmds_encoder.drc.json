@@ -1,0 +1,6351 @@
+{
+  "schema_version": 1,
+  "file": "gds/tmds_encoder.gds",
+  "deck": "gf180mcu",
+  "dbu_um": 0.0005,
+  "status": "violations",
+  "violation_count": 188,
+  "rule_counts": {
+    "mim.space.1": 188
+  },
+  "violations": [
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 58240,
+        "bottom": 16329,
+        "right": 59360,
+        "top": 295343
+      },
+      "polygon": [
+        [
+          58240,
+          16329
+        ],
+        [
+          58240,
+          293220
+        ],
+        [
+          59360,
+          295343
+        ],
+        [
+          59360,
+          18452
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 0,
+        "right": 134680,
+        "top": 2420
+      },
+      "polygon": [
+        [
+          133000,
+          0
+        ],
+        [
+          133000,
+          1040
+        ],
+        [
+          134680,
+          2420
+        ],
+        [
+          134680,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 0,
+        "right": 134680,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          133000,
+          0
+        ],
+        [
+          133000,
+          2754
+        ],
+        [
+          134680,
+          1040
+        ],
+        [
+          134680,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 0,
+        "right": 134680,
+        "top": 4134
+      },
+      "polygon": [
+        [
+          133000,
+          0
+        ],
+        [
+          133000,
+          4134
+        ],
+        [
+          134680,
+          2420
+        ],
+        [
+          134680,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 0,
+        "right": 134680,
+        "top": 4134
+      },
+      "polygon": [
+        [
+          134680,
+          0
+        ],
+        [
+          133000,
+          900
+        ],
+        [
+          133000,
+          4134
+        ],
+        [
+          134680,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 86,
+        "right": 133560,
+        "top": 3374
+      },
+      "polygon": [
+        [
+          133000,
+          86
+        ],
+        [
+          133000,
+          1040
+        ],
+        [
+          133560,
+          3374
+        ],
+        [
+          133560,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 86,
+        "right": 133560,
+        "top": 5314
+      },
+      "polygon": [
+        [
+          133000,
+          86
+        ],
+        [
+          133000,
+          5314
+        ],
+        [
+          133560,
+          2980
+        ],
+        [
+          133560,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 86,
+        "right": 133560,
+        "top": 6534
+      },
+      "polygon": [
+        [
+          133000,
+          86
+        ],
+        [
+          133000,
+          6534
+        ],
+        [
+          133560,
+          4200
+        ],
+        [
+          133560,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 900,
+        "right": 133560,
+        "top": 6634
+      },
+      "polygon": [
+        [
+          133000,
+          900
+        ],
+        [
+          133000,
+          6634
+        ],
+        [
+          133560,
+          4300
+        ],
+        [
+          133560,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 1206,
+        "right": 133560,
+        "top": 6634
+      },
+      "polygon": [
+        [
+          133000,
+          1206
+        ],
+        [
+          133000,
+          6634
+        ],
+        [
+          133560,
+          4300
+        ],
+        [
+          133560,
+          3540
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 2506,
+        "right": 134680,
+        "top": 6494
+      },
+      "polygon": [
+        [
+          133000,
+          2506
+        ],
+        [
+          133000,
+          6494
+        ],
+        [
+          134680,
+          4780
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 2506,
+        "right": 134680,
+        "top": 18234
+      },
+      "polygon": [
+        [
+          133000,
+          2506
+        ],
+        [
+          133000,
+          16520
+        ],
+        [
+          134680,
+          18234
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 133000,
+        "bottom": 2506,
+        "right": 134680,
+        "top": 18334
+      },
+      "polygon": [
+        [
+          133000,
+          2506
+        ],
+        [
+          133000,
+          16620
+        ],
+        [
+          134680,
+          18334
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__dffq_1",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__dffq_1"
+      ],
+      "bbox": {
+        "left": 133000,
+        "bottom": 14146,
+        "right": 134680,
+        "top": 18334
+      },
+      "polygon": [
+        [
+          134680,
+          14146
+        ],
+        [
+          133000,
+          15860
+        ],
+        [
+          133000,
+          16620
+        ],
+        [
+          134680,
+          18334
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2420,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          135800,
+          2420
+        ],
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4200
+        ],
+        [
+          135800,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2420,
+        "right": 135800,
+        "top": 4300
+      },
+      "polygon": [
+        [
+          135800,
+          2420
+        ],
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          135800,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2420,
+        "right": 135800,
+        "top": 4300
+      },
+      "polygon": [
+        [
+          135800,
+          2420
+        ],
+        [
+          134120,
+          3540
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          135800,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2420,
+        "right": 135800,
+        "top": 4300
+      },
+      "polygon": [
+        [
+          135800,
+          2420
+        ],
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          135800,
+          2980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2980,
+        "right": 134680,
+        "top": 4780
+      },
+      "polygon": [
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          134680,
+          4780
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2980,
+        "right": 134680,
+        "top": 6534
+      },
+      "polygon": [
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4200
+        ],
+        [
+          134680,
+          6534
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2980,
+        "right": 134680,
+        "top": 6634
+      },
+      "polygon": [
+        [
+          134120,
+          2980
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          134680,
+          6634
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2980,
+        "right": 135240,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          134120,
+          2980
+        ],
+        [
+          134680,
+          4220
+        ],
+        [
+          135240,
+          4220
+        ],
+        [
+          135240,
+          2980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 2980,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          134120,
+          2980
+        ],
+        [
+          134680,
+          4220
+        ],
+        [
+          135800,
+          4220
+        ],
+        [
+          135240,
+          2980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134120,
+        "bottom": 3540,
+        "right": 134680,
+        "top": 6634
+      },
+      "polygon": [
+        [
+          134120,
+          3540
+        ],
+        [
+          134120,
+          4300
+        ],
+        [
+          134680,
+          6634
+        ],
+        [
+          134680,
+          4220
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 134120,
+        "bottom": 33666,
+        "right": 135800,
+        "top": 37274
+      },
+      "polygon": [
+        [
+          135800,
+          33666
+        ],
+        [
+          134120,
+          35380
+        ],
+        [
+          134120,
+          37274
+        ],
+        [
+          135800,
+          35560
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 134120,
+        "bottom": 33666,
+        "right": 135800,
+        "top": 37374
+      },
+      "polygon": [
+        [
+          135800,
+          33666
+        ],
+        [
+          134120,
+          35380
+        ],
+        [
+          134120,
+          37374
+        ],
+        [
+          135800,
+          35660
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 134120,
+        "bottom": 34900,
+        "right": 135800,
+        "top": 37374
+      },
+      "polygon": [
+        [
+          135800,
+          34900
+        ],
+        [
+          134120,
+          35380
+        ],
+        [
+          134120,
+          37374
+        ],
+        [
+          135800,
+          35660
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 134680,
+        "bottom": 2980,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          134680,
+          2980
+        ],
+        [
+          134680,
+          4220
+        ],
+        [
+          135800,
+          4220
+        ],
+        [
+          135240,
+          2980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 0,
+        "right": 136920,
+        "top": 2420
+      },
+      "polygon": [
+        [
+          135240,
+          0
+        ],
+        [
+          135240,
+          1040
+        ],
+        [
+          136920,
+          2420
+        ],
+        [
+          136920,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 0,
+        "right": 136920,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          135240,
+          0
+        ],
+        [
+          135240,
+          2754
+        ],
+        [
+          136920,
+          1040
+        ],
+        [
+          136920,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 0,
+        "right": 136920,
+        "top": 2980
+      },
+      "polygon": [
+        [
+          135240,
+          0
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          136920,
+          2420
+        ],
+        [
+          136920,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 0,
+        "right": 136920,
+        "top": 2980
+      },
+      "polygon": [
+        [
+          136920,
+          0
+        ],
+        [
+          135240,
+          900
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          136920,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 86,
+        "right": 135800,
+        "top": 2980
+      },
+      "polygon": [
+        [
+          135240,
+          86
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          135800,
+          2980
+        ],
+        [
+          135800,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 86,
+        "right": 135800,
+        "top": 3374
+      },
+      "polygon": [
+        [
+          135240,
+          86
+        ],
+        [
+          135240,
+          1040
+        ],
+        [
+          135800,
+          3374
+        ],
+        [
+          135800,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 86,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          135240,
+          86
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          135800,
+          4220
+        ],
+        [
+          135800,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 706,
+        "right": 136920,
+        "top": 2980
+      },
+      "polygon": [
+        [
+          136920,
+          706
+        ],
+        [
+          135240,
+          2420
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          136920,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 900,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          135240,
+          900
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          135800,
+          4220
+        ],
+        [
+          135800,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 2420,
+        "right": 135800,
+        "top": 4220
+      },
+      "polygon": [
+        [
+          135240,
+          2420
+        ],
+        [
+          135240,
+          2980
+        ],
+        [
+          135800,
+          4220
+        ],
+        [
+          135800,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 135800,
+        "top": 8874
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135240,
+          8874
+        ],
+        [
+          135800,
+          6540
+        ],
+        [
+          135800,
+          5780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 135800,
+        "top": 35560
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          135800,
+          35560
+        ],
+        [
+          135800,
+          5880
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 135800,
+        "top": 35660
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          135800,
+          35660
+        ],
+        [
+          135800,
+          5780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 136360,
+        "top": 5780
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135800,
+          5780
+        ],
+        [
+          136360,
+          5780
+        ],
+        [
+          136360,
+          4780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 136920,
+        "top": 8294
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135240,
+          8294
+        ],
+        [
+          136920,
+          6580
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 136920,
+        "top": 37094
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          136920,
+          37094
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 137480,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          136920,
+          6020
+        ],
+        [
+          137480,
+          6020
+        ],
+        [
+          136360,
+          4780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 4780,
+        "right": 138415,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          135240,
+          4780
+        ],
+        [
+          136920,
+          6020
+        ],
+        [
+          138415,
+          6020
+        ],
+        [
+          136360,
+          4780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 135240,
+        "bottom": 32486,
+        "right": 135800,
+        "top": 35660
+      },
+      "polygon": [
+        [
+          135800,
+          32486
+        ],
+        [
+          135240,
+          34820
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          135800,
+          35660
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 135240,
+        "bottom": 32566,
+        "right": 135800,
+        "top": 35660
+      },
+      "polygon": [
+        [
+          135240,
+          32566
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          135800,
+          35660
+        ],
+        [
+          135800,
+          34900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 135240,
+        "bottom": 33106,
+        "right": 136920,
+        "top": 37094
+      },
+      "polygon": [
+        [
+          136920,
+          33106
+        ],
+        [
+          135240,
+          34820
+        ],
+        [
+          135240,
+          35380
+        ],
+        [
+          136920,
+          37094
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 135240,
+        "bottom": 36706,
+        "right": 136920,
+        "top": 40694
+      },
+      "polygon": [
+        [
+          136920,
+          36706
+        ],
+        [
+          135240,
+          38420
+        ],
+        [
+          135240,
+          38980
+        ],
+        [
+          136920,
+          40694
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 36706,
+        "right": 136920,
+        "top": 86554
+      },
+      "polygon": [
+        [
+          136920,
+          36706
+        ],
+        [
+          135240,
+          38420
+        ],
+        [
+          135240,
+          84840
+        ],
+        [
+          136920,
+          86554
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135240,
+        "bottom": 36706,
+        "right": 136920,
+        "top": 86654
+      },
+      "polygon": [
+        [
+          136920,
+          36706
+        ],
+        [
+          135240,
+          38420
+        ],
+        [
+          135240,
+          84940
+        ],
+        [
+          136920,
+          86654
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__aoi21_1",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__aoi21_1"
+      ],
+      "bbox": {
+        "left": 135240,
+        "bottom": 82466,
+        "right": 136920,
+        "top": 86654
+      },
+      "polygon": [
+        [
+          136920,
+          82466
+        ],
+        [
+          135240,
+          84180
+        ],
+        [
+          135240,
+          84940
+        ],
+        [
+          136920,
+          86654
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135800,
+        "bottom": 4780,
+        "right": 136360,
+        "top": 5780
+      },
+      "polygon": [
+        [
+          135800,
+          4780
+        ],
+        [
+          135800,
+          5780
+        ],
+        [
+          136360,
+          5780
+        ],
+        [
+          136360,
+          4780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 135800,
+        "bottom": 4780,
+        "right": 138415,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          135800,
+          4780
+        ],
+        [
+          136920,
+          6020
+        ],
+        [
+          138415,
+          6020
+        ],
+        [
+          136360,
+          4780
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 3686,
+        "right": 136920,
+        "top": 6580
+      },
+      "polygon": [
+        [
+          136360,
+          3686
+        ],
+        [
+          136360,
+          4780
+        ],
+        [
+          136920,
+          6580
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 3686,
+        "right": 136920,
+        "top": 7114
+      },
+      "polygon": [
+        [
+          136360,
+          3686
+        ],
+        [
+          136360,
+          4780
+        ],
+        [
+          136920,
+          7114
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 4220,
+        "right": 136920,
+        "top": 7114
+      },
+      "polygon": [
+        [
+          136360,
+          4220
+        ],
+        [
+          136360,
+          4780
+        ],
+        [
+          136920,
+          7114
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 5780,
+        "right": 136920,
+        "top": 8874
+      },
+      "polygon": [
+        [
+          136360,
+          5780
+        ],
+        [
+          136360,
+          6540
+        ],
+        [
+          136920,
+          8874
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 5780,
+        "right": 136920,
+        "top": 8914
+      },
+      "polygon": [
+        [
+          136360,
+          5780
+        ],
+        [
+          136360,
+          8914
+        ],
+        [
+          136920,
+          6580
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 5780,
+        "right": 136920,
+        "top": 37994
+      },
+      "polygon": [
+        [
+          136360,
+          5780
+        ],
+        [
+          136360,
+          35660
+        ],
+        [
+          136920,
+          37994
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136360,
+        "bottom": 5880,
+        "right": 136920,
+        "top": 37894
+      },
+      "polygon": [
+        [
+          136360,
+          5880
+        ],
+        [
+          136360,
+          35560
+        ],
+        [
+          136920,
+          37894
+        ],
+        [
+          136920,
+          6020
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 136360,
+        "bottom": 32566,
+        "right": 136920,
+        "top": 37994
+      },
+      "polygon": [
+        [
+          136920,
+          32566
+        ],
+        [
+          136360,
+          34900
+        ],
+        [
+          136360,
+          35660
+        ],
+        [
+          136920,
+          37994
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136920,
+        "bottom": 5420,
+        "right": 139720,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          139160,
+          5420
+        ],
+        [
+          136920,
+          6020
+        ],
+        [
+          137480,
+          6020
+        ],
+        [
+          139720,
+          5420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 136920,
+        "bottom": 5420,
+        "right": 142044,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          139160,
+          5420
+        ],
+        [
+          136920,
+          6020
+        ],
+        [
+          142044,
+          6020
+        ],
+        [
+          139720,
+          5420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 0,
+        "right": 139160,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          137480,
+          0
+        ],
+        [
+          137480,
+          1040
+        ],
+        [
+          139160,
+          2754
+        ],
+        [
+          139160,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 0,
+        "right": 139160,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          137480,
+          0
+        ],
+        [
+          137480,
+          2754
+        ],
+        [
+          139160,
+          1040
+        ],
+        [
+          139160,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 0,
+        "right": 139160,
+        "top": 4694
+      },
+      "polygon": [
+        [
+          139160,
+          0
+        ],
+        [
+          137480,
+          900
+        ],
+        [
+          137480,
+          2980
+        ],
+        [
+          139160,
+          4694
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 0,
+        "right": 139160,
+        "top": 4694
+      },
+      "polygon": [
+        [
+          137480,
+          0
+        ],
+        [
+          137480,
+          2980
+        ],
+        [
+          139160,
+          4694
+        ],
+        [
+          139160,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 706,
+        "right": 139160,
+        "top": 4694
+      },
+      "polygon": [
+        [
+          139160,
+          706
+        ],
+        [
+          137480,
+          2420
+        ],
+        [
+          137480,
+          2980
+        ],
+        [
+          139160,
+          4694
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 2946,
+        "right": 139160,
+        "top": 4694
+      },
+      "polygon": [
+        [
+          137480,
+          2946
+        ],
+        [
+          137480,
+          2980
+        ],
+        [
+          139160,
+          4694
+        ],
+        [
+          139160,
+          4660
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 6580,
+        "right": 138880,
+        "top": 96869
+      },
+      "polygon": [
+        [
+          137480,
+          6580
+        ],
+        [
+          137480,
+          94920
+        ],
+        [
+          138880,
+          96869
+        ],
+        [
+          138880,
+          8372
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 6580,
+        "right": 138880,
+        "top": 96969
+      },
+      "polygon": [
+        [
+          137480,
+          6580
+        ],
+        [
+          137480,
+          95020
+        ],
+        [
+          138880,
+          96969
+        ],
+        [
+          138880,
+          8372
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 137480,
+        "bottom": 6580,
+        "right": 145796,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          137480,
+          6580
+        ],
+        [
+          138880,
+          8372
+        ],
+        [
+          145796,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__xnor2_1",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__xnor2_1"
+      ],
+      "bbox": {
+        "left": 137480,
+        "bottom": 92311,
+        "right": 138880,
+        "top": 96969
+      },
+      "polygon": [
+        [
+          138880,
+          92311
+        ],
+        [
+          137480,
+          94260
+        ],
+        [
+          137480,
+          95020
+        ],
+        [
+          138880,
+          96969
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 139720,
+        "bottom": 0,
+        "right": 141400,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          139720,
+          0
+        ],
+        [
+          139720,
+          1040
+        ],
+        [
+          141400,
+          2060
+        ],
+        [
+          141400,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 139720,
+        "bottom": 0,
+        "right": 141400,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          139720,
+          0
+        ],
+        [
+          139720,
+          2754
+        ],
+        [
+          141400,
+          1040
+        ],
+        [
+          141400,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 139720,
+        "bottom": 0,
+        "right": 141400,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          139720,
+          0
+        ],
+        [
+          139720,
+          3674
+        ],
+        [
+          141400,
+          1960
+        ],
+        [
+          141400,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 139720,
+        "bottom": 0,
+        "right": 141400,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          139720,
+          0
+        ],
+        [
+          139720,
+          3774
+        ],
+        [
+          141400,
+          2060
+        ],
+        [
+          141400,
+          1300
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 139720,
+        "bottom": 0,
+        "right": 141400,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          141400,
+          0
+        ],
+        [
+          139720,
+          900
+        ],
+        [
+          139720,
+          3774
+        ],
+        [
+          141400,
+          2060
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 140412,
+        "bottom": 6580,
+        "right": 144164,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          140412,
+          6580
+        ],
+        [
+          142008,
+          8372
+        ],
+        [
+          142568,
+          8372
+        ],
+        [
+          144164,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 140668,
+        "bottom": 6580,
+        "right": 144200,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          140668,
+          6580
+        ],
+        [
+          142264,
+          8372
+        ],
+        [
+          142824,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 140924,
+        "bottom": 6580,
+        "right": 144200,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          140924,
+          6580
+        ],
+        [
+          142520,
+          8372
+        ],
+        [
+          143080,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141180,
+        "bottom": 6580,
+        "right": 144200,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          141180,
+          6580
+        ],
+        [
+          142776,
+          8372
+        ],
+        [
+          143336,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141436,
+        "bottom": 6580,
+        "right": 144200,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          141436,
+          6580
+        ],
+        [
+          143032,
+          8372
+        ],
+        [
+          143592,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141960,
+        "bottom": 0,
+        "right": 143640,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          141960,
+          0
+        ],
+        [
+          141960,
+          2060
+        ],
+        [
+          143640,
+          1040
+        ],
+        [
+          143640,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141960,
+        "bottom": 0,
+        "right": 143640,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          141960,
+          0
+        ],
+        [
+          141960,
+          1040
+        ],
+        [
+          143640,
+          2754
+        ],
+        [
+          143640,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141960,
+        "bottom": 0,
+        "right": 143640,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          143640,
+          0
+        ],
+        [
+          141960,
+          900
+        ],
+        [
+          141960,
+          1960
+        ],
+        [
+          143640,
+          3674
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141960,
+        "bottom": 0,
+        "right": 143640,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          143640,
+          0
+        ],
+        [
+          141960,
+          1300
+        ],
+        [
+          141960,
+          2060
+        ],
+        [
+          143640,
+          3774
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 141960,
+        "bottom": 0,
+        "right": 143640,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          141960,
+          0
+        ],
+        [
+          141960,
+          2060
+        ],
+        [
+          143640,
+          3774
+        ],
+        [
+          143640,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 142044,
+        "bottom": 6580,
+        "right": 145796,
+        "top": 8372
+      },
+      "polygon": [
+        [
+          143640,
+          6580
+        ],
+        [
+          142044,
+          8372
+        ],
+        [
+          145796,
+          8372
+        ],
+        [
+          144200,
+          6580
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 144200,
+        "bottom": 0,
+        "right": 145880,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          144200,
+          0
+        ],
+        [
+          144200,
+          1040
+        ],
+        [
+          145880,
+          2060
+        ],
+        [
+          145880,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 144200,
+        "bottom": 0,
+        "right": 145880,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          144200,
+          0
+        ],
+        [
+          144200,
+          2754
+        ],
+        [
+          145880,
+          1040
+        ],
+        [
+          145880,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 144200,
+        "bottom": 0,
+        "right": 145880,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          144200,
+          0
+        ],
+        [
+          144200,
+          3674
+        ],
+        [
+          145880,
+          1960
+        ],
+        [
+          145880,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 144200,
+        "bottom": 0,
+        "right": 145880,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          144200,
+          0
+        ],
+        [
+          144200,
+          3774
+        ],
+        [
+          145880,
+          2060
+        ],
+        [
+          145880,
+          1300
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 144200,
+        "bottom": 0,
+        "right": 145880,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          145880,
+          0
+        ],
+        [
+          144200,
+          900
+        ],
+        [
+          144200,
+          3774
+        ],
+        [
+          145880,
+          2060
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 0,
+        "right": 148120,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          146440,
+          0
+        ],
+        [
+          146440,
+          2060
+        ],
+        [
+          148120,
+          1040
+        ],
+        [
+          148120,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 0,
+        "right": 148120,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          146440,
+          0
+        ],
+        [
+          146440,
+          1040
+        ],
+        [
+          148120,
+          2754
+        ],
+        [
+          148120,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 0,
+        "right": 148120,
+        "top": 3080
+      },
+      "polygon": [
+        [
+          146440,
+          0
+        ],
+        [
+          146440,
+          2060
+        ],
+        [
+          148120,
+          3080
+        ],
+        [
+          148120,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 0,
+        "right": 148120,
+        "top": 3180
+      },
+      "polygon": [
+        [
+          148120,
+          0
+        ],
+        [
+          146440,
+          1300
+        ],
+        [
+          146440,
+          2060
+        ],
+        [
+          148120,
+          3180
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 0,
+        "right": 148120,
+        "top": 3180
+      },
+      "polygon": [
+        [
+          148120,
+          0
+        ],
+        [
+          146440,
+          900
+        ],
+        [
+          146440,
+          1960
+        ],
+        [
+          148120,
+          3180
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 146440,
+        "bottom": 706,
+        "right": 148120,
+        "top": 3180
+      },
+      "polygon": [
+        [
+          146440,
+          706
+        ],
+        [
+          146440,
+          2060
+        ],
+        [
+          148120,
+          3180
+        ],
+        [
+          148120,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 147840,
+        "bottom": 16329,
+        "right": 148960,
+        "top": 295343
+      },
+      "polygon": [
+        [
+          147840,
+          16329
+        ],
+        [
+          147840,
+          293220
+        ],
+        [
+          148960,
+          295343
+        ],
+        [
+          148960,
+          18452
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 148680,
+        "bottom": 0,
+        "right": 150360,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          148680,
+          0
+        ],
+        [
+          148680,
+          2754
+        ],
+        [
+          150360,
+          1040
+        ],
+        [
+          150360,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 148680,
+        "bottom": 0,
+        "right": 150360,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          148680,
+          0
+        ],
+        [
+          148680,
+          1040
+        ],
+        [
+          150360,
+          2754
+        ],
+        [
+          150360,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 148680,
+        "bottom": 0,
+        "right": 150360,
+        "top": 4794
+      },
+      "polygon": [
+        [
+          150360,
+          0
+        ],
+        [
+          148680,
+          900
+        ],
+        [
+          148680,
+          3080
+        ],
+        [
+          150360,
+          4794
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 148680,
+        "bottom": 0,
+        "right": 150360,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          148680,
+          0
+        ],
+        [
+          148680,
+          3180
+        ],
+        [
+          150360,
+          4894
+        ],
+        [
+          150360,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 148680,
+        "bottom": 706,
+        "right": 150360,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          150360,
+          706
+        ],
+        [
+          148680,
+          2420
+        ],
+        [
+          148680,
+          3180
+        ],
+        [
+          150360,
+          4894
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 150308,
+        "bottom": 17740,
+        "right": 155452,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          150308,
+          18452
+        ],
+        [
+          155452,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 150920,
+        "bottom": 0,
+        "right": 152600,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          150920,
+          0
+        ],
+        [
+          150920,
+          1040
+        ],
+        [
+          152600,
+          2754
+        ],
+        [
+          152600,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 150920,
+        "bottom": 0,
+        "right": 152600,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          150920,
+          0
+        ],
+        [
+          150920,
+          2754
+        ],
+        [
+          152600,
+          1040
+        ],
+        [
+          152600,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 150920,
+        "bottom": 0,
+        "right": 152600,
+        "top": 17114
+      },
+      "polygon": [
+        [
+          152600,
+          0
+        ],
+        [
+          150920,
+          900
+        ],
+        [
+          150920,
+          15400
+        ],
+        [
+          152600,
+          17114
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 150920,
+        "bottom": 0,
+        "right": 152600,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          150920,
+          0
+        ],
+        [
+          150920,
+          15500
+        ],
+        [
+          152600,
+          17214
+        ],
+        [
+          152600,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 150920,
+        "bottom": 13026,
+        "right": 152600,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          152600,
+          13026
+        ],
+        [
+          150920,
+          14740
+        ],
+        [
+          150920,
+          15500
+        ],
+        [
+          152600,
+          17214
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 150920,
+        "bottom": 15266,
+        "right": 152600,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          150920,
+          15266
+        ],
+        [
+          150920,
+          15500
+        ],
+        [
+          152600,
+          17214
+        ],
+        [
+          152600,
+          16980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 152088,
+        "bottom": 17740,
+        "right": 153160,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          152088,
+          18452
+        ],
+        [
+          152648,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 152344,
+        "bottom": 17740,
+        "right": 153160,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          152344,
+          18452
+        ],
+        [
+          152904,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 152600,
+        "bottom": 17740,
+        "right": 153160,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          152600,
+          18452
+        ],
+        [
+          153160,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 152600,
+        "bottom": 17740,
+        "right": 153416,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          152856,
+          18452
+        ],
+        [
+          153416,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 152600,
+        "bottom": 17740,
+        "right": 153672,
+        "top": 18452
+      },
+      "polygon": [
+        [
+          152600,
+          17740
+        ],
+        [
+          153112,
+          18452
+        ],
+        [
+          153672,
+          18452
+        ],
+        [
+          153160,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 153160,
+        "bottom": 0,
+        "right": 154840,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          153160,
+          0
+        ],
+        [
+          153160,
+          1040
+        ],
+        [
+          154840,
+          2754
+        ],
+        [
+          154840,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 153160,
+        "bottom": 0,
+        "right": 154840,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          153160,
+          0
+        ],
+        [
+          153160,
+          2754
+        ],
+        [
+          154840,
+          1040
+        ],
+        [
+          154840,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 153160,
+        "bottom": 0,
+        "right": 154840,
+        "top": 4794
+      },
+      "polygon": [
+        [
+          153160,
+          0
+        ],
+        [
+          153160,
+          4794
+        ],
+        [
+          154840,
+          3080
+        ],
+        [
+          154840,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 153160,
+        "bottom": 0,
+        "right": 154840,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          154840,
+          0
+        ],
+        [
+          153160,
+          900
+        ],
+        [
+          153160,
+          4894
+        ],
+        [
+          154840,
+          3180
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 153160,
+        "bottom": 706,
+        "right": 154840,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          153160,
+          706
+        ],
+        [
+          153160,
+          4894
+        ],
+        [
+          154840,
+          3180
+        ],
+        [
+          154840,
+          2420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 155400,
+        "bottom": 0,
+        "right": 157080,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          155400,
+          0
+        ],
+        [
+          155400,
+          1040
+        ],
+        [
+          157080,
+          2754
+        ],
+        [
+          157080,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 155400,
+        "bottom": 0,
+        "right": 157080,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          155400,
+          0
+        ],
+        [
+          155400,
+          2754
+        ],
+        [
+          157080,
+          1040
+        ],
+        [
+          157080,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 155400,
+        "bottom": 0,
+        "right": 157080,
+        "top": 4794
+      },
+      "polygon": [
+        [
+          157080,
+          0
+        ],
+        [
+          155400,
+          900
+        ],
+        [
+          155400,
+          3080
+        ],
+        [
+          157080,
+          4794
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 155400,
+        "bottom": 0,
+        "right": 157080,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          155400,
+          0
+        ],
+        [
+          155400,
+          3180
+        ],
+        [
+          157080,
+          4894
+        ],
+        [
+          157080,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 155400,
+        "bottom": 706,
+        "right": 157080,
+        "top": 4894
+      },
+      "polygon": [
+        [
+          157080,
+          706
+        ],
+        [
+          155400,
+          2420
+        ],
+        [
+          155400,
+          3180
+        ],
+        [
+          157080,
+          4894
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 0,
+        "right": 159320,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          157640,
+          0
+        ],
+        [
+          157640,
+          2754
+        ],
+        [
+          159320,
+          1040
+        ],
+        [
+          159320,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 0,
+        "right": 159320,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          157640,
+          0
+        ],
+        [
+          157640,
+          1040
+        ],
+        [
+          159320,
+          2754
+        ],
+        [
+          159320,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 0,
+        "right": 159320,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          159320,
+          0
+        ],
+        [
+          157640,
+          900
+        ],
+        [
+          157640,
+          6020
+        ],
+        [
+          159320,
+          5420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 0,
+        "right": 159320,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          157640,
+          0
+        ],
+        [
+          157640,
+          6020
+        ],
+        [
+          159320,
+          5320
+        ],
+        [
+          159320,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 2946,
+        "right": 159320,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          157640,
+          2946
+        ],
+        [
+          157640,
+          6020
+        ],
+        [
+          159320,
+          5420
+        ],
+        [
+          159320,
+          4660
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 157640,
+        "bottom": 5420,
+        "right": 161000,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          159320,
+          5420
+        ],
+        [
+          157640,
+          6020
+        ],
+        [
+          161000,
+          6020
+        ],
+        [
+          159880,
+          5420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159320,
+        "bottom": 5420,
+        "right": 161000,
+        "top": 6020
+      },
+      "polygon": [
+        [
+          159320,
+          5420
+        ],
+        [
+          160440,
+          6020
+        ],
+        [
+          161000,
+          6020
+        ],
+        [
+          159880,
+          5420
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159880,
+        "bottom": 0,
+        "right": 161560,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          159880,
+          0
+        ],
+        [
+          159880,
+          1040
+        ],
+        [
+          161560,
+          2060
+        ],
+        [
+          161560,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159880,
+        "bottom": 0,
+        "right": 161560,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          159880,
+          0
+        ],
+        [
+          159880,
+          2754
+        ],
+        [
+          161560,
+          1040
+        ],
+        [
+          161560,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159880,
+        "bottom": 0,
+        "right": 161560,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          159880,
+          0
+        ],
+        [
+          159880,
+          3674
+        ],
+        [
+          161560,
+          1960
+        ],
+        [
+          161560,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159880,
+        "bottom": 0,
+        "right": 161560,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          159880,
+          0
+        ],
+        [
+          159880,
+          3774
+        ],
+        [
+          161560,
+          2060
+        ],
+        [
+          161560,
+          1300
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 159880,
+        "bottom": 0,
+        "right": 161560,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          161560,
+          0
+        ],
+        [
+          159880,
+          900
+        ],
+        [
+          159880,
+          3774
+        ],
+        [
+          161560,
+          2060
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 162120,
+        "bottom": 0,
+        "right": 163800,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          162120,
+          0
+        ],
+        [
+          162120,
+          2060
+        ],
+        [
+          163800,
+          1040
+        ],
+        [
+          163800,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 162120,
+        "bottom": 0,
+        "right": 163800,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          162120,
+          0
+        ],
+        [
+          162120,
+          1040
+        ],
+        [
+          163800,
+          2754
+        ],
+        [
+          163800,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 162120,
+        "bottom": 0,
+        "right": 163800,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          163800,
+          0
+        ],
+        [
+          162120,
+          900
+        ],
+        [
+          162120,
+          1960
+        ],
+        [
+          163800,
+          3674
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 162120,
+        "bottom": 0,
+        "right": 163800,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          163800,
+          0
+        ],
+        [
+          162120,
+          1300
+        ],
+        [
+          162120,
+          2060
+        ],
+        [
+          163800,
+          3774
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 162120,
+        "bottom": 0,
+        "right": 163800,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          162120,
+          0
+        ],
+        [
+          162120,
+          2060
+        ],
+        [
+          163800,
+          3774
+        ],
+        [
+          163800,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 164360,
+        "bottom": 0,
+        "right": 166040,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          164360,
+          0
+        ],
+        [
+          164360,
+          1040
+        ],
+        [
+          166040,
+          2754
+        ],
+        [
+          166040,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 164360,
+        "bottom": 0,
+        "right": 166040,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          164360,
+          0
+        ],
+        [
+          164360,
+          2754
+        ],
+        [
+          166040,
+          1040
+        ],
+        [
+          166040,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 164360,
+        "bottom": 0,
+        "right": 166040,
+        "top": 19354
+      },
+      "polygon": [
+        [
+          164360,
+          0
+        ],
+        [
+          164360,
+          19354
+        ],
+        [
+          166040,
+          17640
+        ],
+        [
+          166040,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 164360,
+        "bottom": 0,
+        "right": 166040,
+        "top": 19454
+      },
+      "polygon": [
+        [
+          166040,
+          0
+        ],
+        [
+          164360,
+          900
+        ],
+        [
+          164360,
+          19454
+        ],
+        [
+          166040,
+          17740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 164360,
+        "bottom": 15266,
+        "right": 166040,
+        "top": 19454
+      },
+      "polygon": [
+        [
+          164360,
+          15266
+        ],
+        [
+          164360,
+          19454
+        ],
+        [
+          166040,
+          17740
+        ],
+        [
+          166040,
+          16980
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 166600,
+        "bottom": 0,
+        "right": 168280,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          166600,
+          0
+        ],
+        [
+          166600,
+          1040
+        ],
+        [
+          168280,
+          2754
+        ],
+        [
+          168280,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 166600,
+        "bottom": 0,
+        "right": 168280,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          166600,
+          0
+        ],
+        [
+          166600,
+          2754
+        ],
+        [
+          168280,
+          1040
+        ],
+        [
+          168280,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 166600,
+        "bottom": 0,
+        "right": 168280,
+        "top": 19354
+      },
+      "polygon": [
+        [
+          168280,
+          0
+        ],
+        [
+          166600,
+          900
+        ],
+        [
+          166600,
+          17640
+        ],
+        [
+          168280,
+          19354
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 166600,
+        "bottom": 0,
+        "right": 168280,
+        "top": 19454
+      },
+      "polygon": [
+        [
+          166600,
+          0
+        ],
+        [
+          166600,
+          17740
+        ],
+        [
+          168280,
+          19454
+        ],
+        [
+          168280,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 166600,
+        "bottom": 15266,
+        "right": 168280,
+        "top": 19454
+      },
+      "polygon": [
+        [
+          168280,
+          15266
+        ],
+        [
+          166600,
+          16980
+        ],
+        [
+          166600,
+          17740
+        ],
+        [
+          168280,
+          19454
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 168840,
+        "bottom": 0,
+        "right": 170520,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          168840,
+          0
+        ],
+        [
+          168840,
+          2754
+        ],
+        [
+          170520,
+          1040
+        ],
+        [
+          170520,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 168840,
+        "bottom": 0,
+        "right": 170520,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          168840,
+          0
+        ],
+        [
+          168840,
+          1040
+        ],
+        [
+          170520,
+          2754
+        ],
+        [
+          170520,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 168840,
+        "bottom": 0,
+        "right": 170520,
+        "top": 17114
+      },
+      "polygon": [
+        [
+          168840,
+          0
+        ],
+        [
+          168840,
+          17114
+        ],
+        [
+          170520,
+          15400
+        ],
+        [
+          170520,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 168840,
+        "bottom": 0,
+        "right": 170520,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          170520,
+          0
+        ],
+        [
+          168840,
+          900
+        ],
+        [
+          168840,
+          17214
+        ],
+        [
+          170520,
+          15500
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 168840,
+        "bottom": 13026,
+        "right": 170520,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          168840,
+          13026
+        ],
+        [
+          168840,
+          17214
+        ],
+        [
+          170520,
+          15500
+        ],
+        [
+          170520,
+          14740
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 171080,
+        "bottom": 0,
+        "right": 172760,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          171080,
+          0
+        ],
+        [
+          171080,
+          1040
+        ],
+        [
+          172760,
+          2754
+        ],
+        [
+          172760,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 171080,
+        "bottom": 0,
+        "right": 172760,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          171080,
+          0
+        ],
+        [
+          171080,
+          2754
+        ],
+        [
+          172760,
+          1040
+        ],
+        [
+          172760,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 171080,
+        "bottom": 0,
+        "right": 172760,
+        "top": 17114
+      },
+      "polygon": [
+        [
+          172760,
+          0
+        ],
+        [
+          171080,
+          900
+        ],
+        [
+          171080,
+          15400
+        ],
+        [
+          172760,
+          17114
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 171080,
+        "bottom": 0,
+        "right": 172760,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          171080,
+          0
+        ],
+        [
+          171080,
+          15500
+        ],
+        [
+          172760,
+          17214
+        ],
+        [
+          172760,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": "gf180mcu_fd_sc_mcu9t5v0__fill_32",
+      "source_path": [
+        "gf180mcu_fd_sc_mcu9t5v0__fill_32"
+      ],
+      "bbox": {
+        "left": 171080,
+        "bottom": 13026,
+        "right": 172760,
+        "top": 17214
+      },
+      "polygon": [
+        [
+          172760,
+          13026
+        ],
+        [
+          171080,
+          14740
+        ],
+        [
+          171080,
+          15500
+        ],
+        [
+          172760,
+          17214
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 173320,
+        "bottom": 0,
+        "right": 175000,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          173320,
+          0
+        ],
+        [
+          173320,
+          1040
+        ],
+        [
+          175000,
+          2060
+        ],
+        [
+          175000,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 173320,
+        "bottom": 0,
+        "right": 175000,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          173320,
+          0
+        ],
+        [
+          173320,
+          2754
+        ],
+        [
+          175000,
+          1040
+        ],
+        [
+          175000,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 173320,
+        "bottom": 0,
+        "right": 175000,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          173320,
+          0
+        ],
+        [
+          173320,
+          3674
+        ],
+        [
+          175000,
+          1960
+        ],
+        [
+          175000,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 173320,
+        "bottom": 0,
+        "right": 175000,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          173320,
+          0
+        ],
+        [
+          173320,
+          3774
+        ],
+        [
+          175000,
+          2060
+        ],
+        [
+          175000,
+          1300
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 173320,
+        "bottom": 0,
+        "right": 175000,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          175000,
+          0
+        ],
+        [
+          173320,
+          900
+        ],
+        [
+          173320,
+          3774
+        ],
+        [
+          175000,
+          2060
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 175560,
+        "bottom": 0,
+        "right": 177240,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          175560,
+          0
+        ],
+        [
+          175560,
+          2060
+        ],
+        [
+          177240,
+          1040
+        ],
+        [
+          177240,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 175560,
+        "bottom": 0,
+        "right": 177240,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          175560,
+          0
+        ],
+        [
+          175560,
+          1040
+        ],
+        [
+          177240,
+          2754
+        ],
+        [
+          177240,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 175560,
+        "bottom": 0,
+        "right": 177240,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          177240,
+          0
+        ],
+        [
+          175560,
+          900
+        ],
+        [
+          175560,
+          1960
+        ],
+        [
+          177240,
+          3674
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 175560,
+        "bottom": 0,
+        "right": 177240,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          175560,
+          0
+        ],
+        [
+          175560,
+          2060
+        ],
+        [
+          177240,
+          3774
+        ],
+        [
+          177240,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 175560,
+        "bottom": 0,
+        "right": 177240,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          177240,
+          0
+        ],
+        [
+          175560,
+          1300
+        ],
+        [
+          175560,
+          2060
+        ],
+        [
+          177240,
+          3774
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 177800,
+        "bottom": 0,
+        "right": 179480,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          177800,
+          0
+        ],
+        [
+          177800,
+          1040
+        ],
+        [
+          179480,
+          2060
+        ],
+        [
+          179480,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 177800,
+        "bottom": 0,
+        "right": 179480,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          177800,
+          0
+        ],
+        [
+          177800,
+          2754
+        ],
+        [
+          179480,
+          1040
+        ],
+        [
+          179480,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 177800,
+        "bottom": 0,
+        "right": 179480,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          177800,
+          0
+        ],
+        [
+          177800,
+          3674
+        ],
+        [
+          179480,
+          1960
+        ],
+        [
+          179480,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 177800,
+        "bottom": 0,
+        "right": 179480,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          179480,
+          0
+        ],
+        [
+          177800,
+          900
+        ],
+        [
+          177800,
+          3774
+        ],
+        [
+          179480,
+          2060
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 177800,
+        "bottom": 0,
+        "right": 179480,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          177800,
+          0
+        ],
+        [
+          177800,
+          3774
+        ],
+        [
+          179480,
+          2060
+        ],
+        [
+          179480,
+          1300
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 180040,
+        "bottom": 0,
+        "right": 181720,
+        "top": 2060
+      },
+      "polygon": [
+        [
+          180040,
+          0
+        ],
+        [
+          180040,
+          2060
+        ],
+        [
+          181720,
+          1040
+        ],
+        [
+          181720,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 180040,
+        "bottom": 0,
+        "right": 181720,
+        "top": 2754
+      },
+      "polygon": [
+        [
+          180040,
+          0
+        ],
+        [
+          180040,
+          1040
+        ],
+        [
+          181720,
+          2754
+        ],
+        [
+          181720,
+          0
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 180040,
+        "bottom": 0,
+        "right": 181720,
+        "top": 3674
+      },
+      "polygon": [
+        [
+          181720,
+          0
+        ],
+        [
+          180040,
+          900
+        ],
+        [
+          180040,
+          1960
+        ],
+        [
+          181720,
+          3674
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 180040,
+        "bottom": 0,
+        "right": 181720,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          180040,
+          0
+        ],
+        [
+          180040,
+          2060
+        ],
+        [
+          181720,
+          3774
+        ],
+        [
+          181720,
+          900
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 180040,
+        "bottom": 0,
+        "right": 181720,
+        "top": 3774
+      },
+      "polygon": [
+        [
+          181720,
+          0
+        ],
+        [
+          180040,
+          1300
+        ],
+        [
+          180040,
+          2060
+        ],
+        [
+          181720,
+          3774
+        ]
+      ]
+    },
+    {
+      "rule": "mim.space.1",
+      "description": "minimum MiM bottom-plate (metal4) spacing to bottom-plate metal (approximated as general metal4-to-metal4 spacing)",
+      "check": "space",
+      "layer": "Metal4",
+      "cell": "tmds_encoder",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 237440,
+        "bottom": 16329,
+        "right": 238560,
+        "top": 295343
+      },
+      "polygon": [
+        [
+          237440,
+          16329
+        ],
+        [
+          237440,
+          293220
+        ],
+        [
+          238560,
+          295343
+        ],
+        [
+          238560,
+          18452
+        ]
+      ]
+    }
+  ],
+  "coverage": {
+    "deck_layers": [
+      "21/0",
+      "22/0",
+      "30/0",
+      "33/0",
+      "34/0",
+      "35/0",
+      "36/0",
+      "37/0",
+      "38/0",
+      "40/0",
+      "41/0",
+      "42/0",
+      "46/0",
+      "53/0",
+      "75/0",
+      "81/0",
+      "127/5"
+    ],
+    "layers_checked": [
+      "21/0",
+      "22/0",
+      "30/0",
+      "33/0",
+      "34/0",
+      "35/0",
+      "36/0",
+      "38/0",
+      "40/0",
+      "41/0",
+      "42/0",
+      "46/0",
+      "81/0"
+    ],
+    "layers_in_stream_without_rules": [
+      "0/0",
+      "21/10",
+      "31/0",
+      "32/0",
+      "34/10",
+      "46/10",
+      "55/0",
+      "63/63",
+      "81/10",
+      "112/1",
+      "204/0",
+      "204/10"
+    ],
+    "rules_skipped": [
+      "bjt.separation.comp.1",
+      "metaltop.space.1",
+      "metaltop.width.1",
+      "mim.enclosing.fusetop.1",
+      "mim.enclosing.via4.1",
+      "pad.enclosing.metal5.1"
+    ],
+    "voltage_domain_warnings": [
+      {
+        "marker": "55/0",
+        "description": "Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck's DRC rules apply the 3.3V/_LV thresholds to geometry regardless of Dualgate's presence (e.g. DF.1a min COMP width 0.22 vs. the real 5V/6V DF.1a_MV 0.30, DF.3a min COMP space 0.28 vs. 0.36, DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate."
+      }
+    ],
+    "deck_scope": [
+      "10.4.2 MIM Option B",
+      "10.7 DRC_BJT Mark Layer",
+      "7.12 Contact",
+      "7.13 Metaln",
+      "7.14 Vian",
+      "7.15 MetalTop",
+      "7.4 Nwell",
+      "7.5 Comp",
+      "7.7 Poly2",
+      "9.1 Bond Pad"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:a788d9b69fe3604fa687fd16399dd5d48ec68d565f688279a5982a0877e312c1"
+    },
+    "input": {
+      "content_hash": "sha256:b7f15dc6a4099c2c72c459d77145c596576f20d433c9ec321c91ae67951f286c"
+    }
+  }
+}

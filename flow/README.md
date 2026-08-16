@@ -11,14 +11,29 @@ Synthesis and place-and-route recipes (Yosys, OpenROAD) driven through `klt`.
   corner), and writes a gate-level netlist plus an append-only evidence
   record. See the module's own docstring for the full recipe and the
   cross-checks it runs.
-- `tmds_encoder/` -- this module's synthesis outputs:
+- `pnr_tmds_encoder.py` -- OpenROAD place-and-route driver for the netlist
+  `synth_tmds_encoder.py` produced (issue #84). Floorplan, tap/endcap, power
+  distribution network, placement, and routing via OpenROAD, then an
+  in-process (never a `klayout` subprocess) DEF->GDS merge via the
+  `klayout` PyPI package. Writes the routed DEF, the merged block-level GDS
+  (`layout/gds/tmds_encoder.gds`), and its own evidence record. See the
+  module's own docstring for the full recipe -- including two real,
+  found-and-fixed upstream DEF->GDS-merge defects (a DBU mismatch that
+  silently dropped via-cut geometry, and a related standard-cell-library
+  merge scale corruption) -- and `layout/README.md`'s `tmds_encoder`
+  section for the DRC/LVS signoff this GDS was checked against.
+- `tmds_encoder/` -- this module's synthesis and place-and-route outputs:
   ```
   tmds_encoder/
     netlist/tmds_encoder.synth.v   current gate-level netlist (regenerated
                                     in place by re-running the driver --
                                     not append-only, same as rtl/ source)
+    pnr/tmds_encoder.def           routed DEF (pnr_tmds_encoder.py)
     reports/<record-id>.synth.ys   exact Yosys script run for that record
     reports/<record-id>.synth.log  full Yosys log for that record
+    reports/<record-id>.pnr.tcl    exact OpenROAD script run for that P&R record
+    reports/<record-id>.pnr.log    full OpenROAD log for that P&R record
+    reports/<record-id>.gds_merge.log   DEF->GDS merge log for that P&R record
     records/<record-id>.md         append-only evidence record (see below)
   ```
 
@@ -45,6 +60,19 @@ is not a `gf180mcu_fd_sc_mcu9t5v0__*` standard cell (an "unmapped cell" --
 checked by re-parsing the written netlist, not merely assumed; see the
 module docstring's "no unmapped cells" section). A clean run reports the
 total cell count and writes the evidence record described below.
+
+Place-and-route (requires OpenROAD on `PATH`, run via the pinned
+`openroad/orfs` Docker image, plus the `klayout` PyPI package for the GDS
+merge step -- see "Pinned toolchain" below):
+
+```bash
+python3 flow/pnr_tmds_encoder.py
+```
+
+Takes the netlist `synth_tmds_encoder.py` already wrote, as-is (never
+re-synthesizes it). See the module's own docstring for the full recipe,
+and `layout/README.md`'s `tmds_encoder` section for how to regenerate the
+DRC/LVS reports against the GDS this writes.
 
 ## Evidence record format
 
@@ -77,6 +105,8 @@ the authoritative convention for `flow/`'s own evidence records, mirroring
 | Tool | Verified version | Pin mechanism |
 |---|---|---|
 | Yosys | 0.67 (`yowasp-yosys` locally); CI installs Ubuntu's `yosys` apt package and prints `yosys -V` (`.github/workflows/ci.yml`) | recorded per-record in `tmds_encoder/records/<record-id>.md` |
+| OpenROAD | `26Q3-1278-g4421880472`, run via the `openroad/orfs:latest` Docker image (`docker run -v <repo>:<repo> -w <repo bind mount> openroad/orfs:latest bash -c 'source /OpenROAD-flow-scripts/env.sh && python3 flow/pnr_tmds_encoder.py'` -- bind-mount at the *same* absolute path both inside and outside the container, since `pnr_tmds_encoder.py` writes host-absolute paths) | recorded per-record in `tmds_encoder/records/<record-id>.md`; not on `brew`/`pip` |
+| `klayout` PyPI package | `0.30.10` (`klayout.db`, `pnr_tmds_encoder.py`'s GDS merge step only) | `pip install klayout` -- not preinstalled in the `openroad/orfs` image |
 | gf180mcu PDK | `gf180mcuD`, open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` | `sim/pdk.json` (shared pin with the analog side) |
 | Python | 3.11+ | stdlib only -- no venv, no requirements.txt (same rule `sim/harness/README.md` states for the analog harness) |
 
@@ -120,8 +150,10 @@ not this directory.
 This directory currently synthesizes the encoder only (`rtl/tmds_encoder.v`
 -- the 10:1->2:1 serializer is a deliberate follow-on, per `rtl/README.md`).
 Static timing analysis against the pixel-domain-derived rate (5x pixel
-clock = 371.25 MHz @ 720p60, DR-0003's flagged open item) and
-place-and-route are both explicitly **out of scope for this synthesis
-step** -- separate, sequenced issues own them, so that this driver's job
-stays "does the RTL map cleanly to this library's cells," not "does it
-close timing" or "what's the placed area."
+clock = 371.25 MHz @ 720p60, DR-0003's flagged open item) is explicitly
+**out of scope for this synthesis step** -- a separate, sequenced issue
+(#83) owns it, so that this driver's job stays "does the RTL map cleanly to
+this library's cells," not "does it close timing." Place-and-route
+(`pnr_tmds_encoder.py`, above) has since landed (issue #84) -- also without
+a timing-closure claim, since #83 hasn't landed yet either (no clock-tree
+synthesis is run; see that module's own "No CTS" docstring section).
