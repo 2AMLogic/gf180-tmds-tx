@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-08-16
+
+- **Issue #81** (closed): Decompose the T1 re-read's failing items (#65) into dispatchable issues
+
 ### 2026-08-15
 
 - **Issue #75** (closed): Dedupe RECORD_ID_RE regex: sim/harness/evidence_lint.py vs sim/compare_records.py
