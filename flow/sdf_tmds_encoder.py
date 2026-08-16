@@ -78,7 +78,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -149,21 +148,6 @@ exit
 """
 
 
-def run_openroad(script: str, log_path: Path) -> subprocess.CompletedProcess:
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    script_path = log_path.with_suffix(".tcl")
-    script_path.write_text(script)
-    result = subprocess.run(
-        ["openroad", "-no_init", "-exit", str(script_path)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    log_path.write_text((result.stdout or "") + (result.stderr or ""))
-    return result
-
-
 def parse_worst_unconstrained_delay(log_text: str) -> str | None:
     matches = _WORST_DELAY_RE.findall(log_text)
     return matches[0] if matches else None
@@ -215,7 +199,7 @@ def main() -> int:
     STA_DIR.mkdir(parents=True, exist_ok=True)
     script = build_tcl(tech_lef, sc_lef, liberty, ROUTED_DEF)
     print(f"Extracting parasitics and back-annotated SDF for {TOP} ...")
-    result = run_openroad(script, log_path)
+    result = pnr.run_openroad(script, log_path)
     log_text = log_path.read_text()
     if result.returncode != 0 or "Error:" in log_text or "[ERROR" in log_text:
         print(f"ERROR: openroad exited {result.returncode} -- see {log_path}", file=sys.stderr)
