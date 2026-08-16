@@ -14,14 +14,15 @@ never re-synthesizes it -- and place-and-routes it against the gf180mcu
         flow/tmds_encoder/reports/<record-id>.pnr.log
   - an append-only evidence record: flow/tmds_encoder/records/<record-id>.md
 
-Scope (per issue #84): place-and-route only -- floorplan, tap/endcap
-insertion, power distribution network (PDN), placement, routing, and filler
-insertion. No static timing analysis and no timing-closure claim is made
-here (same DR-0003 boundary #82's synthesis step already draws): clock-tree
-synthesis is deliberately **not** run (see "No CTS" below), and the one
-`create_clock` this script's Tcl issues is a mechanical convenience for the
-router/legalizer, not a verified operating frequency -- see this module's
-evidence record template for the exact wording.
+Scope (per issue #84, extended by #100): place-and-route, now including
+clock-tree synthesis and post-CTS hold repair -- floorplan, tap/endcap
+insertion, power distribution network (PDN), placement, clock-tree
+synthesis, hold repair, routing, and filler insertion. No standalone static
+timing analysis and no timing-closure *verdict* is made here -- that remains
+`flow/sta_tmds_encoder.py`'s job, re-run against this script's output -- but
+`repair_timing -hold` here does actively fix any hold violation CTS itself
+introduces. See "Clock-tree synthesis" below for the full recipe and why #84
+originally skipped it.
 
 PDK resolution reuses ``sim/harness/pdk.py`` (via ``flow/synth_tmds_encoder.py``,
 imported for its already-reviewed ``record_id``/``_git``/``working_tree_dirty``
@@ -60,16 +61,36 @@ every run:
    exactly what P&R actually builds: no tie cell, no dead net, because
    nothing in the real circuit needs one.
 
-## No CTS
+## Clock-tree synthesis (issue #100)
 
-Clock-tree synthesis is not run. #82's synthesis step deliberately applied
-no clock-period constraint (DR-0003 flags the synthesized-domain clock
-ceiling as unverified, owned by a dedicated follow-on STA issue, #83) --
-running CTS would need *some* clock period to balance skew against, and any
-number this script picked would look like a timing commitment this repo has
-not earned yet. The clock net routes as an ordinary signal net instead
-(unbalanced, no clock buffers inserted) -- correct for a P&R-only claim, and
-explicitly not a statement about achievable frequency.
+Clock-tree synthesis now runs. #84 (this script's original form) deliberately
+skipped it "for want of a clock period" -- #82's synthesis applied no
+clock-period constraint at the time, so any period this script picked would
+have looked like an unearned timing commitment. Issue #100's timing-driven
+resynthesis (`flow/synth_tmds_encoder.py`) now targets a real period
+(`spec/tmds-tx.md` §2's 720p60 74.25 MHz pixel clock, `synth.TARGET_PERIOD_NS`),
+so this script uses that same period for `clock_tree_synthesis`, balancing
+the clock net's insertion delay/skew rather than leaving it as an ordinary,
+unbuffered signal net.
+
+Recipe (after placement, before routing -- the conventional CTS point):
+`create_clock` (same period as synthesis), `estimate_parasitics -placement`,
+`clock_tree_synthesis -buf_list <clkbuf_* cells> -sink_clustering_enable`,
+`set_propagated_clock [all_clocks]`, then `detailed_placement` to legalize
+the CTS-inserted buffers. Per issue #100's own scope item 2, hold is
+re-checked and repaired after CTS: `repair_timing -hold` (CTS-inserted clock
+buffers change insertion delay per register, which can turn a passing hold
+path into a violation even though hold was clock-period-independent and
+passed at every corner pre-CTS -- see #83's record), followed by another
+`detailed_placement` to legalize whatever `repair_timing` itself inserts.
+The constraint set (`set_input_delay 0` / `set_output_delay 0` /
+`set_driving_cell`/`set_load`) mirrors `flow/sta_tmds_encoder.py`'s own SDC
+assumptions exactly, so `repair_timing`'s view of the design's I/O boundary
+is not looser than what the post-route STA record checks against.
+
+This still does not by itself constitute a timing-closure claim -- that
+remains `flow/sta_tmds_encoder.py`'s job, re-run against this script's routed
+DEF and post-CTS parasitics.
 
 ## GDS streamout: DEF+LEF -> GDS, and a DBU mismatch that dropped most vias
 
@@ -231,6 +252,21 @@ CORE_UTILIZATION = 35  # percent -- see evidence record for the resulting effect
 PLACE_DENSITY = 0.45
 CORE_SPACE_UM = 4
 
+# Clock-tree synthesis (issue #100) -- see this module's docstring
+# "Clock-tree synthesis" section. Same period synth_tmds_encoder.py's ABC
+# mapping now targets (spec/tmds-tx.md §2's 720p60 pixel clock).
+CTS_PERIOD_NS = synth.TARGET_PERIOD_NS
+# Candidate buffer cells for CTS -- every clkbuf_* drive strength the library
+# ships, so OpenROAD's CTS engine can pick the size each level of the tree
+# needs rather than being limited to one.
+CTS_BUF_LIST = [f"{STD_CELL_LIB}__clkbuf_{d}" for d in (1, 2, 3, 4, 8, 12, 16, 20)]
+# I/O boundary assumptions for `repair_timing`, numerically identical to
+# flow/sta_tmds_encoder.py's own DRIVING_CELL/OUTPUT_LOAD_PF (kept in sync
+# manually; both cite the same rationale -- see that driver's docstring).
+SDC_DRIVING_CELL = f"{STD_CELL_LIB}__inv_1"
+SDC_DRIVING_CELL_PIN = "ZN"
+SDC_OUTPUT_LOAD_PF = 0.027252
+
 # OpenROAD-flow-scripts' bundled, gf180-platform-specific streamout assets
 # this driver reuses read-only for the GDS merge step -- static PDK viewer
 # metadata (KLayout technology file + GDS layer map), not design data. Paths
@@ -306,6 +342,31 @@ pdngen
 global_placement -density {PLACE_DENSITY}
 detailed_placement
 optimize_mirroring
+
+# Clock-tree synthesis (issue #100) -- see this module's docstring "Clock-tree
+# synthesis" section for the full recipe and rationale. Boundary constraint
+# assumptions below are numerically identical to flow/sta_tmds_encoder.py's
+# own generated SDC.
+create_clock -name clk -period {CTS_PERIOD_NS:.4f} [get_ports clk]
+set non_clk_inputs [get_ports {{data[*] ctrl[*] de rst}}]
+set_input_delay 0.0000 -clock clk $non_clk_inputs
+set_output_delay 0.0000 -clock clk [all_outputs]
+set_driving_cell -lib_cell {SDC_DRIVING_CELL} -pin {SDC_DRIVING_CELL_PIN} $non_clk_inputs
+set_load {SDC_OUTPUT_LOAD_PF} [all_outputs]
+
+estimate_parasitics -placement
+clock_tree_synthesis -buf_list {{{" ".join(CTS_BUF_LIST)}}} -sink_clustering_enable
+set_propagated_clock [all_clocks]
+estimate_parasitics -placement
+detailed_placement
+
+# Hold repair (issue #100 step 2): CTS changes per-register clock insertion
+# delay, which can turn a pre-CTS-passing hold path into a violation even
+# though hold is clock-period-independent (see #83's record, "Known
+# limitations" 1). repair_timing legalizes via another detailed_placement.
+estimate_parasitics -placement
+repair_timing -hold
+detailed_placement
 
 global_route
 detailed_route -output_drc {BUILD_DIR}/route_drc.rpt -output_maze {BUILD_DIR}/maze.log
@@ -562,9 +623,13 @@ def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_lo
   the gf180mcu `{STD_CELL_LIB}` standard-cell library at the `{STD_CELL_CORNER}`
   corner (spec/tmds-tx.md DR-0003's synthesized-domain corner, same as #82).
   Addresses #65 item 2 (layout) on the digital partition.
-- **Scope**: Place-and-route only (floorplan, tap/endcap, PDN, placement,
-  routing, filler insertion). No CTS, no SDC/clock-period constraint, no
-  timing-closure claim -- see `flow/pnr_tmds_encoder.py`'s "No CTS" section.
+- **Scope**: Place-and-route, now including clock-tree synthesis and post-CTS
+  hold repair (issue #100 step 2) -- floorplan, tap/endcap, PDN, placement,
+  CTS, hold repair, routing, filler insertion. No standalone timing-closure
+  *verdict* is made here -- that remains `flow/sta_tmds_encoder.py`'s job,
+  re-run against this record's DEF -- but `repair_timing -hold` here actively
+  fixes any hold violation CTS itself introduces. See
+  `flow/pnr_tmds_encoder.py`'s "Clock-tree synthesis" section.
 - **Tool versions**:
   - OpenROAD: `26Q3-1278-g4421880472` (run via the `openroad/orfs:latest`
     Docker image -- see `flow/README.md`'s "Pinned toolchain")
@@ -579,6 +644,16 @@ def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_lo
   - PDN: `flow/tmds_encoder/pnr/pdn.tcl` (Metal1 followpins + Metal4/Metal5
     stripes, the same grid strategy OpenROAD-flow-scripts' own gf180 9-track
     platform config uses)
+  - Clock-tree synthesis (issue #100): `create_clock -period {CTS_PERIOD_NS:.4f}`
+    (`spec/tmds-tx.md` §2's 720p60 target), `clock_tree_synthesis -buf_list
+    {{{" ".join(CTS_BUF_LIST)}}} -sink_clustering_enable`, then `detailed_placement`
+    to legalize the inserted buffers.
+  - Hold repair (issue #100): `repair_timing -hold` after CTS, then another
+    `detailed_placement` to legalize whatever it inserts -- run at the
+    `{STD_CELL_CORNER}` corner this script's liberty uses; the quantitative
+    post-CTS/post-repair hold verdict across all five 3.3 V corners is
+    `flow/sta_tmds_encoder.py`'s job, re-run against this record's DEF, not
+    this record's own claim.
   - Routing: `global_route` + `detailed_route` (TritonRoute), Metal2-Metal5
     (IO pins on Metal3/Metal4)
   - Filler: `filler_placement {STD_CELL_LIB}__fill_*`
@@ -588,8 +663,21 @@ def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_lo
   reader -- the committed `tmds_encoder.synth.v` is never modified): see
   `flow/pnr_tmds_encoder.py`'s "Two mechanical ... preprocessing steps".
 - **Known limitations (disclosed, not silently worked around)**:
-  1. **No CTS / no timing claim** -- see "Scope" above.
-  2. **DRC**: `klt drc` reports `status: violations` against the merged GDS
+  1. **No standalone timing-closure verdict** -- CTS and hold repair now run
+     (see "Scope" above), but the quantitative multi-corner setup/hold
+     verdict remains `flow/sta_tmds_encoder.py`'s job, re-run separately
+     against this record's DEF.
+  1a. **DRC/LVS reports not re-run against this record's GDS (disclosed, not
+     silently stale)**: `layout/drc_reports/tmds_encoder.drc.json`/`.txt` and
+     `layout/lvs_reports/tmds_encoder.lvs.json`/`.txt` (items 2/3 below) were
+     generated against the *pre-#100* GDS (no CTS, no hold repair). Placement
+     and routing both change once CTS/hold-repair buffers are inserted, so
+     those reports describe a superseded layout, not this record's GDS.
+     Re-running `klt drc`/`klt extract`/`klt lvs` against the new GDS is
+     outside issue #100's scope (digital timing closure, not physical
+     verification) and is left as an explicit, disclosed follow-up rather
+     than silently re-asserting stale numbers here.
+  2. **DRC** (pre-#100 GDS, see 1a): `klt drc` reports `status: violations` against the merged GDS
      (188 violations, all `mim.space.1`, none attributed to a
      `source_cell`) -- see `layout/drc_reports/tmds_encoder.drc.json`/`.txt`
      and `layout/README.md`'s `tmds_encoder` section. Filed as
@@ -599,7 +687,7 @@ def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_lo
      so) that cannot distinguish a real MiM capacitor's bottom plate from
      ordinary Metal4 PDN stripes/routing -- this design has zero capacitor
      devices anywhere.
-  3. **LVS**: `klt lvs` reports `status: mismatch` (10 topology mismatches;
+  3. **LVS** (pre-#100 GDS, see 1a): `klt lvs` reports `status: mismatch` (10 topology mismatches;
      281/281 nets and 25/25 pins otherwise match) -- see
      `layout/lvs_reports/tmds_encoder.lvs.json`/`.txt`. All 10 are P&R-inserted
      filler/tap/endcap standard-cell *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`,
