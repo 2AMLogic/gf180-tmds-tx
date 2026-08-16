@@ -17,15 +17,13 @@ _None._
 
 Issues flagged as highest priority (`loom:urgent`).
 
-- **#95**: Dedupe append-only guard across report.py's 4 evidence writers; closes a silent-overwrite gap in write_device_netlist_snapshot
-- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
+_None._
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#95**: Dedupe append-only guard across report.py's 4 evidence writers; closes a silent-overwrite gap in write_device_netlist_snapshot
-- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
+_None._
 
 ## In Progress
 
@@ -49,8 +47,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#95**: Dedupe append-only guard across report.py's 4 evidence writers; closes a silent-overwrite gap in write_device_netlist_snapshot *(curated)*
-- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital) *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
@@ -65,12 +62,12 @@ Issues carrying `loom:curated`.
 | Tier | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Urgent | 2 |
-| Ready (`loom:issue`) | 2 |
+| Urgent | 0 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Curated | 0 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
