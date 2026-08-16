@@ -266,4 +266,4 @@ an area-oriented mapping, every cell at drive strength 1, no `.sdc`). These
 results characterize *that netlist*, not this library's ceiling for this
 RTL. Timing-driven re-synthesis plus clock-tree synthesis has never been
 attempted here and is the substantive follow-up -- deliberately out of
-#83's evidence-gathering scope.
+#83's evidence-gathering scope, and tracked as issue #100.
