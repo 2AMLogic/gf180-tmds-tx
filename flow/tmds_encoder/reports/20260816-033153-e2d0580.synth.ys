@@ -1,0 +1,19 @@
+read_verilog /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v
+hierarchy -check -top tmds_encoder
+proc
+opt
+fsm
+opt
+memory
+opt
+techmap
+opt
+dfflibmap -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+abc -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+opt_clean -purge
+clean
+setundef -zero
+stat -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+select -assert-none t:$_*
+check -noinit
+write_verilog -noattr /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/flow/tmds_encoder/netlist/tmds_encoder.synth.v
