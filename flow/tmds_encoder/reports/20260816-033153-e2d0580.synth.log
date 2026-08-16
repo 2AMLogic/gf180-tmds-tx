@@ -1,0 +1,677 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, Clang /workspace/YoWASP/yosys/wasi-sdk-33.0-x86_64-linux/share/cmake/../..//bin/clang++ 22.1.0)
+
+-- Running command `read_verilog /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v
+hierarchy -check -top tmds_encoder
+proc
+opt
+fsm
+opt
+memory
+opt
+techmap
+opt
+dfflibmap -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+abc -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+opt_clean -purge
+clean
+setundef -zero
+stat -liberty /home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+select -assert-none t:$_*
+check -noinit
+write_verilog -noattr /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/flow/tmds_encoder/netlist/tmds_encoder.synth.v
+' --
+
+1. Executing Verilog-2005 frontend: /home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v
+Parsing Verilog input from `/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v' to AST representation.
+Generating RTLIL representation for module `\tmds_encoder'.
+Successfully finished Verilog frontend.
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+
+2.1. Analyzing design hierarchy..
+Top module:  \tmds_encoder
+
+2.2. Analyzing design hierarchy..
+Top module:  \tmds_encoder
+Removed 0 unused modules.
+
+3. Executing PROC pass (convert processes to netlists).
+
+3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$77 in module tmds_encoder.
+Marked 2 switch rules as full_case in process $proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11 in module tmds_encoder.
+Marked 1 switch rules as full_case in process $proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:183$10 in module tmds_encoder.
+Removed a total of 0 dead cases.
+
+3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 2 redundant assignments.
+Promoted 31 assignments to connections.
+
+3.4. Executing PROC_INIT pass (extract init attributes).
+
+3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~5 debug messages>
+
+3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$77'.
+     1/8: $2\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.next_cnt[7:0]$116
+     2/8: $2\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$115 [7:0]
+     3/8: $2\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$115 [8]
+     4/8: $2\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$115 [9]
+     5/8: $1\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$100 [9]
+     6/8: $1\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.next_cnt[7:0]$101
+     7/8: $1\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$100 [7:0]
+     8/8: $1\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$9.qout[9:0]$100 [8]
+Creating decoders for process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:177$12'.
+Creating decoders for process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11'.
+     1/2: $0\cnt[7:0]
+     2/2: $0\tmds[9:0]
+Creating decoders for process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:183$10'.
+     1/1: $1\ctrl_code[9:0]
+
+3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\tmds_encoder.\stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$5.$result' from process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$77'.
+No latch inferred for signal `\tmds_encoder.\stage1$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:177$4.$result' from process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:177$12'.
+No latch inferred for signal `\tmds_encoder.\ctrl_code' from process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:183$10'.
+
+3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\tmds_encoder.\tmds' using process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11'.
+  created $dff cell `$procdff$176' with positive edge clock.
+Creating register for signal `\tmds_encoder.\cnt' using process `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11'.
+  created $dff cell `$procdff$177' with positive edge clock.
+
+3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 2 empty switches in `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$77'.
+Removing empty process `tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$77'.
+Removing empty process `tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:177$12'.
+Found and cleaned up 2 empty switches in `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11'.
+Removing empty process `tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:192$11'.
+Found and cleaned up 1 empty switch in `\tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:183$10'.
+Removing empty process `tmds_encoder.$proc$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:183$10'.
+Cleaned up 5 empty switches.
+
+3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+<suppressed ~9 debug messages>
+
+4. Executing OPT pass (performing simple optimizations).
+
+4.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+<suppressed ~5 debug messages>
+
+4.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 102 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 92 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 91 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 90 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 89 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 88 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 87 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 86 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 85 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+<suppressed ~51 debug messages>
+Removed a total of 17 cells.
+
+4.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$128.
+    dead port 1/2 on $mux $procmux$134.
+    dead port 1/2 on $mux $procmux$139.
+    dead port 1/2 on $mux $procmux$145.
+Removed 4 multiplexer ports.
+<suppressed ~39 debug messages>
+
+4.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 1 changes.
+
+4.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 80 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+4.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$176 ($dff) from module tmds_encoder (D = $procmux$166_Y, Q = \tmds, rval = 10'1101010100).
+Adding SRST signal on $procdff$177 ($dff) from module tmds_encoder (D = \stage2$func$/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-82/rtl/tmds_encoder.v:178$5.$result [7:0], Q = \cnt, rval = 8'00000000).
+
+4.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+Removed 3 unused cells and 91 unused wires.
+<suppressed ~5 debug messages>
+
+4.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+4.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+4.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+4.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 78 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+4.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+4.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+4.16. Finished fast OPT passes. (There is nothing left to do.)
+
+5. Executing FSM pass (extract and optimize FSM).
+
+5.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+5.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+5.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+5.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+5.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+5.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+6. Executing OPT pass (performing simple optimizations).
+
+6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 78 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 78 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+6.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+6.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+6.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+6.9. Finished fast OPT passes. (There is nothing left to do.)
+
+7. Executing MEMORY pass.
+
+7.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+7.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+7.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+7.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+7.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+7.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+7.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+7.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+7.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+7.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+7.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+8. Executing OPT pass (performing simple optimizations).
+
+8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 78 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 78 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+8.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+8.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+8.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+8.9. Finished fast OPT passes. (There is nothing left to do.)
+
+9. Executing TECHMAP pass (map to technology primitives).
+
+9.1. Executing Verilog-2005 frontend: /share/techmap.v
+Parsing Verilog input from `/share/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu_brent_kung'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `$__div_mod_u'.
+Generating RTLIL representation for module `$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Generating RTLIL representation for module `$connect'.
+Generating RTLIL representation for module `$input_port'.
+Successfully finished Verilog frontend.
+
+9.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $sdff.
+Running "alumacc" on wrapper $extern:wrap:$add:Y_WIDTH=4:B_WIDTH=1:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$add:Y_WIDTH=4:B_WIDTH=1:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$add:Y_WIDTH=4:B_WIDTH=1:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Running "alumacc" on wrapper $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=4:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=4:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=4:A_WIDTH=4:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $logic_or.
+Using extmapper simplemap for cells of type $xor.
+Using extmapper simplemap for cells of type $mux.
+Running "alumacc" on wrapper $extern:wrap:$sub:Y_WIDTH=32:B_WIDTH=32:A_WIDTH=32:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$sub:Y_WIDTH=32:B_WIDTH=32:A_WIDTH=32:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$sub:Y_WIDTH=32:B_WIDTH=32:A_WIDTH=32:B_SIGNED=0:A_SIGNED=0:394426c56d1a028ba8fdd5469b163e04011def47.
+Using extmapper simplemap for cells of type $logic_not.
+Running "alumacc" on wrapper $extern:wrap:$neg:Y_WIDTH=8:A_WIDTH=8:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$neg:Y_WIDTH=8:A_WIDTH=8:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$neg:Y_WIDTH=8:A_WIDTH=8:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Running "alumacc" on wrapper $extern:wrap:$add:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$add:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$add:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Running "alumacc" on wrapper $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$gt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Running "alumacc" on wrapper $extern:wrap:$lt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$lt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$lt:Y_WIDTH=1:B_WIDTH=32:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Running "alumacc" on wrapper $extern:wrap:$sub:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using template $extern:wrap:$sub:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47 for cells of type $extern:wrap:$sub:Y_WIDTH=8:B_WIDTH=8:A_WIDTH=8:B_SIGNED=1:A_SIGNED=1:394426c56d1a028ba8fdd5469b163e04011def47.
+Using extmapper simplemap for cells of type $pmux.
+Using template $paramod$32a7b7b86c07519b7537abc18e96f0331f97914d\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $reduce_and.
+Using template $paramod$740b056ede97228d3eae64ea2fdc81f0a33e0fe7\_90_alu for cells of type $alu.
+Using template $paramod$fbc7873bff55778c0b3173955b7e4bce1d9d6834\_90_alu for cells of type $alu.
+Using template $paramod$fd7bfb1a4f3a7c2ac1a35670d0fa64ccc7b91841\_90_alu for cells of type $alu.
+Using template $paramod$08c2d337fba0d8fba53e35b89be96dd105931d9e\_90_alu for cells of type $alu.
+Using template $paramod$8fdcfe020be5e507ba05385ffd706e02b549d39d\_90_alu for cells of type $alu.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000000100 for cells of type $fa.
+Using template $paramod\_90_lcu_brent_kung\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000100000 for cells of type $fa.
+Using template $paramod\_90_lcu_brent_kung\WIDTH=32'00000000000000000000000000100000 for cells of type $lcu.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000001000 for cells of type $fa.
+Using template $paramod\_90_lcu_brent_kung\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
+Using extmapper simplemap for cells of type $and.
+No more expansions possible.
+<suppressed ~2186 debug messages>
+
+10. Executing OPT pass (performing simple optimizations).
+
+10.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+<suppressed ~2586 debug messages>
+
+10.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 1165 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 1003 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 929 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 861 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 826 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 798 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 781 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 766 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 757 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 743 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 733 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 718 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 709 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 697 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 691 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 685 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 682 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 679 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 678 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+<suppressed ~1461 debug messages>
+Removed a total of 487 cells.
+
+10.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+10.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+10.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 678 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+10.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+10.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+Removed 186 unused cells and 2092 unused wires.
+<suppressed ~187 debug messages>
+
+10.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+<suppressed ~11 debug messages>
+
+10.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+10.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+10.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+10.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 481 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 480 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Computing hashes of 479 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+10.13. Executing OPT_DFF pass (perform DFF optimizations).
+Handling D = Q on $auto$ff.cc:337:slice$258 ($_SDFF_PP0_) from module tmds_encoder (conecting SRST instead).
+Setting constant 0-bit at position 0 on $auto$ff.cc:337:slice$258 ($_DFFE_PP_) from module tmds_encoder.
+
+10.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+Removed 0 unused cells and 7 unused wires.
+<suppressed ~1 debug messages>
+
+10.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+<suppressed ~3 debug messages>
+
+10.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+10.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \tmds_encoder..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+10.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \tmds_encoder.
+Performed a total of 0 changes.
+
+10.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\tmds_encoder'.
+Computing hashes of 475 cells of `\tmds_encoder'.
+Finding duplicate cells in `\tmds_encoder'.
+Removed a total of 0 cells.
+
+10.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+10.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \tmds_encoder..
+
+10.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module tmds_encoder.
+
+10.23. Finished fast OPT passes. (There is nothing left to do.)
+
+11. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty file).
+  cell gf180mcu_fd_sc_mcu9t5v0__dffnq_1 (noninv, pins=3, area=84.67) is a direct match for cell type $_DFF_N_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffq_1 (noninv, pins=3, area=79.03) is a direct match for cell type $_DFF_P_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffnrnq_1 (noninv, pins=4, area=90.32) is a direct match for cell type $_DFF_NN0_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffnsnq_1 (noninv, pins=4, area=101.61) is a direct match for cell type $_DFF_NN1_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffrnq_1 (noninv, pins=4, area=90.32) is a direct match for cell type $_DFF_PN0_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffsnq_1 (noninv, pins=4, area=101.61) is a direct match for cell type $_DFF_PN1_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffnrsnq_1 (noninv, pins=5, area=107.25) is a direct match for cell type $_DFFSR_NNN_.
+  cell gf180mcu_fd_sc_mcu9t5v0__dffrsnq_1 (noninv, pins=5, area=104.43) is a direct match for cell type $_DFFSR_PNN_.
+  final dff cell mappings:
+    \gf180mcu_fd_sc_mcu9t5v0__dffnq_1 _DFF_N_ (.CLKN( C), .D( D), .Q( Q));
+    \gf180mcu_fd_sc_mcu9t5v0__dffq_1 _DFF_P_ (.CLK( C), .D( D), .Q( Q));
+    \gf180mcu_fd_sc_mcu9t5v0__dffnrnq_1 _DFF_NN0_ (.CLKN( C), .D( D), .Q( Q), .RN( R));
+    \gf180mcu_fd_sc_mcu9t5v0__dffnsnq_1 _DFF_NN1_ (.CLKN( C), .D( D), .Q( Q), .SETN( R));
+    unmapped dff cell: $_DFF_NP0_
+    unmapped dff cell: $_DFF_NP1_
+    \gf180mcu_fd_sc_mcu9t5v0__dffrnq_1 _DFF_PN0_ (.CLK( C), .D( D), .Q( Q), .RN( R));
+    \gf180mcu_fd_sc_mcu9t5v0__dffsnq_1 _DFF_PN1_ (.CLK( C), .D( D), .Q( Q), .SETN( R));
+    unmapped dff cell: $_DFF_PP0_
+    unmapped dff cell: $_DFF_PP1_
+    unmapped dff cell: $_DFFE_NN_
+    unmapped dff cell: $_DFFE_NP_
+    unmapped dff cell: $_DFFE_PN_
+    unmapped dff cell: $_DFFE_PP_
+    \gf180mcu_fd_sc_mcu9t5v0__dffnrsnq_1 _DFFSR_NNN_ (.CLKN( C), .D( D), .Q( Q), .RN( R), .SETN( S));
+    unmapped dff cell: $_DFFSR_NNP_
+    unmapped dff cell: $_DFFSR_NPN_
+    unmapped dff cell: $_DFFSR_NPP_
+    \gf180mcu_fd_sc_mcu9t5v0__dffrsnq_1 _DFFSR_PNN_ (.CLK( C), .D( D), .Q( Q), .RN( R), .SETN( S));
+    unmapped dff cell: $_DFFSR_PNP_
+    unmapped dff cell: $_DFFSR_PPN_
+    unmapped dff cell: $_DFFSR_PPP_
+
+11.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+<suppressed ~12 debug messages>
+Mapping DFF cells in module `\tmds_encoder':
+  mapped 17 $_DFF_P_ cells to \gf180mcu_fd_sc_mcu9t5v0__dffq_1 cells.
+
+12. Executing ABC pass (technology mapping using ABC).
+
+12.1. Extracting gate netlist of module `\tmds_encoder' to `<abc-temp-dir>/input.blif'..
+======== ABC command line "source /tmp/yosys-liberty-scl-cache/yosys_merged_scl_convert_4554ab49.script"
+Parsing finished successfully.  Parsing time =     0.20 sec
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__antenna" without logic function.
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_1".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_2".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_3".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_4".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_8".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_12".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__bufz_16".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnrsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffnsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffrsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__dffsnq_4".
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__endcap" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_1" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_2" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_4" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_8" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_16" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_32" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fill_64" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fillcap_4" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fillcap_8" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fillcap_16" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fillcap_32" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__fillcap_64" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__filltie" without logic function.
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__hold".
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtn_1" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtn_2" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtn_4" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtp_1" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtp_2" without logic function.
+Scl_LibertyReadGenlib() skipped cell "gf180mcu_fd_sc_mcu9t5v0__icgtp_4" without logic function.
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_1".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_2".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_3".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_4".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_8".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_12".
+Scl_LibertyReadGenlib() skipped three-state cell "gf180mcu_fd_sc_mcu9t5v0__invz_16".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latrsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__latsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffrsnq_4".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffsnq_1".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffsnq_2".
+Scl_LibertyReadGenlib() skipped sequential cell "gf180mcu_fd_sc_mcu9t5v0__sdffsnq_4".
+Library "gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30" from "/home/ubuntu/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib" has 145 cells (84 skipped: 48 seq; 15 tri-state; 21 no func; 0 dont_use; 0 with 2 outputs; 0 with 3+ outputs).  Time =     0.41 sec
+Memory =   24.60 MB. Time =     0.41 sec
+Warning: Detected 6 multi-output cells (for example, "gf180mcu_fd_sc_mcu9t5v0__addf_1").
