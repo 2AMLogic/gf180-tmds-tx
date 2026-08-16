@@ -7,6 +7,12 @@ selected.
 
 ### 2026-08-16
 
+- **PR #93**: flow: extract back-annotated SDF and re-verify gate-level netlist against it
+- **Issue #85** (closed): Digital: post-layout verification with back-annotated SDF (T1 item 7, digital)
+- **PR #92**: flow: place-and-route tmds_encoder to a gf180mcu digital block-level GDS
+- **Issue #84** (closed): Digital: place & route (P&R) to produce a block-level digital layout (T1 item 2, digital)
+- **PR #90**: flow: synthesize tmds_encoder to a gf180mcu gate-level netlist
+- **Issue #82** (closed): Digital: synthesize tmds_encoder to a gate-level netlist (T1 item 1)
 - **Issue #81** (closed): Decompose the T1 re-read's failing items (#65) into dispatchable issues
 
 ### 2026-08-15
