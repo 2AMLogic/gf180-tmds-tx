@@ -166,8 +166,34 @@ def record_id(when: _dt.datetime) -> str:
     return f"{when.strftime('%Y%m%d-%H%M%S')}-{sha}"
 
 
+def _git_status_porcelain() -> str:
+    """``git status --porcelain``, stripped only of trailing whitespace.
+
+    Deliberately NOT `_git()` (issue #100 -- found directly, not assumed):
+    `_git()`'s `.strip()` trims the *whole* multi-line stdout, which eats the
+    leading space of porcelain's unstaged-modify (`" M "`) / unstaged-delete
+    (`" D"`) status code whenever that happens to be the first line -- e.g.
+    `" M flow/tmds_encoder/netlist/tmds_encoder.synth.v"` becomes
+    `"M flow/tmds_encoder/..."`, one character short, so
+    `working_tree_dirty`'s `line[3:]` then reads `"low/tmds_encoder/..."`
+    instead of `"flow/tmds_encoder/..."` and the `flow/tmds_encoder/` exclusion
+    below silently fails to match -- a real run with zero out-of-tree changes
+    was reproducibly flagged `DIRTY` this way while building this issue's
+    evidence records. Every other line is unaffected (`.strip()` only trims
+    string boundaries, not internal lines), which is why this went unnoticed
+    until a `flow/tmds_encoder/` path happened to sort first.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=REPO_ROOT, capture_output=True, text=True, check=False
+        )
+    except OSError:
+        return ""
+    return result.stdout.rstrip("\n") if result.returncode == 0 else ""
+
+
 def working_tree_dirty() -> bool:
-    status = _git("status", "--porcelain")
+    status = _git_status_porcelain()
     for line in status.splitlines():
         path = line[3:].strip().strip('"')
         if " -> " in path:
