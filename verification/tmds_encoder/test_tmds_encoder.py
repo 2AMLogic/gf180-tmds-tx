@@ -33,7 +33,7 @@ from cocotb.triggers import FallingEdge, RisingEdge, Timer  # noqa: E402
 import tmds_model as model  # noqa: E402
 
 # Overridable via TMDS_SIM_CLOCK_PERIOD_NS so the gate-level, SDF-annotated
-# leg (issue #85; see gate_level/runner.py) can drive this exact same,
+# leg (issue #85; see flow/gate_level_sim_tmds_encoder.py) can drive this exact same,
 # unmodified test module at a slower, conservatively-margined period than
 # the RTL/negative-control legs' default 10 ns -- see that module's
 # docstring for why, and verification/README.md's "gate-level SDF-annotated
