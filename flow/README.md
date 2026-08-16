@@ -22,18 +22,43 @@ Synthesis and place-and-route recipes (Yosys, OpenROAD) driven through `klt`.
   silently dropped via-cut geometry, and a related standard-cell-library
   merge scale corruption) -- and `layout/README.md`'s `tmds_encoder`
   section for the DRC/LVS signoff this GDS was checked against.
-- `tmds_encoder/` -- this module's synthesis and place-and-route outputs:
+- `sdf_tmds_encoder.py` -- OpenSTA back-annotated SDF extraction driver for
+  the routed DEF `pnr_tmds_encoder.py` produced (issue #85). Extracts RC
+  parasitics from the routed geometry (OpenRCX, gf180's own typical-corner
+  rule deck) and writes a back-annotated SDF plus its underlying SPEF, at
+  the same `tt_025C_3v30` corner #82/#84 used. No SDC/clock-period
+  constraint is read or assumed -- `report_checks -unconstrained` is used
+  only to log the worst-case combinational delay found, not to render a
+  setup/hold verdict (issue #83's job). See the module's own docstring for
+  the full recipe.
+- `gate_level_sim_tmds_encoder.py` -- re-runs the *exact same, unmodified*
+  cocotb testbench (`verification/tmds_encoder/test_tmds_encoder.py`) that
+  verifies the RTL, this time against the synthesized netlist with the SDF
+  `sdf_tmds_encoder.py` produced back-annotated via Icarus Verilog's
+  `$sdf_annotate` (issue #85). Documents and mechanically works around two
+  Icarus Verilog 13.0 limitations (`ifnone` + edge-sensitive specify paths;
+  `-ginterconnect` net resolution) in its own docstring, and writes its own
+  evidence record citing the P&R revision, the SDF extraction tool/version,
+  and the re-simulation outcome.
+- `tmds_encoder/` -- this module's synthesis, place-and-route, and
+  post-layout-verification outputs:
   ```
   tmds_encoder/
     netlist/tmds_encoder.synth.v   current gate-level netlist (regenerated
                                     in place by re-running the driver --
                                     not append-only, same as rtl/ source)
     pnr/tmds_encoder.def           routed DEF (pnr_tmds_encoder.py)
+    sta/tmds_encoder.sdf           back-annotated SDF (sdf_tmds_encoder.py)
+    sta/tmds_encoder.spef          extracted parasitics (sdf_tmds_encoder.py)
     reports/<record-id>.synth.ys   exact Yosys script run for that record
     reports/<record-id>.synth.log  full Yosys log for that record
     reports/<record-id>.pnr.tcl    exact OpenROAD script run for that P&R record
     reports/<record-id>.pnr.log    full OpenROAD log for that P&R record
     reports/<record-id>.gds_merge.log   DEF->GDS merge log for that P&R record
+    reports/<record-id>.sta.tcl    exact OpenSTA script run for that SDF record
+    reports/<record-id>.sta.log    full OpenSTA log for that SDF record
+    reports/<record-id>.gl_sim.build.log  Icarus build log for that gate-level-sim record
+    reports/<record-id>.gl_sim.test.log   cocotb test log for that gate-level-sim record
     records/<record-id>.md         append-only evidence record (see below)
   ```
 
@@ -74,6 +99,28 @@ re-synthesizes it). See the module's own docstring for the full recipe,
 and `layout/README.md`'s `tmds_encoder` section for how to regenerate the
 DRC/LVS reports against the GDS this writes.
 
+Back-annotated SDF extraction (requires OpenROAD on `PATH`, same
+`openroad/orfs` Docker image as P&R; requires the routed DEF
+`pnr_tmds_encoder.py` already wrote):
+
+```bash
+python3 flow/sdf_tmds_encoder.py
+```
+
+Post-layout gate-level re-simulation (requires the PDK for the vendor
+cell-library Verilog models, Icarus Verilog + cocotb on `PATH` -- same
+toolchain `verification/tmds_encoder/runner.py` uses; requires the SDF
+`sdf_tmds_encoder.py` already wrote):
+
+```bash
+python3 flow/gate_level_sim_tmds_encoder.py
+```
+
+Re-runs `verification/tmds_encoder/test_tmds_encoder.py` unmodified against
+the synthesized netlist, SDF-back-annotated. See the module's own docstring
+for the two Icarus Verilog 13.0 limitations it works around, and why its
+50 ns test clock period is not an operating-frequency claim.
+
 ## Evidence record format
 
 `tmds_encoder/records/<record-id>.md` follows the same append-only
@@ -107,6 +154,9 @@ the authoritative convention for `flow/`'s own evidence records, mirroring
 | Yosys | 0.67 (`yowasp-yosys` locally); CI installs Ubuntu's `yosys` apt package and prints `yosys -V` (`.github/workflows/ci.yml`) | recorded per-record in `tmds_encoder/records/<record-id>.md` |
 | OpenROAD | `26Q3-1278-g4421880472`, run via the `openroad/orfs:latest` Docker image (`docker run -v <repo>:<repo> -w <repo bind mount> openroad/orfs:latest bash -c 'source /OpenROAD-flow-scripts/env.sh && python3 flow/pnr_tmds_encoder.py'` -- bind-mount at the *same* absolute path both inside and outside the container, since `pnr_tmds_encoder.py` writes host-absolute paths) | recorded per-record in `tmds_encoder/records/<record-id>.md`; not on `brew`/`pip` |
 | `klayout` PyPI package | `0.30.10` (`klayout.db`, `pnr_tmds_encoder.py`'s GDS merge step only) | `pip install klayout` -- not preinstalled in the `openroad/orfs` image |
+| OpenSTA (bundled in the `openroad` binary above) | same `26Q3-1278-g4421880472` build, `sdf_tmds_encoder.py`'s SDF/SPEF extraction | recorded per-record in `tmds_encoder/records/<record-id>.md`; no separate install |
+| Icarus Verilog | 13.0, `gate_level_sim_tmds_encoder.py`'s SDF-annotated re-simulation | same pin as `verification/README.md`'s "Pinned toolchain" |
+| cocotb | 2.0.1, `gate_level_sim_tmds_encoder.py`'s SDF-annotated re-simulation | same pin as `verification/tmds_encoder/requirements.txt` |
 | gf180mcu PDK | `gf180mcuD`, open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` | `sim/pdk.json` (shared pin with the analog side) |
 | Python | 3.11+ | stdlib only -- no venv, no requirements.txt (same rule `sim/harness/README.md` states for the analog harness) |
 
@@ -135,7 +185,10 @@ PR. CI does run a PDK-free Yosys *elaboration* smoke check against
 `tmds-encoder-verification` job -- see `verification/README.md`'s "Yosys
 smoke check". This driver is intended to be run, and its evidence record
 committed, by whoever (human or agent) has the PDK installed, the same
-workflow `sim/`'s corner runner already follows.
+workflow `sim/`'s corner runner already follows. `sdf_tmds_encoder.py` and
+`gate_level_sim_tmds_encoder.py` are excluded from CI for the same reason
+(the vendor cell-library Verilog models the latter needs also live under
+the PDK install).
 
 ## Synthesized/custom boundary and what this flow does not answer yet
 
@@ -157,3 +210,9 @@ this library's cells," not "does it close timing." Place-and-route
 (`pnr_tmds_encoder.py`, above) has since landed (issue #84) -- also without
 a timing-closure claim, since #83 hasn't landed yet either (no clock-tree
 synthesis is run; see that module's own "No CTS" docstring section).
+Back-annotated SDF extraction and SDF-annotated gate-level re-simulation
+(`sdf_tmds_encoder.py` / `gate_level_sim_tmds_encoder.py`, above) have since
+landed too (issue #85) -- these demonstrate functional equivalence under
+real post-route delays at a deliberately conservative test clock, but still
+make no formal setup/hold timing-closure or achievable-operating-frequency
+claim; that remains #83's job.
