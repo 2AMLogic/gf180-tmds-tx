@@ -1,0 +1,38 @@
+     -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:94   in _embed_init_python              Using Python 3.14.3 interpreter at /opt/homebrew/opt/python@3.14/bin/python3.14
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:79   in gpi_print_registered_impl       VPI registered
+     0.00ns INFO     cocotb                             Running on Icarus Verilog version 13.0 (stable)
+     0.00ns INFO     cocotb                             Seeding Python random module with 1786867525
+     0.00ns INFO     cocotb                             Initialized cocotb v2.0.1 from /opt/homebrew/lib/python3.14/site-packages/cocotb
+     0.00ns WARNING  py.warnings                        /opt/homebrew/lib/python3.14/site-packages/pytest_asyncio/plugin.py:15: DeprecationWarning: 'asyncio.AbstractEventLoopPolicy' is deprecated and slated for removal in Python 3.16
+                                                          from asyncio import AbstractEventLoop, AbstractEventLoopPolicy
+     0.00ns WARNING  py.warnings                        /opt/homebrew/lib/python3.14/site-packages/pytest_benchmark/plugin.py:255: PendingDeprecationWarning: FileType is deprecated. Simply open files after parsing arguments.
+                                                          type=argparse.FileType('wb'),
+     0.00ns INFO     cocotb                             Running tests
+     0.00ns INFO     cocotb.regression                  running test_tmds_encoder.test_control_characters_and_blanking_reset (1/3)
+                                                            The four fixed control characters, and the blanking-resets-the-
+   725.00ns INFO     cocotb.tmds_encoder                All 4 control characters match the cited DVI 1.0 values.
+ 27175.00ns INFO     cocotb.tmds_encoder                Blanking correctly resets the running-disparity accumulator (256/256 checked).
+ 27175.00ns INFO     cocotb.regression                  test_tmds_encoder.test_control_characters_and_blanking_reset passed
+ 27175.00ns INFO     cocotb.regression                  running test_tmds_encoder.test_exhaustive_equivalence_and_invariants (2/3)
+                                                            Leg 1 + Leg 2.
+ 27176.00ns INFO     cocotb.tmds_encoder                Discovered 9 reachable running-disparity states: [-8, -6, -4, -2, 0, 2, 4, 6, 8]
+ 27176.00ns INFO     cocotb.tmds_encoder                Leg 2 (accumulator excursion): observed max magnitude = 8 (reachable range [-8, 8]) -- confirmed against the DUT below, since every state in this set is established on real hardware via a witness sequence and its resulting encodes are checked against the model
+475200.00ns INFO     cocotb.tmds_encoder                Leg 1 (exhaustive equivalence): checked 2304 of 2304 enumerated (state, data) vectors (9 reachable states x 256 data words) -- full coverage, not a sample.
+475200.00ns INFO     cocotb.tmds_encoder                Leg 2 (transition bound): observed max transitions = 3
+475200.00ns INFO     cocotb.tmds_encoder                Leg 2 (round-trip decode): 0 failures over 2304 vectors
+475200.00ns INFO     cocotb.tmds_encoder                Leg 2 (control/data distinguishability): 460 distinct reachable data codes (of 1024 possible), 0 collide with the 4 control codes
+475200.00ns INFO     cocotb.regression                  test_tmds_encoder.test_exhaustive_equivalence_and_invariants passed
+475200.00ns INFO     cocotb.regression                  running test_tmds_encoder.test_long_run_cumulative_disparity_bound (3/3)
+                                                            Leg 2: over a long pseudo-random stream with realistic blanking
+884325.00ns INFO     cocotb.tmds_encoder                Leg 2 (long-run cumulative disparity): 8180 symbols, observed max |cumulative disparity| = 120
+884325.00ns INFO     cocotb.tmds_encoder                Leg 2 (long-run cumulative disparity): sanity bound = 452.2
+884325.00ns INFO     cocotb.regression                  test_tmds_encoder.test_long_run_cumulative_disparity_bound passed
+884325.00ns INFO     cocotb.regression                  **********************************************************************************************************************
+                                                        ** TEST                                                          STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        **********************************************************************************************************************
+                                                        ** test_tmds_encoder.test_control_characters_and_blanking_reset   PASS       27175.00           0.56      48813.82  **
+                                                        ** test_tmds_encoder.test_exhaustive_equivalence_and_invariants   PASS      448025.00          14.35      31219.45  **
+                                                        ** test_tmds_encoder.test_long_run_cumulative_disparity_bound     PASS      409125.00          18.68      21897.90  **
+                                                        **********************************************************************************************************************
+                                                        ** TESTS=3 PASS=3 FAIL=0 SKIP=0                                             884325.00          33.60      26321.97  **
+                                                        **********************************************************************************************************************

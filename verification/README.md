@@ -278,3 +278,23 @@ this repo doesn't have to rediscover them:
    posedge's non-blocking assignments have safely settled, reads are
    reliable, and the coroutine is back in a normal (write-legal) phase for
    the next vector's stimulus.
+
+### A fourth DUT variant: post-layout, SDF-annotated gate-level re-simulation
+
+This same, unmodified `test_tmds_encoder.py` module also runs against a
+fourth DUT variant beyond the three legs above: the synthesized gate-level
+netlist, SDF-back-annotated with real post-route delays (issue #85). That
+driver lives under `flow/` (`flow/gate_level_sim_tmds_encoder.py`), not
+here, because -- like `flow/synth_tmds_encoder.py` and
+`flow/pnr_tmds_encoder.py` -- it needs the gf180mcu PDK (for the vendor
+cell-library Verilog models) and is therefore not part of this directory's
+CI-gated three-leg layout; see that module's own docstring for the full
+recipe and its evidence record for the re-simulation outcome.
+
+The only change this required here is that `CLOCK_PERIOD_NS` (top of
+`test_tmds_encoder.py`) is overridable via the `TMDS_SIM_CLOCK_PERIOD_NS`
+environment variable, defaulting to `10` (unchanged for this directory's
+own three legs) -- `flow/gate_level_sim_tmds_encoder.py` sets it to a much
+slower, explicitly-not-an-operating-frequency-claim value so the SDF-
+annotated leg's functional-equivalence check is meaningful under real
+back-annotated delays; see that module's docstring, "Test clock period".
