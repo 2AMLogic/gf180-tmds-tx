@@ -17,13 +17,13 @@ _None._
 
 Issues flagged as highest priority (`loom:urgent`).
 
-_None._
+- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
 
 ## In Progress
 
@@ -47,7 +47,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#83**: Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -62,12 +62,12 @@ _None._
 | Tier | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Urgent | 0 |
-| Ready (`loom:issue`) | 0 |
+| Urgent | 1 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 1 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
