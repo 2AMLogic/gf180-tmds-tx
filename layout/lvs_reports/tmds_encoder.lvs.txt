@@ -1,0 +1,23 @@
+layout: ../gds/tmds_encoder.lvs_extracted.spice
+reference: tmds_encoder.ref.spice
+top: TMDS_ENCODER
+engine: klayout
+status: mismatch
+mismatches: 10
+  nets: layout=281  reference=281  matched=169
+  devices: layout=0  reference=0  matched=0
+  pins: layout=25  reference=25  matched=169
+
+category_counts:
+  topology: 10
+
+[error] topology  (both)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart

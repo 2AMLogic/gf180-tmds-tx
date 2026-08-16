@@ -1,0 +1,5 @@
+{
+  "layout": {"netlist": "../gds/tmds_encoder.lvs_extracted.spice", "top": "tmds_encoder"},
+  "reference": {"netlist": "tmds_encoder.ref.spice", "top": "tmds_encoder"},
+  "options": {"combine_devices": false}
+}
