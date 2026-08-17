@@ -76,8 +76,9 @@ test_tmds_encoder.py`'s `CLOCK_PERIOD_NS`, itself unconstrained by any
 timing analysis). It exists only so this leg's functional-equivalence check
 is meaningful under *real* back-annotated delays: this design's own SDF
 evidence record measured a 13.27 ns worst-case unconstrained
-input-to-register combinational delay for the pipelined (DR-0008) netlist
-this driver now runs against (down from the pre-pipeline 18.30 ns issue #85
+input-to-register combinational delay for the DR-0008 single-register
+netlist, and less again for the DR-0009 four-stage netlist this driver now
+runs against (down from the pre-pipeline 18.30 ns issue #85
 originally measured -- `report_checks -unconstrained`, no clock/SDC applied
 -- see `flow/sdf_tmds_encoder.py`). Icarus does not support SDF
 `TIMINGCHECK` enforcement (`$setup`/`$hold` -- see this module's own
@@ -129,7 +130,7 @@ TOP = "tmds_encoder"
 
 NETLIST_PATH = REPO_ROOT / "flow" / "tmds_encoder" / "netlist" / "tmds_encoder.synth.v"
 SDF_PATH = REPO_ROOT / "flow" / "tmds_encoder" / "sta" / "tmds_encoder.sdf"
-PNR_RECORD_ID = "20260817-012011-7d9130d"  # issue #110's pipelined (DR-0008) P&R record, cited below
+PNR_RECORD_ID = "PNR_RECORD_ID_PLACEHOLDER"  # issue #115's four-stage (DR-0009) P&R record, cited below
 
 OUT_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 REPORTS_DIR = OUT_DIR / "reports"
@@ -387,28 +388,27 @@ def render_record(rid, when, pdk: Pdk, n_tests: int, n_failed: int, passed: bool
 
 - **Record ID**: {rid}
 - **Claim**: The digital gate-level testbench (`verification/tmds_encoder/
-  test_tmds_encoder.py`, unmodified except for its own DR-0008 two-clock-
+  test_tmds_encoder.py`, unmodified except for its own DR-0009 four-clock-
   latency update -- see that update's own commit for the rationale) passes
   when run against the post-route, SDF-back-annotated gate-level netlist for
-  `tmds_encoder` (pipelined (DR-0008) synthesized netlist issue #110
+  `tmds_encoder` (four-stage (DR-0009) synthesized netlist issue #115
   produced, `flow/tmds_encoder/netlist/tmds_encoder.synth.v`, unmodified,
   timing-annotated via Icarus Verilog's `$sdf_annotate` from the
-  back-annotated SDF issue #110's own `flow/sdf_tmds_encoder.py` extracted).
+  back-annotated SDF issue #115's own `flow/sdf_tmds_encoder.py` extracted).
   Addresses #65 item 7 (post-layout verification) on the digital partition,
-  and closes the "not re-run against issue #100's timing-driven netlist/SDF"
-  gap issue #100's own STA record disclosed (issue #110 re-runs it against
-  the pipelined revision directly, superseding that gap rather than
-  perpetuating it one revision further).
-- **P&R revision cited**: issue #110's evidence record
+  and is the check that the DR-0009 restructure -- which changed the
+  encoder's internal structure, not just where its registers sit -- still
+  encodes correctly once real post-route delays are annotated, rather than
+  only in zero-delay RTL simulation.
+- **P&R revision cited**: issue #115's evidence record
   `{PNR_RECORD_ID}`
   (`flow/tmds_encoder/records/{PNR_RECORD_ID}.md`), routed DEF
-  `flow/tmds_encoder/pnr/tmds_encoder.def`, git commit `7d9130d`.
+  `flow/tmds_encoder/pnr/tmds_encoder.def`, git commit `{sha}`.
 - **SDF extraction tool/version cited**: `flow/sdf_tmds_encoder.py`'s own
-  evidence record (issue #110, this same issue) -- see that record for the
-  OpenROAD/OpenSTA version, RC extraction rule deck, and the 13.27 ns
-  worst-case unconstrained combinational delay this driver's own
-  `CLOCK_PERIOD_NS` margins against (see this module's docstring, "Test
-  clock period").
+  evidence record (issue #115, this same issue) -- see that record for the
+  OpenROAD/OpenSTA version, RC extraction rule deck, and the worst-case
+  unconstrained combinational delay this driver's own `CLOCK_PERIOD_NS`
+  margins against (see this module's docstring, "Test clock period").
 - **Re-simulation outcome**: {outcome}.
 - **Simulator**: Icarus Verilog (via cocotb's Python runner API,
   `cocotb_tools.runner`), `-g2005 -gspecify` (specify-block/SDF timing
@@ -417,9 +417,10 @@ def render_record(rid, when, pdk: Pdk, n_tests: int, n_failed: int, passed: bool
 - **Test clock period**: {CLOCK_PERIOD_NS} ns -- not an operating-frequency
   claim; see this module's docstring, "Test clock period", for the full
   margin rationale against the worst-case combinational delay
-  `flow/sdf_tmds_encoder.py`'s own record measured (13.27 ns for this
-  pipelined revision, down from the pre-pipeline 18.30 ns issue #85
-  originally measured -- both well inside this driver's margin).
+  `flow/sdf_tmds_encoder.py`'s own record measured for this four-stage
+  (DR-0009) revision -- comfortably inside this driver's margin, as it was
+  for the DR-0008 (13.27 ns) and pre-pipeline (18.30 ns) revisions before
+  it.
 - **Known limitations (disclosed, not silently worked around)**:
   1. **Two Icarus Verilog 13.0 parser/runtime limitations required
      mechanical, documented preprocessing** (`ifnone` + edge-sensitive

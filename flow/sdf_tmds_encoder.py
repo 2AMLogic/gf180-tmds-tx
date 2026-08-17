@@ -97,7 +97,7 @@ REPORTS_DIR = OUT_DIR / "reports"
 RECORDS_DIR = OUT_DIR / "records"
 
 ROUTED_DEF = OUT_DIR / "pnr" / "tmds_encoder.def"
-PNR_RECORD_ID = "20260817-012011-7d9130d"  # issue #110's pipelined (DR-0008) P&R record, cited below
+PNR_RECORD_ID = "PNR_RECORD_ID_PLACEHOLDER"  # issue #115's four-stage (DR-0009) P&R record, cited below
 
 SDF_PATH = STA_DIR / "tmds_encoder.sdf"
 SPEF_PATH = STA_DIR / "tmds_encoder.spef"
@@ -173,7 +173,7 @@ def main() -> int:
         return 3
 
     try:
-        tech_lef, sc_lef, liberty, _cell_gds = pnr.lef_paths(pdk)
+        tech_lef, sc_lef, liberty, _setup_liberty, _cell_gds = pnr.lef_paths(pdk)
     except pnr.PnrError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
@@ -237,10 +237,10 @@ def render_record(rid, when, pdk: Pdk, liberty: Path, worst_delay, net_counts, o
 - **Record ID**: {rid}
 - **Claim**: A back-annotated SDF (real per-cell and per-net delays) and its
   underlying extracted-parasitics SPEF exist for the post-route digital
-  layout issue #110 produced (routed DEF `flow/tmds_encoder/pnr/tmds_encoder.def`,
-  record `{PNR_RECORD_ID}`, git commit `7d9130d`) -- the pipelined (DR-0008)
-  netlist, place-and-routed through the same timing-driven-synthesis + CTS +
-  hold-repair machinery issue #100 built -- built against the gf180mcu
+  layout issue #115 produced (routed DEF `flow/tmds_encoder/pnr/tmds_encoder.def`,
+  record `{PNR_RECORD_ID}`, git commit `{sha}`) -- the four-stage (DR-0009)
+  netlist, place-and-routed through the timing-driven-synthesis + CTS +
+  timing-repair machinery issue #100 built and issue #115 extended -- built against the gf180mcu
   `{pnr.STD_CELL_LIB}` standard-cell library at the `{pnr.STD_CELL_CORNER}` corner
   (spec/tmds-tx.md DR-0003's synthesized-domain corner, same as #82/#84/#100).
   Addresses #65 item 7 (post-layout verification) on the digital partition.
@@ -250,9 +250,9 @@ def render_record(rid, when, pdk: Pdk, liberty: Path, worst_delay, net_counts, o
   -unconstrained` is used only to log the worst-case combinational delay
   found, not to render a setup/hold pass/fail verdict -- that is issue #83's
   (STA) job, not this one's.
-- **P&R revision cited**: issue #110's evidence record `{PNR_RECORD_ID}`
+- **P&R revision cited**: issue #115's evidence record `{PNR_RECORD_ID}`
   (`flow/tmds_encoder/records/{PNR_RECORD_ID}.md`), routed DEF
-  `flow/tmds_encoder/pnr/tmds_encoder.def`, git commit `7d9130d`.
+  `flow/tmds_encoder/pnr/tmds_encoder.def`, git commit `{sha}`.
 - **Tool versions**:
   - OpenROAD/OpenSTA: `{or_version}` (run via the `openroad/orfs:latest`
     Docker image -- see `flow/README.md`'s "Pinned toolchain")
