@@ -21,7 +21,9 @@ corners. This script now feeds ABC an explicit delay target instead:
 
   - **Target period**: `TARGET_PERIOD_NS` (13.4680 ns = 1/74.25 MHz, spec
     §2's 720p60 pixel clock -- not invented here; identical rounding to
-    `flow/sta_tmds_encoder.py`'s own `period_ns(74.25)`).
+    `flow/sta_tmds_encoder.py`'s own `period_ns(74.25)`), less the
+    sequential overhead the "ABC's `-D` budgets combinational logic"
+    section below describes -- i.e. `ABC_TARGET_NS`, not the raw period.
   - **Mapping corner**: `TIMING_CORNER` (`ss_125C_3v00`) rather than the
     `tt_025C_3v30` nominal corner DR-0003's synthesized-domain decision
     names. This is a **worst-case-corner synthesis** choice, not a DR-0003
@@ -45,6 +47,38 @@ This does not by itself guarantee closure at every corner (that is what the
 new STA evidence record this issue produces measures) -- it is the first,
 least-invasive step of issue #100's scope, before clock-tree synthesis and,
 if still insufficient, RTL pipelining.
+
+## ABC's `-D` budgets combinational logic, not the clock period (issue #115)
+
+ABC's `-D` target constrains the delay of the *combinational* logic it maps.
+The clock period, by contrast, must also cover the launching flip-flop's
+clock-to-Q delay, the capturing flip-flop's setup time, and the clock skew
+between them -- none of which ABC models. Handing ABC the raw period
+therefore over-states the logic budget by exactly that sequential overhead,
+and on this design at the worst corner the overstatement is large: 3.12 ns
+of a 13.468 ns period, nearly a quarter of it.
+
+That is not a theoretical concern here. Issue #115's four-stage encoder
+(`spec/tmds-tx.md` DR-0009), mapped with `-D` set to the raw period, came
+out of place-and-route missing 720p60 setup at `ss_125C_3v00` by -0.3249 ns
+on a *register-to-register* path -- ABC had mapped that path to just under
+13.5 ns of logic, which is a correct answer to the question it was asked and
+the wrong answer to the question that matters. `SEQUENTIAL_OVERHEAD_NS`
+(below) subtracts the measured overhead, so the number ABC optimizes against
+is the budget the logic actually has. Nothing about this relaxes the 74.25 MHz
+target or the I/O boundary assumptions: it constrains synthesis *more*
+tightly, not less.
+
+Only the *measured* sequential overhead is subtracted, and deliberately so.
+Subtracting a further interconnect allowance on top (ABC maps with no wire
+model at all, so its own estimate is optimistic) was tried and recorded here
+because it did **not** work: an extra 0.5 ns of target tightening made the
+post-route worst-corner slack *worse*, from -0.0534 ns to -0.2642 ns, because
+ABC's mapping is not monotonic in `-D` -- past a point it starts making
+different structural choices that place-and-route then has to live with.
+Squeezing the last fraction of a nanosecond is `repair_timing -setup`'s job
+in `flow/pnr_tmds_encoder.py`, where real placement-derived parasitics are
+available, not a matter of guessing a tighter number here.
 
 See "no unmapped cells" below for what *is* checked mechanically.
 
@@ -112,7 +146,18 @@ CELL_PREFIX = f"{STD_CELL_LIB}__"
 TIMING_CORNER = "ss_125C_3v00"  # worst setup corner per issue #83's record
 TARGET_FREQ_MHZ = 74.25  # 720p60 pixel clock, spec/tmds-tx.md §2
 TARGET_PERIOD_NS = round(1000.0 / TARGET_FREQ_MHZ, 4)  # 13.4680 ns
-TARGET_PERIOD_PS = round(TARGET_PERIOD_NS * 1000)
+
+# Sequential overhead subtracted from the clock period before handing ABC a
+# delay target -- see this module's docstring, "ABC's `-D` budgets
+# combinational logic, not the clock period" (issue #115). Measured, not
+# guessed: at `TIMING_CORNER`, issue #115's own post-route STA
+# (`flow/tmds_encoder/records/`) reports 2.3452 ns clk->Q on the
+# `gf180mcu_fd_sc_mcu9t5v0__dffq_1` this design's registers map to, 0.7707 ns
+# library setup time at the capture flop, and 0.004 ns launch-vs-capture
+# clock skew -- 3.1199 ns in total, rounded up to a round 3.2 ns.
+SEQUENTIAL_OVERHEAD_NS = 3.2
+ABC_TARGET_NS = round(TARGET_PERIOD_NS - SEQUENTIAL_OVERHEAD_NS, 4)  # 10.2680 ns
+ABC_TARGET_PS = round(ABC_TARGET_NS * 1000)
 
 # I/O boundary assumptions for ABC's `-constr` file -- numerically identical
 # to flow/sta_tmds_encoder.py's DRIVING_CELL / OUTPUT_LOAD_PF (kept in sync
@@ -237,7 +282,7 @@ def build_abc_script() -> str:
     -D <ps>`).
 
     That splice is *not* used here because it was found, directly, to
-    corrupt this design: passing `-D {TARGET_PERIOD_PS}` (no custom
+    corrupt this design: passing `-D {ABC_TARGET_PS}` (no custom
     `-script`) produced a netlist whose `tmds` primary output had **no
     driver at all** (`Warning: Wire tmds_encoder.\\tmds [N] is used but has
     no driver`, all 10 bits, reproduced deterministically) -- ABC's `retime`
@@ -255,7 +300,7 @@ def build_abc_script() -> str:
     cells to hit the delay target, and it is not implicated in the
     corruption.
     """
-    d = f"-D {TARGET_PERIOD_PS}"
+    d = f"-D {ABC_TARGET_PS}"
     return f"""\
 strash
 &get -n
@@ -455,8 +500,13 @@ def render_record(
 - **Standard-cell library**: `{liberty.relative_to(pdk.path)}` (`{STD_CELL_LIB}`,
   `{STD_CELL_CORNER}` nominal corner -- reporting/provenance only, see below)
 - **Timing-driven mapping** (issue #100):
-  - ABC delay target: `-D {TARGET_PERIOD_PS}` ({TARGET_PERIOD_NS:.4f} ns = 1/{TARGET_FREQ_MHZ:g} MHz,
-    `spec/tmds-tx.md` §2's 720p60 pixel clock -- not invented here).
+  - ABC delay target: `-D {ABC_TARGET_PS}` ({ABC_TARGET_NS:.4f} ns) -- the
+    {TARGET_PERIOD_NS:.4f} ns = 1/{TARGET_FREQ_MHZ:g} MHz 720p60 pixel clock
+    `spec/tmds-tx.md` §2 states (not invented here), less {SEQUENTIAL_OVERHEAD_NS:.1f} ns of
+    measured sequential overhead (flop clock-to-Q + capture setup time + clock skew at
+    `{TIMING_CORNER}`), because `-D` budgets the *combinational* logic ABC maps and not
+    the whole period -- see this module's docstring, "ABC's `-D` budgets combinational
+    logic, not the clock period" (issue #115).
   - Mapping corner: `{timing_liberty.relative_to(pdk.path)}` (`{TIMING_CORNER}`) --
     the **worst setup corner** per issue #83's STA record `20260816-172539-930e864`,
     not the `{STD_CELL_CORNER}` nominal corner DR-0003 names for the synthesized
@@ -552,7 +602,7 @@ def main() -> int:
 
     print(
         f"Synthesizing {TOP} against {timing_liberty} "
-        f"(timing-driven, -D {TARGET_PERIOD_PS}ps target) ..."
+        f"(timing-driven, -D {ABC_TARGET_PS}ps target) ..."
     )
     result = run_yosys(script, log_path)
     if result.returncode != 0:

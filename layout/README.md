@@ -223,34 +223,47 @@ klt lvs layout/lvs/tmds_encoder.lvs_request.json --format json > layout/lvs_repo
 ```
 
 **Scope**: place-and-route only, per issue #84 (issue #100 added
-clock-tree synthesis and hold repair to this same driver; issue #110 reuses
-it unchanged for the pipelined (DR-0008) netlist) -- no timing-closure
-*claim* is made here either way (issue #83/#110 own static timing analysis).
-This does not integrate with the analog pad ring (#86's scope, separate for
-the analog partition).
+clock-tree synthesis and hold repair to this same driver; issue #115 added a
+two-corner timing view and a `repair_timing -setup` pass for the four-stage
+(DR-0009) netlist) -- no timing-closure *claim* is made here either way
+(issue #83/#110/#115 own static timing analysis). This does not integrate
+with the analog pad ring (#86's scope, separate for the analog partition).
 
-**Current signoff status** (regenerated for issue #110's pipelined (DR-0008)
-GDS -- superseding the pre-pipeline numbers this section used to cite, same
-`klt` version and deck): **DRC clean** (0 violations -- the `mim.space.1`
-false positives this section used to report, 188 of them, no longer appear;
-consistent with [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)
-having been addressed upstream since the pre-pipeline GDS was checked, not
-with anything this design changed) and **LVS mismatch** (13 topology
+**Current signoff status** (regenerated for issue #115's four-stage (DR-0009)
+GDS -- superseding the DR-0008 numbers this section used to cite, same
+`klt` version, 0.2.0, and deck): **DRC clean** (0 violations -- unchanged
+from the DR-0008 GDS; the `mim.space.1` false positives this section used to
+report before that, 188 of them, remain absent, consistent with
+[klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)
+having been addressed upstream) and **LVS mismatch** (18 topology
 mismatches; nets/pins otherwise match fully) -- fully attributed and
 explained, not silently worked around:
 
-- The LVS mismatches are 12 P&R-inserted utility/clock-tree/hold-repair
-  standard-cell *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`, `__filltie`,
-  `__endcap`, `__clkbuf_1` and `__dlyc_1` from clock-tree synthesis,
-  `__inv_2` from hold repair -- diffed directly against the netlist's own
-  instantiated cell types, not assumed) that carry no logic and that the
-  pre-P&R reference netlist has no counterpart for, by construction (see
-  `layout/scripts/filter_pnr_utility_cells.py`'s docstring), plus one
-  top-level rollup mismatch (12 + 1 = 13). This is the same root cause the
-  pre-pipeline GDS's 10 mismatches had (9 utility-cell types + 1 rollup);
-  the count grew because DR-0008's larger, CTS/hold-repaired implementation
-  now also inserts `clkbuf_1`/`dlyc_1`/`inv_2` instances the pre-CTS
-  reference netlist naturally has no counterpart for either.
+- The LVS mismatches are 17 standard-cell *types* present in the layout that
+  the pre-P&R reference netlist has no counterpart for, plus one top-level
+  rollup mismatch (17 + 1 = 18). Diffed directly against the reference
+  netlist's own `.subckt` set, not assumed:
+  - **13 P&R-inserted utility/clock-tree/timing-repair types** that carry no
+    logic or that no netlist instance names --
+    `gf180mcu_fd_sc_mcu9t5v0__fill_{1,2,4,8,16,32,64}`, `__filltie`,
+    `__endcap`, `__clkbuf_12` and `__clkbuf_16` from clock-tree synthesis,
+    `__dlyc_1` and `__clkinv_2` from hold repair. Same root cause as the
+    DR-0008 GDS's 12 (see `layout/scripts/filter_pnr_utility_cells.py`'s
+    docstring); the specific CTS/hold-repair cells differ because issue
+    #115 names an explicit CTS root/tree buffer instead of taking
+    TritonCTS's default.
+  - **2 hold-repair inverter types** (`__inv_3`, `__inv_4`) — the same
+    class as the DR-0008 GDS's `__inv_2`, at the sizes this layout's hold
+    repair chose.
+  - **2 setup-repair *resized* types** (`__oai21_2`, `__oai31_2`). These are
+    the three instances `repair_timing -setup` upsized (`_278_`, `_322_`,
+    `_339_`), enumerated by name in issue #115's own STA evidence record.
+    The reference netlist derives from the pre-P&R synthesized netlist,
+    which names the `_1`-strength originals, so the `_2` variants appear
+    here as layout-only types. This is the same disclosed netlist-vs-layout
+    difference `flow/sta_tmds_encoder.py`'s `assert_def_matches_netlist`
+    accepts and enumerates — a drive-strength change, never a function
+    change — surfacing in a second place rather than a new one.
 
 **Two real, upstream DEF->GDS-merge defects were found and fixed while
 building this driver** (not worked around) -- a DBU mismatch between

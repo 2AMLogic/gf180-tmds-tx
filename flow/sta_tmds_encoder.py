@@ -40,6 +40,17 @@ silently timing a stale layout. SHA-256 digests of all three inputs are
 recorded, so "the exact netlist revision" in the evidence record is a
 verifiable statement rather than a filename.
 
+One deliberate, disclosed relaxation of that check (issue #115): a DEF
+component may differ from its netlist instance in the numeric
+**drive-strength suffix only** (`..._oai21_1` -> `..._oai21_2`), because
+`flow/pnr_tmds_encoder.py` now runs `repair_timing -setup`, whose entire
+mechanism is upsizing an existing instance to drive its real load. A change
+of logic *function*, a missing instance, or an unexplained extra component
+all still fail loudly, and every resized instance is enumerated by name in
+the evidence record rather than reduced to a count. See
+`assert_def_matches_netlist`'s own docstring for why that is the right notch
+and no further.
+
 ## Corners
 
 Five liberty corners from the 3.3 V family DR-0003 selects for the
@@ -162,9 +173,9 @@ SPEF = STA_DIR / f"{TOP}.spef"
 SDC = STA_DIR / f"{TOP}.sdc"
 
 # Upstream evidence records this analysis is run against (cited in the record).
-SYNTH_RECORD_ID = "20260817-011745-7d9130d"  # issue #110, pipelined (DR-0008) gate-level netlist
-PNR_RECORD_ID = "20260817-012011-7d9130d"  # issue #110, CTS/hold-repaired routed DEF (pipelined)
-SPEF_RECORD_ID = "20260817-012545-7d9130d"  # issue #110, post-CTS extracted parasitics (pipelined)
+SYNTH_RECORD_ID = "20260817-105547-049c240"  # issue #115, four-stage (DR-0009) gate-level netlist
+PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115, CTS/setup+hold-repaired routed DEF (four-stage)
+SPEF_RECORD_ID = "20260817-105709-049c240"  # issue #115, post-CTS extracted parasitics (four-stage)
 
 # Every 3.3 V corner the vendored gf180mcu_fd_sc_mcu9t5v0 library ships.
 CORNERS: list[tuple[str, str]] = [
@@ -200,6 +211,11 @@ _PHYSICAL_ONLY_RE = re.compile(r"__(fill|filltie|endcap|fillcap|decap|antenna)")
 # TIMING` marker -- see `def_components`'s docstring (issue #100).
 _DEF_COMPONENT_RE = re.compile(r"^\s*-\s+(\S+)\s+(\S+)(.*)$", re.MULTILINE)
 _NETLIST_INSTANCE_RE = re.compile(rf"^\s+({pnr.STD_CELL_LIB}__\S+)\s+(\S+)\s*\(", re.MULTILINE)
+# A `gf180mcu_fd_sc_mcu9t5v0` cell name splits into a logic function and a
+# drive strength: `..._oai21_1` -> (`..._oai21`, `1`). Used to tell a
+# *resize* (same function, different drive) from a real retype (issue #115) --
+# see `cell_function`.
+_DRIVE_STRENGTH_RE = re.compile(r"^(?P<function>.+)_(?P<drive>\d+)$")
 
 _SLACK_RE = re.compile(r"^\s*(-?[\d.]+)\s+slack \((MET|VIOLATED)\)", re.MULTILINE)
 _STARTPOINT_RE = re.compile(r"^Startpoint: (.+)$", re.MULTILINE)
@@ -252,14 +268,61 @@ def def_components(text: str) -> dict[str, tuple[str, bool]]:
     }
 
 
-def assert_def_matches_netlist(netlist: Path, routed_def: Path) -> tuple[int, int, int]:
+def cell_function(cell: str) -> str:
+    """A cell's logic function, with its drive-strength suffix stripped.
+
+    `gf180mcu_fd_sc_mcu9t5v0__oai21_1` and `..._oai21_2` are the same
+    Boolean function realized at two drive strengths -- identical pin names,
+    identical truth table, identical `specify` paths -- differing only in
+    transistor sizing. Cells with no numeric suffix (`..._fill`, `..._endcap`)
+    are returned unchanged.
+    """
+    m = _DRIVE_STRENGTH_RE.match(cell)
+    return m.group("function") if m else cell
+
+
+def assert_def_matches_netlist(netlist: Path, routed_def: Path) -> tuple[int, int, int, list[str]]:
     """The DEF must realize *this* netlist: same instance names, same cell
-    types, plus only physical-only (filler/tap/endcap) additions and/or
+    *functions*, plus only physical-only (filler/tap/endcap) additions and/or
     `SOURCE TIMING`-marked cells clock-tree synthesis / hold repair
     legitimately inserted (issue #100 -- `flow/pnr_tmds_encoder.py` now runs
     both; see `def_components`'s docstring for how those are distinguished
     from a real defect, not just assumed benign). Returns `(netlist instance
-    count, physical-only cell count, CTS/hold-repair-inserted cell count)`."""
+    count, physical-only cell count, CTS/hold-repair-inserted cell count,
+    resized instances)`.
+
+    ## Why a drive-strength difference is accepted, and a function change is not (issue #115)
+
+    An earlier revision of this check demanded a bit-identical cell type per
+    instance. That is stricter than the property the check exists to
+    establish -- "the DEF realizes this netlist, not a stale one" -- and it
+    forbids `repair_timing -setup`, whose entire mechanism is upsizing an
+    existing instance (`..._oai21_1` -> `..._oai21_2`) so it can drive its
+    real, placement-derived load. Issue #115 needs that: the encoder's
+    remaining 720p60 setup gap at `ss_125C_3v00` is a drive-strength problem
+    (min-size cells on high-fanout nets, since ABC maps with no wire load at
+    all), not a logic-depth one.
+
+    So the check is relaxed **exactly one notch and no further**: a DEF
+    component may differ from its netlist instance only in the numeric drive
+    suffix, i.e. `cell_function()` must still match exactly. That is not a
+    weakening of the netlist-vs-layout guarantee in any way that matters
+    downstream:
+
+    - **Logic** is unchanged by construction -- the two cells compute the
+      same Boolean function on identically-named pins, so the routed
+      connectivity the DEF carries is the netlist's connectivity.
+    - **Timing** is *more* accurate, not less: the SPEF and the liberty arcs
+      this driver times against both come from the DEF's actual cell, so the
+      numbers reported are the physically-realized ones.
+    - **A stale layout still fails loudly**: any instance whose function
+      changed, went missing, or appeared without provenance still raises.
+
+    Resized instances are returned so the evidence record can name every one
+    of them rather than burying the delta in a count -- an unreported
+    layout-vs-netlist difference is the thing this check is really guarding
+    against.
+    """
     instances = netlist_instances(netlist.read_text())
     components = def_components(routed_def.read_text())
     if not instances:
@@ -272,12 +335,22 @@ def assert_def_matches_netlist(netlist: Path, routed_def: Path) -> tuple[int, in
             f"(e.g. {missing[:5]}) -- the DEF does not realize this netlist; "
             "re-run flow/pnr_tmds_encoder.py before running STA"
         )
-    retyped = sorted(n for n, cell in instances.items() if components[n][0] != cell)
+    retyped = sorted(
+        n
+        for n, cell in instances.items()
+        if cell_function(components[n][0]) != cell_function(cell)
+    )
     if retyped:
         raise StaError(
-            f"{len(retyped)} instance(s) have a different cell type in the DEF than in "
-            f"the netlist (e.g. {retyped[:5]}) -- netlist and layout are out of sync"
+            f"{len(retyped)} instance(s) have a different cell *function* in the DEF than "
+            f"in the netlist (e.g. {[f'{n}: {instances[n]} -> {components[n][0]}' for n in retyped[:5]]}) "
+            "-- netlist and layout are out of sync"
         )
+    resized = sorted(
+        f"{n}: {cell} -> {components[n][0]}"
+        for n, cell in instances.items()
+        if components[n][0] != cell
+    )
     extra = sorted(set(components) - set(instances))
     physical_only = [n for n in extra if _PHYSICAL_ONLY_RE.search(components[n][0])]
     timing_inserted = [n for n in extra if components[n][1] and n not in physical_only]
@@ -288,7 +361,7 @@ def assert_def_matches_netlist(netlist: Path, routed_def: Path) -> tuple[int, in
             "physical-only cells, nor SOURCE TIMING (CTS/hold-repair) insertions "
             f"(e.g. {unexpected[:5]}) -- unexplained layout content"
         )
-    return len(instances), len(physical_only), len(timing_inserted)
+    return len(instances), len(physical_only), len(timing_inserted), resized
 
 
 def build_sdc(freq_mhz: float, target: str) -> str:
@@ -467,7 +540,7 @@ def main() -> int:
         return 3
 
     try:
-        tech_lef, sc_lef, _liberty, _cell_gds = pnr.lef_paths(pdk)
+        tech_lef, sc_lef, _liberty, _setup_liberty, _cell_gds = pnr.lef_paths(pdk)
     except pnr.PnrError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
@@ -491,17 +564,23 @@ def main() -> int:
         liberties[corner] = lib
 
     try:
-        instance_count, physical_only_count, timing_inserted_count = assert_def_matches_netlist(
-            NETLIST, ROUTED_DEF
-        )
+        (
+            instance_count,
+            physical_only_count,
+            timing_inserted_count,
+            resized_instances,
+        ) = assert_def_matches_netlist(NETLIST, ROUTED_DEF)
     except StaError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     print(
         f"Netlist/DEF consistency: {instance_count} netlist instances all present in the "
-        f"routed DEF with matching cell types (+{physical_only_count} physical-only cells, "
-        f"+{timing_inserted_count} CTS/hold-repair-inserted cells)"
+        f"routed DEF with matching cell functions (+{physical_only_count} physical-only cells, "
+        f"+{timing_inserted_count} CTS/hold-repair-inserted cells, "
+        f"{len(resized_instances)} setup-repair resized instances)"
     )
+    for line in resized_instances:
+        print(f"  resized by repair_timing: {line}")
 
     when = synth._dt.datetime.now(synth._dt.timezone.utc)
     rid = synth.record_id(when)
@@ -562,6 +641,7 @@ def main() -> int:
                 instance_count,
                 physical_only_count,
                 timing_inserted_count,
+                resized_instances,
                 dirty,
                 sha,
             )
@@ -601,6 +681,7 @@ def render_record(
     instance_count,
     physical_only_count,
     timing_inserted_count,
+    resized_instances: list[str],
     dirty,
     sha,
 ) -> str:
@@ -623,24 +704,30 @@ def render_record(
 
 - **Record ID**: {rid}
 - **Claim**: Static timing analysis (setup **and** hold) has been re-run
-  (issue #110, following #83's original pre-timing-driven-synthesis,
-  pre-CTS record `20260816-172539-930e864` and #100's post-timing-driven-
-  synthesis/CTS record `20260817-001614-064d550`) on the pipelined gate-level
-  netlist issue #110 produced -- `rtl/tmds_encoder.v` now has a pipeline
-  register at the stage1/stage2 boundary per `spec/tmds-tx.md` DR-0008, run
-  through the *same* timing-driven-synthesis + CTS + hold-repair machinery
-  issue #100 built (`flow/synth_tmds_encoder.py` / `flow/pnr_tmds_encoder.py`
-  are otherwise unchanged) -- as physically realized by issue #110's own
-  CTS/hold-repaired routed layout with issue #110's own re-extracted
-  post-route parasitics back-annotated, across all five 3.3 V liberty corners
-  the `{pnr.STD_CELL_LIB}` library ships, at both of `spec/tmds-tx.md` §2's
-  pixel-clock rates. Addresses #65 item 5 (full corner verification vs. the
-  ratified spec) on the digital partition, and supplies the measurement
-  DR-0007 (which resolved DR-0003's open item to "an architecture change is
-  needed") and DR-0008 (which specified that architecture change) require --
-  this record specifically measures whether DR-0008's stage1/stage2 pipeline
-  register closed the 720p60 setup violations #100's own record still had at
-  3 of 5 corners.
+  (issue #115, following #83's original pre-timing-driven-synthesis,
+  pre-CTS record `20260816-172539-930e864`, #100's post-timing-driven-
+  synthesis/CTS record `20260817-001614-064d550`, and #110's DR-0008
+  single-pipeline-register record `20260817-012556-7d9130d`) on the
+  four-stage gate-level netlist issue #115 produced -- `rtl/tmds_encoder.v`
+  is now the four-stage pipeline `spec/tmds-tx.md` DR-0009 specifies
+  (S1 popcount/threshold, S2 parallel-prefix transition-minimized word,
+  S3 accumulator-independent DC-balance candidates, S4 decision +
+  accumulator recurrence), run through the timing-driven-synthesis + CTS +
+  timing-repair machinery issue #100 built and issue #115 extended
+  (sequential-overhead-corrected ABC delay target, two-corner P&R timing
+  view with explicit CTS root/tree buffers and placement-stage layer RC, and
+  a `repair_timing -setup` pass -- every one of which constrains the design
+  *more* tightly, not less; see DR-0009's "Consequences") -- as physically
+  realized by issue #115's own routed layout with issue #115's own
+  re-extracted post-route parasitics back-annotated, across all five 3.3 V
+  liberty corners the `{pnr.STD_CELL_LIB}` library ships, at both of
+  `spec/tmds-tx.md` §2's pixel-clock rates. Addresses #65 item 5 (full
+  corner verification vs. the ratified spec) on the digital partition, and
+  supplies the measurement DR-0007 (which resolved DR-0003's open item to
+  "an architecture change is needed"), DR-0008 (the first such change) and
+  DR-0009 (this one) require -- this record specifically measures whether
+  DR-0009 closed the 720p60 setup violations DR-0008's own record still had
+  at `ss_125C_3v00` and `ss_n40C_3v00`.
 - **Verdict (setup, 720p60 target, 74.25 MHz)**: **{verdict_720}** -- {
     f"setup violated at {len(setup_720)} of {len(by_target['720p60'])} corners"
     if setup_720 else "setup met at every corner"}.
@@ -658,22 +745,28 @@ def render_record(
   constraints, so path delays are constraint-independent and `period - slack` is
   the true critical-path requirement.
 - **Netlist revision analyzed** (the exact revision, verified, not just cited):
-  - Netlist: `flow/tmds_encoder/netlist/{TOP}.synth.v`, issue #110's pipelined
-    (DR-0008), timing-driven synthesis evidence record `{SYNTH_RECORD_ID}` --
+  - Netlist: `flow/tmds_encoder/netlist/{TOP}.synth.v`, issue #115's four-stage
+    (DR-0009), timing-driven synthesis evidence record `{SYNTH_RECORD_ID}` --
     SHA-256 `{sha256(NETLIST)}`
-  - Routed DEF: `flow/tmds_encoder/pnr/{TOP}.def`, issue #110's CTS/hold-repair
+  - Routed DEF: `flow/tmds_encoder/pnr/{TOP}.def`, issue #115's CTS/timing-repair
     record `{PNR_RECORD_ID}` -- SHA-256 `{sha256(ROUTED_DEF)}`
-  - Parasitics (SPEF): `flow/tmds_encoder/sta/{TOP}.spef`, issue #110's
+  - Parasitics (SPEF): `flow/tmds_encoder/sta/{TOP}.spef`, issue #115's
     post-CTS extraction record `{SPEF_RECORD_ID}` -- SHA-256 `{sha256(SPEF)}`
   - Netlist/DEF consistency **checked mechanically**, not assumed: all
     {instance_count} netlist instances are present in the routed DEF with matching
-    cell types; the DEF's only additional components are the
+    cell *functions*; the DEF's only additional components are the
     {physical_only_count} physical-only cells P&R inserts (filler/tap/endcap) and
-    {timing_inserted_count} cells clock-tree synthesis / hold repair inserted
+    {timing_inserted_count} cells clock-tree synthesis / timing repair inserted
     (DEF `SOURCE TIMING`-marked -- issue #100 introduced this CTS/hold-repair
-    machinery, reused unchanged here; these have no netlist counterpart by
+    machinery, reused here; these have no netlist counterpart by
     design, since the netlist predates CTS). See
     `assert_def_matches_netlist` in `flow/sta_tmds_encoder.py`.
+  - **Instances `repair_timing -setup` resized** ({len(resized_instances)}, enumerated rather
+    than counted -- issue #115; a drive-strength difference is the *only*
+    netlist-vs-DEF cell difference this driver accepts, and it re-checks that
+    the logic function is unchanged for every one of them):
+{chr(10).join(f"    - `{line}`" for line in resized_instances) if resized_instances
+  else "    - none -- `repair_timing -setup` changed no instance's drive strength on this layout"}
 - **Tool versions**:
   - OpenSTA: bundled in OpenROAD `{or_version}` (run via the `openroad/orfs:latest`
     Docker image -- see `flow/README.md`'s "Pinned toolchain")
@@ -683,7 +776,7 @@ def render_record(
 {chr(10).join(f"  - `{c}` -- {d}" for c, d in CORNERS)}
 - **Corner reconciliation** (carried over from #85's own test plan, which asked
   its successor to confirm the SDF corner matches this analysis's): reconciled,
-  no mismatch. The re-extracted SDF/SPEF (issue #110, record `{SPEF_RECORD_ID}`)
+  no mismatch. The re-extracted SDF/SPEF (issue #115, record `{SPEF_RECORD_ID}`)
   were built at `tt_025C_3v30`, one of the five corners analyzed here; the other
   four re-time the same extracted parasitics against a different liberty corner
   (see "Known limitations" 2).
@@ -738,9 +831,9 @@ def render_record(
    would still be caught and reported here, since this driver re-checks hold at
    every corner independently of what corner produced the layout.
 2. **One RC corner, five liberty corners.** The post-CTS re-extraction (issue
-   #110, record `{SPEF_RECORD_ID}`) used the gf180 platform's typical
-   (`FuncRCtyp`) RCX deck only, same as #85's original extraction and #100's
-   re-extraction; this analysis reuses that single SPEF at all five liberty
+   #115, record `{SPEF_RECORD_ID}`) used the gf180 platform's typical
+   (`FuncRCtyp`) RCX deck only, same as every earlier extraction in this
+   chain; this analysis reuses that single SPEF at all five liberty
    corners. #85 established that post-route net delays on this die round to
    0.000 ns at 3-decimal precision, so the liberty corner dominates -- but
    this is an approximation, and re-extraction per RC corner is the right
@@ -750,23 +843,38 @@ def render_record(
    `flow/synth_tmds_encoder.py` targets ABC's `-D` delay constraint using the
    `ss_125C_3v00` liberty specifically (per #83's own record, the worst setup
    corner of the five checked) rather than a formal multi-corner sign-off flow;
-   issue #110 reuses this unchanged for the pipelined RTL. This is disclosed
-   reasoning, not an unstated assumption (see that script's docstring), and
-   this record's own multi-corner re-check is exactly the verification step
-   that confirms (or does not confirm) it actually worked -- see the Results
-   tables above for the corner-by-corner outcome.
-4. **720p60 setup does not close at every corner even after DR-0008's
-   pipeline register.** See the Results table above: `ss_125C_3v00` and
-   `ss_n40C_3v00` still fail setup at 720p60 (74.25 MHz), though by a much
-   smaller margin than #100's pre-pipeline record
-   (`20260817-001614-064d550`) measured, and `tt_025C_3v30` now passes where
-   it previously failed. 480p (27.000 MHz) and hold (all corners, both
-   targets) close fully. This is not silently accepted as final: it is the
-   measured outcome DR-0008 itself flagged as possible ("if one boundary
-   register is insufficient at some corner, a further pipelining decision ...
-   would need its own follow-up decision record") and is tracked as a
-   dedicated follow-up issue rather than expanding this record's own scope
-   further.
+   issue #115 reuses this unchanged for the four-stage RTL, with the ABC
+   delay target now corrected for sequential overhead (DR-0009). This is
+   disclosed reasoning, not an unstated assumption (see that script's
+   docstring), and this record's own multi-corner re-check is exactly the
+   verification step that confirms (or does not confirm) it actually
+   worked -- see the Results tables above for the corner-by-corner outcome.
+4. **The 720p60 setup margin at the worst corner is small.**{
+    f" It is met at every corner, but the worst of them ({worst.corner}) has"
+    f" {worst.setup_slack:+.4f} ns of it against a"
+    f" {period_ns(TARGETS[0][1]):.4f} ns period -- {abs(worst.setup_slack) / period_ns(TARGETS[0][1]) * 100:.1f}%."
+    " That is a genuine pass under this record's own (deliberately"
+    " pessimistic, see 'Constraints applied') boundary assumptions, and it is"
+    " not a comfortable one: it leaves little room for a later netlist change,"
+    " a floorplan change, or on-chip variation derating this flow does not yet"
+    " model. Treat 720p60 as closed but margin-limited, not as closed with"
+    " headroom." if not setup_720 else
+    f" It is *not* met at {len(setup_720)} of {len(by_target['720p60'])} corners"
+    f" ({', '.join(r.corner for r in setup_720)}); see the Results table above"
+    " for the per-corner slack. This is not silently accepted as final -- per"
+    " CLAUDE.md, an evidenced partial result is recorded as such rather than"
+    " reported as a close."}
+5. **`repair_timing -setup` upsizes existing instances, so the routed DEF can
+   name a different drive strength than the committed netlist** (issue #115).
+   Every such resize is enumerated by name above, and this driver re-checks
+   that the logic *function* is identical for each; a function change, a
+   missing instance, or an unexplained component still fails the run. The
+   gate-level re-simulation (`flow/gate_level_sim_tmds_encoder.py`) simulates
+   the committed netlist's cell types with this layout's extracted SDF
+   annotated onto it -- the same additive approximation that flow already
+   makes for CTS/hold-repair-inserted buffers, and a smaller one, since a
+   drive-strength variant has identical pins, identical function, and
+   identical `specify` paths.
 
 - **Reproducibility**: working tree {"DIRTY (uncommitted changes outside flow/tmds_encoder/ at run time -- re-run against a clean checkout before trusting this record)" if dirty else "clean"} at commit `{sha}`.
 - **Links**:

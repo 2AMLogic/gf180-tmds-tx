@@ -6,15 +6,15 @@
   "top": "TMDS_ENCODER",
   "parameter_tolerance": null,
   "status": "mismatch",
-  "mismatch_count": 13,
+  "mismatch_count": 18,
   "category_counts": {
-    "topology": 13
+    "topology": 18
   },
   "counts": {
     "nets": {
-      "layout": 330,
-      "reference": 306,
-      "matched": 257
+      "layout": 384,
+      "reference": 357,
+      "matched": 173
     },
     "devices": {
       "layout": 0,
@@ -24,15 +24,15 @@
     "pins": {
       "layout": 25,
       "reference": 25,
-      "matched": 257
+      "matched": 173
     }
   },
   "device_classes": null,
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.10",
-    "layout_sha256": "a833d58d19ce76a10318723adfac242f14a00cf685ce81378e6452b638c810dc",
-    "reference_sha256": "14ad8fb7b64be6e3d38ae3ba7a1de51b7c5f2f2d279fe3e12c5ccc0bcf6db248",
+    "layout_sha256": "4a46acfc0540743038d0da441d6ea8172d90747420e3e6c7d1c86cce1bcfa290",
+    "reference_sha256": "73357dc3959a029ef100d3ec8037c220d3827a3c31014c6e07ccecea0b1b8e5d",
     "extracted_netlist": null
   },
   "provenance": {
@@ -48,6 +48,56 @@
       "severity": "error",
       "description": "circuit could not be matched to a counterpart",
       "side": "both",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "circuit could not be matched to a counterpart",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "circuit could not be matched to a counterpart",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "circuit could not be matched to a counterpart",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "circuit could not be matched to a counterpart",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "circuit could not be matched to a counterpart",
+      "side": "layout",
       "net": null,
       "device": null,
       "property": null,
@@ -301,76 +351,6 @@
       "pin": true
     },
     {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
-      "layout": "A1",
-      "reference": "A1",
-      "pin": true
-    },
-    {
       "layout": "A2",
       "reference": "A2",
       "pin": true
@@ -493,101 +473,6 @@
     {
       "layout": "A2",
       "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A2",
-      "reference": "A2",
-      "pin": true
-    },
-    {
-      "layout": "A3",
-      "reference": "A3",
-      "pin": true
-    },
-    {
-      "layout": "A3",
-      "reference": "A3",
-      "pin": true
-    },
-    {
-      "layout": "A3",
-      "reference": "A3",
-      "pin": true
-    },
-    {
-      "layout": "A3",
-      "reference": "A3",
-      "pin": true
-    },
-    {
-      "layout": "A3",
-      "reference": "A3",
       "pin": true
     },
     {
@@ -701,21 +586,6 @@
       "pin": true
     },
     {
-      "layout": "B1",
-      "reference": "B1",
-      "pin": true
-    },
-    {
-      "layout": "B1",
-      "reference": "B1",
-      "pin": true
-    },
-    {
-      "layout": "B1",
-      "reference": "B1",
-      "pin": true
-    },
-    {
       "layout": "B2",
       "reference": "B2",
       "pin": true
@@ -731,18 +601,8 @@
       "pin": true
     },
     {
-      "layout": "B2",
-      "reference": "B2",
-      "pin": true
-    },
-    {
-      "layout": "B2",
-      "reference": "B2",
-      "pin": true
-    },
-    {
-      "layout": "B2",
-      "reference": "B2",
+      "layout": "C",
+      "reference": "C",
       "pin": true
     },
     {
@@ -768,11 +628,6 @@
     {
       "layout": "D",
       "reference": "D",
-      "pin": true
-    },
-    {
-      "layout": "I",
-      "reference": "I",
       "pin": true
     },
     {
@@ -951,156 +806,6 @@
       "pin": true
     },
     {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VDD",
-      "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
-      "layout": "VSS",
-      "reference": "VSS",
-      "pin": true
-    },
-    {
       "layout": "VSS",
       "reference": "VSS",
       "pin": true
@@ -1298,81 +1003,6 @@
     {
       "layout": "Z",
       "reference": "Z",
-      "pin": true
-    },
-    {
-      "layout": "Z",
-      "reference": "Z",
-      "pin": true
-    },
-    {
-      "layout": "Z",
-      "reference": "Z",
-      "pin": true
-    },
-    {
-      "layout": "Z",
-      "reference": "Z",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
-      "pin": true
-    },
-    {
-      "layout": "ZN",
-      "reference": "ZN",
       "pin": true
     },
     {

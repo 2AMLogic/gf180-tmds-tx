@@ -16,42 +16,47 @@ their filename, because both declare `module tmds_encoder` with the same
 port list; only the Verilog *source* passed to the builder differs
 (see runner.py).
 
-## DR-0008 two-clock latency, and why this bench streams rather than
+## DR-0009 four-clock latency, and why this bench streams rather than
 ## "hold and re-read"
 
-Per spec/tmds-tx.md DR-0008, the DUT now has a pipeline register at the
-stage1/stage2 boundary: `data`/`de`/`ctrl` reach the registered `tmds`
-output **two** clock cycles after being driven, not one, and every single
-clock edge unconditionally samples whatever is currently on
-`data`/`de`/`ctrl` into that pipeline register -- there is no stall/valid
-signal. That matters for how this bench drives the DUT: holding a
-symbol's inputs steady for a second cycle to "wait for the pipeline to
-catch up" (the naive fix, tried and found wrong while implementing this
-change) re-latches the *same* symbol into the pipeline register a second
-time; the moment any further real symbol is pushed after that, the DUT's
-final output register consumes that stale, already-read symbol *again* --
-silently corrupting the running-disparity accumulator `cnt` one cycle
+Per spec/tmds-tx.md DR-0009 (which supersedes DR-0008's two-clock
+contract), the DUT is a four-stage pipeline: `data`/`de`/`ctrl` reach the
+registered `tmds` output **`LATENCY_CYCLES` = 4** clock cycles after being
+driven, and every single clock edge unconditionally samples whatever is
+currently on `data`/`de`/`ctrl` into the first pipeline register -- there
+is no stall/valid signal. That matters for how this bench drives the DUT:
+holding a symbol's inputs steady for extra cycles to "wait for the
+pipeline to catch up" (the naive fix, tried and found wrong while
+implementing DR-0008) re-latches the *same* symbol into the pipeline a
+second time; the moment any further real symbol is pushed after that, the
+DUT's final output register consumes that stale, already-read symbol
+*again* -- silently corrupting the running-disparity accumulator `cnt`
 later, with no assertion failure at the point the corruption happens
 (only downstream, when a later encode's disparity looks wrong). This was
-caught directly, not assumed: an early version of this bench's `apply_data`
-held inputs for two cycles and failed the exhaustive-equivalence test at
-`state=-8, data=0x00` with an output that turned out to be `stage1(0)`
-re-consumed against the *already-updated* `cnt`, not corruption in the
-model or the RTL.
+caught directly, not assumed: an early version of this bench's
+`apply_data` held inputs for two cycles and failed the
+exhaustive-equivalence test at `state=-8, data=0x00` with an output that
+turned out to be `stage1(0)` re-consumed against the *already-updated*
+`cnt`, not corruption in the model or the RTL.
 
 The fix (`SymbolPipe` below): push exactly one real symbol per clock
 cycle (matching the DUT's native, un-stalled throughput), and read each
-pushed symbol's registered `tmds` code with the correct **one-call lag**
-(`push_data`/`push_control` return the *previous* call's code, not this
-call's -- it is not registered yet). Chains of `push_data`/`push_control`
-calls compose correctly with no intervening resets needed, because every
-push is a real, intentional symbol; `drain()` (one more push, contents
+pushed symbol's registered `tmds` code with the correct
+**`LATENCY_CYCLES - 1` call lag** (`push_data`/`push_control` return the
+code of the symbol pushed `LATENCY_CYCLES - 1` calls ago, not this call's
+-- it is not registered yet). The lag is derived from the single
+`LATENCY_CYCLES` constant below rather than hard-coded, so a further
+latency change is a one-line edit here, not a rewrite of every test.
+
+Chains of `push_data`/`push_control` calls compose correctly with no
+intervening resets needed, because every push is a real, intentional
+symbol; `drain()` (`LATENCY_CYCLES - 1` further pushes, contents
 irrelevant) shifts out the final pushed symbol's code, and is only used
-directly before `reset_dut()`, which unconditionally clears the pipeline
-register regardless of `drain()`'s own leftover content (see
+directly before `reset_dut()`, which unconditionally clears every
+pipeline register regardless of `drain()`'s own leftover content (see
 rtl/tmds_encoder.v's `rst` handling, and DR-0008's "rst is not pipelined"
-consequence) -- so nothing about `drain()`'s arbitrary inputs ever gets
-silently reprocessed as a real symbol.
+consequence, carried forward by DR-0009) -- so nothing about `drain()`'s
+arbitrary inputs ever gets silently reprocessed as a real symbol.
 """
 
 from __future__ import annotations
@@ -78,6 +83,13 @@ import tmds_model as model  # noqa: E402
 # claim, the same disclaimer flow/pnr_tmds_encoder.py's own one
 # `create_clock` already carries for the identical reason).
 CLOCK_PERIOD_NS = int(os.environ.get("TMDS_SIM_CLOCK_PERIOD_NS", "10"))
+
+# The DUT's registered input-to-`tmds` latency, in clock cycles, per
+# spec/tmds-tx.md DR-0009 (four pipeline stages: S1 popcount/threshold,
+# S2 transition-minimized word, S3 disparity candidates, S4 DC-balance
+# decision + accumulator). Every lag in this bench is derived from this
+# one constant -- see the module docstring.
+LATENCY_CYCLES = 4
 
 
 async def start_clock(dut) -> None:
@@ -106,8 +118,8 @@ async def clock_edge(dut) -> None:
 
 
 async def reset_dut(dut) -> None:
-    """Synchronous reset. Per DR-0008, `rst` is *not* pipelined through the
-    stage1/stage2 boundary register -- both it and the final tmds/cnt
+    """Synchronous reset. Per DR-0008 (carried forward by DR-0009), `rst`
+    is *not* pipelined -- every pipeline register and the final tmds/cnt
     register clear on the same edge `rst` is sampled asserted, so this
     keeps the same one-cycle-to-effect latency the pre-pipeline DUT had.
     It also unconditionally discards any pipeline content a preceding
@@ -124,37 +136,62 @@ async def reset_dut(dut) -> None:
 class SymbolPipe:
     """Drives `tmds_encoder`'s `data`/`de`/`ctrl` one real symbol per clock
     cycle (its native, un-stalled throughput) and reads back each pushed
-    symbol's registered `tmds` code with the correct one-call lag -- see
-    this module's docstring for why holding/repeating a symbol's inputs to
-    fake an immediate read is unsafe instead.
+    symbol's registered `tmds` code with the correct `LATENCY_CYCLES - 1`
+    call lag -- see this module's docstring for why holding/repeating a
+    symbol's inputs to fake an immediate read is unsafe instead.
+
+    Every push returns a code; that code belongs to the symbol pushed
+    `LATENCY_CYCLES - 1` calls earlier, so the first `LATENCY_CYCLES - 1`
+    returns after a reset are pipeline-fill artifacts with no symbol
+    behind them. `pushes` counts calls since construction so a caller can
+    tell which returns are meaningful; `has_output` says the same thing
+    directly.
     """
+
+    #: How many pushes after a symbol's own push its code comes back.
+    LAG = LATENCY_CYCLES - 1
 
     def __init__(self, dut) -> None:
         self.dut = dut
+        self.pushes = 0
+
+    @property
+    def has_output(self) -> bool:
+        """True once enough pushes have happened that the last push's
+        return value belongs to a real, caller-supplied symbol."""
+        return self.pushes > self.LAG
 
     async def push_data(self, data: int, ctrl: int = 0) -> int:
-        """Push one active-video symbol. Returns the *previous* push's
-        registered `tmds` code (this call's own code is not registered
-        until the next push, or `drain()`)."""
+        """Push one active-video symbol. Returns the registered `tmds`
+        code of the symbol pushed `LAG` calls ago (this call's own code is
+        not registered for another `LAG` pushes -- see `drain()`)."""
         return await self._push(de=1, data=data, ctrl=ctrl)
 
     async def push_control(self, ctrl: int) -> int:
-        """Push one blanking symbol. Returns the *previous* push's
-        registered `tmds` code."""
+        """Push one blanking symbol. Returns the code of the symbol pushed
+        `LAG` calls ago."""
         return await self._push(de=0, data=0, ctrl=ctrl)
 
     async def drain(self) -> int:
-        """One more push, with arbitrary inputs, to shift out the most
-        recently pushed symbol's code. Only safe to call immediately
-        before `reset_dut()` (or another `drain()`) -- see module
-        docstring."""
-        return await self._push(de=1, data=0, ctrl=0)
+        """`LAG` further pushes, with arbitrary inputs, to shift out the
+        most recently pushed real symbol's code (returned). Only safe to
+        call immediately before `reset_dut()` (or another `drain()`) --
+        see module docstring."""
+        codes = await self.drain_all()
+        return codes[-1]
+
+    async def drain_all(self) -> list[int]:
+        """`LAG` further pushes, returning every code they shift out --
+        i.e. the codes of the last `LAG` real symbols pushed, oldest
+        first. Same safety caveat as `drain()`."""
+        return [await self._push(de=1, data=0, ctrl=0) for _ in range(self.LAG)]
 
     async def _push(self, de: int, data: int, ctrl: int) -> int:
         self.dut.de.value = de
         self.dut.data.value = data
         self.dut.ctrl.value = ctrl
         await clock_edge(self.dut)
+        self.pushes += 1
         return int(self.dut.tmds.value)
 
 
@@ -193,11 +230,15 @@ async def test_control_characters_and_blanking_reset(dut):
 
     for d in range(256):
         expected_code, _ = model.encode(d, 0)
-        # This push's own code isn't available yet (one-call lag) --
-        # the *following* push_control's return value is this push_data's
-        # code, since by then it is the "previous" push.
+        # This push's own code isn't available yet (`SymbolPipe.LAG`-call
+        # lag) -- the LAG'th following push's return value is this
+        # push_data's code. Those following pushes are deliberately
+        # *blanking* symbols, so they also re-blank `cnt` to zero ahead of
+        # the next `d`, which is the property this loop is testing.
         await pipe.push_data(d)
-        actual_code = await pipe.push_control(0)  # also re-blanks cnt for the next d
+        actual_code = -1
+        for _ in range(SymbolPipe.LAG):
+            actual_code = await pipe.push_control(0)
         assert actual_code == expected_code, (
             f"post-blanking data mismatch (accumulator not reset?): data={d:#04x} "
             f"dut={actual_code:#05x} model={expected_code:#05x}"
@@ -341,11 +382,12 @@ async def test_long_run_cumulative_disparity_bound(dut):
     reported regardless of the assertion, per the acceptance criteria.
 
     Reads every pushed symbol's code over one continuous stream (200
-    burst/blank groups, no resets in between) via `SymbolPipe`'s one-call
-    lag: each push's return is the *previous* push's code, so the very
-    first push (right after reset, nothing meaningful pending yet) is
-    discarded, and one trailing `drain()` reads back the truly last
-    pushed symbol once the stream ends."""
+    burst/blank groups, no resets in between) via `SymbolPipe`'s
+    `LATENCY_CYCLES - 1` call lag: each push's return is the code of the
+    symbol pushed that many calls earlier, so the first `LAG` pushes
+    (right after reset, nothing meaningful in flight yet) are discarded
+    via `has_output`, and one trailing `drain_all()` reads back the last
+    `LAG` real symbols once the stream ends."""
     await start_clock(dut)
     await reset_dut(dut)
     pipe = SymbolPipe(dut)
@@ -354,7 +396,6 @@ async def test_long_run_cumulative_disparity_bound(dut):
     cumulative = 0
     max_abs_cumulative = 0
     n_symbols = 0
-    have_pending = False  # becomes True once the first real push has happened
 
     def record(code: int) -> None:
         nonlocal cumulative, max_abs_cumulative, n_symbols
@@ -366,18 +407,17 @@ async def test_long_run_cumulative_disparity_bound(dut):
         burst_len = rnd.randint(1, 64)
         for _ in range(burst_len):
             code = await pipe.push_data(rnd.randint(0, 255))
-            if have_pending:
+            if pipe.has_output:
                 record(code)
-            have_pending = True
 
         blank_len = rnd.randint(1, 16)
         for _ in range(blank_len):
             code = await pipe.push_control(rnd.randint(0, 3))
-            if have_pending:
+            if pipe.has_output:
                 record(code)
-            have_pending = True
 
-    record(await pipe.drain())
+    for code in await pipe.drain_all():
+        record(code)
 
     dut._log.info(
         f"Leg 2 (long-run cumulative disparity): {n_symbols} symbols, "

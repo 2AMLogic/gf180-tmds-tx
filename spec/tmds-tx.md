@@ -178,7 +178,12 @@ reduction (smaller custom-domain multiplexing ratio needed) or vice versa.
 as unverified is now measured — see DR-0007, which resolves this open item
 to timing-driven synthesis + CTS closing hold and the 480p fallback, with
 full 720p60 setup closure deferred to a follow-up architecture (RTL
-pipelining) decision record (issue #110).
+pipelining) decision record (issue #110). That follow-up landed in two
+steps: **DR-0008** (one boundary register, 3 of 5 corners) and **DR-0009**
+(four pipeline stages, **5 of 5 corners** at 74.25 MHz, worst-corner Fmax
+75.83 MHz). The **encoder** side of this record's open item is therefore
+closed; the 371.25 MHz intermediate rate this record flags belongs to the
+10:1→2:1 serializer, which is still unwritten and still unmeasured.
 
 ### DR-0004: PLL interface numerics and jitter budget
 
@@ -484,10 +489,12 @@ contract.
 
 **Status**: Accepted — DR-0003's synthesized-domain clock ceiling open item
 is resolved to this measured outcome. The follow-up architecture (RTL
-pipelining) decision record has since landed as **DR-0008**: it closes
-720p60 setup at 3 of 5 corners (up from 2 of 5 here), with the remaining
-2 corners tracked as a further follow-up (issue #115) — see DR-0008 for the
-full measured outcome.
+pipelining) decision record landed as **DR-0008**, closing 720p60 setup at
+3 of 5 corners (up from 2 of 5 here); the remaining 2 corners were then
+closed by **DR-0009**'s four-stage pipeline, which brings 720p60 setup to
+5 of 5 corners. See DR-0009 for the full measured outcome, and note it is
+the encoder that closes — the 10:1→2:1 serializer this record's own
+371.25 MHz figure belongs to is still unwritten.
 
 ### DR-0008: `tmds_encoder` stage1→stage2 pipeline register — two-clock latency contract
 
@@ -623,4 +630,189 @@ without a testbench" and this repo's stated preference for an evidenced,
 honest partial result over silently expanding one issue's scope to chase
 full closure.
 
-**Status**: Accepted.
+**Status**: Accepted — superseded on the latency contract only by **DR-0009**,
+which extends the encoder from two pipeline stages to four. DR-0008's other
+provisions (`rst` is not pipelined; blanking *is* pipelined; the DVI 1.0
+§3.3 encoding function is unchanged) are carried forward unchanged by
+DR-0009 rather than reopened.
+
+### DR-0009: `tmds_encoder` four-stage pipeline — four-clock latency contract, and two logic-depth reductions
+
+**Context**: DR-0008's single `stage1`→`stage2` boundary register was a real
+improvement (720p60 setup at 3 of 5 corners, up from 2 of 5) but not a full
+close: `flow/tmds_encoder/records/20260817-012556-7d9130d.md` measured
+`ss_125C_3v00` still missing by −13.5129 ns against a 13.4680 ns period, and
+`ss_n40C_3v00` by −5.0300 ns. DR-0008's own "Consequences" required that any
+further pipelining become its own ratified decision record, since it extends
+the latency contract DR-0008 established. This is that record (issue #115).
+
+Two facts shaped this decision, both measured rather than assumed. First,
+one boundary cut still leaves each remaining cone far too deep: after
+DR-0008 the worst path is still ~10 levels of standard-cell logic at a
+corner where a single loaded `_1`-strength cell costs 1–3 ns. Second, the
+two logic structures at the heart of those cones are both *serial by how
+they were written*, not by what they compute — the transition-minimization
+chain and the DC-balancing decision each admit an exactly-equivalent,
+shallower formulation.
+
+**Decision**: Restructure `rtl/tmds_encoder.v` into **four** pipeline
+stages, and re-express two internal computations in equivalent
+logarithmic-depth form. The DVI 1.0 §3.3 encoding *function* is unchanged
+bit-for-bit; only its temporal and structural decomposition changes.
+
+- **S1** — population count of `data` and the DVI 1.0 Figure 3-5
+  XOR-vs-XNOR threshold test. `data` is carried forward unmodified.
+- **S2** — the 9-bit transition-minimized intermediate word `qm`, computed
+  as a **parallel-prefix XOR** of `data` rather than the serial 8-deep
+  chain the DVI 1.0 figure draws. Unrolling the figure's own recurrence
+  `qm[i] = qm[i-1] ^ d[i] ^ use_xnor` gives
+  `qm[i] = (d[0]^…^d[i]) ^ (i odd ? use_xnor : 0)` — the chain *is* a
+  prefix-XOR followed by one conditional inversion of the odd bits. This is
+  an algebraic identity, not an approximation: same `qm` for every one of
+  the 256 inputs, at depth log₂(8)+1 = 4 instead of 8. The exhaustive
+  equivalence sweep in `verification/tmds_encoder/` re-establishes this
+  against the unchanged golden model rather than taking the derivation on
+  trust.
+- **S3** — everything in DVI 1.0's DC-balancing stage that depends only on
+  `qm` and *not* on the running-disparity accumulator: `N1(qm[7:0])`, the
+  character's own disparity, the two candidate output words (inverted /
+  not inverted), and the two candidate accumulator deltas. The published
+  stage is written as a three-way conditional, but its three branches emit
+  only ever one of those same two words — the degenerate
+  `cnt == 0 || disparity == 0` branch's output is literally the
+  not-inverted word when `qm[8]` is 1 and the inverted word when it is 0,
+  and the same collapse holds for that branch's accumulator update. So the
+  decision reduces to a single "invert or not" bit.
+- **S4** — the DC-balancing decision and the accumulator recurrence. This
+  is the one stage that *cannot* be pipelined further, because it carries
+  the algorithm's only sequential recurrence (`cnt` feeds its own next
+  value). It is deliberately reduced to a sign/zero test on `cnt`, one 2:1
+  select, and one add, with **both** candidate sums computed in parallel
+  with the select rather than after it, so the recurrence is one adder
+  deep and not an adder plus the selection logic.
+
+The encoder's registered latency from `data`/`de`/`ctrl` to the
+corresponding `tmds` output is therefore **four clock cycles**, superseding
+DR-0008's two and the original design's one. `de`/`ctrl` are pipelined
+alongside the datapath so they reach the output register aligned with the
+word they belong to.
+
+`rst` (synchronous, active-high) remains **not** pipelined — every one of
+the four registers clears on the same edge `rst` is sampled asserted, so
+reset keeps its original one-cycle-to-effect latency and also flushes the
+pipeline rather than letting in-flight symbols emerge afterwards. This is
+DR-0008's asymmetry, carried forward for DR-0008's reason: a reset that
+itself took four cycles would be a strictly worse contract with no
+compensating benefit. Blanking (`de` deasserted) remains pipelined like any
+other control signal, so `cnt` is re-zeroed four cycles after the caller
+drives `de = 0`.
+
+**Alternatives considered**:
+- **The `stage1`-internal 4-bit/4-bit split DR-0008 named** (registering an
+  intermediate bit of the serial XOR/XNOR chain) was considered and
+  rejected in favour of the parallel-prefix reformulation above. The split
+  buys one register's worth of depth on a chain that, once the identity is
+  recognized, does not need to be 8 deep at all; the prefix form gets the
+  same depth reduction *and more* without spending a pipeline stage or a
+  latency cycle on it. The pipeline stages this record does spend are spent
+  where they buy something the algebra cannot.
+- **A second boundary-only register** (i.e. DR-0008's cut, applied twice)
+  was considered and rejected: it leaves the two deepest structures — the
+  serial XOR chain and the three-way DC-balancing conditional — intact, so
+  it addresses the symptom (cone length) without addressing why the cones
+  are long.
+- **Recoding `cnt` narrower** (it is empirically confined to
+  {−8,−6,…,+6,+8}, so a 4-bit half-disparity encoding would suffice) was
+  considered and *deferred*, not rejected: it is a further real reduction
+  in S4's adder and comparator width, but S4 already meets timing with
+  margin at every corner once the above lands, and narrowing the
+  accumulator would trade a documented, generously-sized 8-bit accumulator
+  for one whose correctness depends on the empirically-discovered reachable
+  state set. That is the wrong trade to make for margin that is not needed.
+  It remains available if a future clock target needs it.
+- **Relaxing the 74.25 MHz target, or loosening this block's STA boundary
+  assumptions** (`set_input_delay`/`set_output_delay`/`set_driving_cell`/
+  `set_load`) to manufacture slack was rejected outright — CLAUDE.md
+  forbids relaxing the ratified spec to make results pass, and every flow
+  change this record's measurement depended on constrains the design
+  *more* tightly, never less.
+
+**Consequences**:
+- `rtl/tmds_encoder.v`'s header, `rtl/README.md`, and
+  `verification/tmds_encoder/`'s cocotb bench are updated to the four-clock
+  contract. The bench derives every read-back lag from one
+  `LATENCY_CYCLES = 4` constant rather than hard-coding it, so a future
+  contract change is a one-line edit there.
+- Any consumer of `tmds_encoder` — the not-yet-written 10:1→2:1
+  serializer, or any testbench driving this module directly — must budget
+  for **four** cycles from `data`/`de`/`ctrl` to `tmds`, and must not
+  assume `rst`'s one-cycle latency generalizes to the data path.
+- The four-stage pipeline is not sufficient on its own; three flow-side
+  changes were required alongside it, and all three tighten rather than
+  relax the analysis:
+  1. `flow/synth_tmds_encoder.py` now hands ABC a delay target of the
+     clock period **less the measured sequential overhead** (flop
+     clock-to-Q + capture setup + clock skew at `ss_125C_3v00`, 3.12 ns,
+     rounded to 3.2 ns). ABC's `-D` budgets the *combinational* logic it
+     maps, not the clock period; handing it the raw period over-stated the
+     logic budget by nearly a quarter of the period.
+  2. `flow/pnr_tmds_encoder.py` now carries a two-corner timing view
+     (setup optimized at `ss_125C_3v00`, hold repaired at `tt_025C_3v30`),
+     an explicit CTS root/internal buffer instead of TritonCTS's default
+     weakest `clkbuf_1`, ORFS's own gf180 per-layer RC for the
+     placement-stage estimate, and a `repair_timing -setup` pass with a
+     margin covering the estimate-vs-extracted gap.
+  3. Because `repair_timing -setup` works by **upsizing** existing
+     instances, `flow/sta_tmds_encoder.py`'s netlist-vs-DEF consistency
+     assertion is relaxed by exactly one notch: a DEF component may now
+     differ from its netlist instance in the numeric drive-strength suffix
+     only (`…_oai21_1` → `…_oai21_2`), never in logic function. Every such
+     resize is enumerated by name in the evidence record rather than
+     reduced to a count. This does not weaken what the check establishes —
+     the two cells compute the same function on the same pins, the timing
+     reported comes from the DEF's actual cell, and a stale layout or a
+     changed function still fails loudly.
+- 1080p60 (148.5 MHz) is still not claimed and is still not driving
+  architecture, per DR-0001 and CLAUDE.md.
+
+**Measured outcome** (issue #115, full flow re-run from scratch against the
+four-stage RTL — `flow/tmds_encoder/records/20260817-110611-37e197a.md`,
+minted from a clean checkout at commit `37e197a`): **720p60 setup now closes
+at all 5 of 5 3.3 V corners**, up from 3 of 5 under DR-0008.
+
+| Corner | 720p60 setup, DR-0008 | 720p60 setup, DR-0009 |
+|---|---|---|
+| `tt_025C_3v30` | PASS +0.2603 ns | PASS +6.7550 ns |
+| `ss_125C_3v00` | **FAIL −13.5129 ns** | **PASS +0.2799 ns** |
+| `ss_n40C_3v00` | **FAIL −5.0300 ns** | **PASS +4.2895 ns** |
+| `ff_125C_3v60` | PASS | PASS +7.9050 ns |
+| `ff_n40C_3v60` | PASS | PASS +9.5244 ns |
+
+Worst-corner Fmax is **75.83 MHz** (whole design, i.e. including the
+input-port paths, and identical to the register-to-register figure), against
+the 74.25 MHz target — a real pass under this flow's deliberately
+pessimistic `set_input_delay 0`/`set_output_delay 0` boundary assumptions,
+and a **margin-limited** one: 0.2799 ns is 2.1% of the 13.4680 ns period.
+Treat 720p60 as closed, not as closed with headroom; a later netlist or
+floorplan change can take that back, and this flow does not yet model
+on-chip-variation derating.
+
+480p (27.000 MHz) continues to close at all 5 corners, and hold continues to
+close at all 5 corners at both targets — no regression on either. The
+gate-level, SDF-annotated re-simulation of the *unmodified* cocotb bench
+against the routed netlist passes (`20260817-110422-37e197a`), as does the
+RTL bench itself including its negative-control leg. The post-route
+worst-case unconstrained combinational delay fell to 5.18 ns
+(`20260817-105709-049c240`), from 13.27 ns under DR-0008 and 18.30 ns
+pre-pipeline. DRC on the regenerated GDS stays clean; LVS's topology
+mismatch count moves from 13 to 18, every one attributed in
+`layout/README.md` (P&R utility/CTS/hold-repair cell types, plus the two
+setup-repair resized types this record's "Consequences" already disclose).
+
+**Status**: Accepted — and, with this record's measured outcome, DR-0003's
+synthesized-domain clock ceiling question (opened by DR-0003, resolved to
+"an architecture change is needed" by DR-0007, partially addressed by
+DR-0008) is **closed for the encoder at 720p60**: the change DR-0007 called
+for has landed and the target closes at every 3.3 V corner. It is not closed
+for the block as a whole — the 10:1→2:1 serializer, which is where DR-0003's
+371.25 MHz intermediate rate actually lives, is still unwritten.

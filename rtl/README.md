@@ -10,12 +10,12 @@ DVI-mode TMDS transmitter component, not an HDMI part -- see `CLAUDE.md`,
   XOR/XNOR selection (stage 1) followed by DC-balancing against a
   running-disparity accumulator (stage 2), plus the four fixed control
   characters emitted during blanking. Registered output, one 10-bit TMDS
-  character per pixel clock, at a **two-clock-cycle** latency from
-  `data`/`de`/`ctrl` to `tmds` (a pipeline register sits at the
-  stage1/stage2 boundary -- `spec/tmds-tx.md` DR-0008; `rst` itself keeps a
-  one-cycle latency, see that decision record). Algorithm and
-  control-character citation, and the full interface/behavior description,
-  are in the file's own header.
+  character per pixel clock, at a **four-clock-cycle** latency from
+  `data`/`de`/`ctrl` to `tmds` (a four-stage pipeline -- `spec/tmds-tx.md`
+  DR-0009, superseding DR-0008's two-stage contract; `rst` itself keeps a
+  one-cycle latency, see those decision records). Algorithm and
+  control-character citation, the four stages' cut points, and the full
+  interface/behavior description, are in the file's own header.
 
 Verified by `verification/tmds_encoder/` -- see `verification/README.md`
 for the verification conventions this repo follows (three-leg plan,

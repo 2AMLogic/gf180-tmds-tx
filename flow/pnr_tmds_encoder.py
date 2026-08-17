@@ -38,28 +38,36 @@ in-memory/`flow/build/`-scratch copy only -- the committed netlist file
 itself is never touched, and both deltas are re-verified (not just assumed)
 every run:
 
-1. ``wire signed [7:0] cnt;`` -> ``wire [7:0] cnt;`` -- a type-only
+1. ``wire signed [N:0] <net>;`` -> ``wire [N:0] <net>;`` -- a type-only
    annotation OpenROAD's reader's grammar does not accept
-   (``STA-0171 syntax error``, confirmed against this exact line while
-   building this driver). Purely cosmetic: nothing downstream reads the
-   *signedness* of a `wire` (only `reg`/behavioral arithmetic cares, and
-   this is already a fully gate-level, structural netlist).
-2. The single dead tie ``assign cnt[0] = 1'h0;`` is dropped rather than fed
-   through. ``cnt[0]`` has zero fanout in the synthesized netlist (verified
-   by regex fanout-counting the written netlist, not assumed --
-   see ``dead_net_fanout_count``): Yosys's own `opt`/`abc` folded the
-   running-disparity accumulator's LSB to a constant and left this leftover
-   top-level continuous assignment, which nothing reads. OpenROAD's reader
-   accepts the line syntactically, but represents the literal-0 driver as
+   (``STA-0171 syntax error``, confirmed against this exact construct while
+   building this driver, and re-confirmed against DR-0009's netlist). Purely
+   cosmetic: nothing downstream reads the *signedness* of a `wire` (only
+   `reg`/behavioral arithmetic cares, and this is already a fully gate-level,
+   structural netlist). Applied to every signed net, not one name: the
+   pre-DR-0009 netlist had exactly one (``cnt``); DR-0009's four-stage
+   encoder also carries the two candidate accumulator deltas as signed nets.
+2. Dead ties such as ``assign cnt[0] = 1'h0;`` are dropped rather than fed
+   through. Every bit such an assign drives has zero fanout in the
+   synthesized netlist (verified by re-searching the written netlist with
+   the assigns removed, not assumed -- see ``live_assign_targets``): Yosys's
+   own `opt`/`abc` folded whatever used to read those bits to a constant (the
+   running-disparity accumulator's LSB, the two deltas' LSBs -- all three are
+   structurally even -- and the candidate output words' two bits that do not
+   depend on the inversion decision) and left the leftover top-level
+   continuous assignments behind, which nothing reads. OpenROAD's reader
+   accepts the lines syntactically, but represents a literal-0 driver as
    an implicit, deck-wide ``zero_`` net of ``SignalType GROUND`` -- which
    TritonRoute then refuses to route (``DRT-0305 ... is not routable ...
    Move to special nets``), even though the net drives nothing. Dropping the
-   dead assign (rather than trying to tie it off with a real
+   dead assigns (rather than trying to tie them off with a real
    ``gf180mcu_fd_sc_mcu9t5v0__tiel`` cell via `repair_tie_fanout`, which
    this script tried first and confirmed is a no-op here -- OpenROAD's
    constant-fanout repair does not fire on a zero-fanout net) reflects
    exactly what P&R actually builds: no tie cell, no dead net, because
-   nothing in the real circuit needs one.
+   nothing in the real circuit needs one. A *live* top-level assign, or one
+   whose syntax this step does not recognize, raises instead of being
+   silently dropped.
 
 ## Clock-tree synthesis (issue #100)
 
@@ -91,6 +99,63 @@ is not looser than what the post-route STA record checks against.
 This still does not by itself constitute a timing-closure claim -- that
 remains `flow/sta_tmds_encoder.py`'s job, re-run against this script's routed
 DEF and post-CTS parasitics.
+
+## Clock insertion delay is a setup-timing term here, not just a skew term (issue #115)
+
+`clock_tree_synthesis`'s `-buf_list` is a *candidate* list; the buffer
+TritonCTS actually instantiates for the tree's root and internal levels, when
+not told otherwise, is the **first entry** of that list -- which for the
+drive-strength-ordered list above is the weakest cell the library ships,
+`clkbuf_1`. On this design that produced a clock tree whose root buffer was
+driving a load it had no business driving, and the resulting insertion delay
+was not merely large but *unbalanced*: the launching register's clock
+arrived measurably later than the capturing register's, which is a direct,
+one-for-one subtraction from setup slack on every register-to-register path.
+
+`CTS_ROOT_BUF`/`CTS_TREE_BUF` therefore name the buffers explicitly
+(`clkbuf_16` at the root, `clkbuf_8` internally) rather than letting the
+list order decide. Measured, not guessed: naming them was worth 0.2148 ns of
+worst-corner setup slack on this design (-0.5397 ns -> -0.3249 ns at
+`ss_125C_3v00`) with no other change in the same run. The candidate list is
+left as-is, so CTS still picks per-level sizes for the leaves.
+
+## Two-corner optimization: setup at the slow corner, hold at the nominal one (issue #115)
+
+Every earlier revision of this driver read a single liberty
+(`STD_CELL_CORNER`, the `tt_025C_3v30` nominal corner), so `repair_timing`
+optimized against the nominal corner's timing -- which has multiple
+nanoseconds of setup slack on this design and therefore gives a setup
+resizer nothing to do, while the corner 720p60 setup actually has to close
+at (`ss_125C_3v00`, the same corner `flow/synth_tmds_encoder.py`'s ABC
+mapping already targets) went unmodelled.
+
+`define_corners` now declares both, and each `repair_timing` pass is aimed
+where it belongs:
+
+  - **setup** is repaired against `SETUP_CORNER` (`ss_125C_3v00`), before
+    hold. Setup repair restructures/upsizes; there is no point protecting a
+    hold path that setup repair is about to change underneath.
+  - **hold** is repaired against `HOLD_CORNER` (`tt_025C_3v30`) exactly as
+    before, so this change is strictly additive on the hold side rather
+    than a re-tuning of an already-passing check.
+
+Both passes run pre-route, against `estimate_parasitics -placement`, and
+that estimate is optimistic relative to the post-route OpenRCX extraction
+`flow/sta_tmds_encoder.py` signs off against. `SETUP_MARGIN_NS` exists for
+exactly the reason `HOLD_MARGIN_NS` does, and was sized the same way --
+measured, not guessed: with no margin, `repair_timing -setup` reported
+`RSZ-0098 No setup violations found` and did nothing at all, while the
+post-route re-check on that same layout came back at -0.0706 ns.
+
+**Setup repair works by upsizing existing instances**, which means the
+routed DEF this driver writes can name a different drive strength for an
+instance than the committed netlist does (`..._oai21_1` -> `..._oai21_2`).
+That is a real, disclosed netlist-vs-layout difference, and
+`flow/sta_tmds_encoder.py`'s `assert_def_matches_netlist` is what decides
+whether it is acceptable -- it accepts a drive-strength-only difference,
+still rejects any change of logic function, and enumerates every resized
+instance by name in the evidence record. See that function's docstring for
+why that is the right notch to relax and no further.
 
 ## GDS streamout: DEF+LEF -> GDS, and a DBU mismatch that dropped most vias
 
@@ -247,6 +312,16 @@ FINAL_GDS = LAYOUT_GDS_DIR / "tmds_encoder.gds"
 
 STD_CELL_LIB = "gf180mcu_fd_sc_mcu9t5v0"
 STD_CELL_CORNER = "tt_025C_3v30"
+# Two-corner timing view for the resizer (issue #115) -- see this module's
+# docstring, "Two-corner optimization: setup at the slow corner, hold at the
+# nominal one". `SETUP_CORNER` is the worst setup corner of the five
+# `flow/sta_tmds_encoder.py` signs off against (and the same corner
+# `flow/synth_tmds_encoder.py`'s ABC mapping already targets); `HOLD_CORNER`
+# is the nominal corner every earlier revision of this driver used as its
+# single corner, kept as the hold-repair corner so this change is
+# strictly additive on the hold side.
+SETUP_CORNER = synth.TIMING_CORNER  # ss_125C_3v00
+HOLD_CORNER = STD_CELL_CORNER  # tt_025C_3v30
 SITE = "GF018hv5v_green_sc9"
 CORE_UTILIZATION = 35  # percent -- see evidence record for the resulting effective utilization
 PLACE_DENSITY = 0.45
@@ -260,6 +335,36 @@ CTS_PERIOD_NS = synth.TARGET_PERIOD_NS
 # ships, so OpenROAD's CTS engine can pick the size each level of the tree
 # needs rather than being limited to one.
 CTS_BUF_LIST = [f"{STD_CELL_LIB}__clkbuf_{d}" for d in (1, 2, 3, 4, 8, 12, 16, 20)]
+# Root/internal clock-tree buffer, named explicitly rather than left to
+# TritonCTS's default (which is the *first* entry of `-buf_list`, i.e. the
+# weakest `clkbuf_1`). See this module's docstring, "Clock insertion delay
+# is a setup-timing term here, not just a skew term (issue #115)".
+CTS_ROOT_BUF = f"{STD_CELL_LIB}__clkbuf_16"
+CTS_TREE_BUF = f"{STD_CELL_LIB}__clkbuf_8"
+
+# Per-layer resistance/capacitance for `estimate_parasitics -placement`
+# (issue #115). Values copied verbatim from OpenROAD-flow-scripts' own gf180
+# platform deck, `flow/platforms/gf180/setRC.tcl` in the pinned
+# `openroad/orfs` image -- the same upstream, platform-authored numbers ORFS
+# uses for every gf180 design, not numbers invented here. Ohms/square and
+# farads/meter, OpenROAD's `set_layer_rc` units.
+#
+# Before this, no `set_wire_rc`/`set_layer_rc` was configured at all, so the
+# placement-stage estimate was literally zero-wire-load (the `EST-0018 wire
+# capacitance for corner ... is zero` warnings in this driver's own log were
+# not cosmetic). That was survivable for `repair_timing -hold`, which only
+# adds delay, but `repair_timing -setup` refuses to run without it outright
+# (`RSZ-0089 Could not find a resistance value for any corner`), and it is
+# the direct cause of the estimate-vs-extracted hold gap `HOLD_MARGIN_NS`
+# below exists to paper over.
+WIRE_RC_LAYERS = {
+    "Metal2": (2.25636e-04, 1.35357e-04),
+    "Metal3": (2.25636e-04, 1.46141e-04),
+    "Metal4": (2.25637e-04, 1.50688e-04),
+    "Metal5": (5.85545e-05, 1.55595e-04),
+}
+WIRE_RC_SIGNAL_LAYER = "Metal2"  # ORFS gf180's own choice for signal nets
+WIRE_RC_CLOCK_LAYER = "Metal5"  # ...and for clock nets
 # I/O boundary assumptions for `repair_timing`, numerically identical to
 # flow/sta_tmds_encoder.py's own DRIVING_CELL/OUTPUT_LOAD_PF (kept in sync
 # manually; both cite the same rationale -- see that driver's docstring).
@@ -282,6 +387,16 @@ SDC_OUTPUT_LOAD_PF = 0.027252
 # -0.0412 ns). This margin pads the repair target well past that measured
 # gap so the post-route re-check has real, not estimate-derived, headroom.
 HOLD_MARGIN_NS = 0.25
+# Setup-repair margin (issue #115), for exactly the reason `HOLD_MARGIN_NS`
+# above exists: `repair_timing` runs pre-route against `estimate_parasitics
+# -placement`, and that estimate is optimistic relative to the post-route
+# OpenRCX extraction `flow/sta_tmds_encoder.py` signs off against. Measured,
+# not guessed: with no margin, `repair_timing -setup` reported `RSZ-0098 No
+# setup violations found` at `SETUP_CORNER` and did nothing at all, while the
+# post-route re-check on that same layout came back at -0.0706 ns. This margin
+# is what makes the resizer optimize the paths that are actually going to be
+# tight once real parasitics land.
+SETUP_MARGIN_NS = 0.5
 
 # OpenROAD-flow-scripts' bundled, gf180-platform-specific streamout assets
 # this driver reuses read-only for the GDS merge step -- static PDK viewer
@@ -303,44 +418,113 @@ class PnrError(RuntimeError):
     pass
 
 
-def lef_paths(pdk: Pdk) -> tuple[Path, Path, Path, Path]:
+def lef_paths(pdk: Pdk) -> tuple[Path, Path, Path, Path, Path]:
     base = pdk.path / "libs.ref" / STD_CELL_LIB
     tech_lef = base / "techlef" / f"{STD_CELL_LIB}__nom.tlef"
     sc_lef = base / "lef" / f"{STD_CELL_LIB}.lef"
-    liberty = base / "lib" / f"{STD_CELL_LIB}__{STD_CELL_CORNER}.lib"
+    nominal_liberty = base / "lib" / f"{STD_CELL_LIB}__{STD_CELL_CORNER}.lib"
+    setup_liberty = base / "lib" / f"{STD_CELL_LIB}__{SETUP_CORNER}.lib"
     cell_gds = base / "gds" / f"{STD_CELL_LIB}.gds"
-    for p in (tech_lef, sc_lef, liberty, cell_gds):
+    for p in (tech_lef, sc_lef, nominal_liberty, setup_liberty, cell_gds):
         if not p.is_file():
             raise PnrError(f"expected gf180mcu PDK file not found: {p}")
-    return tech_lef, sc_lef, liberty, cell_gds
+    return tech_lef, sc_lef, nominal_liberty, setup_liberty, cell_gds
+
+
+#: `wire signed [...] foo;` -- the signedness annotation OpenROAD's reader
+#: rejects. Matched generically (any net), not by name: DR-0009's four-stage
+#: encoder synthesizes several signed nets (`cnt`, both candidate accumulator
+#: deltas) where the pre-DR-0009 netlist had exactly one (`cnt`).
+_SIGNED_WIRE_RE = re.compile(r"^(?P<lead>\s*wire )signed (?P<rest>\[)", re.MULTILINE)
+
+#: A top-level continuous assignment in the written netlist, e.g.
+#: `  assign cnt[0] = 1'h0;` or `  assign word_keep_s3[9:8] = { 1'h0, qm8_s3 };`.
+_ASSIGN_RE = re.compile(
+    r"^  assign (?P<net>\w+)\[(?P<msb>\d+)(?::(?P<lsb>\d+))?\] = (?P<rhs>[^;]+);\n",
+    re.MULTILINE,
+)
 
 
 def preprocess_netlist_for_openroad(src: Path, dst: Path) -> None:
-    """The two mechanical, documented deltas from this module's docstring."""
+    """The two mechanical, documented deltas from this module's docstring.
+
+    Both are applied generically rather than to one hard-coded net name, and
+    both re-verify their own precondition every run: the signedness strip is
+    purely syntactic, and an `assign` is dropped only after mechanically
+    confirming every bit it drives has zero fanout in the same netlist. A
+    *live* top-level assign would be a real structural change, so it raises
+    instead of being silently dropped.
+    """
     text = src.read_text()
-    fanout = dead_net_fanout_count(text, "cnt[0]")
-    if fanout > 0:
+
+    all_assigns = re.findall(r"^  assign .*$", text, re.MULTILINE)
+    recognized = len(_ASSIGN_RE.findall(text))
+    if len(all_assigns) != recognized:
         raise PnrError(
-            f"cnt[0] has {fanout} reference(s) beyond its own declaration/assignment -- "
-            "no longer dead; this preprocessing step no longer applies, investigate"
+            f"netlist has {len(all_assigns)} top-level continuous assignment(s) but only "
+            f"{recognized} match the bit-select form this preprocessing step understands -- "
+            "investigate before place-and-route rather than passing an unrecognized "
+            "construct through to OpenROAD's reader"
         )
-    text = text.replace("wire signed [7:0] cnt;", "wire [7:0] cnt;")
-    text = text.replace("  assign cnt[0] = 1'h0;\n", "")
+
+    live = live_assign_targets(text)
+    if live:
+        raise PnrError(
+            "netlist contains top-level continuous assignment(s) whose target bits "
+            f"are actually read: {', '.join(live)} -- the dead-tie preprocessing step "
+            "documented in this module's docstring no longer applies, investigate "
+            "before place-and-route"
+        )
+
+    text = _SIGNED_WIRE_RE.sub(lambda m: m.group("lead") + m.group("rest"), text)
+    text = _ASSIGN_RE.sub("", text)
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(text)
 
 
+def assign_target_bits(text: str) -> list[str]:
+    """Every `<net>[<bit>]` a top-level continuous assignment drives."""
+    targets: list[str] = []
+    for m in _ASSIGN_RE.finditer(text):
+        msb = int(m.group("msb"))
+        lsb = int(m.group("lsb")) if m.group("lsb") is not None else msb
+        lo, hi = min(msb, lsb), max(msb, lsb)
+        targets.extend(f"{m.group('net')}[{bit}]" for bit in range(lo, hi + 1))
+    return targets
+
+
+def live_assign_targets(text: str) -> list[str]:
+    """Assign-driven bits that something *other than* the assign itself reads.
+
+    Measured by deleting every top-level continuous assignment first and then
+    searching what remains -- which is exactly the netlist P&R would see once
+    the dead ties are dropped -- rather than by counting occurrences and
+    guessing how many of them belong to the assign's own left-hand side (a
+    range assign such as `foo[9:8] = ...` never spells its individual bits
+    out, so occurrence-counting undercounts it).
+    """
+    without_assigns = _ASSIGN_RE.sub("", text)
+    return [
+        target
+        for target in assign_target_bits(text)
+        if dead_net_fanout_count(without_assigns, target) > 0
+    ]
+
+
 def dead_net_fanout_count(text: str, net: str) -> int:
-    """References to `net` beyond its own wire declaration + assign LHS."""
-    refs = len(re.findall(re.escape(net) + r"\b", text))
-    return max(0, refs - 2)
+    """Occurrences of the exact bit-select `net` in `text`."""
+    return len(re.findall(re.escape(net), text))
 
 
-def build_tcl(tech_lef: Path, sc_lef: Path, liberty: Path, pnr_input: Path) -> str:
+def build_tcl(
+    tech_lef: Path, sc_lef: Path, setup_liberty: Path, nominal_liberty: Path, pnr_input: Path
+) -> str:
     return f"""\
 read_lef {tech_lef}
 read_lef {sc_lef}
-read_liberty {liberty}
+define_corners {SETUP_CORNER} {HOLD_CORNER}
+read_liberty -corner {SETUP_CORNER} {setup_liberty}
+read_liberty -corner {HOLD_CORNER} {nominal_liberty}
 read_verilog {pnr_input}
 link_design {TOP}
 
@@ -370,10 +554,27 @@ set_output_delay 0.0000 -clock clk [all_outputs]
 set_driving_cell -lib_cell {SDC_DRIVING_CELL} -pin {SDC_DRIVING_CELL_PIN} $non_clk_inputs
 set_load {SDC_OUTPUT_LOAD_PF} [all_outputs]
 
+# Placement-stage RC estimate (issue #115) -- see WIRE_RC_LAYERS.
+{chr(10).join(f"set_layer_rc -layer {layer} -resistance {r:.5E} -capacitance {c:.5E}" for layer, (r, c) in WIRE_RC_LAYERS.items())}
+set_wire_rc -signal -layer {WIRE_RC_SIGNAL_LAYER}
+set_wire_rc -clock -layer {WIRE_RC_CLOCK_LAYER}
+
 estimate_parasitics -placement
-clock_tree_synthesis -buf_list {{{" ".join(CTS_BUF_LIST)}}} -sink_clustering_enable
+clock_tree_synthesis -buf_list {{{" ".join(CTS_BUF_LIST)}}} \\
+    -root_buf {CTS_ROOT_BUF} -tree_buf {CTS_TREE_BUF} -sink_clustering_enable
 set_propagated_clock [all_clocks]
 estimate_parasitics -placement
+detailed_placement
+
+# Setup repair (issue #115). Runs against the two-corner timing view defined
+# above, so the slack it optimizes is the one at `{SETUP_CORNER}` -- the corner
+# 720p60 setup actually has to close at -- rather than at the nominal corner,
+# which has multiple nanoseconds of slack and would give the resizer nothing
+# to do. Setup before hold, the conventional order: hold repair adds delay,
+# and there is no point protecting hold on a path setup repair is about to
+# restructure.
+estimate_parasitics -placement
+repair_timing -setup -setup_margin {SETUP_MARGIN_NS}
 detailed_placement
 
 # Hold repair (issue #100 step 2): CTS changes per-register clock insertion
@@ -575,7 +776,7 @@ def main() -> int:
         return 3
 
     try:
-        tech_lef, sc_lef, liberty, cell_gds = lef_paths(pdk)
+        tech_lef, sc_lef, nominal_liberty, setup_liberty, cell_gds = lef_paths(pdk)
     except PnrError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
@@ -593,7 +794,7 @@ def main() -> int:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     log_path = REPORTS_DIR / f"{rid}.pnr.log"
 
-    script = build_tcl(tech_lef, sc_lef, liberty, pnr_input)
+    script = build_tcl(tech_lef, sc_lef, setup_liberty, nominal_liberty, pnr_input)
     print(f"Place-and-routing {TOP} ...")
     result = run_openroad(script, log_path)
     log_text = log_path.read_text()
@@ -627,13 +828,19 @@ def main() -> int:
             return 1
         sha = synth._git("rev-parse", "HEAD") or "unknown"
         dirty = synth.working_tree_dirty()
-        record_path.write_text(render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_log))
+        record_path.write_text(
+            render_record(
+                rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+            )
+        )
         print(f"Evidence record written to {record_path}")
 
     return 0
 
 
-def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_log) -> str:
+def render_record(
+    rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+) -> str:
     return f"""\
 # Record {rid}
 

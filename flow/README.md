@@ -41,8 +41,12 @@ Synthesis and place-and-route recipes (Yosys, OpenROAD) driven through `klt`.
   generates the constraint file it analyses against
   (`tmds_encoder/sta/tmds_encoder.sdc`) rather than assuming one exists,
   mechanically asserts that the DEF really realizes *that* netlist
-  (`assert_def_matches_netlist`), and records SHA-256 digests of all three
-  inputs so "the exact netlist revision" is verifiable rather than a
+  (`assert_def_matches_netlist` -- which since issue #115 accepts a
+  drive-strength-only difference, because `pnr_tmds_encoder.py` now runs
+  `repair_timing -setup`, but still rejects any change of logic function and
+  enumerates every resized instance by name in the record), and records
+  SHA-256 digests of all three inputs so "the exact netlist revision" is
+  verifiable rather than a
   filename. Every constraint assumption that shapes the verdict is stated
   in the module docstring, in the generated SDC, and in the evidence
   record. See that docstring for why the record reports two verdicts
@@ -243,27 +247,33 @@ This directory currently synthesizes the encoder only (`rtl/tmds_encoder.v`
 -- the 10:1->2:1 serializer is a deliberate follow-on, per `rtl/README.md`).
 Synthesis (#82), place-and-route (#84) and SDF extraction / SDF-annotated
 gate-level re-simulation (#85) each deliberately declined to make a
-timing-closure claim, deferring it to a dedicated STA step. That step is
-`sta_tmds_encoder.py` (issue #83), and it has landed -- so the honest
-summary of what this flow now answers is:
+timing-closure claim, deferring it to a dedicated STA step
+(`sta_tmds_encoder.py`, issue #83). Four rounds of work followed that first
+verdict -- timing-driven synthesis + CTS + hold repair (#100), the DR-0008
+stage1/stage2 pipeline register (#110), and the DR-0009 four-stage pipeline
+plus two-corner setup repair (#115) -- so the honest summary of what this
+flow now answers, per the current STA evidence record
+(`tmds_encoder/records/20260817-110611-37e197a.md`), is:
 
-- **Hold: PASS** at every 3.3 V corner, at both pixel-clock targets. Pre-CTS
-  (no clock tree has been built yet), so it must be re-checked after CTS.
-- **Setup: FAIL** at the 720p60 target (74.25 MHz) at four of five corners,
-  and at the 480p fallback (27.000 MHz) at the slow/hot corner. The measured
-  Fmax of the committed netlist is **22.70 MHz worst-corner** (45.88 MHz
-  typical) -- see the STA evidence record for the full matrix.
+- **Setup at the 720p60 target (74.25 MHz): PASS at all five 3.3 V corners.**
+  Worst corner `ss_125C_3v00` at **+0.2799 ns**, i.e. 2.1% of the 13.4680 ns
+  period -- a real pass under this flow's deliberately pessimistic
+  `set_input_delay 0`/`set_output_delay 0` boundary assumptions, and a
+  margin-limited one. Measured Fmax **75.83 MHz** worst-corner
+  (148.96 MHz typical).
+- **Setup at the 480p fallback (27.000 MHz): PASS** at every corner, with
+  more than 23 ns of margin at the worst.
+- **Hold: PASS** at every corner, at both targets -- and *post*-CTS, against
+  the real propagated clock tree, not the pre-CTS approximation #83 could
+  only give.
 - **DR-0003's flagged open item** (does the standard-cell library close at
-  the 5x-pixel intermediate rate, 371.25 MHz?) now has a *measurement*
-  against it rather than a deferral: not with this netlist, by more than an
-  order of magnitude. That rate belongs to the not-yet-written serializer,
-  not to this encoder.
+  the 5x-pixel intermediate rate, 371.25 MHz?) still has only a measurement
+  of the *encoder* against it: no, not at that rate, by a wide margin. That
+  rate belongs to the not-yet-written 10:1->2:1 serializer, not to this
+  encoder, and is not claimed here either way.
 
-The critical caveat, stated in the record and repeated here because it is
-the whole reason those setup numbers look the way they do: **the netlist
-under analysis was synthesized with no timing constraint at all** (#82 ran
-an area-oriented mapping, every cell at drive strength 1, no `.sdc`). These
-results characterize *that netlist*, not this library's ceiling for this
-RTL. Timing-driven re-synthesis plus clock-tree synthesis has never been
-attempted here and is the substantive follow-up -- deliberately out of
-#83's evidence-gathering scope, and tracked as issue #100.
+The history is preserved rather than overwritten: every intermediate verdict
+above still exists as its own append-only record under `tmds_encoder/records/`
+(`20260816-172539-930e864` for #83's original no-constraint netlist, whose
+22.70 MHz worst-corner Fmax this section used to report; `20260817-001614-064d550`
+for #100's timing-driven/CTS result; `20260817-012556-7d9130d` for DR-0008's).
