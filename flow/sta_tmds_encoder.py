@@ -138,7 +138,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -148,7 +147,7 @@ sys.path.insert(0, str(REPO_ROOT / "flow"))
 
 from sim.harness.pdk import Pdk, PdkNotFound, find_pdk  # noqa: E402
 import synth_tmds_encoder as synth  # noqa: E402  (reuses record_id/_git/working_tree_dirty)
-import pnr_tmds_encoder as pnr  # noqa: E402  (reuses lef_paths, STD_CELL_LIB)
+import pnr_tmds_encoder as pnr  # noqa: E402  (reuses lef_paths, STD_CELL_LIB, run_openroad, openroad_version)
 
 TOP = "tmds_encoder"
 
@@ -365,20 +364,6 @@ exit
 """
 
 
-def run_openroad(script: str, script_path: Path, log_path: Path) -> subprocess.CompletedProcess:
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    script_path.write_text(script)
-    result = subprocess.run(
-        ["openroad", "-no_init", "-exit", str(script_path)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    log_path.write_text((result.stdout or "") + (result.stderr or ""))
-    return result
-
-
 def section(log_text: str, name: str) -> str:
     """Text between `=== name ===` and the next `=== ... ===` marker."""
     marker = f"=== {name} ==="
@@ -402,11 +387,6 @@ def count_violators(text: str) -> int:
         for line in text.splitlines()
         if (m := _SLACK_ONLY_LINE_RE.match(line)) and float(m.group(1)) < 0
     )
-
-
-def openroad_version(log_text: str) -> str:
-    m = re.search(r"^OpenROAD (\S+)", log_text, re.MULTILINE)
-    return m.group(1) if m else "unknown"
 
 
 class Result:
@@ -539,12 +519,9 @@ def main() -> int:
         sdc_path.write_text(build_sdc(freq_mhz, target))
         for corner, _desc in CORNERS:
             stem = f"{rid}.sta_{corner}_{target}"
-            script_path = REPORTS_DIR / f"{stem}.tcl"
             log_path = REPORTS_DIR / f"{stem}.log"
             print(f"STA: corner {corner}, target {target} ({freq_mhz:g} MHz) ...")
-            result = run_openroad(
-                build_tcl(tech_lef, sc_lef, liberties[corner], sdc_path), script_path, log_path
-            )
+            result = pnr.run_openroad(build_tcl(tech_lef, sc_lef, liberties[corner], sdc_path), log_path)
             log_text = log_path.read_text()
             if result.returncode != 0 or "Error:" in log_text or "[ERROR" in log_text:
                 print(f"ERROR: openroad exited {result.returncode} -- see {log_path}", file=sys.stderr)
@@ -552,7 +529,7 @@ def main() -> int:
             if "=== END ===" not in log_text:
                 print(f"ERROR: OpenSTA run did not reach the end marker -- see {log_path}", file=sys.stderr)
                 return 1
-            or_version = openroad_version(log_text) or or_version
+            or_version = pnr.openroad_version(log_text) or or_version
             try:
                 parsed = Result(corner, target, freq_mhz, log_text, log_path)
             except StaError as exc:

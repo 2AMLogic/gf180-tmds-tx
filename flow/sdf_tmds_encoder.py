@@ -87,7 +87,7 @@ sys.path.insert(0, str(REPO_ROOT / "flow"))
 
 from sim.harness.pdk import Pdk, PdkNotFound, find_pdk  # noqa: E402
 import synth_tmds_encoder as synth  # noqa: E402  (reuses record_id/_git/working_tree_dirty)
-import pnr_tmds_encoder as pnr  # noqa: E402  (reuses lef_paths, STD_CELL_LIB/CORNER)
+import pnr_tmds_encoder as pnr  # noqa: E402  (reuses lef_paths, STD_CELL_LIB/CORNER, run_openroad, openroad_version)
 
 TOP = "tmds_encoder"
 
@@ -161,11 +161,6 @@ def parse_net_counts(log_text: str) -> str | None:
     return f"{nets} nets, {rsegs} rsegs, {caps} caps, {ccs} coupling caps"
 
 
-def openroad_version(log_text: str) -> str:
-    m = re.search(r"^OpenROAD (\S+)", log_text, re.MULTILINE)
-    return m.group(1) if m else "unknown"
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--no-record", action="store_true")
@@ -213,7 +208,7 @@ def main() -> int:
 
     worst_delay = parse_worst_unconstrained_delay(log_text)
     net_counts = parse_net_counts(log_text)
-    or_version = openroad_version(log_text)
+    or_version = pnr.openroad_version(log_text)
     print(
         f"OK: SDF written to {SDF_PATH}, SPEF written to {SPEF_PATH} "
         f"(worst unconstrained input-to-register delay: {worst_delay} ns; {net_counts})"

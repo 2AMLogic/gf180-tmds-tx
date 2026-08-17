@@ -412,6 +412,11 @@ def run_openroad(script: str, log_path: Path) -> subprocess.CompletedProcess:
     return result
 
 
+def openroad_version(log_text: str) -> str:
+    m = re.search(r"^OpenROAD (\S+)", log_text, re.MULTILINE)
+    return m.group(1) if m else "unknown"
+
+
 def tech_lef_database_microns(tech_lef: Path) -> int:
     """The tech LEF's own `DATABASE MICRONS <N>` value -- see this module's
     docstring's "GDS streamout" section for why this must match the KLayout
