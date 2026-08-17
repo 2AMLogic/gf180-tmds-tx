@@ -10,11 +10,14 @@ silence.
 
 Per CLAUDE.md ("Verification is the product: no claim without a
 testbench... recorded results are append-only evidence"), every verdict
-below cites a specific `sim/*/records/*.md` file. This document makes no
-claim beyond what those records already state — it is a index and rollup,
-not new measurement work. `measurements/` itself stays otherwise empty
-until tape-out (see `measurements/README.md`), consistent with this being a
-design/simulation-stage rollup, not a silicon characterization.
+below cites a specific evidence record — `sim/*/records/*.md` for the analog
+CML-driver partition (§1), `flow/tmds_encoder/records/*.md` plus
+`verification/tmds_encoder/` for the digital encoder partition (§2). This
+document makes no claim beyond what those records already state — it is a
+index and rollup, not new measurement work. `measurements/` itself stays
+otherwise empty until tape-out (see `measurements/README.md`), consistent
+with this being a design/simulation-stage rollup, not a silicon
+characterization.
 
 **Convention**: this document is not append-only in the `sim/` sense — it is
 expected to be revised in place as evidence accumulates (a new record lands,
@@ -37,7 +40,7 @@ no simulation evidence at all yet.
 | Common mode 2.8–3.3 V at nominal AVCC = 3.3 V | **PASS** | same record | 3.041–3.054 V across the full PVT × rate × pad-cap grid at nominal supply. |
 | Common mode across the ±10 % supply-corner sweep | **PASS, against DR-0006's qualified reading** | same record | At AVCC = 2.97 V/3.63 V, common mode reaches 2.711 V / 3.384 V — outside DR-0002's original flat 2.8–3.3 V window taken literally, but DR-0006 (`spec/tmds-tx.md` §4) ratifies the window as a nominal-AVCC-3.3 V figure with this measured 1:1 supply-tracking as the explicit qualifier. Graded against DR-0006, every row in this record PASSes; graded against DR-0002's original unqualified text, the supply-corner rows do not. Both readings are stated here, per DR-0006's own correction of `design/cml-driver-sizing.md`'s earlier framing. |
 | `Vgs`/`Vgd`/`Vds` margin against the 3.3 V core devices' rated limit (deferred to driver design work by DR-0002) | **PASS** | same record | Worst measured stress 2.761 V (`vds_sw_max`, `ss_-40c_2.97v`) against the adopted 3.63 V rated ceiling — positive margin at every corner. |
-| Remaining (serializer+driver+board) jitter allocation, ≤ 0.15 UI p-p (spec/tmds-tx.md §2) | **PASS** | same record | Driver's own deterministic-jitter contribution measured ≤ 3.56×10⁻⁵ UI at 2 pF pad load (full PVT, both rates) — several thousand times inside the 0.15 UI budget. This measures the driver stage only, not the full serializer+driver+board chain the budget row nominally covers (the serializer/mux stage upstream of this driver has not itself been captured yet — see §2 below). |
+| Remaining (serializer+driver+board) jitter allocation, ≤ 0.15 UI p-p (spec/tmds-tx.md §2) | **PASS** | same record | Driver's own deterministic-jitter contribution measured ≤ 3.56×10⁻⁵ UI at 2 pF pad load (full PVT, both rates) — several thousand times inside the 0.15 UI budget. This measures the driver stage only, not the full serializer+driver+board chain the budget row nominally covers (the serializer/mux stage upstream of this driver has not itself been captured yet — see §3 below). |
 | Tail-current tolerance (this cell's own derived requirement, §2 of `design/cml-driver-sizing.md`, not a `spec/tmds-tx.md` row) | **PASS** (informative, not spec-bound) | same record | 9.822–10.327 mA across the full PVT matrix, inside the design's own derived 8–12 mA tolerance. |
 
 #### DR-0002, post-layout (extracted) corroboration
@@ -102,7 +105,7 @@ deltas fall into three groups:
 
 **What this post-layout run does and does not model** (stated here as well as
 in the record's own **Claim** field, per the coverage-honesty requirement in
-§2 below — a post-layout label is worth nothing if the reader has to guess
+§3 below — a post-layout label is worth nothing if the reader has to guess
 what was extracted):
 
 - **Modelled**: the drawn device geometry of the real cell — 338 extracted
@@ -116,7 +119,7 @@ what was extracted):
   *schematic-equivalent* (devices + connectivity); `klt extract --parasitics`
   was **not** used. Intra-cell metal resistance, coupling capacitance and
   wiring capacitance to ground are absent. **This is therefore device-level
-  post-layout evidence, not parasitic-RC post-layout evidence** — see §2
+  post-layout evidence, not parasitic-RC post-layout evidence** — see §3
   item 2 for what remains open because of it.
 - **Not modelled — diffusion sheet resistance.** The extraction carries no
   `NRD`/`NRS`, so `nfet_03v3`'s zero defaults apply; the schematic DUT states
@@ -134,7 +137,7 @@ what was extracted):
   exactly as in the schematic record.
 - **PDK-variant caveat.** The layout and its extraction were produced against
   `gf180mcuC`; this simulation uses the `gf180mcuD` models `sim/pdk.json`
-  pins (same open_pdks revision). That discrepancy is the same one §2 item 1
+  pins (same open_pdks revision). That discrepancy is the same one §3 item 1
   describes and is owned by issue #9 — it is not resolved by this record.
 
 The record sets **Supersedes**: `20260810-041436-a2c358b`, which
@@ -159,7 +162,45 @@ the one taken against the drawn geometry).
 |---|---|---|---|
 | Analog sim harness transient/rate-axis machinery, at both #1 operating points | **PASS** | [`sim/smoke-cml-pair/records/20260808-032312-430859a.md`](../sim/smoke-cml-pair/records/20260808-032312-430859a.md) | Full PVT × both rates (90 points), on a bare 3.3 V NMOS differential pair with the DR-0002 load topology — explicitly **not** a CML driver design deliverable (`sim/README.md`'s own framing). This record's own **Claim** field states "None — harness self-verification"; it is listed here for completeness (it is the first evidence this repo produced) but substantiates no spec row on its own. Taken against a dirty working tree, so it is not citable as a clean-tree result even for its own harness-proof purpose. |
 
-## 2. What is not yet covered (named explicitly)
+## 2. Digital partition
+
+This section indexes the `tmds_encoder` synthesis/P&R/STA/verification
+pipeline under `flow/tmds_encoder/` and `verification/tmds_encoder/` against
+DR-0003 (`spec/tmds-tx.md`'s digital encoder/serializer row) and against the
+`klayout-tools/docs/design-evidence-tiers.md` T1 checklist items each result
+addresses. Unlike §1's analog rows, several results below are **disclosed
+FAILs**, not PASSes — per CLAUDE.md's "Verification is the product" and this
+document's own coverage-honesty convention, they are stated as such rather
+than summarized as "done" or omitted.
+
+| # | Item | Verdict | Evidence record | Notes |
+|---|---|---|---|---|
+| 1 | RTL-level functional verification (three-leg plan: exhaustive golden-model equivalence, invariants, negative control) | **PASS** | [`verification/tmds_encoder/`](../verification/tmds_encoder/), convention documented in [`verification/README.md`](../verification/README.md) | Cold-start re-run (`pip install -r requirements.txt && python3 runner.py`) reproduces cleanly: real DUT passes, negative-control DUT correctly fails, per issue #65's 2026-08-15 T1 re-read (item 9, "fresh cold-start re-run ... reproduces cleanly"). This bench uses its own convention (`verification/README.md`), distinct from `sim/`'s analog evidence-record format, so it is cited by directory + convention doc rather than a single dated record file. |
+| 2 | Synthesis (gate-level netlist) | **PASS** | [`flow/tmds_encoder/records/20260816-033153-e2d0580.md`](../flow/tmds_encoder/records/20260816-033153-e2d0580.md) | 266 cell instances (17 sequential, 249 combinational), 0 unmapped cells, `gf180mcu_fd_sc_mcu9t5v0` library at `tt_025C_3v30` (DR-0003's synthesized-domain corner). Area-oriented mapping only — no `.sdc`/clock-period constraint applied at this stage, every cell drive strength 1; this matters for reading the STA result below. |
+| 3 | Place & route (block-level digital layout exists) | **PASS** | [`flow/tmds_encoder/records/20260816-063442-def7827.md`](../flow/tmds_encoder/records/20260816-063442-def7827.md) | `layout/gds/tmds_encoder.gds`, 266 instances placed and routed (11184 µm total wire length, 1684 vias), 35% target / 36.1% effective utilization. No CTS, no SDC — scope disclosed in the record itself. |
+| 4 | DRC | **Disclosed FAIL** | same record (`layout/drc_reports/tmds_encoder.drc.json`) | `status: violations`, 188 violations, all rule `mim.space.1` — a Metal4-to-Metal4 spacing check the curated gf180mcu deck cannot distinguish from a real MiM capacitor's bottom plate; this design has zero capacitor devices. Filed generically upstream per this repo's friction protocol: [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033). |
+| 5 | LVS | **Disclosed FAIL** | same record (`layout/lvs_reports/tmds_encoder.lvs.json`) | `status: mismatch`, 10 topology mismatches; 281/281 nets and 25/25 pins otherwise match. All 10 are P&R-inserted filler/tap/endcap standard-cell *types* carrying no logic, which the pre-P&R reference netlist has no counterpart for by construction — full accounting in `layout/scripts/filter_pnr_utility_cells.py`'s docstring. |
+| 6 | Post-layout verification (SDF-back-annotated gate-level re-simulation) | **PASS, scope-limited** | [`flow/tmds_encoder/records/20260816-080228-185a5d3.md`](../flow/tmds_encoder/records/20260816-080228-185a5d3.md) (SDF extraction), [`flow/tmds_encoder/records/20260816-080524-185a5d3.md`](../flow/tmds_encoder/records/20260816-080524-185a5d3.md) (re-simulation) | The unmodified `verification/tmds_encoder/test_tmds_encoder.py` bench, run against the SDF-annotated post-route netlist: 3/3 tests PASS. SDF extracted at a single corner (`tt_025C_3v30`, OpenRCX), no PVT sweep, no CTS/SDC. No formal setup/hold timing-closure verdict is made at this stage — that is item 7/8 below. |
+| 7 | Static timing analysis — setup, 720p60 target (74.25 MHz) | **Disclosed FAIL** | [`flow/tmds_encoder/records/20260816-172539-930e864.md`](../flow/tmds_encoder/records/20260816-172539-930e864.md) | Setup **FAILs at 4 of 5** 3.3 V liberty corners (`tt_025C_3v30`, `ss_125C_3v00`, `ss_n40C_3v00`, `ff_125C_3v60` fail; `ff_n40C_3v60` passes). Measured Fmax: **22.70 MHz worst-corner, 45.88 MHz typical**, against the 74.25 MHz requirement. Setup at the 480p fallback (27.000 MHz) also FAILs, at 1 of the 5 corners (slow/hot, `ss_125C_3v00`). Root cause: item 2's synthesis carried no timing constraint and item 3's P&R ran no CTS — this measures *this specific netlist as built*, not the library's achievable ceiling for this RTL. |
+| 8 | Static timing analysis — hold, all corners, both targets | **PASS** | same record | Hold met at every one of the 5 corners, at both the 720p60 and 480p targets (hold is clock-period-independent, so both targets give the same answer). Worst hold margin +0.3179 ns (`ff_n40C_3v60`). |
+
+**What this means.** The digital partition's RTL-level functional
+verification, synthesis, layout existence, and post-layout gate-level
+re-simulation are clean PASSes (items 1–3, 6 above). Its DRC, LVS, and
+setup-timing closure at the 720p60 target are disclosed FAILs with named
+causes: DRC's `mim.space.1` false-positive is a deck-level klayout-tools gap
+([#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)), LVS's 10
+mismatches are accounted for entirely by P&R-inserted utility cells with no
+netlist counterpart, and the timing-closure gap traces to an
+area-oriented, unconstrained synthesis plus a CTS-free P&R run — not to a
+library or architecture ceiling. Closing the timing gap (timing-driven
+synthesis, CTS, RTL pipelining if needed) is tracked separately by
+**#100**; this rollup's job is to report the current, disclosed state, not
+to fix it. Per CLAUDE.md's "720p60 is the target" scope discipline, the
+setup-timing FAIL at 4/5 corners against the 74.25 MHz requirement is the
+single most load-bearing fact in this section, not a footnote.
+
+## 3. What is not yet covered (named explicitly)
 
 Per the coverage-honesty requirement this document exists to meet, the
 following gaps are stated by name rather than left as silent omissions:
@@ -211,14 +252,15 @@ following gaps are stated by name rather than left as silent omissions:
    landed as of this document.
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
-evidence at all — in particular, the encoder/serializer digital domain
-(DR-0003) is verified by `verification/tmds_encoder/` (cocotb, not the
-`sim/` analog harness this document indexes) and is out of scope for this
-rollup; the PLL interface (§2 of `spec/tmds-tx.md`, DR-0004) is a
-requirement levied on a sibling canary block and has no evidence to cite
+evidence at all. The encoder/serializer digital domain (DR-0003) is verified
+by a separate `flow/tmds_encoder/records/` and `verification/tmds_encoder/`
+evidence trail (cocotb, Yosys, OpenROAD — not the `sim/` analog harness §1
+indexes); that trail is already folded into this rollup, as §2 above, rather
+than left out of it. The PLL interface (§2 of `spec/tmds-tx.md`, DR-0004) is
+a requirement levied on a sibling canary block and has no evidence to cite
 here by design (DR-0001/CLAUDE.md scope discipline).
 
-## 3. Links
+## 4. Links
 
 - Ratified spec: [`spec/tmds-tx.md`](../spec/tmds-tx.md)
 - Evidence-record convention: [`sim/README.md`](../sim/README.md)
@@ -230,4 +272,7 @@ here by design (DR-0001/CLAUDE.md scope discipline).
   [`layout/README.md`](../layout/README.md) § "Post-layout simulation of this
   cell", generated by `layout/scripts/gen_cml_driver_core_dut.py`
 - Record-to-record delta tool used in §1: `sim/compare_records.py`
+- Digital evidence-record convention: [`flow/README.md`](../flow/README.md)
+- Digital verification convention (three-leg plan): [`verification/README.md`](../verification/README.md)
+- Digital timing-closure follow-up (§2 items 7/8's disclosed setup FAIL): #100
 - Epic tracking the gap to T1 sim-validated (bronze): #17
