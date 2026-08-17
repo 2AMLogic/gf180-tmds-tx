@@ -178,7 +178,12 @@ reduction (smaller custom-domain multiplexing ratio needed) or vice versa.
 as unverified is now measured — see DR-0007, which resolves this open item
 to timing-driven synthesis + CTS closing hold and the 480p fallback, with
 full 720p60 setup closure deferred to a follow-up architecture (RTL
-pipelining) decision record (issue #110).
+pipelining) decision record (issue #110). That follow-up landed in two
+steps: **DR-0008** (one boundary register, 3 of 5 corners) and **DR-0009**
+(four pipeline stages, **5 of 5 corners** at 74.25 MHz, worst-corner Fmax
+75.83 MHz). The **encoder** side of this record's open item is therefore
+closed; the 371.25 MHz intermediate rate this record flags belongs to the
+10:1→2:1 serializer, which is still unwritten and still unmeasured.
 
 ### DR-0004: PLL interface numerics and jitter budget
 
@@ -484,10 +489,12 @@ contract.
 
 **Status**: Accepted — DR-0003's synthesized-domain clock ceiling open item
 is resolved to this measured outcome. The follow-up architecture (RTL
-pipelining) decision record has since landed as **DR-0008**: it closes
-720p60 setup at 3 of 5 corners (up from 2 of 5 here), with the remaining
-2 corners tracked as a further follow-up (issue #115) — see DR-0008 for the
-full measured outcome.
+pipelining) decision record landed as **DR-0008**, closing 720p60 setup at
+3 of 5 corners (up from 2 of 5 here); the remaining 2 corners were then
+closed by **DR-0009**'s four-stage pipeline, which brings 720p60 setup to
+5 of 5 corners. See DR-0009 for the full measured outcome, and note it is
+the encoder that closes — the 10:1→2:1 serializer this record's own
+371.25 MHz figure belongs to is still unwritten.
 
 ### DR-0008: `tmds_encoder` stage1→stage2 pipeline register — two-clock latency contract
 
@@ -769,7 +776,43 @@ drives `de = 0`.
   architecture, per DR-0001 and CLAUDE.md.
 
 **Measured outcome** (issue #115, full flow re-run from scratch against the
-four-stage RTL): recorded below once the evidence record exists — see the
-"Status" line.
+four-stage RTL — `flow/tmds_encoder/records/20260817-110611-37e197a.md`,
+minted from a clean checkout at commit `37e197a`): **720p60 setup now closes
+at all 5 of 5 3.3 V corners**, up from 3 of 5 under DR-0008.
 
-**Status**: Accepted.
+| Corner | 720p60 setup, DR-0008 | 720p60 setup, DR-0009 |
+|---|---|---|
+| `tt_025C_3v30` | PASS +0.2603 ns | PASS +6.7550 ns |
+| `ss_125C_3v00` | **FAIL −13.5129 ns** | **PASS +0.2799 ns** |
+| `ss_n40C_3v00` | **FAIL −5.0300 ns** | **PASS +4.2895 ns** |
+| `ff_125C_3v60` | PASS | PASS +7.9050 ns |
+| `ff_n40C_3v60` | PASS | PASS +9.5244 ns |
+
+Worst-corner Fmax is **75.83 MHz** (whole design, i.e. including the
+input-port paths, and identical to the register-to-register figure), against
+the 74.25 MHz target — a real pass under this flow's deliberately
+pessimistic `set_input_delay 0`/`set_output_delay 0` boundary assumptions,
+and a **margin-limited** one: 0.2799 ns is 2.1% of the 13.4680 ns period.
+Treat 720p60 as closed, not as closed with headroom; a later netlist or
+floorplan change can take that back, and this flow does not yet model
+on-chip-variation derating.
+
+480p (27.000 MHz) continues to close at all 5 corners, and hold continues to
+close at all 5 corners at both targets — no regression on either. The
+gate-level, SDF-annotated re-simulation of the *unmodified* cocotb bench
+against the routed netlist passes (`20260817-110422-37e197a`), as does the
+RTL bench itself including its negative-control leg. The post-route
+worst-case unconstrained combinational delay fell to 5.18 ns
+(`20260817-105709-049c240`), from 13.27 ns under DR-0008 and 18.30 ns
+pre-pipeline. DRC on the regenerated GDS stays clean; LVS's topology
+mismatch count moves from 13 to 18, every one attributed in
+`layout/README.md` (P&R utility/CTS/hold-repair cell types, plus the two
+setup-repair resized types this record's "Consequences" already disclose).
+
+**Status**: Accepted — and, with this record's measured outcome, DR-0003's
+synthesized-domain clock ceiling question (opened by DR-0003, resolved to
+"an architecture change is needed" by DR-0007, partially addressed by
+DR-0008) is **closed for the encoder at 720p60**: the change DR-0007 called
+for has landed and the target closes at every 3.3 V corner. It is not closed
+for the block as a whole — the 10:1→2:1 serializer, which is where DR-0003's
+371.25 MHz intermediate rate actually lives, is still unwritten.
