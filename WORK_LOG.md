@@ -5,6 +5,13 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-08-17
+
+- **PR #111**: flow: timing-driven synthesis + CTS/hold-repair for tmds_encoder
+- **Issue #100** (closed): Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
+- **PR #109**: docs: fold digital-partition results into the block characterization rollup
+- **Issue #88** (closed): Fold the digital partition into the block-level characterization report (T1 item 8)
+
 ### 2026-08-16
 
 - **PR #104**: refactor: dedupe run_openroad() in sdf_tmds_encoder.py onto pnr_tmds_encoder
