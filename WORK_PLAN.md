@@ -17,7 +17,7 @@ _None._
 
 Issues flagged as highest priority (`loom:urgent`).
 
-_None._
+- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
 
 ## Ready
 
@@ -29,7 +29,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
+- **#88**: Fold the digital partition into the block-level characterization report (T1 item 8)
 
 ## PRs Awaiting Review
 
@@ -47,7 +48,8 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA) *(curated)*
+- **#88**: Fold the digital partition into the block-level characterization report (T1 item 8) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -62,12 +64,12 @@ _None._
 | Tier | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Urgent | 0 |
+| Urgent | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 2 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

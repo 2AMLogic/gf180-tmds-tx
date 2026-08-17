@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-16
 
+- **PR #104**: refactor: dedupe run_openroad() in sdf_tmds_encoder.py onto pnr_tmds_encoder
+- **Issue #103** (closed): Dedupe run_openroad() shell-out: flow/sdf_tmds_encoder.py vs flow/pnr_tmds_encoder.py
 - **PR #101**: flow: run multi-corner setup/hold STA on the tmds_encoder gate-level netlist
 - **Issue #83** (closed): Digital: run static timing analysis (STA) on the synthesized gate-level netlist (T1 item 5, digital)
 - **PR #99**: fix: remove unused import os in gate_level_sim_tmds_encoder.py
