@@ -97,7 +97,7 @@ REPORTS_DIR = OUT_DIR / "reports"
 RECORDS_DIR = OUT_DIR / "records"
 
 ROUTED_DEF = OUT_DIR / "pnr" / "tmds_encoder.def"
-PNR_RECORD_ID = "PNR_RECORD_ID_PLACEHOLDER"  # issue #115's four-stage (DR-0009) P&R record, cited below
+PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115's four-stage (DR-0009) P&R record, cited below
 
 SDF_PATH = STA_DIR / "tmds_encoder.sdf"
 SPEF_PATH = STA_DIR / "tmds_encoder.spef"

@@ -77,7 +77,7 @@ timing analysis). It exists only so this leg's functional-equivalence check
 is meaningful under *real* back-annotated delays: this design's own SDF
 evidence record measured a 13.27 ns worst-case unconstrained
 input-to-register combinational delay for the DR-0008 single-register
-netlist, and less again for the DR-0009 four-stage netlist this driver now
+netlist, and 5.18 ns for the DR-0009 four-stage netlist this driver now
 runs against (down from the pre-pipeline 18.30 ns issue #85
 originally measured -- `report_checks -unconstrained`, no clock/SDC applied
 -- see `flow/sdf_tmds_encoder.py`). Icarus does not support SDF
@@ -130,7 +130,7 @@ TOP = "tmds_encoder"
 
 NETLIST_PATH = REPO_ROOT / "flow" / "tmds_encoder" / "netlist" / "tmds_encoder.synth.v"
 SDF_PATH = REPO_ROOT / "flow" / "tmds_encoder" / "sta" / "tmds_encoder.sdf"
-PNR_RECORD_ID = "PNR_RECORD_ID_PLACEHOLDER"  # issue #115's four-stage (DR-0009) P&R record, cited below
+PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115's four-stage (DR-0009) P&R record, cited below
 
 OUT_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 REPORTS_DIR = OUT_DIR / "reports"

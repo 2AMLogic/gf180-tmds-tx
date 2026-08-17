@@ -173,9 +173,9 @@ SPEF = STA_DIR / f"{TOP}.spef"
 SDC = STA_DIR / f"{TOP}.sdc"
 
 # Upstream evidence records this analysis is run against (cited in the record).
-SYNTH_RECORD_ID = "20260817-011745-7d9130d"  # issue #110, pipelined (DR-0008) gate-level netlist
-PNR_RECORD_ID = "20260817-012011-7d9130d"  # issue #110, CTS/hold-repaired routed DEF (pipelined)
-SPEF_RECORD_ID = "20260817-012545-7d9130d"  # issue #110, post-CTS extracted parasitics (pipelined)
+SYNTH_RECORD_ID = "20260817-105547-049c240"  # issue #115, four-stage (DR-0009) gate-level netlist
+PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115, CTS/setup+hold-repaired routed DEF (four-stage)
+SPEF_RECORD_ID = "20260817-105709-049c240"  # issue #115, post-CTS extracted parasitics (four-stage)
 
 # Every 3.3 V corner the vendored gf180mcu_fd_sc_mcu9t5v0 library ships.
 CORNERS: list[tuple[str, str]] = [
