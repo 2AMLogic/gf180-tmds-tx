@@ -7,6 +7,8 @@ selected.
 
 ### 2026-08-17
 
+- **PR #114**: refactor: dedupe run_openroad/openroad_version onto pnr_tmds_encoder
+- **Issue #112** (closed): Dedupe run_openroad/openroad_version in flow/sta_tmds_encoder.py onto pnr_tmds_encoder.py
 - **PR #111**: flow: timing-driven synthesis + CTS/hold-repair for tmds_encoder
 - **Issue #100** (closed): Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
 - **PR #109**: docs: fold digital-partition results into the block characterization rollup
