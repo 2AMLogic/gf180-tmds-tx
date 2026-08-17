@@ -445,7 +445,10 @@ This decision record does **not** itself propose that architecture change
 (no concrete pipeline-stage/latency design is specified here) — it records
 the measurement that makes one necessary, and requires it be pursued as a
 dedicated, separately-decided follow-up: issue #110 (filed alongside this
-record), not folded silently into issue #100's own scope.
+record), not folded silently into issue #100's own scope. That follow-up
+decision has since landed as **DR-0008**, which specifies the
+`stage1`→`stage2` boundary register and the resulting two-clock latency
+contract.
 
 **Alternatives considered**:
 - **Pushing ABC's delay target further, or additional cell-level
@@ -480,5 +483,144 @@ record), not folded silently into issue #100's own scope.
   to find, and it is what fully closes 480p and post-CTS hold today.
 
 **Status**: Accepted — DR-0003's synthesized-domain clock ceiling open item
-is resolved to this measured outcome. Full 720p60 setup closure remains
-open pending a follow-up architecture (RTL pipelining) decision record.
+is resolved to this measured outcome. The follow-up architecture (RTL
+pipelining) decision record has since landed as **DR-0008**: it closes
+720p60 setup at 3 of 5 corners (up from 2 of 5 here), with the remaining
+2 corners tracked as a further follow-up (issue #115) — see DR-0008 for the
+full measured outcome.
+
+### DR-0008: `tmds_encoder` stage1→stage2 pipeline register — two-clock latency contract
+
+**Context**: DR-0007 measured that `rtl/tmds_encoder.v`'s single combinational
+cone from `data` (primary input) through `stage1` (the inherently serial
+8-bit transition-minimizing XOR/XNOR chain) directly into `stage2`
+(DC-balancing against the running-disparity accumulator `cnt`), with no
+register at the `stage1`/`stage2` boundary, exceeds what cell
+sizing/CTS/hold-repair alone can close at 720p60 (74.25 MHz) on the
+`gf180mcu_fd_sc_mcu9t5v0` standard-cell library: `ss_125C_3v00` — the exact
+corner ABC's delay target was mapped against — still misses by −17.1329 ns
+against a 13.4680 ns period even after timing-driven synthesis and CTS
+(`flow/tmds_encoder/records/20260817-001614-064d550.md`). DR-0007 named a
+pipeline register at that boundary as the most plausible fix and required
+it be pursued as a dedicated, ratified decision (issue #110), not folded
+silently into #100's scope.
+
+**Decision**: Add one pipeline register at the `stage1`→`stage2` boundary,
+registering `stage1`'s 9-bit intermediate word (`qm`, `qm[8]` the XOR/XNOR
+selector) together with the `de`/`ctrl` control signals that must stay
+aligned with it, so `stage2`'s combinational disparity arithmetic reads
+already-registered `stage1` output every cycle instead of `stage1`'s raw
+combinational output. This splits the single combinational cone DR-0007
+measured into two shallower ones (`data` → `qm_p1` register, and `qm_p1`/
+`cnt` → `tmds`/`cnt` register), at the cost of the encoder's latency
+contract: **`tmds_encoder` now has a two-clock-cycle registered latency
+from `data`/`de`/`ctrl` to the corresponding `tmds` output**, not the
+one-clock latency `rtl/tmds_encoder.v`'s header previously documented
+("Interface and behavior": *"a single synchronous output register — no
+combinational passthrough"*).
+
+`rst` (synchronous, active-high) is **not** pipelined through this new
+register — both the new `stage1`/`stage2` pipeline register and the
+existing `tmds`/`cnt` output register clear on the same clock edge `rst` is
+sampled asserted, exactly as the pre-pipeline single-register design did.
+Reset therefore keeps its original one-cycle-to-effect latency (`tmds`
+reads `CTRL_00` the cycle after `rst` is sampled high); only the
+`data`/`de`/`ctrl` → `tmds` data path gains the extra cycle. This is a
+deliberate asymmetry, not an oversight: a synchronous reset that itself
+took two cycles to reach the output register would be a strictly worse
+contract for any downstream consumer with no compensating benefit — nothing
+about closing setup timing on the `data` path requires slowing down `rst`.
+
+Blanking (`de` deasserted, not `rst`) is pipelined like every other control
+signal: the running-disparity accumulator `cnt` is reset to zero when the
+*registered* `de_p1` (the pipelined copy) reads 0, which happens two cycles
+after the caller drives `de = 0`, exactly the same two-cycle latency as an
+active-video `data` word's encoding — the blanking-reset path is not a
+special case that must additionally be kept single-cycle.
+
+The two-stage TMDS-encoding algorithm itself (DVI 1.0 §3.3: transition
+minimization then DC balancing) is **unchanged** — `stage1`/`stage2`'s
+combinational bodies are not touched by this decision, only where a
+register boundary sits between two combinational functions that were
+already logically sequential (stage 2 has always consumed stage 1's output,
+never the reverse). Every reachable `cnt` state, the four fixed control
+characters, and the transition/disparity bounds `verification/README.md`
+documents are unaffected by this change; verification re-establishes this
+against the pipelined RTL (issue #110) rather than assuming it.
+
+**Alternatives considered**:
+- **Retiming within `stage1` itself** (e.g. registering an intermediate bit
+  of the serial XOR/XNOR chain, splitting its 8-bit dependency chain into
+  two 4-bit halves across a register) was considered and rejected as the
+  first cut: it only shortens `stage1`'s own combinational depth, leaving
+  `stage2`'s DC-balancing arithmetic (disparity computation against `cnt`,
+  a 3-way conditional, plus the `cnt` update) still chained directly onto
+  whatever half of `stage1` remains un-registered, so it does not cleanly
+  separate the two heaviest known blocks the way a boundary register does.
+  A `stage1`-internal split may still be a useful follow-up if the boundary
+  register alone does not close every corner (see "Consequences" below),
+  but it is not this decision's chosen first step, since it is more
+  invasive to `stage1`'s citation-mapped structure (DVI 1.0 Figure 3-5) for
+  an unmeasured, likely smaller, timing benefit than cutting the cone
+  exactly at the stage boundary DR-0007's own root-cause analysis
+  identified.
+- **Pipelining `rst` through the new boundary register** (so both registers
+  in the chain always see the same, uniformly-delayed reset behavior) was
+  considered and rejected: it would make `rst`'s effect on `tmds` two cycles
+  instead of one, a strictly worse reset-to-output latency with no
+  offsetting benefit — nothing about closing setup timing on the
+  `data`/`de`/`ctrl` path requires slowing down reset, and a downstream
+  integrator reading this decision record should be able to rely on
+  `rst`'s latency being unchanged from the pre-pipeline design.
+- **Not pipelining, and instead accepting 480p as the sole closed
+  operating point** was already considered and rejected by DR-0007 itself;
+  this decision does not reopen that question.
+
+**Consequences**:
+- `rtl/tmds_encoder.v`'s header ("Interface and behavior") is updated to
+  state the new two-clock latency and the `rst`-is-not-pipelined asymmetry
+  explicitly, superseding the "no combinational passthrough... one clock
+  after" language DR-0007 quoted from the pre-pipeline design.
+  `rtl/README.md`'s one-line description is updated to match.
+- `verification/tmds_encoder/` (the cocotb testbench and its helper
+  functions) must be updated for the new two-cycle latency before it can
+  be trusted against the pipelined RTL — this is tracked as part of the
+  same issue (#110) landing this decision, not a follow-up left
+  unaddressed after the RTL change lands.
+- Any future consumer of `tmds_encoder` (the not-yet-written 10:1→2:1
+  serializer, or any testbench driving this module directly) must budget
+  for the two-cycle latency from `data`/`de`/`ctrl` to `tmds`, and must not
+  assume `rst`'s one-cycle latency generalizes to the data path.
+- This decision does not itself claim 720p60 setup closes at every 3.3 V
+  corner — that is `flow/sta_tmds_encoder.py`'s job, re-run against a fresh
+  synthesis/PnR of the pipelined RTL as part of the same issue. If one
+  boundary register is insufficient at some corner, a further pipelining
+  decision (e.g. the `stage1`-internal split named above, or a second
+  boundary register) would need its own follow-up decision record, since
+  it would extend the latency contract this record establishes yet again.
+- DR-0003's "Status" line, which already points to DR-0007 for the
+  synthesized-domain clock ceiling's resolution, is left unchanged here;
+  DR-0007's own text (which names issue #110 as the pipelining follow-up)
+  is the right place a reader lands next, and it is updated to note this
+  decision record exists.
+
+**Measured outcome** (issue #110, re-running the full flow from scratch
+against the pipelined RTL -- `flow/tmds_encoder/records/20260817-012556-7d9130d.md`):
+this decision's boundary register is a **real, substantial improvement**,
+not a full close. 720p60 setup now passes at 3 of 5 corners (was 2 of 5 pre-
+pipeline): `tt_025C_3v30` now **passes** (+0.2603 ns, was −1.6870 ns),
+`ff_125C_3v60`/`ff_n40C_3v60` continue to pass with more margin. The two
+slow-process corners still fail: `ss_125C_3v00` −13.5129 ns (was −17.1329 ns,
+a 21% reduction) and `ss_n40C_3v00` −5.0300 ns (was −7.4201 ns, a 32%
+reduction). 480p (27.000 MHz) closes at all 5 corners, and hold closes at
+all 5 corners at both targets -- both unchanged from #100's own pre-pipeline
+record. The gate-level, SDF-annotated re-simulation
+(`flow/gate_level_sim_tmds_encoder.py`) also passes against this pipelined,
+routed netlist. Per this record's own "Consequences" above, closing the
+remaining 2 corners is not pursued within issue #110's own scope -- it is
+tracked as a dedicated follow-up (issue #115), per CLAUDE.md's "no claim
+without a testbench" and this repo's stated preference for an evidenced,
+honest partial result over silently expanding one issue's scope to chase
+full closure.
+
+**Status**: Accepted.

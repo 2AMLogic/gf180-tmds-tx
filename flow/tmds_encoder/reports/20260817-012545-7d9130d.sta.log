@@ -1,0 +1,64 @@
+OpenROAD 26Q3-1080-gab6fd26351 
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via1 :"
+  	EOLENCLOSURE 0.34 0.06 ;"
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via2 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via3 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via4 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0227] LEF file: /Users/rwalters/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/techlef/gf180mcu_fd_sc_mcu9t5v0__nom.tlef, created 15 layers, 56 vias
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /Users/rwalters/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef at line 2.
+
+[INFO ODB-0227] LEF file: /Users/rwalters/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef, created 229 library cells
+[INFO ODB-0127] Reading DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-110/flow/tmds_encoder/pnr/tmds_encoder.def
+[INFO ODB-0128] Design: tmds_encoder
+[INFO ODB-0130]     Created 25 pins.
+[INFO ODB-0131]     Created 1102 components and 5277 component-terminals.
+[INFO ODB-0132]     Created 2 special nets and 744 connections.
+[INFO ODB-0133]     Created 325 nets and 1028 connections.
+[INFO ODB-0134] Finished DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-110/flow/tmds_encoder/pnr/tmds_encoder.def
+[INFO RCX-0431] Defined process_corner TYP with ext_model_index 0
+[INFO RCX-0029] Defined extraction corner TYP
+[WARNING RCX-0514] The ext_model_file option is deprecated. Use set_extraction_rules_file command instead.
+[INFO RCX-0435] Reading extraction model file /OpenROAD-flow-scripts/flow/platforms/gf180/openROAD/rcx/gf180mcu_1p5m_1tm_9k_sp_smim_OPTB_typ.rules ...
+[INFO RCX-0436] RC segment generation tmds_encoder (max_merge_res 50.0) ...
+[INFO RCX-0040] Final 1113 rc segments
+[INFO RCX-0439] Coupling Cap extraction tmds_encoder ...
+[INFO RCX-0440] Coupling threshhold is 0.1000 fF, coupling capacitance less than 0.1000 fF will be grounded.
+[INFO RCX-0442] 51% of 2068 wires extracted
+[INFO RCX-0442] 100% of 2068 wires extracted
+[INFO RCX-0045] Extract 325 nets, 1438 rsegs, 1438 caps, 2110 ccs
+[INFO RCX-0443] 325 nets finished
+[WARNING STA-0503] report_checks -group_count is deprecated. Use -group_path_count instead.
+Startpoint: data[0] (input port)
+Endpoint: _532_ (rising edge-triggered flip-flop)
+Path Group: unconstrained
+Path Type: max
+
+  Delay    Time   Description
+---------------------------------------------------------
+   0.00    0.00 v input external delay
+   0.00    0.00 v data[0] (in)
+   2.31    2.31 v hold12/Z (gf180mcu_fd_sc_mcu9t5v0__dlyc_1)
+   0.77    3.08 v _457_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_1)
+   0.75    3.83 v _458_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_1)
+   0.55    4.38 v _459_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   2.35    6.74 v hold14/Z (gf180mcu_fd_sc_mcu9t5v0__dlyc_1)
+   0.31    7.04 ^ _466_/ZN (gf180mcu_fd_sc_mcu9t5v0__clkinv_1)
+   0.15    7.20 v _467_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   0.43    7.63 ^ _468_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai21_1)
+   0.85    8.47 ^ _474_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_1)
+   0.50    8.97 ^ _487_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   0.23    9.20 v _488_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor3_1)
+   1.07   10.27 ^ _489_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor2_1)
+   0.59   10.86 ^ _493_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   0.16   11.02 v _494_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor2_1)
+   2.25   13.27 v hold5/Z (gf180mcu_fd_sc_mcu9t5v0__dlyc_1)
+   0.00   13.27 v _532_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+          13.27   data arrival time
+---------------------------------------------------------
+(Path is unconstrained)
+
+

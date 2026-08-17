@@ -8,7 +8,8 @@
 // control" for the rule). Explanatory comments were trimmed here for
 // brevity -- the only *functional* change from the real DUT is the
 // single sign flip marked "INJECTED BUG" below; every other line of
-// logic is identical. It exists solely so CI can prove
+// logic, including the stage1->stage2 pipeline register
+// (spec/tmds-tx.md DR-0008), is identical. It exists solely so CI can prove
 // verification/tmds_encoder/test_tmds_encoder.py is actually capable of
 // failing -- per CLAUDE.md's LVS negative-control precedent
 // (layout/gds/gf180_tmds_pad_min_shorted.gds): "LVS clean alone is not
@@ -109,14 +110,33 @@ module tmds_encoder (
     end
   endfunction
 
-  wire [8:0]  qm         = stage1(data);
-  wire [17:0] enc         = stage2(qm, cnt);
-  wire [9:0]  data_code   = enc[17:8];
-  wire [7:0]  next_cnt_w  = enc[7:0];
+  wire [8:0] qm = stage1(data);
+
+  // Pipeline register: stage1 -> stage2 boundary (spec/tmds-tx.md DR-0008).
+  // Not part of the injected bug -- kept identical to rtl/tmds_encoder.v.
+  reg [8:0] qm_p1;
+  reg       de_p1;
+  reg [1:0] ctrl_p1;
+
+  always @(posedge clk) begin
+    if (rst) begin
+      qm_p1   <= 9'd0;
+      de_p1   <= 1'b0;
+      ctrl_p1 <= 2'b00;
+    end else begin
+      qm_p1   <= qm;
+      de_p1   <= de;
+      ctrl_p1 <= ctrl;
+    end
+  end
+
+  wire [17:0] enc        = stage2(qm_p1, cnt);
+  wire [9:0]  data_code  = enc[17:8];
+  wire [7:0]  next_cnt_w = enc[7:0];
 
   reg [9:0] ctrl_code;
   always @(*) begin
-    case (ctrl)
+    case (ctrl_p1)
       2'b00:   ctrl_code = CTRL_00;
       2'b01:   ctrl_code = CTRL_01;
       2'b10:   ctrl_code = CTRL_10;
@@ -128,7 +148,7 @@ module tmds_encoder (
     if (rst) begin
       tmds <= CTRL_00;
       cnt  <= 8'sd0;
-    end else if (de) begin
+    end else if (de_p1) begin
       tmds <= data_code;
       cnt  <= next_cnt_w;
     end else begin

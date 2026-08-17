@@ -162,9 +162,9 @@ SPEF = STA_DIR / f"{TOP}.spef"
 SDC = STA_DIR / f"{TOP}.sdc"
 
 # Upstream evidence records this analysis is run against (cited in the record).
-SYNTH_RECORD_ID = "20260816-235816-a8de8a9"  # issue #100, timing-driven gate-level netlist
-PNR_RECORD_ID = "20260817-001429-b33dfe3"  # issue #100, CTS/hold-repaired routed DEF (margined)
-SPEF_RECORD_ID = "20260817-001519-c991002"  # issue #100, post-CTS extracted parasitics (margined)
+SYNTH_RECORD_ID = "20260817-011745-7d9130d"  # issue #110, pipelined (DR-0008) gate-level netlist
+PNR_RECORD_ID = "20260817-012011-7d9130d"  # issue #110, CTS/hold-repaired routed DEF (pipelined)
+SPEF_RECORD_ID = "20260817-012545-7d9130d"  # issue #110, post-CTS extracted parasitics (pipelined)
 
 # Every 3.3 V corner the vendored gf180mcu_fd_sc_mcu9t5v0 library ships.
 CORNERS: list[tuple[str, str]] = [
@@ -623,17 +623,24 @@ def render_record(
 
 - **Record ID**: {rid}
 - **Claim**: Static timing analysis (setup **and** hold) has been re-run
-  (issue #100, following #83's original pre-timing-driven-synthesis,
-  pre-CTS record `20260816-172539-930e864`) on the timing-driven gate-level
-  netlist issue #100 produced, as physically realized by issue #100's
-  CTS/hold-repaired routed layout with issue #100's re-extracted post-route
-  parasitics back-annotated, across all five 3.3 V liberty corners the
-  `{pnr.STD_CELL_LIB}` library ships, at both of `spec/tmds-tx.md` §2's
+  (issue #110, following #83's original pre-timing-driven-synthesis,
+  pre-CTS record `20260816-172539-930e864` and #100's post-timing-driven-
+  synthesis/CTS record `20260817-001614-064d550`) on the pipelined gate-level
+  netlist issue #110 produced -- `rtl/tmds_encoder.v` now has a pipeline
+  register at the stage1/stage2 boundary per `spec/tmds-tx.md` DR-0008, run
+  through the *same* timing-driven-synthesis + CTS + hold-repair machinery
+  issue #100 built (`flow/synth_tmds_encoder.py` / `flow/pnr_tmds_encoder.py`
+  are otherwise unchanged) -- as physically realized by issue #110's own
+  CTS/hold-repaired routed layout with issue #110's own re-extracted
+  post-route parasitics back-annotated, across all five 3.3 V liberty corners
+  the `{pnr.STD_CELL_LIB}` library ships, at both of `spec/tmds-tx.md` §2's
   pixel-clock rates. Addresses #65 item 5 (full corner verification vs. the
   ratified spec) on the digital partition, and supplies the measurement
-  DR-0003 flags as its open item (synthesized-domain clock ceiling) --
-  this record specifically measures whether issue #100's timing-driven
-  synthesis + CTS + hold repair closed the setup violations #83 found.
+  DR-0007 (which resolved DR-0003's open item to "an architecture change is
+  needed") and DR-0008 (which specified that architecture change) require --
+  this record specifically measures whether DR-0008's stage1/stage2 pipeline
+  register closed the 720p60 setup violations #100's own record still had at
+  3 of 5 corners.
 - **Verdict (setup, 720p60 target, 74.25 MHz)**: **{verdict_720}** -- {
     f"setup violated at {len(setup_720)} of {len(by_target['720p60'])} corners"
     if setup_720 else "setup met at every corner"}.
@@ -651,19 +658,21 @@ def render_record(
   constraints, so path delays are constraint-independent and `period - slack` is
   the true critical-path requirement.
 - **Netlist revision analyzed** (the exact revision, verified, not just cited):
-  - Netlist: `flow/tmds_encoder/netlist/{TOP}.synth.v`, issue #100's timing-driven
-    synthesis evidence record `{SYNTH_RECORD_ID}` -- SHA-256 `{sha256(NETLIST)}`
-  - Routed DEF: `flow/tmds_encoder/pnr/{TOP}.def`, issue #100's CTS/hold-repair
+  - Netlist: `flow/tmds_encoder/netlist/{TOP}.synth.v`, issue #110's pipelined
+    (DR-0008), timing-driven synthesis evidence record `{SYNTH_RECORD_ID}` --
+    SHA-256 `{sha256(NETLIST)}`
+  - Routed DEF: `flow/tmds_encoder/pnr/{TOP}.def`, issue #110's CTS/hold-repair
     record `{PNR_RECORD_ID}` -- SHA-256 `{sha256(ROUTED_DEF)}`
-  - Parasitics (SPEF): `flow/tmds_encoder/sta/{TOP}.spef`, issue #100's
+  - Parasitics (SPEF): `flow/tmds_encoder/sta/{TOP}.spef`, issue #110's
     post-CTS extraction record `{SPEF_RECORD_ID}` -- SHA-256 `{sha256(SPEF)}`
   - Netlist/DEF consistency **checked mechanically**, not assumed: all
     {instance_count} netlist instances are present in the routed DEF with matching
     cell types; the DEF's only additional components are the
     {physical_only_count} physical-only cells P&R inserts (filler/tap/endcap) and
     {timing_inserted_count} cells clock-tree synthesis / hold repair inserted
-    (DEF `SOURCE TIMING`-marked -- issue #100; these have no netlist counterpart
-    by design, since the netlist predates CTS). See
+    (DEF `SOURCE TIMING`-marked -- issue #100 introduced this CTS/hold-repair
+    machinery, reused unchanged here; these have no netlist counterpart by
+    design, since the netlist predates CTS). See
     `assert_def_matches_netlist` in `flow/sta_tmds_encoder.py`.
 - **Tool versions**:
   - OpenSTA: bundled in OpenROAD `{or_version}` (run via the `openroad/orfs:latest`
@@ -674,7 +683,7 @@ def render_record(
 {chr(10).join(f"  - `{c}` -- {d}" for c, d in CORNERS)}
 - **Corner reconciliation** (carried over from #85's own test plan, which asked
   its successor to confirm the SDF corner matches this analysis's): reconciled,
-  no mismatch. The re-extracted SDF/SPEF (issue #100, record `{SPEF_RECORD_ID}`)
+  no mismatch. The re-extracted SDF/SPEF (issue #110, record `{SPEF_RECORD_ID}`)
   were built at `tt_025C_3v30`, one of the five corners analyzed here; the other
   four re-time the same extracted parasitics against a different liberty corner
   (see "Known limitations" 2).
@@ -729,30 +738,35 @@ def render_record(
    would still be caught and reported here, since this driver re-checks hold at
    every corner independently of what corner produced the layout.
 2. **One RC corner, five liberty corners.** The post-CTS re-extraction (issue
-   #100, record `{SPEF_RECORD_ID}`) used the gf180 platform's typical
-   (`FuncRCtyp`) RCX deck only, same as #85's original extraction; this analysis
-   reuses that single SPEF at all five liberty corners. #85 established that
-   post-route net delays on this die round to 0.000 ns at 3-decimal precision, so
-   the liberty corner dominates -- but this is an approximation, and
-   re-extraction per RC corner is the right thing to do once interconnect
-   matters.
+   #110, record `{SPEF_RECORD_ID}`) used the gf180 platform's typical
+   (`FuncRCtyp`) RCX deck only, same as #85's original extraction and #100's
+   re-extraction; this analysis reuses that single SPEF at all five liberty
+   corners. #85 established that post-route net delays on this die round to
+   0.000 ns at 3-decimal precision, so the liberty corner dominates -- but
+   this is an approximation, and re-extraction per RC corner is the right
+   thing to do once interconnect matters.
 3. **Timing-driven synthesis maps against one worst-case corner's liberty, not
    an on-chip-variation-derated multi-corner target.** Issue #100's
    `flow/synth_tmds_encoder.py` targets ABC's `-D` delay constraint using the
    `ss_125C_3v00` liberty specifically (per #83's own record, the worst setup
-   corner of the five checked) rather than a formal multi-corner sign-off flow.
-   This is disclosed reasoning, not an unstated assumption (see that script's
-   docstring), and this record's own multi-corner re-check is exactly the
-   verification step that confirms (or does not confirm) it actually worked --
-   see the Results tables above for the corner-by-corner outcome.
-4. **No SDF-based cross-check of the STA numbers against this netlist revision.**
-   #85's SDF-annotated gate-level re-simulation (`flow/gate_level_sim_tmds_encoder.py`)
-   has not been re-run against issue #100's timing-driven netlist/SDF -- it still
-   only validates the pre-#100 revision. It used a deliberately conservative
-   50 ns test clock and made no frequency claim even then, so this was never a
-   corroboration of achievable frequency either way; re-running it against the
-   current netlist is a disclosed, out-of-#100-scope follow-up (digital
-   functional re-verification, not timing closure).
+   corner of the five checked) rather than a formal multi-corner sign-off flow;
+   issue #110 reuses this unchanged for the pipelined RTL. This is disclosed
+   reasoning, not an unstated assumption (see that script's docstring), and
+   this record's own multi-corner re-check is exactly the verification step
+   that confirms (or does not confirm) it actually worked -- see the Results
+   tables above for the corner-by-corner outcome.
+4. **720p60 setup does not close at every corner even after DR-0008's
+   pipeline register.** See the Results table above: `ss_125C_3v00` and
+   `ss_n40C_3v00` still fail setup at 720p60 (74.25 MHz), though by a much
+   smaller margin than #100's pre-pipeline record
+   (`20260817-001614-064d550`) measured, and `tt_025C_3v30` now passes where
+   it previously failed. 480p (27.000 MHz) and hold (all corners, both
+   targets) close fully. This is not silently accepted as final: it is the
+   measured outcome DR-0008 itself flagged as possible ("if one boundary
+   register is insufficient at some corner, a further pipelining decision ...
+   would need its own follow-up decision record") and is tracked as a
+   dedicated follow-up issue rather than expanding this record's own scope
+   further.
 
 - **Reproducibility**: working tree {"DIRTY (uncommitted changes outside flow/tmds_encoder/ at run time -- re-run against a clean checkout before trusting this record)" if dirty else "clean"} at commit `{sha}`.
 - **Links**:
