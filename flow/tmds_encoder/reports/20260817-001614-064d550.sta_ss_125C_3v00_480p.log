@@ -1,0 +1,195 @@
+OpenROAD 26Q3-1278-g4421880472 
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via1 :"
+  	EOLENCLOSURE 0.34 0.06 ;"
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via2 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via3 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via4 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0227] LEF file: /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/techlef/gf180mcu_fd_sc_mcu9t5v0__nom.tlef, created 15 layers, 56 vias
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef at line 2.
+
+[INFO ODB-0227] LEF file: /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef, created 229 library cells
+[INFO ODB-0127] Reading DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-100/flow/tmds_encoder/pnr/tmds_encoder.def
+[INFO ODB-0128] Design: tmds_encoder
+[INFO ODB-0130]     Created 25 pins.
+[INFO ODB-0131]     Created 1076 components and 5120 component-terminals.
+[INFO ODB-0132]     Created 2 special nets and 700 connections.
+[INFO ODB-0133]     Created 302 nets and 971 connections.
+[INFO ODB-0134] Finished DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-100/flow/tmds_encoder/pnr/tmds_encoder.def
+=== SETUP_WORST ===
+Startpoint: data[1] (input port clocked by clk)
+Endpoint: _515_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   0.0000    0.0000   clock network delay (propagated)
+   0.0000    0.0000 ^ input external delay
+   0.8630    0.8630 ^ data[1] (in)
+   3.2281    4.0911 v _257_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_2)
+   2.2233    6.3143 ^ _258_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_2)
+   1.5796    7.8940 v _259_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_2)
+   0.8404    8.7344 v _275_/Z (gf180mcu_fd_sc_mcu9t5v0__and2_4)
+   2.5508   11.2852 v _284_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_1)
+   1.3201   12.6053 ^ _285_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi22_2)
+   0.6678   13.2731 v _293_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai22_4)
+   0.9459   14.2190 v _294_/Z (gf180mcu_fd_sc_mcu9t5v0__buf_4)
+   1.5106   15.7296 ^ _308_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   0.7633   16.4929 v _310_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai21_2)
+   3.2301   19.7230 v _315_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_1)
+   1.5561   21.2791 v _393_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_1)
+   2.2470   23.5261 ^ _400_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai33_2)
+   0.9291   24.4552 v _405_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi21_1)
+   1.6940   26.1492 v _408_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_1)
+   0.7790   26.9282 ^ _409_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor2_4)
+   0.4792   27.4074 v _415_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   2.8969   30.3043 v _421_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_1)
+   1.8262   32.1305 ^ _447_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_1)
+   0.6723   32.8028 v _448_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_2)
+   0.0001   32.8029 v _515_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+            32.8029   data arrival time
+
+  37.0370   37.0370   clock clk (rise edge)
+   2.5007   39.5377   clock network delay (propagated)
+   0.0000   39.5377   clock reconvergence pessimism
+            39.5377 ^ _515_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+  -0.2987   39.2390   library setup time
+            39.2390   data required time
+-------------------------------------------------------------
+            39.2390   data required time
+           -32.8029   data arrival time
+-------------------------------------------------------------
+             6.4361   slack (MET)
+
+
+=== HOLD_WORST ===
+Startpoint: data[6] (input port clocked by clk)
+Endpoint: _523_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   0.0000    0.0000   clock network delay (propagated)
+   0.0000    0.0000 v input external delay
+   0.5414    0.5414 v data[6] (in)
+   1.2952    1.8366 v _260_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_2)
+   0.6301    2.4666 ^ _343_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   0.3355    2.8021 v _344_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   0.5981    3.4002 ^ _345_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai211_1)
+   0.3111    3.7113 v _346_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   0.0001    3.7114 v _523_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+             3.7114   data arrival time
+
+   0.0000    0.0000   clock clk (rise edge)
+   2.3034    2.3034   clock network delay (propagated)
+   0.0000    2.3034   clock reconvergence pessimism
+             2.3034 ^ _523_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   0.5094    2.8129   library hold time
+             2.8129   data required time
+-------------------------------------------------------------
+             2.8129   data required time
+            -3.7114   data arrival time
+-------------------------------------------------------------
+             0.8986   slack (MET)
+
+
+=== REG2REG_SETUP ===
+Startpoint: _511_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _515_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   2.5002    2.5002   clock network delay (propagated)
+   0.0000    2.5002 ^ _511_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   2.9738    5.4741 ^ _511_/Q (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   2.7356    8.2097 v _393_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_1)
+   2.2470   10.4567 ^ _400_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai33_2)
+   0.9291   11.3858 v _405_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi21_1)
+   1.6940   13.0798 v _408_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_1)
+   0.7790   13.8588 ^ _409_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor2_4)
+   0.4792   14.3380 v _415_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   2.8969   17.2349 v _421_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_1)
+   1.8262   19.0611 ^ _447_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_1)
+   0.6723   19.7334 v _448_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_2)
+   0.0001   19.7335 v _515_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+            19.7335   data arrival time
+
+  37.0370   37.0370   clock clk (rise edge)
+   2.5007   39.5377   clock network delay (propagated)
+   0.0000   39.5377   clock reconvergence pessimism
+            39.5377 ^ _515_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+  -0.2987   39.2390   library setup time
+            39.2390   data required time
+-------------------------------------------------------------
+            39.2390   data required time
+           -19.7335   data arrival time
+-------------------------------------------------------------
+            19.5054   slack (MET)
+
+
+=== REG2REG_HOLD ===
+Startpoint: _516_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _516_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   2.5005    2.5005   clock network delay (propagated)
+   0.0000    2.5005 ^ _516_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   2.2742    4.7747 v _516_/Q (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   0.6921    5.4668 ^ _501_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor2_1)
+   0.4921    5.9589 v _503_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai211_1)
+   0.4895    6.4483 ^ _504_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   0.2809    6.7292 v _505_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi21_1)
+   0.0000    6.7293 v _516_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+             6.7293   data arrival time
+
+   0.0000    0.0000   clock clk (rise edge)
+   2.5005    2.5005   clock network delay (propagated)
+   0.0000    2.5005   clock reconvergence pessimism
+             2.5005 ^ _516_/CLK (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+   0.5421    3.0425   library hold time
+             3.0425   data required time
+-------------------------------------------------------------
+             3.0425   data required time
+            -6.7293   data arrival time
+-------------------------------------------------------------
+             3.6868   slack (MET)
+
+
+=== WORST_SLACK ===
+worst slack max 6.4361
+worst slack min 0.8986
+=== TNS ===
+tns max 0.0000
+=== SETUP_VIOLATORS ===
+Group                                    Slack
+----------------------------------------------
+No paths found.
+
+=== HOLD_VIOLATORS ===
+Group                                    Slack
+----------------------------------------------
+No paths found.
+
+=== CLOCK_SKEW ===
+Clock clk
+ 2.5009 source latency _512_/CLK ^
+-2.3029 target latency _522_/CLK ^
+ 0.0000 CRPR
+--------------
+ 0.1980 setup skew
+
+=== END ===

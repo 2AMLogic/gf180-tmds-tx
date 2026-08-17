@@ -3,9 +3,9 @@
 # file. See the driver's docstring for why each assumption below is what it
 # is -- every one of them is disclosed in the evidence record too.
 
-# 720p60 pixel clock, 74.25 MHz (spec/tmds-tx.md §2). The encoder is a
+# 480p pixel clock, 27 MHz (spec/tmds-tx.md §2). The encoder is a
 # pixel-domain block: one 10-bit TMDS character per pixel clock.
-create_clock -name clk -period 13.4680 [get_ports clk]
+create_clock -name clk -period 37.0370 [get_ports clk]
 
 # flow/pnr_tmds_encoder.py now runs clock-tree synthesis (issue #100).
 # Propagate the real, CTS-balanced clock net delay rather than idealizing
