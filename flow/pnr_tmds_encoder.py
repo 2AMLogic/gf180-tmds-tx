@@ -266,6 +266,22 @@ CTS_BUF_LIST = [f"{STD_CELL_LIB}__clkbuf_{d}" for d in (1, 2, 3, 4, 8, 12, 16, 2
 SDC_DRIVING_CELL = f"{STD_CELL_LIB}__inv_1"
 SDC_DRIVING_CELL_PIN = "ZN"
 SDC_OUTPUT_LOAD_PF = 0.027252
+# `repair_timing -hold` here runs pre-route, against `estimate_parasitics
+# -placement`'s rough RC estimate (the EST-0018 "wire capacitance ... is
+# zero" warnings in this driver's own log are literal -- no `set_wire_rc` is
+# configured, so the estimate is effectively zero-wire-load). The real
+# post-route parasitics `flow/sdf_tmds_encoder.py` later extracts (OpenRCX,
+# actual routed geometry) are not yet available at this point in the flow.
+# Found directly (not assumed): a first `repair_timing -hold` run with no
+# margin closed hold to +0.003 ns WNS against the placement-stage estimate,
+# but the post-route multi-corner STA re-check (`flow/sta_tmds_encoder.py`)
+# still found small hold violations at 4/5 corners (worst -0.1401 ns,
+# `ss_n40C_3v00`) once real extracted parasitics were used -- the
+# estimate-vs-extracted gap, not a cross-corner issue (even `tt_025C_3v30`,
+# the corner this repair step's own liberty targets, still failed by
+# -0.0412 ns). This margin pads the repair target well past that measured
+# gap so the post-route re-check has real, not estimate-derived, headroom.
+HOLD_MARGIN_NS = 0.25
 
 # OpenROAD-flow-scripts' bundled, gf180-platform-specific streamout assets
 # this driver reuses read-only for the GDS merge step -- static PDK viewer
@@ -365,7 +381,7 @@ detailed_placement
 # though hold is clock-period-independent (see #83's record, "Known
 # limitations" 1). repair_timing legalizes via another detailed_placement.
 estimate_parasitics -placement
-repair_timing -hold
+repair_timing -hold -hold_margin {HOLD_MARGIN_NS}
 detailed_placement
 
 global_route
@@ -648,8 +664,11 @@ def render_record(rid, when, pdk, liberty, metrics, dirty, sha, log_path, gds_lo
     (`spec/tmds-tx.md` §2's 720p60 target), `clock_tree_synthesis -buf_list
     {{{" ".join(CTS_BUF_LIST)}}} -sink_clustering_enable`, then `detailed_placement`
     to legalize the inserted buffers.
-  - Hold repair (issue #100): `repair_timing -hold` after CTS, then another
-    `detailed_placement` to legalize whatever it inserts -- run at the
+  - Hold repair (issue #100): `repair_timing -hold -hold_margin {HOLD_MARGIN_NS}`
+    after CTS, then another `detailed_placement` to legalize whatever it
+    inserts. The `{HOLD_MARGIN_NS}` ns margin is not cosmetic -- see
+    `flow/pnr_tmds_encoder.py`'s `HOLD_MARGIN_NS` docstring for the measured
+    estimate-vs-extracted-parasitics gap it pads against. Run at the
     `{STD_CELL_CORNER}` corner this script's liberty uses; the quantitative
     post-CTS/post-repair hold verdict across all five 3.3 V corners is
     `flow/sta_tmds_encoder.py`'s job, re-run against this record's DEF, not
