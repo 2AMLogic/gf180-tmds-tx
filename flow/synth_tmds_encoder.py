@@ -192,16 +192,26 @@ def _git_status_porcelain() -> str:
     return result.stdout.rstrip("\n") if result.returncode == 0 else ""
 
 
+# Output trees this shared helper's callers write to, none of which counts
+# towards "dirty" -- each is exactly what that driver's own run leaves behind
+# (same reasoning as sim/harness/report.py's working_tree_dirty, adapted to
+# flow/'s output paths). `layout/gds/` is issue #100's own fix (found
+# directly, not assumed): flow/pnr_tmds_encoder.py's evidence-record text
+# already claimed this exclusion ("DIRTY (uncommitted changes outside
+# flow/tmds_encoder/ and layout/...")) but the shared helper it calls
+# (`synth.working_tree_dirty`, reused unmodified) never actually implemented
+# it, so a real PnR run with zero out-of-tree changes was reproducibly
+# flagged DIRTY purely because it writes `layout/gds/tmds_encoder.gds`.
+_OWN_OUTPUT_PREFIXES = ("flow/tmds_encoder/", "layout/gds/")
+
+
 def working_tree_dirty() -> bool:
     status = _git_status_porcelain()
     for line in status.splitlines():
         path = line[3:].strip().strip('"')
         if " -> " in path:
             path = path.split(" -> ", 1)[1]
-        # This run's own output tree does not count -- it is exactly what a
-        # run leaves behind (same reasoning as sim/harness/report.py's
-        # working_tree_dirty, adapted to flow/'s output paths).
-        if path and not path.startswith("flow/tmds_encoder/"):
+        if path and not path.startswith(_OWN_OUTPUT_PREFIXES):
             return True
     return False
 
