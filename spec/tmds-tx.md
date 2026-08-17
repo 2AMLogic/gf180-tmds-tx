@@ -174,8 +174,11 @@ timing at the pixel-domain-derived intermediate rate (5× pixel clock =
 not, this decision record will need superseding with a deeper synthesized
 reduction (smaller custom-domain multiplexing ratio needed) or vice versa.
 
-**Status**: Accepted, with the synthesized-domain frequency ceiling flagged
-as unverified pending RTL/synthesis work.
+**Status**: Accepted. The synthesized-domain frequency ceiling flagged here
+as unverified is now measured — see DR-0007, which resolves this open item
+to timing-driven synthesis + CTS closing hold and the 480p fallback, with
+full 720p60 setup closure deferred to a follow-up architecture (RTL
+pipelining) decision record (issue #110).
 
 ### DR-0004: PLL interface numerics and jitter budget
 
