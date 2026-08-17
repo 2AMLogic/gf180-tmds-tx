@@ -385,3 +385,97 @@ range at nominal supply), not hundreds of millivolts.
   descriptions of the same tracking relationship.
 
 **Status**: Accepted.
+
+### DR-0007: Synthesized-domain clock ceiling — timing-driven synthesis + CTS measured; full 720p60 closure requires an architecture change
+
+**Context**: DR-0003 named the synthesized-domain clock ceiling an open
+item: RTL/synthesis work must confirm the standard-cell library closes
+timing on the encoder before that boundary is treated as final, and if it
+does not, DR-0003 "will need superseding ... or vice versa." Issue #83's
+first STA pass measured (deliberately evidence-only, no closure attempt) a
+netlist synthesized with **no** clock constraint at all — area-only
+mapping, every cell forced to drive strength 1 — and found setup failing at
+74.25 MHz (`spec/tmds-tx.md` §2's 720p60 target) at 4 of 5 3.3 V corners
+(record `20260816-172539-930e864`). Issue #100 was filed to close that gap,
+with an explicit, increasing-invasiveness ladder: (1) timing-driven
+synthesis, (2) clock-tree synthesis (CTS) + hold repair, (3) RTL pipelining
+only if (1)+(2) prove insufficient — and (3) was explicitly gated behind a
+decision record, not a silent RTL edit, by issue #100's own guardrails.
+
+**Decision**: Steps (1) and (2) are implemented and measured (not merely
+attempted) — `flow/synth_tmds_encoder.py` now maps ABC's technology mapping
+against an explicit delay target (74.25 MHz's 13.4680 ns period) using the
+**worst setup corner's own liberty** (`ss_125C_3v00`, per #83's own record)
+rather than the nominal corner, so a netlist meeting the target there
+carries margin at every faster corner by construction; `flow/pnr_tmds_encoder.py`
+now runs `clock_tree_synthesis` and a margined `repair_timing -hold`
+(previously skipped entirely). The result, per the new multi-corner STA
+record (`20260817-001614-064d550`):
+
+- **480p fallback (27.000 MHz): closes at all 5 corners** (previously failed
+  at 1 of 5).
+- **Hold: closes at all 5 corners, both targets** — the first *post-CTS*
+  hold verdict this design has had (#83's PASS was necessarily pre-CTS).
+- **720p60 target (74.25 MHz): still fails at 3 of 5 corners** —
+  `ss_125C_3v00` −17.1329 ns (was −30.5845 ns, a 44% reduction),
+  `tt_025C_3v30` −1.6870 ns (was −8.3279 ns), `ss_n40C_3v00` −7.4201 ns (was
+  −16.6225 ns). `ff_125C_3v60` and `ff_n40C_3v60` now pass.
+
+The 720p60 shortfall is not attributed to an under-tuned synthesis
+parameter: `ss_125C_3v00` is the **exact corner** ABC's delay target was
+mapped against, and it still misses by a wide margin (−17.13 ns against a
+13.47 ns period — the arrival time is more than double the target). This is
+read as a measured signal, not a guess, that the encoder's combinational
+depth — the transition-minimization stage's inherently serial 8-bit
+XOR/XNOR chain (`rtl/tmds_encoder.v`'s `stage1`, each bit depending on the
+previous), feeding directly into the disparity-accumulation stage
+(`stage2`) with no register between them — exceeds what cell
+sizing/CTS/hold-repair alone can close at this standard-cell library's
+speed, at this pixel rate. Per DR-0003's own pre-authorized escape hatch
+("this decision record will need superseding ... or vice versa") and issue
+#100's guardrail ("If closure genuinely requires an architecture change
+... that is a DR-0003 supersede proposal through `spec/`, not a quiet
+retarget"): **DR-0003's open item is resolved to this measured outcome** —
+closing 720p60 fully requires an architecture change (most plausibly
+pipelining the stage1→stage2 boundary), not further synthesis/CTS tuning.
+This decision record does **not** itself propose that architecture change
+(no concrete pipeline-stage/latency design is specified here) — it records
+the measurement that makes one necessary, and requires it be pursued as a
+dedicated, separately-decided follow-up: issue #110 (filed alongside this
+record), not folded silently into issue #100's own scope.
+
+**Alternatives considered**:
+- **Pushing ABC's delay target further, or additional cell-level
+  micro-optimization**, was considered and rejected as the next step: the
+  evidence above already maps directly against the worst corner's own
+  liberty at the exact spec-mandated period, so there is no remaining
+  "free" synthesis lever to pull without diminishing, unmeasured returns —
+  spending further effort there without evidence it would close the
+  remaining ~17 ns gap at `ss_125C_3v00` would not meet this repo's
+  verification-is-the-product standard.
+- **Accepting 480p as the sole closed operating point and quietly dropping
+  720p60** was considered and rejected — `spec/tmds-tx.md` §1 and DR-0001
+  name 720p60 as the **target**, not a stretch goal 480p may silently
+  supersede; doing so without a ratified decision record is exactly the
+  "relax the ratified spec to make results pass" CLAUDE.md forbids.
+
+**Consequences**:
+- `spec/tmds-tx.md` §1's 74.25 MHz target is **unchanged** — this record
+  does not relax it.
+- 720p60 timing closure on the digital partition remains **open** pending a
+  follow-up architecture decision record and RTL work (pipelining the
+  encoder's combinational cone); 480p already operates within spec at every
+  corner today.
+- Any future pipelining proposal must itself become a ratified decision
+  record before landing as RTL (per issue #100's own guardrail), since it
+  changes the encoder's latency contract (currently one clock from input to
+  `tmds` output) that downstream verification and any consumer of this
+  block currently assumes.
+- The measured 44% worst-corner setup-slack improvement from steps (1)+(2)
+  is not wasted even though 720p60 does not yet close: it is a real
+  reduction in the pipelining margin a future architecture change will need
+  to find, and it is what fully closes 480p and post-CTS hold today.
+
+**Status**: Accepted — DR-0003's synthesized-domain clock ceiling open item
+is resolved to this measured outcome. Full 720p60 setup closure remains
+open pending a follow-up architecture (RTL pipelining) decision record.
