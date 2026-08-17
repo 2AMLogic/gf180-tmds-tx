@@ -1,0 +1,68 @@
+OpenROAD 26Q3-1278-g4421880472 
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via1 :"
+  	EOLENCLOSURE 0.34 0.06 ;"
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via2 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via3 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via4 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0227] LEF file: /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/techlef/gf180mcu_fd_sc_mcu9t5v0__nom.tlef, created 15 layers, 56 vias
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef at line 2.
+
+[INFO ODB-0227] LEF file: /root/.volare/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lef/gf180mcu_fd_sc_mcu9t5v0.lef, created 229 library cells
+[INFO ODB-0127] Reading DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-100/flow/tmds_encoder/pnr/tmds_encoder.def
+[INFO ODB-0128] Design: tmds_encoder
+[INFO ODB-0130]     Created 25 pins.
+[INFO ODB-0131]     Created 1065 components and 5066 component-terminals.
+[INFO ODB-0132]     Created 2 special nets and 700 connections.
+[INFO ODB-0133]     Created 297 nets and 961 connections.
+[INFO ODB-0134] Finished DEF file: /Users/rwalters/GitHub/gf180-tmds-tx/.loom/worktrees/issue-100/flow/tmds_encoder/pnr/tmds_encoder.def
+[INFO RCX-0431] Defined process_corner TYP with ext_model_index 0
+[INFO RCX-0029] Defined extraction corner TYP
+[WARNING RCX-0514] The ext_model_file option is deprecated. Use set_extraction_rules_file command instead.
+[INFO RCX-0435] Reading extraction model file /OpenROAD-flow-scripts/flow/platforms/gf180/openROAD/rcx/gf180mcu_1p5m_1tm_9k_sp_smim_OPTB_typ.rules ...
+[INFO RCX-0436] RC segment generation tmds_encoder (max_merge_res 50.0) ...
+[INFO RCX-0040] Final 1058 rc segments
+[INFO RCX-0439] Coupling Cap extraction tmds_encoder ...
+[INFO RCX-0440] Coupling threshhold is 0.1000 fF, coupling capacitance less than 0.1000 fF will be grounded.
+[INFO RCX-0442] 50% of 1821 wires extracted
+[INFO RCX-0442] 100% of 1821 wires extracted
+[INFO RCX-0045] Extract 297 nets, 1355 rsegs, 1355 caps, 2122 ccs
+[INFO RCX-0443] 297 nets finished
+[WARNING STA-0503] report_checks -group_count is deprecated. Use -group_path_count instead.
+Startpoint: data[1] (input port)
+Endpoint: _515_ (rising edge-triggered flip-flop)
+Path Group: unconstrained
+Path Type: max
+
+  Delay    Time   Description
+---------------------------------------------------------
+   0.00    0.00 v input external delay
+   0.00    0.00 v data[1] (in)
+   1.45    1.45 ^ _257_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_2)
+   0.89    2.33 v _258_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_2)
+   0.80    3.14 ^ _259_/Z (gf180mcu_fd_sc_mcu9t5v0__xor2_2)
+   0.38    3.51 ^ _275_/Z (gf180mcu_fd_sc_mcu9t5v0__and2_4)
+   1.39    4.90 ^ _284_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_1)
+   0.37    5.28 v _285_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi22_2)
+   0.54    5.82 ^ _293_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai22_4)
+   1.49    7.31 v _312_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_2)
+   0.77    8.08 ^ _314_/ZN (gf180mcu_fd_sc_mcu9t5v0__oai32_4)
+   0.90    8.97 v _320_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_2)
+   0.94    9.91 v _325_/Z (gf180mcu_fd_sc_mcu9t5v0__or4_4)
+   0.24   10.15 ^ _374_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_4)
+   1.10   11.26 v _401_/ZN (gf180mcu_fd_sc_mcu9t5v0__xnor3_1)
+   0.56   11.82 v _402_/Z (gf180mcu_fd_sc_mcu9t5v0__or2_4)
+   0.23   12.05 ^ _409_/ZN (gf180mcu_fd_sc_mcu9t5v0__nor2_4)
+   0.21   12.26 v _415_/ZN (gf180mcu_fd_sc_mcu9t5v0__nand2_1)
+   1.39   13.65 v _421_/Z (gf180mcu_fd_sc_mcu9t5v0__xor3_1)
+   0.59   14.24 ^ _447_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_1)
+   0.29   14.53 v _448_/ZN (gf180mcu_fd_sc_mcu9t5v0__aoi211_2)
+   0.00   14.53 v _515_/D (gf180mcu_fd_sc_mcu9t5v0__dffq_1)
+          14.53   data arrival time
+---------------------------------------------------------
+(Path is unconstrained)
+
+
