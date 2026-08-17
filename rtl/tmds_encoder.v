@@ -41,22 +41,52 @@
 //
 // Interface and behavior
 // -----------------------------------------------------------------------
-//   - One TMDS lane, registered output: one 10-bit TMDS character is
-//     produced per pixel clock, one clock after the corresponding input
-//     is presented (a single synchronous output register -- no
-//     combinational passthrough).
+//   - One TMDS lane, registered output, **two-clock-cycle latency** from
+//     `data`/`de`/`ctrl` to the corresponding `tmds` output (per
+//     spec/tmds-tx.md DR-0008): a pipeline register sits at the
+//     stage1->stage2 boundary (see "Pipelining" below), so a new 10-bit
+//     TMDS character reaches `tmds` two clocks after the corresponding
+//     input is presented, not one. This supersedes an earlier one-clock
+//     contract this header used to state -- DR-0007 measured that the
+//     un-pipelined single combinational cone from `data` through both
+//     stages did not close 720p60 setup timing at 3 of 5 3.3V corners, and
+//     DR-0008 is the ratified fix.
 //   - `de` (data-enable) asserted: encode `data` through both stages --
 //     the transition-minimizing XOR/XNOR selection (stage 1), then the
 //     DC-balancing stage (stage 2) driven by the running-disparity
-//     accumulator `cnt`.
+//     accumulator `cnt`. `de`/`ctrl` are pipelined alongside stage 1's
+//     result so they reach stage 2 already aligned with it -- see
+//     "Pipelining" below.
 //   - `de` deasserted (blanking): emit the fixed control character
 //     selected by `ctrl` = {C1, C0}, and reset the running-disparity
 //     accumulator to zero -- the standard's blanking behaviour, since
 //     each blanking interval starts a fresh disparity run for the next
-//     active-video period.
+//     active-video period. Like the data path, this reset of `cnt`
+//     happens two clocks after `de` is driven low, not one (the
+//     pipelined `de` is what stage 2 actually observes).
 //   - `rst`: synchronous, active-high. Clears the running-disparity
 //     accumulator and forces the output to the C1=0/C0=0 control
-//     character.
+//     character, on the *same* clock edge `rst` is sampled asserted --
+//     `rst` is deliberately **not** pipelined through the stage1/stage2
+//     boundary register (DR-0008), so its one-cycle-to-effect latency is
+//     unchanged from the pre-pipeline design even though `data`/`de`/
+//     `ctrl` now take two clocks. This is an intentional asymmetry: a
+//     synchronous reset that itself took two cycles to reach `tmds` would
+//     be a strictly worse contract with no benefit to the setup-timing
+//     problem the pipeline register exists to fix.
+//
+// Pipelining (spec/tmds-tx.md DR-0008)
+// -----------------------------------------------------------------------
+// `stage1`'s output (`qm`, the 9-bit transition-minimized intermediate
+// word) and the `de`/`ctrl` control signals that must stay aligned with it
+// are captured in a pipeline register (`qm_p1`/`de_p1`/`ctrl_p1`) before
+// `stage2` consumes them. This splits the original single combinational
+// cone (primary input -> stage1's serial 8-bit XOR/XNOR chain -> stage2's
+// disparity arithmetic -> the `tmds`/`cnt` output register, measured by
+// DR-0007 to miss 720p60 setup timing by more than 2x at the worst 3.3V
+// corner) into two shallower cones. The two-stage TMDS-encoding algorithm
+// itself (DVI 1.0 Sec 3.3) is unchanged by this -- only where the register
+// boundary between two already-sequential combinational stages sits.
 //
 // Scope note (per issue #10 / DR-0003): this module is the encoder only.
 // The 10:1->2:1 serializer, synthesis, and DR-0003's synthesized-domain
@@ -174,14 +204,40 @@ module tmds_encoder (
     end
   endfunction
 
-  wire [8:0]  qm         = stage1(data);
-  wire [17:0] enc         = stage2(qm, cnt);
-  wire [9:0]  data_code   = enc[17:8];
-  wire [7:0]  next_cnt_w  = enc[7:0];
+  wire [8:0] qm = stage1(data);
+
+  // -----------------------------------------------------------------
+  // Pipeline register: stage1 -> stage2 boundary (spec/tmds-tx.md
+  // DR-0008). Captures stage1's result and the control signals stage2
+  // needs to stay aligned with it. Deliberately *not* gated by `rst`
+  // being pipelined further -- both this register and the final
+  // tmds/cnt register below clear on the same edge `rst` is sampled
+  // asserted, so `rst` keeps its original one-cycle-to-effect latency
+  // (see this file's "Interface and behavior" header).
+  // -----------------------------------------------------------------
+  reg [8:0] qm_p1;
+  reg       de_p1;
+  reg [1:0] ctrl_p1;
+
+  always @(posedge clk) begin
+    if (rst) begin
+      qm_p1   <= 9'd0;
+      de_p1   <= 1'b0;
+      ctrl_p1 <= 2'b00;
+    end else begin
+      qm_p1   <= qm;
+      de_p1   <= de;
+      ctrl_p1 <= ctrl;
+    end
+  end
+
+  wire [17:0] enc        = stage2(qm_p1, cnt);
+  wire [9:0]  data_code  = enc[17:8];
+  wire [7:0]  next_cnt_w = enc[7:0];
 
   reg [9:0] ctrl_code;
   always @(*) begin
-    case (ctrl)
+    case (ctrl_p1)
       2'b00:   ctrl_code = CTRL_00;
       2'b01:   ctrl_code = CTRL_01;
       2'b10:   ctrl_code = CTRL_10;
@@ -193,7 +249,7 @@ module tmds_encoder (
     if (rst) begin
       tmds <= CTRL_00;
       cnt  <= 8'sd0;
-    end else if (de) begin
+    end else if (de_p1) begin
       tmds <= data_code;
       cnt  <= next_cnt_w;
     end else begin

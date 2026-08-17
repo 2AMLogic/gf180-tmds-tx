@@ -3,15 +3,18 @@ reference: tmds_encoder.ref.spice
 top: TMDS_ENCODER
 engine: klayout
 status: mismatch
-mismatches: 10
-  nets: layout=281  reference=281  matched=169
+mismatches: 13
+  nets: layout=330  reference=306  matched=257
   devices: layout=0  reference=0  matched=0
-  pins: layout=25  reference=25  matched=169
+  pins: layout=25  reference=25  matched=257
 
 category_counts:
-  topology: 10
+  topology: 13
 
 [error] topology  (both)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
+[error] topology  (layout)  circuit could not be matched to a counterpart
 [error] topology  (layout)  circuit could not be matched to a counterpart
 [error] topology  (layout)  circuit could not be matched to a counterpart
 [error] topology  (layout)  circuit could not be matched to a counterpart

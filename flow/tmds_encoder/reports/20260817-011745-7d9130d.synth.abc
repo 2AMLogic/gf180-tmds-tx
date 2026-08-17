@@ -1,0 +1,16 @@
+strash
+&get -n
+&fraig -x
+&put
+scorr
+dc2
+dretime
+strash
+&get -n
+&dch -f
+&nf -D 13468
+&put
+buffer
+upsize -D 13468
+dnsize -D 13468
+stime -p

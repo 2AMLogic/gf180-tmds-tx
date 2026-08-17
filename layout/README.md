@@ -222,26 +222,35 @@ python3 layout/scripts/gen_tmds_encoder_ref.py \
 klt lvs layout/lvs/tmds_encoder.lvs_request.json --format json > layout/lvs_reports/tmds_encoder.lvs.json
 ```
 
-**Scope**: place-and-route only, per issue #84 -- no clock-tree synthesis
-and no timing-closure claim (issue #83 owns static timing analysis). This
-does not integrate with the analog pad ring (#86's scope, separate for the
-analog partition).
+**Scope**: place-and-route only, per issue #84 (issue #100 added
+clock-tree synthesis and hold repair to this same driver; issue #110 reuses
+it unchanged for the pipelined (DR-0008) netlist) -- no timing-closure
+*claim* is made here either way (issue #83/#110 own static timing analysis).
+This does not integrate with the analog pad ring (#86's scope, separate for
+the analog partition).
 
-**Current signoff status**: **DRC violations** (188, all `mim.space.1`) and
-**LVS mismatch** (10 topology mismatches; nets/pins otherwise match fully)
--- both fully attributed and explained, not silently worked around:
+**Current signoff status** (regenerated for issue #110's pipelined (DR-0008)
+GDS -- superseding the pre-pipeline numbers this section used to cite, same
+`klt` version and deck): **DRC clean** (0 violations -- the `mim.space.1`
+false positives this section used to report, 188 of them, no longer appear;
+consistent with [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)
+having been addressed upstream since the pre-pipeline GDS was checked, not
+with anything this design changed) and **LVS mismatch** (13 topology
+mismatches; nets/pins otherwise match fully) -- fully attributed and
+explained, not silently worked around:
 
-- The DRC violations are consistent with
-  [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033):
-  the curated gf180mcu deck's `mim.space.1` rule is a general
-  Metal4-to-Metal4 spacing check (its own violation `description` says so)
-  applied indiscriminately to ordinary Metal4 PDN/routing geometry, not just
-  real MiM capacitor plates -- this design has zero capacitor devices.
-- The LVS mismatches are the 9 P&R-inserted filler/tap/endcap standard-cell
-  *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`, `__filltie`, `__endcap`, plus
-  one top-level rollup) that carry no logic and that the pre-P&R reference
-  netlist has no counterpart for, by construction (see
-  `layout/scripts/filter_pnr_utility_cells.py`'s docstring).
+- The LVS mismatches are 12 P&R-inserted utility/clock-tree/hold-repair
+  standard-cell *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`, `__filltie`,
+  `__endcap`, `__clkbuf_1` and `__dlyc_1` from clock-tree synthesis,
+  `__inv_2` from hold repair -- diffed directly against the netlist's own
+  instantiated cell types, not assumed) that carry no logic and that the
+  pre-P&R reference netlist has no counterpart for, by construction (see
+  `layout/scripts/filter_pnr_utility_cells.py`'s docstring), plus one
+  top-level rollup mismatch (12 + 1 = 13). This is the same root cause the
+  pre-pipeline GDS's 10 mismatches had (9 utility-cell types + 1 rollup);
+  the count grew because DR-0008's larger, CTS/hold-repaired implementation
+  now also inserts `clkbuf_1`/`dlyc_1`/`inv_2` instances the pre-CTS
+  reference netlist naturally has no counterpart for either.
 
 **Two real, upstream DEF->GDS-merge defects were found and fixed while
 building this driver** (not worked around) -- a DBU mismatch between

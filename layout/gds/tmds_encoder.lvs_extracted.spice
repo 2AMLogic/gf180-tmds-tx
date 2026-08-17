@@ -30,233 +30,371 @@
 + data[3] data[4] data[5] data[6] data[7] de rst tmds[0] tmds[1] tmds[2]
 + tmds[3] tmds[4] tmds[5] tmds[6] tmds[7] tmds[8] tmds[9]
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_0 data[2] \$60 VDD VSS \$94
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_0 \$487 \$605 VDD VSS \$675
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_1 \$316 \$384 VDD VSS \$385
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_1 \$256 \$47 VDD VSS \$278
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_2 \$383 \$364 VDD VSS \$428
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_2 \$47 \$143 VDD VSS \$269
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_3 \$390 \$385 VDD VSS \$336
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_3 \$425 \$743 VDD VSS \$749
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_4 data[6] \$238 VDD VSS \$265
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_4 \$364 \$343 VDD VSS \$566
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_5 data[1] data[0] VDD VSS \$122
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_5 \$551 \$550 VDD VSS \$500
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_6 \$172 \$163 VDD VSS \$307
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_6 \$47 \$48 VDD VSS \$55
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and2_1_7 \$344 \$376 VDD VSS \$425
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_7 \$47 \$49 VDD VSS \$26
++ gf180mcu_fd_sc_mcu9t5v0__and2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_8 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_8 \$342 \$740 VDD VSS \$827
++ gf180mcu_fd_sc_mcu9t5v0__and2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_9 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_9 \$47 \$31 VDD VSS \$107
++ gf180mcu_fd_sc_mcu9t5v0__and2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_10 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_10 \$512 \$260 VDD VSS \$370
++ gf180mcu_fd_sc_mcu9t5v0__and2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_11 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_11 \$506 \$504 VDD VSS \$602
++ gf180mcu_fd_sc_mcu9t5v0__and2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__and2_1_12 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__and2_1_12 \$259 \$260 VDD VSS \$272
 + gf180mcu_fd_sc_mcu9t5v0__and2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and3_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and3_1_0 \$648 \$645 \$618 VDD VSS \$591
+Xgf180mcu_fd_sc_mcu9t5v0__and3_1_0 \$564 \$303 \$566 VDD VSS \$614
 + gf180mcu_fd_sc_mcu9t5v0__and3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__and3_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and3_1_1 data[2] data[3] \$122 VDD VSS \$145
-+ gf180mcu_fd_sc_mcu9t5v0__and3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__and3_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__and3_1_2 \$175 \$192 \$118 VDD VSS \$245
+Xgf180mcu_fd_sc_mcu9t5v0__and3_1_1 \$742 \$711 \$778 VDD VSS \$674
 + gf180mcu_fd_sc_mcu9t5v0__and3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_0 \$263 \$335 \$322 \$121 VDD VSS \$305
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_0 \$51 \$110 \$181 \$222 VDD VSS \$310
 + gf180mcu_fd_sc_mcu9t5v0__aoi211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_1 \$263 \$388 \$406 \$121 VDD VSS \$395
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_1 \$467 \$534 \$468 \$208 VDD VSS \$466
 + gf180mcu_fd_sc_mcu9t5v0__aoi211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_2 \$263 \$443 \$498 \$121 VDD VSS \$502
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_2 \$506 \$592 \$573 \$208 VDD VSS \$572
 + gf180mcu_fd_sc_mcu9t5v0__aoi211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_3 \$525 \$528 \$492 \$263 VDD VSS \$500
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_3 \$212 \$223 \$297 \$213 VDD VSS \$211
 + gf180mcu_fd_sc_mcu9t5v0__aoi211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_4 \$263 \$456 \$500 \$121 VDD VSS \$503
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_4 \$467 \$251 \$214 \$208 VDD VSS \$252
++ gf180mcu_fd_sc_mcu9t5v0__aoi211_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi211_1_5 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__aoi211_1_5 \$764 \$787 \$799 \$842 VDD VSS \$715
 + gf180mcu_fd_sc_mcu9t5v0__aoi211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_0 \$124 \$246 \$261 VDD VSS \$273
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_0 \$98 \$363 \$347 VDD VSS \$559
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_1 \$477 \$530 \$562 VDD VSS \$601
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_1 \$145 \$363 \$349 VDD VSS \$375
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_2 de \$102 \$71 VDD VSS \$61
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_2 \$637 \$698 \$665 VDD VSS \$699
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_3 \$316 \$384 \$593 VDD VSS \$629
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_3 \$612 \$653 \$614 VDD VSS \$665
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_4 de \$199 \$71 VDD VSS \$177
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_4 \$303 \$581 \$566 VDD VSS \$653
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_5 de \$112 \$71 VDD VSS \$73
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_5 \$257 \$569 \$258 VDD VSS \$397
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_6 \$624 \$434 \$629 VDD VSS \$615
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_6 \$257 \$450 \$258 VDD VSS \$439
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_7 de \$254 \$71 VDD VSS \$201
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_7 \$257 \$344 \$258 VDD VSS \$325
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_8 \$403 \$419 \$428 VDD VSS \$420
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_8 \$257 \$232 \$258 VDD VSS \$248
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_9 \$172 \$188 \$81 VDD VSS \$189
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_9 \$257 \$529 \$258 VDD VSS \$465
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_10 \$218 \$189 \$71 VDD VSS \$141
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_10 \$737 \$726 \$551 VDD VSS \$739
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_11 \$558 \$501 \$121 VDD VSS \$511
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_11 \$501 \$498 \$500 VDD VSS \$223
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_12 \$306 \$263 \$307 VDD VSS \$69
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_12 \$835 \$763 \$825 VDD VSS \$834
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_13 \$390 \$385 \$341 VDD VSS \$376
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_13 \$504 \$757 \$467 VDD VSS \$457
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_14 ctrl[0] ctrl[1] \$24 VDD VSS \$23
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_14 \$838 \$728 \$827 VDD VSS \$837
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_15 \$344 \$577 \$466 VDD VSS \$560
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_15 \$212 \$223 \$297 VDD VSS \$296
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_16 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_16 \$307 \$640 \$263 VDD VSS \$488
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_16 \$814 \$670 \$630 VDD VSS \$671
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_17 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_17 \$489 \$490 \$544 VDD VSS \$492
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_17 \$429 \$392 \$208 VDD VSS \$418
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_18 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_18 \$489 \$490 \$526 VDD VSS \$527
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_18 \$262 \$261 \$208 VDD VSS \$215
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_19 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_19 data[2] \$60 \$122 VDD VSS \$92
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_19 \$630 \$508 \$467 VDD VSS \$459
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_20 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_20 \$648 \$618 \$645 VDD VSS \$592
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_20 \$628 \$621 \$602 VDD VSS \$615
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_21 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_21 \$466 \$600 \$591 VDD VSS \$588
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_21 \$264 \$263 \$362 VDD VSS \$361
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_22 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_22 \$493 \$386 \$121 VDD VSS \$359
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_22 \$742 \$778 \$711 VDD VSS \$673
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_23 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_23 \$109 \$92 \$145 VDD VSS \$118
+Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_23 \$512 \$553 \$674 VDD VSS \$616
 + gf180mcu_fd_sc_mcu9t5v0__aoi21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_24 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_24 \$175 \$192 \$118 VDD VSS \$170
-+ gf180mcu_fd_sc_mcu9t5v0__aoi21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi21_1_25 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi21_1_25 \$93 \$146 \$145 VDD VSS \$138
-+ gf180mcu_fd_sc_mcu9t5v0__aoi21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi221_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi221_1_0 \$461 \$457 \$403 \$419 \$428 VDD VSS
-+ \$451 gf180mcu_fd_sc_mcu9t5v0__aoi221_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi221_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__aoi221_2_0 \$467 \$398 \$459 \$454 \$208 VDD VSS
++ \$458 gf180mcu_fd_sc_mcu9t5v0__aoi221_2
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_0 \$525 \$485 \$479 \$163 VDD VSS \$509
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_0 data[1] data[0] data[3] \$143 VDD VSS \$99
 + gf180mcu_fd_sc_mcu9t5v0__aoi22_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_1 \$559 \$564 \$635 \$163 VDD VSS \$539
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_1 \$637 \$698 \$653 \$612 VDD VSS \$689
 + gf180mcu_fd_sc_mcu9t5v0__aoi22_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_2 \$474 \$488 \$433 \$263 VDD VSS \$348
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_2 \$630 \$625 \$773 \$504 VDD VSS \$502
 + gf180mcu_fd_sc_mcu9t5v0__aoi22_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_3 \$259 \$138 \$211 \$281 VDD VSS \$288
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_3 \$456 \$457 \$443 \$467 VDD VSS \$424
 + gf180mcu_fd_sc_mcu9t5v0__aoi22_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_1_4 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_1_4 \$630 \$619 \$632 \$504 VDD VSS \$224
++ gf180mcu_fd_sc_mcu9t5v0__aoi22_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__aoi22_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__aoi22_4_0 \$765 \$702 \$780 \$725 VDD VSS \$790
++ gf180mcu_fd_sc_mcu9t5v0__aoi22_4
+* cell instance gf180mcu_fd_sc_mcu9t5v0__buf_1_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__buf_1_0 \$494 VDD VSS \$510
++ gf180mcu_fd_sc_mcu9t5v0__buf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__buf_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__buf_1_1 \$266 VDD VSS \$47
++ gf180mcu_fd_sc_mcu9t5v0__buf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__buf_1_2 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__buf_1_2 \$150 VDD VSS \$257
++ gf180mcu_fd_sc_mcu9t5v0__buf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__buf_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__buf_2_0 \$102 VDD VSS \$259
++ gf180mcu_fd_sc_mcu9t5v0__buf_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkbuf_1_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkbuf_1_0 \$210 VDD VSS \$449
++ gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkbuf_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkbuf_1_1 \$210 VDD VSS \$165
++ gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkbuf_1_2 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkbuf_1_2 clk VDD VSS \$210
++ gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkbuf_1_3 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkbuf_1_3 \$210 VDD VSS \$147
++ gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkbuf_1_4 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkbuf_1_4 \$210 VDD VSS \$385
++ gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_0 \$334 VDD VSS \$314
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_0 \$103 VDD VSS \$77
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_1 \$383 VDD VSS \$416
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_1 \$188 VDD VSS \$309
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_2 data[0] VDD VSS \$171
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_2 \$156 VDD VSS \$155
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_3 \$293 VDD VSS \$417
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_3 \$275 VDD VSS \$255
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_4 \$356 VDD VSS \$319
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_4 \$486 VDD VSS \$681
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_5 \$461 VDD VSS \$593
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_5 \$108 VDD VSS \$98
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_6 de VDD VSS \$81
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_6 \$449 VDD VSS \$462
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_7 \$432 VDD VSS \$462
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_7 \$525 VDD VSS \$526
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_8 \$121 VDD VSS \$105
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_8 data[5] VDD VSS \$105
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_9 rst VDD VSS \$34
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_9 \$623 VDD VSS \$501
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_10 \$343 VDD VSS \$595
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_10 \$655 VDD VSS \$598
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_11 data[4] VDD VSS \$27
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_11 \$622 VDD VSS \$718
++ gf180mcu_fd_sc_mcu9t5v0__clkinv_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_12 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_12 \$455 VDD VSS \$266
++ gf180mcu_fd_sc_mcu9t5v0__clkinv_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_13 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_13 \$510 VDD VSS \$712
++ gf180mcu_fd_sc_mcu9t5v0__clkinv_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_14 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_14 \$342 VDD VSS \$797
++ gf180mcu_fd_sc_mcu9t5v0__clkinv_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__clkinv_1_15 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__clkinv_1_15 \$212 VDD VSS \$365
 + gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_0 clk \$61 tmds[0] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_0 \$449 \$509 \$486 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_1 clk \$73 tmds[1] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_1 \$449 \$372 \$425 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_2 clk \$177 tmds[3] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_2 \$449 \$431 \$487 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_3 clk \$201 tmds[7] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_3 \$449 \$559 \$564 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_4 clk \$17 tmds[8] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_4 \$449 \$437 \$525 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_5 clk \$141 tmds[5] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_5 \$165 \$278 \$343 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_6 clk \$305 \$356 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_6 \$449 \$375 \$364 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_7 clk \$395 \$383 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_7 \$449 \$432 \$494 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_8 clk \$62 tmds[2] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_8 \$165 \$269 \$303 VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_9 clk \$511 \$461 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_9 \$165 \$397 tmds[5] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_10 clk \$133 tmds[9] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_10 \$165 \$439 tmds[7] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_11 clk \$502 \$343 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_11 \$165 \$325 tmds[1] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_12 clk \$349 \$344 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_12 \$165 \$248 tmds[0] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_13 clk \$64 tmds[4] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_13 \$449 \$465 tmds[3] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_14 clk \$90 tmds[6] VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_14 \$147 \$203 tmds[2] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_15 clk \$359 \$346 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_15 \$147 \$106 tmds[4] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_16 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_16 clk \$503 \$466 VDD VSS
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_16 \$147 \$289 tmds[6] VDD VSS
 + gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_17 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_17 \$147 \$55 \$150 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_18 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_18 \$385 \$466 \$551 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_19 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_19 \$385 \$368 tmds[8] VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_20 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_20 \$385 \$345 \$342 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_21 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_21 \$147 \$26 \$101 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_22 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_22 \$385 \$572 \$552 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_23 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_23 \$147 \$133 tmds[9] VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_24 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_24 \$147 \$107 \$148 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_25 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_25 \$385 \$418 \$453 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_26 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_26 \$147 \$252 \$102 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_27 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_27 \$147 \$215 \$250 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dffq_1_28 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dffq_1_28 \$385 \$458 \$512 VDD VSS
++ gf180mcu_fd_sc_mcu9t5v0__dffq_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_0 \$430 VDD VSS \$509
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_1 \$275 VDD VSS \$316
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_2 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_2 \$78 VDD VSS \$448
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_3 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_3 \$182 VDD VSS \$228
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_4 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_4 \$45 VDD VSS \$108
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_5 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_5 rst VDD VSS \$455
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_6 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_6 data[6] VDD VSS \$60
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_7 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_7 data[7] VDD VSS \$167
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_8 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_8 data[4] VDD VSS \$14
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_9 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_9 data[0] VDD VSS \$256
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_10 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_10 data[2] VDD VSS \$62
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_11 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_11 data[1] VDD VSS \$25
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_12 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_12 data[3] VDD VSS \$144
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_13 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_13 de VDD VSS \$48
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_14 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_14 ctrl[0] VDD VSS \$49
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__dlyc_1_15 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__dlyc_1_15 ctrl[1] VDD VSS \$31
++ gf180mcu_fd_sc_mcu9t5v0__dlyc_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__endcap_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
 * cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_1 r0 *1 0,0
@@ -373,6 +511,18 @@ Xgf180mcu_fd_sc_mcu9t5v0__endcap_55 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
 Xgf180mcu_fd_sc_mcu9t5v0__endcap_56 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
 * cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_57 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__endcap_57 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_58 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_58 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_59 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_59 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_60 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_60 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_61 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_61 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_62 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_62 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
+* cell instance gf180mcu_fd_sc_mcu9t5v0__endcap_63 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__endcap_63 VDD VSS gf180mcu_fd_sc_mcu9t5v0__endcap
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_1_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_1_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_1_1 r0 *1 0,0
@@ -655,6 +805,8 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_1_138 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_1
 Xgf180mcu_fd_sc_mcu9t5v0__fill_1_139 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_1_140 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_1_140 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_1_141 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_1_141 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_16_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_1 r0 *1 0,0
@@ -855,6 +1007,16 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_16_97 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
 Xgf180mcu_fd_sc_mcu9t5v0__fill_16_98 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_99 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_16_99 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_100 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_16_100 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_101 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_16_101 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_102 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_16_102 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_103 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_16_103 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_16_104 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_16_104 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_16
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_2_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_1 r0 *1 0,0
@@ -1129,6 +1291,16 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_2_134 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
 Xgf180mcu_fd_sc_mcu9t5v0__fill_2_135 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_136 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_2_136 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_137 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_2_137 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_138 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_2_138 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_139 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_2_139 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_140 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_2_140 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_2_141 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_2_141 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_32_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_32_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_32_1 r0 *1 0,0
@@ -1183,8 +1355,6 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_32_24 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
 Xgf180mcu_fd_sc_mcu9t5v0__fill_32_25 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_32_26 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_32_26 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_32_27 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_32_27 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_4_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_1 r0 *1 0,0
@@ -1463,42 +1633,32 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_4_136 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
 Xgf180mcu_fd_sc_mcu9t5v0__fill_4_137 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_138 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_4_138 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_139 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_139 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_140 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_140 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_141 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_141 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_142 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_142 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_143 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_143 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_144 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_144 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_145 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_145 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_146 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_146 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_147 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_147 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_148 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_148 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_149 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_149 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_150 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_150 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_151 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_151 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_152 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_152 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
-* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_4_153 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__fill_4_153 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_64_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_1 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_64_1 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_2 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_64_2 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_3 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_3 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_4 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_4 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_5 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_5 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_6 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_6 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_7 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_7 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_8 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_8 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_9 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_9 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_10 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_10 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_11 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_11 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_64_12 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_64_12 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_64
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_8_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_1 r0 *1 0,0
@@ -1769,6 +1929,12 @@ Xgf180mcu_fd_sc_mcu9t5v0__fill_8_132 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
 Xgf180mcu_fd_sc_mcu9t5v0__fill_8_133 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
 * cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_134 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__fill_8_134 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_135 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_8_135 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_136 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_8_136 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
+* cell instance gf180mcu_fd_sc_mcu9t5v0__fill_8_137 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__fill_8_137 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_8
 * cell instance gf180mcu_fd_sc_mcu9t5v0__filltie_0 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__filltie_0 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
 * cell instance gf180mcu_fd_sc_mcu9t5v0__filltie_1 r0 *1 0,0
@@ -1799,577 +1965,600 @@ Xgf180mcu_fd_sc_mcu9t5v0__filltie_12 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
 Xgf180mcu_fd_sc_mcu9t5v0__filltie_13 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
 * cell instance gf180mcu_fd_sc_mcu9t5v0__filltie_14 r0 *1 0,0
 Xgf180mcu_fd_sc_mcu9t5v0__filltie_14 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
+* cell instance gf180mcu_fd_sc_mcu9t5v0__filltie_15 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__filltie_15 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
+* cell instance gf180mcu_fd_sc_mcu9t5v0__filltie_16 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__filltie_16 VDD VSS gf180mcu_fd_sc_mcu9t5v0__filltie
+* cell instance gf180mcu_fd_sc_mcu9t5v0__inv_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__inv_2_0 \$165 VDD VSS \$323
++ gf180mcu_fd_sc_mcu9t5v0__inv_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__inv_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__inv_2_1 \$385 VDD VSS \$469
++ gf180mcu_fd_sc_mcu9t5v0__inv_2
 * cell instance gf180mcu_fd_sc_mcu9t5v0__mux2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__mux2_1_0 \$362 \$317 \$338 VDD VSS \$364
-+ gf180mcu_fd_sc_mcu9t5v0__mux2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__mux2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__mux2_1_1 \$217 \$187 \$172 VDD VSS \$199
+Xgf180mcu_fd_sc_mcu9t5v0__mux2_1_0 \$566 \$653 \$612 VDD VSS \$638
 + gf180mcu_fd_sc_mcu9t5v0__mux2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_0 \$477 \$530 VDD VSS \$535
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_0 \$57 \$109 VDD VSS \$110
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_1 \$471 \$529 VDD VSS \$530
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_1 \$51 \$44 VDD VSS \$50
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_2 \$172 \$153 VDD VSS \$140
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_2 \$103 \$44 VDD VSS \$142
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_3 \$383 \$470 VDD VSS \$551
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_3 \$149 \$222 VDD VSS \$267
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_4 \$163 \$563 VDD VSS \$555
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_4 \$77 \$50 VDD VSS \$57
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_5 \$316 \$384 VDD VSS \$482
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_5 \$149 \$142 VDD VSS \$109
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_6 \$306 \$335 VDD VSS \$357
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_6 data[6] \$155 VDD VSS \$149
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_7 \$252 \$263 VDD VSS \$264
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_7 data[7] \$255 VDD VSS \$222
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_8 \$537 \$574 VDD VSS \$602
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_8 data[0] \$182 VDD VSS \$183
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_9 \$172 \$163 VDD VSS \$525
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_9 data[4] \$98 VDD VSS \$79
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_10 \$634 \$617 VDD VSS \$635
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_10 \$487 \$605 VDD VSS \$637
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_11 \$589 \$602 VDD VSS \$576
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_11 \$564 \$617 VDD VSS \$612
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_12 \$646 \$634 VDD VSS \$636
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_12 \$100 \$99 VDD VSS \$44
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_13 \$238 \$263 VDD VSS \$218
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_13 data[2] \$145 VDD VSS \$100
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_14 \$461 \$457 VDD VSS \$432
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_14 \$425 \$743 VDD VSS \$765
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_15 \$263 \$439 VDD VSS \$501
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_15 \$737 \$726 VDD VSS \$654
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_16 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_16 \$589 \$590 VDD VSS \$559
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_16 \$765 \$702 VDD VSS \$801
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_17 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_17 \$173 \$142 VDD VSS \$216
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_17 \$257 \$286 VDD VSS \$265
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_18 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_18 ctrl[0] \$34 VDD VSS \$84
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_18 \$257 \$423 VDD VSS \$403
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_19 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_19 de \$34 VDD VSS \$121
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_19 \$257 \$358 VDD VSS \$359
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_20 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_20 \$121 \$84 VDD VSS \$104
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_20 \$234 \$265 VDD VSS \$203
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_21 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_21 \$344 \$600 VDD VSS \$626
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_21 \$234 \$359 VDD VSS \$289
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_22 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_22 \$343 \$600 VDD VSS \$619
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_22 \$234 \$403 VDD VSS \$106
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_23 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_23 \$343 \$376 VDD VSS \$422
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_23 \$552 \$718 VDD VSS \$623
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_24 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_24 \$104 \$117 VDD VSS \$64
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_24 \$510 \$552 VDD VSS \$729
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_25 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_25 \$344 \$577 VDD VSS \$561
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_25 \$369 \$234 VDD VSS \$368
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_26 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_26 \$104 \$209 VDD VSS \$90
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_26 \$510 \$257 VDD VSS \$369
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_27 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_27 data[7] \$280 VDD VSS \$281
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_27 \$208 \$249 VDD VSS \$234
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_28 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_28 \$172 \$266 VDD VSS \$221
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_28 \$740 \$752 VDD VSS \$835
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_29 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_29 \$172 \$174 VDD VSS \$144
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_29 \$150 \$266 VDD VSS \$208
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_30 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_30 data[0] \$252 VDD VSS \$257
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_30 \$101 \$47 VDD VSS \$249
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_31 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_31 \$587 \$599 VDD VSS \$606
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_31 \$607 \$662 VDD VSS \$647
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_32 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_32 data[5] \$173 VDD VSS \$192
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_32 \$712 \$764 VDD VSS \$710
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_33 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_33 \$648 \$618 VDD VSS \$628
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_33 \$150 \$247 VDD VSS \$180
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_34 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_34 data[3] \$57 VDD VSS \$109
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_34 \$510 \$553 VDD VSS \$741
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_35 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_35 \$263 \$408 VDD VSS \$386
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_35 \$647 \$656 VDD VSS \$626
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_36 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_36 \$109 \$92 VDD VSS \$93
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_36 \$342 \$777 VDD VSS \$212
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_37 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_37 \$175 \$192 VDD VSS \$146
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_37 \$259 \$713 VDD VSS \$793
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_38 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_38 \$259 \$138 VDD VSS \$308
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_38 \$764 \$734 VDD VSS \$735
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_39 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_39 \$466 \$376 VDD VSS \$427
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_39 \$506 \$504 VDD VSS \$630
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_40 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_40 \$602 \$620 VDD VSS \$556
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_41 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_41 \$602 \$574 VDD VSS \$454
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_42 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_42 \$259 \$553 VDD VSS \$844
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_43 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_43 \$628 \$621 VDD VSS \$695
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_44 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_44 \$250 \$553 VDD VSS \$820
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_45 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_45 \$820 \$742 VDD VSS \$816
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_46 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_46 \$264 \$263 VDD VSS \$241
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_47 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_47 \$250 \$260 VDD VSS \$264
++ gf180mcu_fd_sc_mcu9t5v0__nand2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand2_1_48 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand2_1_48 \$742 \$778 VDD VSS \$717
 + gf180mcu_fd_sc_mcu9t5v0__nand2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_0 \$593 \$316 \$384 VDD VSS \$624
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_0 \$637 \$698 \$665 VDD VSS \$725
 + gf180mcu_fd_sc_mcu9t5v0__nand3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_1 \$383 \$461 \$470 VDD VSS \$556
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_1 \$551 \$737 \$726 VDD VSS \$738
 + gf180mcu_fd_sc_mcu9t5v0__nand3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_2 \$466 \$344 \$577 VDD VSS \$605
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_2 \$510 \$552 \$551 VDD VSS \$730
 + gf180mcu_fd_sc_mcu9t5v0__nand3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_3 \$525 \$606 \$579 VDD VSS \$474
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_3 \$630 \$631 \$626 VDD VSS \$456
 + gf180mcu_fd_sc_mcu9t5v0__nand3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_4 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_4 \$250 \$259 \$713 VDD VSS \$732
++ gf180mcu_fd_sc_mcu9t5v0__nand3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand3_1_5 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand3_1_5 \$506 \$627 \$672 VDD VSS \$262
++ gf180mcu_fd_sc_mcu9t5v0__nand3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand4_1_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand4_1_0 data[2] data[1] data[0] data[3] VDD VSS
++ \$51 gf180mcu_fd_sc_mcu9t5v0__nand4_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand4_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand4_1_1 \$765 \$702 \$780 \$725 VDD VSS \$737
++ gf180mcu_fd_sc_mcu9t5v0__nand4_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nand4_1_2 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nand4_1_2 \$250 \$512 \$259 \$713 VDD VSS \$705
++ gf180mcu_fd_sc_mcu9t5v0__nand4_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_0 \$124 \$246 VDD VSS \$272
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_0 \$455 \$447 VDD VSS \$430
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_1 \$314 \$317 VDD VSS \$448
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_1 \$309 \$268 VDD VSS \$363
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_2 \$272 \$273 VDD VSS \$337
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_2 \$455 \$316 VDD VSS \$372
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_3 data[2] \$60 VDD VSS \$30
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_3 \$455 \$448 VDD VSS \$431
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_4 \$448 \$337 VDD VSS \$600
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_4 \$681 \$659 VDD VSS \$722
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_5 \$334 \$393 VDD VSS \$415
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_5 \$455 \$401 VDD VSS \$437
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_6 \$111 \$293 VDD VSS \$338
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_6 \$455 \$363 VDD VSS \$432
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_7 \$318 \$251 VDD VSS \$334
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_7 \$526 \$687 VDD VSS \$700
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_8 \$356 \$111 VDD VSS \$339
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_8 \$510 \$622 VDD VSS \$618
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_9 \$319 \$293 VDD VSS \$403
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_9 \$622 \$598 VDD VSS \$693
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_10 \$362 \$417 VDD VSS \$390
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_10 \$794 \$790 VDD VSS \$703
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_11 \$482 \$585 VDD VSS \$613
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_11 \$467 \$502 VDD VSS \$468
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_12 \$319 \$306 VDD VSS \$470
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_12 \$740 \$752 VDD VSS \$825
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_13 \$263 \$298 VDD VSS \$322
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_13 \$510 \$624 VDD VSS \$607
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_14 \$263 \$509 VDD VSS \$406
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_14 \$506 \$624 VDD VSS \$573
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_15 \$461 \$457 VDD VSS \$458
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_15 \$208 \$424 VDD VSS \$345
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_16 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_16 \$595 \$556 VDD VSS \$577
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_16 \$797 \$730 VDD VSS \$713
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_17 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_17 \$589 \$590 VDD VSS \$587
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_17 \$342 \$777 VDD VSS \$297
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_18 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_18 \$263 \$539 VDD VSS \$498
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_18 \$467 \$224 VDD VSS \$214
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_19 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_19 data[6] \$238 VDD VSS \$239
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_19 \$553 \$841 VDD VSS \$842
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_20 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_20 \$307 \$587 VDD VSS \$564
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_20 \$834 \$829 VDD VSS \$831
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_21 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_21 \$336 \$330 VDD VSS \$172
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_21 \$259 \$553 VDD VSS \$833
 + gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_22 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_22 \$343 \$376 VDD VSS \$399
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_23 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_23 \$121 \$348 VDD VSS \$349
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_24 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_24 \$344 \$376 VDD VSS \$429
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_25 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_25 \$267 \$258 VDD VSS \$306
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_26 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_26 \$257 \$288 VDD VSS \$258
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_27 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_27 \$283 \$308 VDD VSS \$267
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_28 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_28 \$281 \$284 VDD VSS \$283
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_29 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_29 \$245 \$170 VDD VSS \$284
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_1_30 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor2_1_30 \$466 \$376 VDD VSS \$447
-+ gf180mcu_fd_sc_mcu9t5v0__nor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_2_0 \$699 \$769 VDD VSS \$781
++ gf180mcu_fd_sc_mcu9t5v0__nor2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_2_1 \$790 \$819 VDD VSS \$553
++ gf180mcu_fd_sc_mcu9t5v0__nor2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_4_0 \$631 \$657 VDD VSS \$628
++ gf180mcu_fd_sc_mcu9t5v0__nor2_4
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor2_4_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor2_4_1 \$304 \$300 VDD VSS \$506
++ gf180mcu_fd_sc_mcu9t5v0__nor2_4
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor3_1_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor3_1_0 \$310 \$183 \$254 VDD VSS \$268
++ gf180mcu_fd_sc_mcu9t5v0__nor3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor3_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor3_1_1 \$834 \$829 \$814 VDD VSS \$799
++ gf180mcu_fd_sc_mcu9t5v0__nor3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor3_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor3_2_0 \$749 \$614 \$689 VDD VSS \$821
++ gf180mcu_fd_sc_mcu9t5v0__nor3_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor3_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor3_2_1 \$703 \$718 \$740 VDD VSS \$304
++ gf180mcu_fd_sc_mcu9t5v0__nor3_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor3_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor3_4_0 \$675 \$722 \$638 VDD VSS \$769
++ gf180mcu_fd_sc_mcu9t5v0__nor3_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__nor4_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__nor4_1_0 \$356 \$344 \$343 \$342 VDD VSS \$330
+Xgf180mcu_fd_sc_mcu9t5v0__nor4_1_0 \$749 \$700 \$699 \$769 VDD VSS \$794
++ gf180mcu_fd_sc_mcu9t5v0__nor4_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__nor4_1_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__nor4_1_1 \$259 \$552 \$551 \$471 VDD VSS \$300
 + gf180mcu_fd_sc_mcu9t5v0__nor4_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_0 \$613 \$601 \$625 \$656 VDD VSS \$630
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_0 \$222 \$181 \$110 \$51 VDD VSS \$188
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_1 \$307 \$576 \$555 \$172 VDD VSS \$558
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_1 \$257 \$151 \$180 \$47 VDD VSS \$133
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_2 \$600 \$637 \$630 \$646 VDD VSS \$489
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_2 \$715 \$714 \$735 \$705 VDD VSS \$620
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_3 \$615 \$657 \$626 \$619 VDD VSS \$618
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_3 \$602 \$554 \$556 \$506 VDD VSS \$429
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_4 \$172 \$242 \$221 de VDD VSS \$209
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_4 \$837 \$833 \$820 \$844 VDD VSS \$778
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_5 \$172 \$147 \$144 de VDD VSS \$117
-+ gf180mcu_fd_sc_mcu9t5v0__oai211_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_6 \$591 \$592 \$587 \$599 VDD VSS \$580
-+ gf180mcu_fd_sc_mcu9t5v0__oai211_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_7 \$307 \$494 \$524 \$172 VDD VSS \$493
-+ gf180mcu_fd_sc_mcu9t5v0__oai211_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai211_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_8 \$447 \$400 \$402 \$427 VDD VSS \$408
+Xgf180mcu_fd_sc_mcu9t5v0__oai211_1_5 \$674 \$673 \$628 \$621 VDD VSS \$599
 + gf180mcu_fd_sc_mcu9t5v0__oai211_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_0 \$185 \$215 \$216 VDD VSS \$246
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_0 \$105 \$78 \$79 VDD VSS \$103
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_1 \$470 \$339 \$417 VDD VSS \$471
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_1 \$98 \$363 \$47 VDD VSS \$347
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_2 \$362 \$417 \$306 VDD VSS \$480
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_2 \$675 \$722 \$638 VDD VSS \$780
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_3 \$60 \$172 \$140 VDD VSS \$112
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_3 \$145 \$363 \$47 VDD VSS \$349
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_4 \$263 \$262 \$264 VDD VSS \$254
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_4 \$623 \$739 \$738 VDD VSS \$728
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_5 \$613 \$601 \$625 VDD VSS \$634
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_5 \$794 \$790 \$751 VDD VSS \$783
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_6 \$81 \$306 \$104 VDD VSS \$17
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_6 \$693 \$813 \$783 VDD VSS \$763
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_7 \$81 \$95 \$104 VDD VSS \$62
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_7 \$703 \$718 \$712 VDD VSS \$704
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_8 \$462 \$458 \$420 VDD VSS \$439
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_8 \$101 \$150 \$47 VDD VSS \$258
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_9 ctrl[0] de \$34 VDD VSS \$71
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_9 \$365 \$297 \$223 VDD VSS \$443
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_10 ctrl[0] ctrl[1] \$34 VDD VSS \$24
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_10 \$814 \$670 \$671 VDD VSS \$672
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_11 \$615 \$657 \$619 VDD VSS \$669
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_11 \$628 \$621 \$615 VDD VSS \$627
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_12 \$600 \$560 \$605 VDD VSS \$526
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_12 \$837 \$833 \$844 VDD VSS \$856
 + gf180mcu_fd_sc_mcu9t5v0__oai21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_13 \$489 \$490 \$307 VDD VSS \$544
-+ gf180mcu_fd_sc_mcu9t5v0__oai21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_14 \$425 \$410 \$404 VDD VSS \$400
-+ gf180mcu_fd_sc_mcu9t5v0__oai21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai21_1_15 \$245 \$170 \$265 VDD VSS \$259
-+ gf180mcu_fd_sc_mcu9t5v0__oai21_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai221_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai221_1_0 \$425 \$429 \$399 \$397 \$422 VDD VSS
-+ \$433 gf180mcu_fd_sc_mcu9t5v0__oai221_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_2_0 \$510 \$506 \$630 VDD VSS \$247
++ gf180mcu_fd_sc_mcu9t5v0__oai21_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__oai21_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__oai21_4_0 \$304 \$710 \$741 VDD VSS \$260
++ gf180mcu_fd_sc_mcu9t5v0__oai21_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai22_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai22_1_0 \$314 \$317 \$273 \$272 VDD VSS \$316
+Xgf180mcu_fd_sc_mcu9t5v0__oai22_1_0 \$749 \$700 \$699 \$769 VDD VSS \$726
 + gf180mcu_fd_sc_mcu9t5v0__oai22_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai22_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai22_1_1 \$81 \$69 \$23 \$105 VDD VSS \$133
+Xgf180mcu_fd_sc_mcu9t5v0__oai22_1_1 \$250 \$260 \$272 \$211 VDD VSS \$263
 + gf180mcu_fd_sc_mcu9t5v0__oai22_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai22_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai22_1_2 \$283 \$308 \$257 \$288 VDD VSS \$111
-+ gf180mcu_fd_sc_mcu9t5v0__oai22_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai31_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai31_1_0 \$399 \$458 \$451 \$422 VDD VSS \$410
-+ gf180mcu_fd_sc_mcu9t5v0__oai31_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai32_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai32_1_0 \$94 \$30 \$151 \$139 \$171 VDD VSS \$124
+Xgf180mcu_fd_sc_mcu9t5v0__oai32_1_0 \$370 \$361 \$395 \$300 \$304 VDD VSS \$392
 + gf180mcu_fd_sc_mcu9t5v0__oai32_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__oai32_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai32_1_1 \$265 \$239 \$207 \$236 \$135 VDD VSS \$261
+Xgf180mcu_fd_sc_mcu9t5v0__oai32_1_1 \$272 \$211 \$238 \$300 \$304 VDD VSS \$261
 + gf180mcu_fd_sc_mcu9t5v0__oai32_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__oai33_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__oai33_1_0 \$416 \$448 \$415 \$293 \$449 \$319 VDD VSS
-+ \$434 gf180mcu_fd_sc_mcu9t5v0__oai33_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__oai32_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__oai32_4_0 \$702 \$781 \$821 \$819 \$790 VDD VSS \$740
++ gf180mcu_fd_sc_mcu9t5v0__oai32_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_0 \$94 \$30 VDD VSS \$67
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_0 \$364 \$343 VDD VSS \$581
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_1 \$362 \$469 VDD VSS \$477
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_1 \$614 \$689 VDD VSS \$819
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_2 \$383 \$364 VDD VSS \$419
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_2 \$551 \$550 VDD VSS \$498
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_3 \$357 \$436 VDD VSS \$537
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_3 \$790 \$819 VDD VSS \$764
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_4 \$537 \$574 VDD VSS \$589
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_4 \$342 \$740 VDD VSS \$838
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_5 \$600 \$664 VDD VSS \$646
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_5 \$842 \$831 VDD VSS \$670
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_6 \$336 \$330 VDD VSS \$263
+Xgf180mcu_fd_sc_mcu9t5v0__or2_1_6 \$250 \$553 VDD VSS \$742
 + gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_7 \$458 \$451 VDD VSS \$397
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_8 \$587 \$599 VDD VSS \$579
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_9 \$344 \$600 VDD VSS \$648
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_10 \$344 \$376 VDD VSS \$404
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_11 \$525 \$527 VDD VSS \$524
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or2_1_12 \$27 \$217 VDD VSS \$175
-+ gf180mcu_fd_sc_mcu9t5v0__or2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or3_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or3_1_0 \$613 \$601 \$625 VDD VSS \$617
-+ gf180mcu_fd_sc_mcu9t5v0__or3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__or2_2_0 \$681 \$659 VDD VSS \$698
++ gf180mcu_fd_sc_mcu9t5v0__or2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__or2_2_1 \$304 \$300 VDD VSS \$467
++ gf180mcu_fd_sc_mcu9t5v0__or2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__or2_4_0 \$526 \$687 VDD VSS \$702
++ gf180mcu_fd_sc_mcu9t5v0__or2_4
+* cell instance gf180mcu_fd_sc_mcu9t5v0__or2_4_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__or2_4_1 \$647 \$656 VDD VSS \$631
++ gf180mcu_fd_sc_mcu9t5v0__or2_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__or4_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or4_1_0 \$314 \$272 \$317 \$273 VDD VSS \$384
-+ gf180mcu_fd_sc_mcu9t5v0__or4_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__or4_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__or4_1_1 \$346 \$383 \$466 \$461 VDD VSS \$342
+Xgf180mcu_fd_sc_mcu9t5v0__or4_1_0 \$453 \$342 \$250 \$512 VDD VSS \$471
 + gf180mcu_fd_sc_mcu9t5v0__or4_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_0 \$314 \$393 VDD VSS \$362
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_0 \$181 \$267 VDD VSS \$254
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_1 \$383 \$470 VDD VSS \$469
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_1 \$155 \$363 VDD VSS \$447
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_2 \$67 \$69 VDD VSS \$95
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_2 \$105 \$78 VDD VSS \$156
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_3 \$471 \$529 VDD VSS \$479
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_3 \$486 \$659 VDD VSS \$743
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_4 \$171 \$69 VDD VSS \$102
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_4 \$144 \$143 VDD VSS \$45
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_5 \$251 \$163 VDD VSS \$262
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_5 \$486 \$247 VDD VSS \$569
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_6 \$217 \$111 VDD VSS \$215
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_6 \$364 \$247 VDD VSS \$344
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_7 \$593 \$551 VDD VSS \$585
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_7 \$343 \$247 VDD VSS \$232
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_8 \$319 \$293 VDD VSS \$335
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_8 \$525 \$247 VDD VSS \$450
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_9 \$318 \$251 VDD VSS \$293
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_9 \$564 \$247 VDD VSS \$529
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_10 \$252 \$111 VDD VSS \$251
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_10 \$654 \$618 VDD VSS \$550
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_11 \$403 \$449 VDD VSS \$436
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_11 \$510 \$552 VDD VSS \$655
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_12 \$482 \$480 VDD VSS \$457
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_12 \$551 \$729 VDD VSS \$751
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_13 \$316 \$664 VDD VSS \$625
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_13 \$693 \$813 VDD VSS \$773
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_14 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_14 \$236 \$163 VDD VSS \$188
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_14 \$552 \$622 VDD VSS \$624
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_15 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_15 \$656 \$636 VDD VSS \$640
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_15 \$797 \$730 VDD VSS \$752
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_16 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_16 \$595 \$556 VDD VSS \$664
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_16 \$259 \$260 VDD VSS \$213
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_17 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_17 \$316 \$637 VDD VSS \$656
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_17 \$512 \$732 VDD VSS \$734
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_18 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_18 \$111 \$316 VDD VSS \$341
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_18 \$250 \$793 VDD VSS \$787
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_19 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_19 \$595 \$316 VDD VSS \$657
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_19 \$259 \$713 VDD VSS \$841
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_20 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_20 \$344 \$577 VDD VSS \$637
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_20 \$453 \$553 VDD VSS \$504
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_21 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_21 \$173 \$142 VDD VSS \$135
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_21 \$834 \$829 VDD VSS \$632
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_22 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_22 data[6] \$236 VDD VSS \$242
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_22 \$764 \$734 VDD VSS \$714
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_23 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_23 \$173 \$111 VDD VSS \$147
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_23 \$553 \$841 VDD VSS \$829
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_24 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_24 \$280 \$163 VDD VSS \$266
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_24 \$764 \$787 VDD VSS \$814
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_25 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_25 \$173 \$163 VDD VSS \$174
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_25 \$512 \$260 VDD VSS \$362
 + gf180mcu_fd_sc_mcu9t5v0__xnor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_26 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_26 data[7] \$280 VDD VSS \$252
-+ gf180mcu_fd_sc_mcu9t5v0__xnor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_27 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_27 \$466 \$316 VDD VSS \$645
-+ gf180mcu_fd_sc_mcu9t5v0__xnor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_28 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_28 data[3] \$57 VDD VSS \$217
-+ gf180mcu_fd_sc_mcu9t5v0__xnor2_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_1_29 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor2_1_29 \$346 \$376 VDD VSS \$402
-+ gf180mcu_fd_sc_mcu9t5v0__xnor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_2_0 \$526 \$687 VDD VSS \$622
++ gf180mcu_fd_sc_mcu9t5v0__xnor2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_2_1 \$512 \$764 VDD VSS \$711
++ gf180mcu_fd_sc_mcu9t5v0__xnor2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor2_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor2_4_0 \$740 \$704 VDD VSS \$777
++ gf180mcu_fd_sc_mcu9t5v0__xnor2_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_0 \$383 \$334 \$393 VDD VSS \$449
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_0 \$487 \$564 \$617 VDD VSS \$659
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_1 \$171 data[2] \$111 VDD VSS \$185
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_1 \$551 \$654 \$623 VDD VSS \$662
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_2 \$334 \$317 \$469 VDD VSS \$529
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_2 \$551 \$550 \$501 VDD VSS \$534
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_3 \$124 \$246 \$261 VDD VSS \$317
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_3 \$801 \$781 \$751 VDD VSS \$813
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_4 \$593 \$482 \$434 VDD VSS \$574
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_4 \$622 \$504 \$598 VDD VSS \$592
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_5 \$306 \$163 \$335 VDD VSS \$298
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_5 \$797 \$740 \$728 VDD VSS \$656
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_6 \$383 \$364 \$403 VDD VSS \$388
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_6 \$504 \$599 \$616 VDD VSS \$554
 + gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_7 \$595 \$376 \$397 VDD VSS \$443
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_8 data[6] \$111 \$135 VDD VSS \$318
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_9 \$466 \$316 \$561 VDD VSS \$490
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_10 \$344 \$600 \$669 VDD VSS \$599
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_11 \$27 data[3] \$57 VDD VSS \$173
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_12 \$163 \$580 \$588 VDD VSS \$494
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_1_13 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xnor3_1_13 \$265 \$118 \$146 VDD VSS \$211
-+ gf180mcu_fd_sc_mcu9t5v0__xnor3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_2_0 \$681 \$425 \$659 VDD VSS \$687
++ gf180mcu_fd_sc_mcu9t5v0__xnor3_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_2_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_2_1 \$259 \$553 \$837 VDD VSS \$657
++ gf180mcu_fd_sc_mcu9t5v0__xnor3_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xnor3_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xnor3_4_0 \$740 \$752 \$763 VDD VSS \$757
++ gf180mcu_fd_sc_mcu9t5v0__xnor3_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_0 \$60 \$111 VDD VSS \$139
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_0 \$103 \$50 VDD VSS \$181
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_1 data[1] \$111 VDD VSS \$151
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_1 \$60 \$156 VDD VSS \$275
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_2 data[1] data[0] VDD VSS \$60
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_2 \$167 \$275 VDD VSS \$182
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_3 \$562 \$535 VDD VSS \$563
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_3 \$228 \$363 VDD VSS \$401
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_4 \$139 \$163 VDD VSS \$153
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_4 \$14 \$45 VDD VSS \$78
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_5 \$215 \$163 VDD VSS \$187
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_5 \$62 \$145 VDD VSS \$143
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_6 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_6 \$357 \$436 VDD VSS \$485
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_6 \$25 \$256 VDD VSS \$145
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_7 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_7 \$238 \$111 VDD VSS \$236
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_7 \$303 \$247 VDD VSS \$286
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_8 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_8 \$615 \$657 VDD VSS \$590
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_8 \$487 \$247 VDD VSS \$423
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_9 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_9 data[1] data[3] VDD VSS \$142
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_9 \$425 \$247 VDD VSS \$358
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_10 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_10 data[6] \$238 VDD VSS \$280
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_10 \$607 \$662 VDD VSS \$625
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_11 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_11 data[5] \$173 VDD VSS \$238
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_11 \$101 \$148 VDD VSS \$151
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_12 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_12 \$346 \$316 VDD VSS \$163
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_12 \$213 \$296 VDD VSS \$251
 + gf180mcu_fd_sc_mcu9t5v0__xor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_13 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_13 \$453 \$260 VDD VSS \$395
++ gf180mcu_fd_sc_mcu9t5v0__xor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_14 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_14 \$715 \$714 VDD VSS \$574
++ gf180mcu_fd_sc_mcu9t5v0__xor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_15 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_15 \$250 \$260 VDD VSS \$238
++ gf180mcu_fd_sc_mcu9t5v0__xor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_1_16 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_1_16 \$362 \$241 VDD VSS \$398
++ gf180mcu_fd_sc_mcu9t5v0__xor2_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_2_0 \$856 \$816 VDD VSS \$621
++ gf180mcu_fd_sc_mcu9t5v0__xor2_2
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_4_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_4_0 \$564 \$617 VDD VSS \$605
++ gf180mcu_fd_sc_mcu9t5v0__xor2_4
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor2_4_1 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor2_4_1 \$631 \$657 VDD VSS \$619
++ gf180mcu_fd_sc_mcu9t5v0__xor2_4
 * cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_0 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_0 \$124 \$246 \$261 VDD VSS \$393
+Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_0 \$695 \$711 \$717 VDD VSS \$508
 + gf180mcu_fd_sc_mcu9t5v0__xor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_1 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_1 \$448 \$337 \$585 VDD VSS \$562
-+ gf180mcu_fd_sc_mcu9t5v0__xor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_2 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_2 data[5] \$111 \$142 VDD VSS \$207
-+ gf180mcu_fd_sc_mcu9t5v0__xor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_3 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_3 data[1] data[0] data[2] VDD VSS \$57
-+ gf180mcu_fd_sc_mcu9t5v0__xor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_4 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_4 \$606 \$645 \$628 VDD VSS \$528
-+ gf180mcu_fd_sc_mcu9t5v0__xor3_1
-* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_1_5 r0 *1 0,0
-Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
-+ gf180mcu_fd_sc_mcu9t5v0__xor3_1
+* cell instance gf180mcu_fd_sc_mcu9t5v0__xor3_2_0 r0 *1 0,0
+Xgf180mcu_fd_sc_mcu9t5v0__xor3_2_0 \$364 \$343 \$303 VDD VSS \$617
++ gf180mcu_fd_sc_mcu9t5v0__xor3_2
 .ENDS tmds_encoder
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xor3_2
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor3_2 A1 A2 A3 VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xor3_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__xor3_1
 * pin A1
@@ -2381,6 +2570,24 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor3_1 A1 A2 A3 VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__xor3_1
 
+* cell gf180mcu_fd_sc_mcu9t5v0__xor2_4
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor2_4 A1 A2 VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xor2_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xor2_2
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor2_2 A1 A2 VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xor2_2
+
 * cell gf180mcu_fd_sc_mcu9t5v0__xor2_1
 * pin A1
 * pin A2
@@ -2389,6 +2596,26 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 * pin Z
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor2_1 A1 A2 VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__xor2_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xnor3_4
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xnor3_4 A1 A2 A3 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xnor3_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xnor3_2
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xnor3_2 A1 A2 A3 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xnor3_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__xnor3_1
 * pin A1
@@ -2399,6 +2626,24 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 * pin ZN
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__xnor3_1 A1 A2 A3 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__xnor3_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xnor2_4
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xnor2_4 A1 A2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xnor2_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__xnor2_2
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__xnor2_2 A1 A2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__xnor2_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__xnor2_1
 * pin A1
@@ -2420,15 +2665,23 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__or4_1 A1 A2 A3 A4 VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__or4_1
 
-* cell gf180mcu_fd_sc_mcu9t5v0__or3_1
+* cell gf180mcu_fd_sc_mcu9t5v0__or2_4
 * pin A1
 * pin A2
-* pin A3
 * pin VDD
 * pin VSS
 * pin Z
-.SUBCKT gf180mcu_fd_sc_mcu9t5v0__or3_1 A1 A2 A3 VDD VSS Z
-.ENDS gf180mcu_fd_sc_mcu9t5v0__or3_1
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__or2_4 A1 A2 VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__or2_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__or2_2
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__or2_2 A1 A2 VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__or2_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__or2_1
 * pin A1
@@ -2439,18 +2692,17 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__or2_1 A1 A2 VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__or2_1
 
-* cell gf180mcu_fd_sc_mcu9t5v0__oai33_1
+* cell gf180mcu_fd_sc_mcu9t5v0__oai32_4
 * pin A1
 * pin A2
 * pin A3
 * pin B1
 * pin B2
-* pin B3
 * pin VDD
 * pin VSS
 * pin ZN
-.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai33_1 A1 A2 A3 B1 B2 B3 VDD VSS ZN
-.ENDS gf180mcu_fd_sc_mcu9t5v0__oai33_1
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai32_4 A1 A2 A3 B1 B2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__oai32_4
 
 * cell gf180mcu_fd_sc_mcu9t5v0__oai32_1
 * pin A1
@@ -2464,17 +2716,6 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai32_1 A1 A2 A3 B1 B2 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__oai32_1
 
-* cell gf180mcu_fd_sc_mcu9t5v0__oai31_1
-* pin A1
-* pin A2
-* pin A3
-* pin B
-* pin VDD
-* pin VSS
-* pin ZN
-.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai31_1 A1 A2 A3 B VDD VSS ZN
-.ENDS gf180mcu_fd_sc_mcu9t5v0__oai31_1
-
 * cell gf180mcu_fd_sc_mcu9t5v0__oai22_1
 * pin A1
 * pin A2
@@ -2486,17 +2727,25 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai22_1 A1 A2 B1 B2 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__oai22_1
 
-* cell gf180mcu_fd_sc_mcu9t5v0__oai221_1
+* cell gf180mcu_fd_sc_mcu9t5v0__oai21_4
 * pin A1
 * pin A2
-* pin B1
-* pin B2
-* pin C
+* pin B
 * pin VDD
 * pin VSS
 * pin ZN
-.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai221_1 A1 A2 B1 B2 C VDD VSS ZN
-.ENDS gf180mcu_fd_sc_mcu9t5v0__oai221_1
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai21_4 A1 A2 B VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__oai21_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__oai21_2
+* pin A1
+* pin A2
+* pin B
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__oai21_2 A1 A2 B VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__oai21_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__oai21_1
 * pin A1
@@ -2530,6 +2779,54 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor4_1 A1 A2 A3 A4 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__nor4_1
 
+* cell gf180mcu_fd_sc_mcu9t5v0__nor3_4
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor3_4 A1 A2 A3 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nor3_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__nor3_2
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor3_2 A1 A2 A3 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nor3_2
+
+* cell gf180mcu_fd_sc_mcu9t5v0__nor3_1
+* pin A1
+* pin A2
+* pin A3
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor3_1 A1 A2 A3 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nor3_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__nor2_4
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor2_4 A1 A2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nor2_4
+
+* cell gf180mcu_fd_sc_mcu9t5v0__nor2_2
+* pin A1
+* pin A2
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor2_2 A1 A2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nor2_2
+
 * cell gf180mcu_fd_sc_mcu9t5v0__nor2_1
 * pin A1
 * pin A2
@@ -2538,6 +2835,17 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 * pin ZN
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__nor2_1 A1 A2 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__nor2_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__nand4_1
+* pin A1
+* pin A2
+* pin A3
+* pin A4
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__nand4_1 A1 A2 A3 A4 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__nand4_1
 
 * cell gf180mcu_fd_sc_mcu9t5v0__nand3_1
 * pin A1
@@ -2567,6 +2875,14 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 * pin Z
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__mux2_1 I0 I1 S VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__mux2_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__inv_2
+* pin I
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__inv_2 I VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__inv_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__filltie
 * pin VDD
@@ -2622,6 +2938,14 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__endcap VDD VSS
 .ENDS gf180mcu_fd_sc_mcu9t5v0__endcap
 
+* cell gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+* pin I
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__dlyc_1 I VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+
 * cell gf180mcu_fd_sc_mcu9t5v0__dffq_1
 * pin CLK
 * pin D
@@ -2639,6 +2963,41 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__clkinv_1 I VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__clkinv_1
 
+* cell gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+* pin I
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__clkbuf_1 I VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__clkbuf_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__buf_2
+* pin I
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__buf_2 I VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__buf_2
+
+* cell gf180mcu_fd_sc_mcu9t5v0__buf_1
+* pin I
+* pin VDD
+* pin VSS
+* pin Z
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__buf_1 I VDD VSS Z
+.ENDS gf180mcu_fd_sc_mcu9t5v0__buf_1
+
+* cell gf180mcu_fd_sc_mcu9t5v0__aoi22_4
+* pin A1
+* pin A2
+* pin B1
+* pin B2
+* pin VDD
+* pin VSS
+* pin ZN
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__aoi22_4 A1 A2 B1 B2 VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__aoi22_4
+
 * cell gf180mcu_fd_sc_mcu9t5v0__aoi22_1
 * pin A1
 * pin A2
@@ -2650,7 +3009,7 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__aoi22_1 A1 A2 B1 B2 VDD VSS ZN
 .ENDS gf180mcu_fd_sc_mcu9t5v0__aoi22_1
 
-* cell gf180mcu_fd_sc_mcu9t5v0__aoi221_1
+* cell gf180mcu_fd_sc_mcu9t5v0__aoi221_2
 * pin A1
 * pin A2
 * pin B1
@@ -2659,8 +3018,8 @@ Xgf180mcu_fd_sc_mcu9t5v0__xor3_1_5 \$466 \$376 \$400 VDD VSS \$456
 * pin VDD
 * pin VSS
 * pin ZN
-.SUBCKT gf180mcu_fd_sc_mcu9t5v0__aoi221_1 A1 A2 B1 B2 C VDD VSS ZN
-.ENDS gf180mcu_fd_sc_mcu9t5v0__aoi221_1
+.SUBCKT gf180mcu_fd_sc_mcu9t5v0__aoi221_2 A1 A2 B1 B2 C VDD VSS ZN
+.ENDS gf180mcu_fd_sc_mcu9t5v0__aoi221_2
 
 * cell gf180mcu_fd_sc_mcu9t5v0__aoi21_1
 * pin A1
