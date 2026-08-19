@@ -39,9 +39,9 @@ fields, both called out explicitly below.
 operator's amendment ruling (2026-08-19T04:35:28Z): every observed tape-out
 path for these canaries runs through wafer.space's GF180MCU shuttle, whose
 advertised stack is `gf180mcuD`. `layout/` artifacts committed under
-`layout/` (from issue #2 onward) were drawn against `gf180mcuC` and need
-regeneration and re-signoff against `gf180mcuD` — tracked separately (issue
-#127), not blocking this `sim/`-side re-citation. `spec/tmds-tx.md`'s
+`layout/` (from issue #2 onward) were originally drawn against `gf180mcuC`
+and have since been regenerated and re-signed off against `gf180mcuD`
+(issue #127, closed, DR-0010's amendment). `spec/tmds-tx.md`'s
 DR-0002 citation of `gf180mcuD` is qualified by DR-0010's Status-line note
 (DR-0005's own `gf180mcuD` citation is superseded in full, via DR-0011).
 
