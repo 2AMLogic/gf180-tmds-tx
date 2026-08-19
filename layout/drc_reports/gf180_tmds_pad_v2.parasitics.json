@@ -1,0 +1,629 @@
+{
+  "schema_version": 2,
+  "file": "gds/gf180_tmds_pad_v2.gds",
+  "deck": "gf180mcu",
+  "top": "gf180_tmds_pad_v2",
+  "dbu_um": 0.001,
+  "netlist_path": "gds/gf180_tmds_pad_v2.spice",
+  "netlist_sha256": "24edafa470c7f02399db01b5c3565ec59d5f9b244ba4439692e8460bd4c333a4",
+  "status": "extracted",
+  "device_count": 20,
+  "net_count": 2,
+  "pin_count": 2,
+  "device_counts": {
+    "diode_nd2ps_06v0": 20
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [
+    {
+      "layer": 37,
+      "datatype": 0,
+      "shapes": 1
+    }
+  ],
+  "device_recognition_only_layers": [
+    {
+      "layer": 55,
+      "datatype": 0,
+      "shapes": 1
+    },
+    {
+      "layer": 115,
+      "datatype": 5,
+      "shapes": 1
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$10",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$11",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$12",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$13",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$14",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$15",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$16",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$17",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$18",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$19",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$2",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$20",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$3",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$4",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$5",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$6",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$7",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$8",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$9",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "PAD"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    }
+  ],
+  "nets": [
+    {
+      "name": "PAD",
+      "pin": true,
+      "device_count": 20
+    },
+    {
+      "name": "VSS",
+      "pin": true,
+      "device_count": 20
+    }
+  ],
+  "warnings": [
+    "MOS device geometry overlaps the '55/0' voltage-domain marker: Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck models it for the DF.1a/DF.3a COMP width/space rules only, which ship as _LV/_MV pairs (0.22/0.30 and 0.28/0.36 um) scoped to the marker; every other DRC rule still applies the 3.3V/_LV thresholds regardless of Dualgate's presence (e.g. DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um, and neither transcribed in this deck yet), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate.",
+    "1 layer (37/0) carrying 1 shape is outside 'gf180mcu' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "voltage_domain_warnings": [
+    {
+      "marker": "55/0",
+      "description": "Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck models it for the DF.1a/DF.3a COMP width/space rules only, which ship as _LV/_MV pairs (0.22/0.30 and 0.28/0.36 um) scoped to the marker; every other DRC rule still applies the 3.3V/_LV thresholds regardless of Dualgate's presence (e.g. DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um, and neither transcribed in this deck yet), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate."
+    }
+  ],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [],
+  "matched_device_groups": [],
+  "pdk": {
+    "variant": "gf180mcuC",
+    "root": "/home/ubuntu/.ciel",
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+    },
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+    },
+    "input": {
+      "content_hash": "sha256:2855877afe13e96e21482c323e37c126233b1edb79e7cf1a633679219b7c289e"
+    }
+  },
+  "parasitics": {
+    "r_count": 40,
+    "c_count": 2,
+    "cc_count": 0,
+    "l_count": 0,
+    "total_resistance_ohm": 10.47,
+    "total_capacitance_ff": 12.294539,
+    "total_coupling_capacitance_ff": 0.0,
+    "total_inductance_nh": 0.0,
+    "nets": [
+      {
+        "net": "PAD",
+        "net_id": 1,
+        "resistance_ohm": 10.38,
+        "capacitance_ff": 12.185218,
+        "inductance_nh": 0.0,
+        "hub_net": "PAD",
+        "rc_model": "lumped",
+        "terminals": [
+          {
+            "device": "$1",
+            "terminal": "C",
+            "leg_net": "PAD__t0",
+            "resistance_ohm": 0.9861
+          },
+          {
+            "device": "$2",
+            "terminal": "C",
+            "leg_net": "PAD__t1",
+            "resistance_ohm": 0.8823
+          },
+          {
+            "device": "$3",
+            "terminal": "C",
+            "leg_net": "PAD__t2",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$4",
+            "terminal": "C",
+            "leg_net": "PAD__t3",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$5",
+            "terminal": "C",
+            "leg_net": "PAD__t4",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$6",
+            "terminal": "C",
+            "leg_net": "PAD__t5",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$7",
+            "terminal": "C",
+            "leg_net": "PAD__t6",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$8",
+            "terminal": "C",
+            "leg_net": "PAD__t7",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$9",
+            "terminal": "C",
+            "leg_net": "PAD__t8",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$10",
+            "terminal": "C",
+            "leg_net": "PAD__t9",
+            "resistance_ohm": 0.0519
+          },
+          {
+            "device": "$12",
+            "terminal": "C",
+            "leg_net": "PAD__t10",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$13",
+            "terminal": "C",
+            "leg_net": "PAD__t11",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$14",
+            "terminal": "C",
+            "leg_net": "PAD__t12",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$15",
+            "terminal": "C",
+            "leg_net": "PAD__t13",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$16",
+            "terminal": "C",
+            "leg_net": "PAD__t14",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$17",
+            "terminal": "C",
+            "leg_net": "PAD__t15",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$18",
+            "terminal": "C",
+            "leg_net": "PAD__t16",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$19",
+            "terminal": "C",
+            "leg_net": "PAD__t17",
+            "resistance_ohm": 0.8823
+          },
+          {
+            "device": "$20",
+            "terminal": "C",
+            "leg_net": "PAD__t18",
+            "resistance_ohm": 0.9861
+          },
+          {
+            "device": "$11",
+            "terminal": "C",
+            "leg_net": "PAD__t19",
+            "resistance_ohm": 0.0519
+          }
+        ],
+        "segments": [],
+        "coupled": []
+      },
+      {
+        "net": "VSS",
+        "net_id": 3,
+        "resistance_ohm": 0.09,
+        "capacitance_ff": 0.109321,
+        "inductance_nh": 0.0,
+        "hub_net": "VSS",
+        "rc_model": "lumped",
+        "terminals": [
+          {
+            "device": "$1",
+            "terminal": "A",
+            "leg_net": "VSS__t0",
+            "resistance_ohm": 0.0086
+          },
+          {
+            "device": "$2",
+            "terminal": "A",
+            "leg_net": "VSS__t1",
+            "resistance_ohm": 0.0076
+          },
+          {
+            "device": "$3",
+            "terminal": "A",
+            "leg_net": "VSS__t2",
+            "resistance_ohm": 0.0067
+          },
+          {
+            "device": "$4",
+            "terminal": "A",
+            "leg_net": "VSS__t3",
+            "resistance_ohm": 0.0058
+          },
+          {
+            "device": "$5",
+            "terminal": "A",
+            "leg_net": "VSS__t4",
+            "resistance_ohm": 0.0049
+          },
+          {
+            "device": "$6",
+            "terminal": "A",
+            "leg_net": "VSS__t5",
+            "resistance_ohm": 0.004
+          },
+          {
+            "device": "$7",
+            "terminal": "A",
+            "leg_net": "VSS__t6",
+            "resistance_ohm": 0.0031
+          },
+          {
+            "device": "$8",
+            "terminal": "A",
+            "leg_net": "VSS__t7",
+            "resistance_ohm": 0.0022
+          },
+          {
+            "device": "$9",
+            "terminal": "A",
+            "leg_net": "VSS__t8",
+            "resistance_ohm": 0.0013
+          },
+          {
+            "device": "$10",
+            "terminal": "A",
+            "leg_net": "VSS__t9",
+            "resistance_ohm": 0.001
+          },
+          {
+            "device": "$11",
+            "terminal": "A",
+            "leg_net": "VSS__t10",
+            "resistance_ohm": 0.001
+          },
+          {
+            "device": "$12",
+            "terminal": "A",
+            "leg_net": "VSS__t11",
+            "resistance_ohm": 0.0014
+          },
+          {
+            "device": "$13",
+            "terminal": "A",
+            "leg_net": "VSS__t12",
+            "resistance_ohm": 0.0023
+          },
+          {
+            "device": "$14",
+            "terminal": "A",
+            "leg_net": "VSS__t13",
+            "resistance_ohm": 0.0032
+          },
+          {
+            "device": "$15",
+            "terminal": "A",
+            "leg_net": "VSS__t14",
+            "resistance_ohm": 0.0041
+          },
+          {
+            "device": "$16",
+            "terminal": "A",
+            "leg_net": "VSS__t15",
+            "resistance_ohm": 0.0049
+          },
+          {
+            "device": "$17",
+            "terminal": "A",
+            "leg_net": "VSS__t16",
+            "resistance_ohm": 0.0059
+          },
+          {
+            "device": "$18",
+            "terminal": "A",
+            "leg_net": "VSS__t17",
+            "resistance_ohm": 0.0068
+          },
+          {
+            "device": "$19",
+            "terminal": "A",
+            "leg_net": "VSS__t18",
+            "resistance_ohm": 0.0077
+          },
+          {
+            "device": "$20",
+            "terminal": "A",
+            "leg_net": "VSS__t19",
+            "resistance_ohm": 0.0086
+          }
+        ],
+        "segments": [],
+        "coupled": []
+      }
+    ],
+    "metals_without_coefficient": [],
+    "overlap_pairs_without_coefficient": [],
+    "critical_nets": [],
+    "distributed_rc": false,
+    "model": {
+      "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+      "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+      "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+      "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+    },
+    "mom_crosscheck": null,
+    "mom_rlc_override": null
+  },
+  "spef_path": null
+}

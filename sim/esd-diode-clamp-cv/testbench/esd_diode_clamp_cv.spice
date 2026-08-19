@@ -1,0 +1,54 @@
+* diode_nd2ps_06v0 ESD-clamp small-signal capacitance at the PAD node
+* (issue #87). Diode counterpart of sim/esd-clamp-cv/testbench/esd_clamp_cv.spice
+* (issue #12's GGNMOS study) -- same structure, same corner/bias axes, same
+* AC-probe method, swapped onto the DR-0011-ratified diode_nd2ps_06v0 clamp
+* device (layout/gds/gf180_tmds_pad_v2.gds, layout/scripts/gen_pad_v2.py)
+* instead of the GGNMOS gf180_tmds_pad_min.gds used.
+*
+* Six independent branches: three device sizes x two DC bias states. Each
+* branch is its own AC voltage source driving its own D-device instance
+* (anode=VSS=0, cathode=probed PAD node), so all six are electrically
+* independent within one ngspice invocation -- no crosstalk, one PVT grid
+* point measures the whole curve.
+*
+* Device / sizing convention (see design/esd-capacitance-budget.md Sec.1-3
+* for the full derivation this reuses):
+* -- "base": the aggregate device gf180_tmds_pad_v2.gds actually draws --
+*    20 fingers in parallel, A=40um^2 P=120um total (verbatim from
+*    layout/lvs/gf180_tmds_pad_v2.ref.spice's combined D-card).
+* -- "w222"/"w444": the same HBM-sizing-window total widths
+*    sim/esd-clamp-cv's GGNMOS study already swept (222/444 um, the
+*    6/3 mA/um density readings from design/esd-capacitance-budget.md
+*    Sec.2b), applied with that same document's own per-um-width-to-A/P
+*    convention (A=W*1um, P=2*(W+1um)) so the two clamp families' numbers
+*    are read on the same total-periphery x-axis. 667um (2 mA/um) is
+*    reported by linear extrapolation, not simulated -- same choice
+*    sim/esd-clamp-cv made, and justified the same way (Sec.3c: the curve
+*    is linear in width since junction area/perimeter both scale linearly
+*    with a fixed per-finger geometry).
+*
+* Bias: DC=0 is the "easy to quote" reference point. DC='vdd_val' reuses
+* the harness's own supply-tolerance axis (2.97/3.30/3.63 V) as the TMDS
+* operating-bias proxy, same justification sim/esd-clamp-cv's own testbench
+* documents (DR-0002/DR-0006's DC-coupled, pad-tracks-rail topology) --
+* the cathode (PAD) sits at the positive operating bias, the anode (VSS)
+* at 0, so this diode is reverse-biased at the operating point, matching
+* its role as a diode-to-ground ESD clamp under normal (non-ESD) operation.
+
+* -- "base" (20 x 2.0/1.0um fingers, A=40um^2 P=120um total) --
+Vpad_base_0v pad_base_0v 0 DC=0 AC=1
+Dclamp_base_0v 0 pad_base_0v diode_nd2ps_06v0 area=40p pj=120u
+Vpad_base_opv pad_base_opv 0 DC='vdd_val' AC=1
+Dclamp_base_opv 0 pad_base_opv diode_nd2ps_06v0 area=40p pj=120u
+
+* -- w222 (222um total periphery-equivalent width, 6 mA/um HBM density) --
+Vpad_w222_0v pad_w222_0v 0 DC=0 AC=1
+Dclamp_w222_0v 0 pad_w222_0v diode_nd2ps_06v0 area=222p pj=446u
+Vpad_w222_opv pad_w222_opv 0 DC='vdd_val' AC=1
+Dclamp_w222_opv 0 pad_w222_opv diode_nd2ps_06v0 area=222p pj=446u
+
+* -- w444 (444um total periphery-equivalent width, 3 mA/um HBM density) --
+Vpad_w444_0v pad_w444_0v 0 DC=0 AC=1
+Dclamp_w444_0v 0 pad_w444_0v diode_nd2ps_06v0 area=444p pj=890u
+Vpad_w444_opv pad_w444_opv 0 DC='vdd_val' AC=1
+Dclamp_w444_opv 0 pad_w444_opv diode_nd2ps_06v0 area=444p pj=890u
