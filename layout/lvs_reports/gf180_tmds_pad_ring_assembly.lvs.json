@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "../gds/gf180_tmds_pad_ring_assembly.gds",
+  "reference": "gf180_tmds_pad_ring_assembly.ref.spice",
+  "top": "gf180_tmds_pad_ring_assembly",
+  "parameter_tolerance": null,
+  "status": "match",
+  "mismatch_count": 2,
+  "category_counts": {
+    "topology": 2
+  },
+  "counts": {
+    "nets": {
+      "layout": 7,
+      "reference": 7,
+      "matched": 7
+    },
+    "devices": {
+      "layout": 6,
+      "reference": 6,
+      "matched": 6
+    },
+    "pins": {
+      "layout": 7,
+      "reference": 6,
+      "matched": 7
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "43176701db1d796a3a482a530976604664993e8a4815ebe2deb34dfeb0d5380d",
+    "reference_sha256": "1f0777032102afd504d50b56a5f34e55ee685d506761ef8a1152052828004554",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.2.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+    },
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
+    {
+      "layout": "INN",
+      "reference": "INN",
+      "pin": true
+    },
+    {
+      "layout": "INP",
+      "reference": "INP",
+      "pin": true
+    },
+    {
+      "layout": "OUTN",
+      "reference": "OUTN",
+      "pin": true
+    },
+    {
+      "layout": "OUTP",
+      "reference": "OUTP",
+      "pin": true
+    },
+    {
+      "layout": "TAIL",
+      "reference": "TAIL",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
+}

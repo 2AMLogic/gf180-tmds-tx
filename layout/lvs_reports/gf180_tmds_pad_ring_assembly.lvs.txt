@@ -1,0 +1,15 @@
+layout: ../gds/gf180_tmds_pad_ring_assembly.gds
+reference: gf180_tmds_pad_ring_assembly.ref.spice
+top: gf180_tmds_pad_ring_assembly
+engine: klayout
+status: match
+mismatches: 2
+  nets: layout=7  reference=7  matched=7
+  devices: layout=6  reference=6  matched=6
+  pins: layout=7  reference=6  matched=7
+
+category_counts:
+  topology: 2
+
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch

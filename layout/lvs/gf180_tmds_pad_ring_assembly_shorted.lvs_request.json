@@ -1,0 +1,5 @@
+{
+  "layout": {"file": "../gds/gf180_tmds_pad_ring_assembly_shorted.gds", "deck": "gf180mcu", "top": "gf180_tmds_pad_ring_assembly_shorted"},
+  "reference": {"netlist": "gf180_tmds_pad_ring_assembly_shorted.ref.spice", "top": "gf180_tmds_pad_ring_assembly_shorted"},
+  "options": {"combine_devices": true}
+}
