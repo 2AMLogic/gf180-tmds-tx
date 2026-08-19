@@ -1,0 +1,47 @@
+* Reference (schematic-equivalent) netlist for gf180_tmds_pad_ring_assembly
+* (issue #86, T1 item 2 analog block-level assembly), checked against
+* design/netlist/cml_driver.spice (issue #11's sized schematic) plus the
+* two diode_nd2ps_06v0 ESD clamps this assembly adds (DR-0011).
+*
+* Same two translations cml_driver_core.ref.spice's own header documents
+* (folded W/L per klt lvs's schematic-equivalent contract; bulk stated
+* directly, see below) plus one new one this assembly's own substrate tap
+* makes possible:
+*
+*  1. Folded W/L, no nf/m -- unchanged from cml_driver_core.ref.spice, see
+*     that file's header and design/cml-driver-sizing.md section 1.3.
+*  2. Bulk = VSS, not vsubs. Unlike cml_driver_core.ref.spice (whose NMOS
+*     bodies tie only to the deck's synthesized "vsubs" global, since that
+*     cell draws no substrate tap), this assembly draws an explicit
+*     Pplus/Comp substrate tap wired into the DVSS ring strap and labelled
+*     "VSS" (gen_pad_ring_assembly.py's `_draw_substrate_tap`) -- per
+*     klayout_tools/decks/gf180mcu.py's issue-#1084 `tap_pplus` derivation,
+*     this ties the deck's "vsubs" synthesized net into the real, drawn VSS
+*     net. `klt extract`'s own output confirms this: every nfet device's
+*     body net is "VSS" directly (device_count for VSS net = 550, no
+*     separate "vsubs" net exists at all) -- the exact
+*     `device.body_unverified`-class gap DR-0011 flags as open for the
+*     "eventual driver-integrated pad" is closed by this assembly, not
+*     merely carried forward.
+*
+* The two ESD clamps: diode_nd2ps_06v0, cathode = the protected output
+* (OUTP / OUTN), anode = VSS (same substrate/VSS net the tap above ties
+* together) -- gen_pad_ring_assembly.py's `_draw_diode_pad`, reusing
+* gen_pad_diode_draft.py's own DRC/LVS-verified geometry (issue #9/DR-0011)
+* translated per pad.
+*
+* Not modelled here (see gen_pad_ring_assembly.py's own module docstring
+* for the full scope note): the DVDD ring strap (drawn for ring continuity,
+* but this driver has no VDD pin and nothing else in this increment
+* connects to it -- `klt extract` correctly reports it as disconnected
+* "dead metal", not a missing connection); INP/INN/IBIAS are not routed to
+* pads (out of scope -- this issue targets the *output* pad-ring
+* integration, not driver inputs).
+.SUBCKT gf180_tmds_pad_ring_assembly OUTP OUTN INP INN IBIAS VSS
+M1 OUTP INP TAIL VSS nfet L=0.28U W=128U
+M2 OUTN INN TAIL VSS nfet L=0.28U W=128U
+MT TAIL IBIAS VSS VSS nfet L=0.5U W=400U
+MB IBIAS IBIAS VSS VSS nfet L=0.5U W=20U
+D1 VSS OUTP diode_nd2ps_06v0
+D2 VSS OUTN diode_nd2ps_06v0
+.ENDS gf180_tmds_pad_ring_assembly

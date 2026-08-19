@@ -122,8 +122,11 @@ silently clip back into its own origin block and short two of that block's
 internal rails together — worked around here with an explicit
 `waypoints_um` detour, not a design defect).
 
-**Scope**: core driver cell only — ESD/pad-ring integration is explicitly
-out of scope for this cell (downstream work, per the issue).
+**Scope**: core driver cell only — ESD/pad-ring integration was explicitly
+out of scope for this cell when it was drawn (downstream work, per the
+issue). That downstream work now exists: see
+`gf180_tmds_pad_ring_assembly` below (issue #86), which imports this GDS
+directly and integrates it with a drawn ESD/pad-ring structure.
 
 **Toolchain note**: `mos_array`'s `gate_contact` param this generator relies
 on landed in klayout-tools after the `v0.2.0` PyPI tag (klayout-tools#497) —
@@ -230,6 +233,126 @@ Until this repo's `klt` moves past that tag, the generator here rewrites the
 `AS`/`AD`/`PS`/`PD`-bearing form itself rather than using `--pdk`, and
 `sim/tests/test_extracted_dut.py` asserts every simulated device carries
 non-zero junction area and perimeter so the gap cannot silently reappear.
+
+## `gf180_tmds_pad_ring_assembly` — block-level layout with pad-ring/ESD integration (issue #86)
+
+The analog partition's first block-level assembly: `cml_driver_core.gds`
+(above) imported as a flattened GDS instance and integrated with a drawn
+ESD/pad-ring structure for its two differential outputs (`OUTP`/`OUTN`) —
+the gap `cml_driver_core`'s own "ESD/pad-ring integration is explicitly out
+of scope for this cell" disclosure (and `gf180_tmds_pad_min`'s "not the
+final TMDS driver pad" disclosure, still accurate for that specific
+minimal verification cell, which this assembly does not use) both flagged,
+and #65's item 2 checklist re-read FAILed on for exactly that reason.
+
+Structure, per DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`):
+
+- **Two integrated, diode-clamped bond pads** (`diode_nd2ps_06v0`, pad
+  cathode / VSS anode), one per driver output, placed at DR-0011's ratified
+  **350 um pad pitch**. Each pad reuses `gen_pad_diode_draft.py`'s own
+  DRC/LVS-verified cathode + via-stack + bond-pad geometry (issue #9/
+  DR-0011), translated and relabelled per pad rather than re-derived.
+- **DVDD/DVSS ring continuity**: Metal3/Metal4/Metal5 supply straps drawn
+  continuously across the full two-pad span (not stopping at either pad's
+  own footprint) and via-stitched every 50 um so the three metal levels
+  form one electrically continuous conductor per net — the requirement
+  DR-0011 flagged as not yet exercised by any previously-committed cell.
+- **A substrate tap on a real net**: an explicit Pplus/Comp region outside
+  every Nwell, contacted and wired directly into the DVSS strap. Per
+  `klayout_tools/decks/gf180mcu.py`'s issue-#1084 `tap_pplus` derivation,
+  this ties the deck's synthesized `vsubs` global into the real, drawn VSS
+  net — confirmed by `klt extract`'s own output, where every driver NMOS's
+  body terminal reports `VSS` directly (no separate `vsubs` net exists in
+  the extracted netlist at all), closing the `device.body_unverified`-class
+  gap DR-0011 left open for "the eventual driver-integrated pad."
+
+**Scope, deliberately bounded** (see `scripts/gen_pad_ring_assembly.py`'s
+own module docstring for the full reasoning): two pads only (this driver's
+own outputs), not a full multi-lane TMDS ring — three data lanes plus clock,
+each needing its own differential pair, is a follow-up increment once this
+pattern is proven. Clamp topology is `diode_nd2ps_06v0` (pad-to-VSS) only;
+DR-0011's symmetric `diode_pd2nw_06v0` VDD-side leg is not drawn (this
+driver has no VDD pin to begin with — the DVDD strap is still drawn for
+ring-continuity's own sake, but carries no clamp leg or other connection in
+this increment, and `klt extract` correctly reports it as disconnected
+"dead metal", not a missing connection: see the Signoff section below).
+`INP`/`INN`/`IBIAS` (driver inputs) are not routed to pads — out of scope
+for the *output* pad-ring integration this issue targets. Pad-opening size
+(2x2 um, matching the verified diode draft) is DRC-legal but not a
+production wire-bond target; sizing the pad opening for a real bond process,
+and the VDD clamp leg, and the multi-lane ring, are follow-up work (#87's
+capacitance-budget redesign is the most likely owner for the pad-sizing
+question specifically).
+
+```
+scripts/gen_pad_ring_assembly.py                     generator (klayout.db; imports gds/cml_driver_core.gds)
+gds/gf180_tmds_pad_ring_assembly.gds                  the assembled block
+gds/gf180_tmds_pad_ring_assembly_shorted.gds          LVS negative control (OUTP shorted to VSS)
+gds/gf180_tmds_pad_ring_assembly.spice                klt extract's schematic-equivalent netlist
+gds/gf180_tmds_pad_ring_assembly_shorted.spice        klt extract's schematic-equivalent netlist (shorted variant)
+drc_reports/gf180_tmds_pad_ring_assembly*.{drc,extract}.json(.txt)  klt drc/extract reports, both cells
+lvs_reports/gf180_tmds_pad_ring_assembly*.lvs.{json,txt}            klt lvs reports, both cells
+lvs/gf180_tmds_pad_ring_assembly*.ref.spice           hand-written reference netlists for LVS
+lvs/gf180_tmds_pad_ring_assembly*.lvs_request.json    klt lvs request documents
+```
+
+Regenerate and re-run signoff:
+
+```bash
+cd layout
+python3 scripts/gen_pad_ring_assembly.py -o gds/gf180_tmds_pad_ring_assembly.gds --driver-gds gds/cml_driver_core.gds
+python3 scripts/gen_pad_ring_assembly.py -o gds/gf180_tmds_pad_ring_assembly_shorted.gds --driver-gds gds/cml_driver_core.gds --shorted
+klt drc --deck gf180mcu gds/gf180_tmds_pad_ring_assembly.gds
+klt extract --deck gf180mcu gds/gf180_tmds_pad_ring_assembly.gds --top gf180_tmds_pad_ring_assembly -o gds/gf180_tmds_pad_ring_assembly.spice
+klt lvs lvs/gf180_tmds_pad_ring_assembly.lvs_request.json                   # expect status: match
+klt lvs lvs/gf180_tmds_pad_ring_assembly_shorted.lvs_request.json           # expect status: mismatch (negative control)
+```
+
+**Current signoff status**: **DRC-clean** (0 violations, both the clean
+assembly and its `_shorted` negative control) and **LVS `status: match`** (2
+`severity: warning` `topology` findings only — the same "unused device
+class" informational notes every other cell's own clean LVS run already
+carries) against a hand-written schematic-equivalent reference
+(`lvs/gf180_tmds_pad_ring_assembly.ref.spice`, `design/netlist/cml_driver.spice`
+plus two `diode_nd2ps_06v0` `D` cards). The `_shorted` negative control
+(OUTP bridged directly to VSS) correctly reports `status: mismatch`
+(`net.merged`/`net.split` findings, plus cascading device mismatches) against
+the same reference, confirming the LVS check actually distinguishes
+connected from disconnected. `klt extract`'s own report additionally flags
+the DVDD strap's three 700x4um (~2800 um² each) Metal3/Metal4/Metal5
+rectangles (plus its via3/via4 stitches) as
+disclosed, expected "dead metal" — connected to no device or labelled net in
+this single-driver-instance increment, exactly as the Scope note above
+states.
+
+**Tool gap, friction protocol (nondeterministic LVS)**: re-running the
+*identical* `klt lvs` invocation against the unshorted assembly repeatedly
+(same GDS/reference content hash every time) intermittently — roughly 1-in-5
+runs, observed directly — flips `status` from `match` to `mismatch`, driven
+by an internal KLayout `Netlist.combine_devices()` consistency error
+(`"Internal error: Terminal still connected after removing device in device
+combination"`) that partially folds one multi-finger device before
+aborting, cascading into spurious `device.property`/`device.unmatched`
+findings against an unchanged reference. Filed generically (no design-
+specific detail) at
+[klayout-tools#1185](https://github.com/2AMLogic/klayout-tools/issues/1185).
+The committed `lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json` reflects
+one of the majority (`match`) outcomes; re-running the command above is
+expected to reproduce `match` most of the time but not always, until that
+issue is resolved upstream. The `_shorted` negative control's `mismatch`
+result is unaffected by this flakiness in practice (observed stable across
+five repeated runs) since its `net.merged`/`net.split` findings alone
+already force `status: mismatch` regardless of how `combine_devices`
+resolves.
+
+Also re-verified while assembling this block, per DR-0011's own flagged
+regression: `klt drc --deck gf180mcu` against the already-committed
+`gf180_tmds_pad_min.gds` still reports the same **8 violations**
+(`pad.enclosing.metal5.1` x4, `via{1,2,3,4}.width.1` x1 each) under the
+currently-installed `klt` build — unchanged from DR-0011's own finding, and
+still out of scope to fix here since this assembly does not build on that
+cell (it uses the diode-clamped pad structure above instead, which is
+DRC-clean under the same current deck).
 
 ## `tmds_encoder` — digital block-level place-and-route (issue #84)
 

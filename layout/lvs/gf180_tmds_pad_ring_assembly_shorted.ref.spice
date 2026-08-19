@@ -1,0 +1,17 @@
+* LVS negative control for gf180_tmds_pad_ring_assembly (issue #86):
+* checked against the SAME reference the unshorted assembly passes
+* (gf180_tmds_pad_ring_assembly.ref.spice's own topology, OUTP left
+* independent) while the *layout* now also bridges OUTP to VSS with an
+* extra Metal1/Metal2 wire (gen_pad_ring_assembly.py's `--shorted` option)
+* -- a pure connectivity defect the layout-vs-reference net count/topology
+* comparison must catch (`status: mismatch`), proving this LVS check
+* actually distinguishes connected from disconnected rather than passing
+* vacuously.
+.SUBCKT gf180_tmds_pad_ring_assembly_shorted OUTP OUTN INP INN IBIAS VSS
+M1 OUTP INP TAIL VSS nfet L=0.28U W=128U
+M2 OUTN INN TAIL VSS nfet L=0.28U W=128U
+MT TAIL IBIAS VSS VSS nfet L=0.5U W=400U
+MB IBIAS IBIAS VSS VSS nfet L=0.5U W=20U
+D1 VSS OUTP diode_nd2ps_06v0
+D2 VSS OUTN diode_nd2ps_06v0
+.ENDS gf180_tmds_pad_ring_assembly_shorted
