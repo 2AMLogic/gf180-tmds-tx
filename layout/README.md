@@ -2,6 +2,30 @@
 
 GDS, generator scripts, and DRC/LVS signoff reports.
 
+## Every LVS signoff is a pair, and the pair is enforced
+
+Each drawn cell below is signed off with **two** `klt lvs` runs: the intact
+cell, which must report `status: match`, and a deliberately-shorted twin
+(`<cell>_shorted.gds`), which must report `status: mismatch`. The second run
+is the negative control — the only evidence that the first run's `match`
+means anything at all, rather than `klt lvs` having quietly lost the ability
+to tell a short from an intact cell.
+
+That invariant is checked mechanically, not just written down here:
+
+```bash
+python3 layout/scripts/check_lvs_signoff.py --list
+```
+
+It reads the committed reports only (stdlib, no PDK, no `klt`, no KLayout),
+and runs on every PR as step 6/6 of `.github/scripts/lint.sh`. A `_shorted`
+report that says `match`, a `.json`/`.txt` pair from two runs that disagreed,
+or an intact cell's unexplained `mismatch` all fail the build. Issue #129 is
+why: an upstream extraction-deck drift silently flipped one negative control
+to `match` — a defeated control, reported by the tool as good news — and
+nothing in this repo noticed. The full episode is written up in the
+`gf180_tmds_pad_v2` section below.
+
 ## `gf180_tmds_pad_min` — minimal custom pad cell (issue #2)
 
 The program's first custom-drawn pad cell: a Metal5 bond pad wired down a
@@ -135,8 +159,12 @@ python3 scripts/gen_pad_v2.py -o gds/gf180_tmds_pad_v2_shorted.gds --shorted
 klt drc --deck gf180mcu gds/gf180_tmds_pad_v2.gds
 klt extract --deck gf180mcu gds/gf180_tmds_pad_v2.gds -o gds/gf180_tmds_pad_v2.spice
 klt extract --deck gf180mcu --parasitics --pdk gf180mcuC gds/gf180_tmds_pad_v2.gds --format json
-klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json
-klt lvs lvs/gf180_tmds_pad_v2.lvs_request_shorted.json   # expect status: mismatch (negative control)
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json --format json > lvs_reports/gf180_tmds_pad_v2.lvs.json
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json --format text > lvs_reports/gf180_tmds_pad_v2.lvs.txt
+# expect status: mismatch (negative control) from both of the next two:
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request_shorted.json --format json > lvs_reports/gf180_tmds_pad_v2_shorted.lvs.json
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request_shorted.json --format text > lvs_reports/gf180_tmds_pad_v2_shorted.lvs.txt
+python3 scripts/check_lvs_signoff.py --list   # verdicts must still be match / mismatch
 ```
 
 Signoff status: **DRC-clean** (0 violations, including the
@@ -149,13 +177,108 @@ clear both from the start), **extraction finds 20 real
 `D1 VSS PAD diode_nd2ps_06v0 A=40P P=120U` reference card, same convention
 `cml_driver_core.ref.spice` already established for folded MOS fingers).
 The `_shorted` negative control correctly reports `status: mismatch`
-against the same reference. `klt extract --parasitics` measures the real
+(4 error-severity findings: the merged `PAD|VSS` net, both reference nets
+left with no layout counterpart, and the unmatched combined `D` card).
+`klt extract --parasitics` measures the real
 `PAD`-net parasitic capacitance at **12.185 fF** (byte-identical between
 `--pdk gf180mcuC`/`gf180mcuD`, confirming DR-0010) — see
 `design/esd-capacitance-budget.md` Sec.9 for the full capacitance-budget
 verdict (clamp capacitance swept separately in SPICE,
 `sim/esd-diode-clamp-cv`, and summed with this real pad/interconnect
 figure).
+
+**Deck-drift episode: this cell's negative control was silently defeated,
+and is now re-verified (issue #129, 2026-08-19).** The `PAD`/`VSS`
+extraction claim above is not a claim that has held continuously — it broke
+and was restored upstream, and the episode is recorded here rather than
+quietly overwritten, because the way it broke is the interesting part.
+
+For a window of klayout-tools commits, the gf180mcu extraction deck bound
+`diode_nd2ps_06v0`'s anode to the deck's synthesized `substrate_net` global
+(`vsubs`) with no path for this cell's *drawn* `Pplus`/`Comp` substrate tap
+to join that same global. The anode therefore resolved to `vsubs` and this
+cell's real, labeled `VSS` tie was discarded — precisely the
+`device.body_unverified` gap the tap was drawn to close. Filed generically
+(tool-side, no design detail) at
+[klayout-tools#1196](https://github.com/2AMLogic/klayout-tools/issues/1196).
+
+The damage was not that LVS started failing. It is that LVS *stopped*
+failing where it had to: with the anode moved onto `vsubs`, the shorted
+cell extracted as two nets (`PAD|VSS`, `vsubs`) against the reference's two
+(`PAD`, `VSS`), a coincidental size match — so `klt lvs` reported
+`status: match` on a cell whose drawn geometry still shorts `PAD` to `VSS`.
+The negative control had been defeated, and it reported that as good news.
+The intact cell also passed, on three nets against the reference's two.
+
+Reproduced exactly, against the **unmodified** committed GDS, reference
+netlist, and request document — the deck is the only variable:
+
+| | broken | restored (current) |
+|---|---|---|
+| klayout-tools commit | `74a1bb0` (`e5763f3~1`) | `e5763f3` and later |
+| deck `content_hash` | `sha256:e2726af8…` | `sha256:79e71a1e…` |
+| intact cell | `match`, 3 nets/3 pins, `PAD`/`vsubs`/`VSS` | `match`, 2 nets/2 pins, `PAD`/`VSS` |
+| `_shorted` control | **`match`** (0 error findings) | `mismatch`, 4 error findings |
+
+The upstream fix is klayout-tools `e5763f3` (PR #1113, issue #1084), which
+derives the well/substrate tap from the `Nplus`/`Pplus` implants and ties it
+into the same `substrate_net` global, so a drawn tap's real net once again
+carries the anode. **No workaround was applied in this repo**: the reference
+netlist still names the anode `VSS`, because `VSS` is what the cell draws.
+Renaming it to `vsubs` to match the broken deck would have encoded a tool
+bug into the golden reference and broken the intact cell's own signoff once
+the deck was fixed. The committed reports above were re-run against the
+restored deck (`sha256:79e71a1e…`), and the broken report pair is kept as
+evidence under `tests/fixtures/klayout_tools_1196/`.
+
+Two things changed here as a result, both structural:
+
+- `scripts/check_lvs_signoff.py` (wired into `.github/scripts/lint.sh` step
+  6/6, so every PR runs it) asserts that **every** `_shorted` report is
+  still a `mismatch` carrying at least one error-severity finding, that
+  every intact report is a `match` unless explicitly allowlisted with a
+  rationale, and that each report's `.json`/`.txt` pair agrees. A committed
+  report that says a negative control passed is now a red build, not a green
+  one.
+- `tests/test_check_lvs_signoff.py` runs that guard against the captured
+  broken report pair and requires it to be rejected — so the guard itself
+  has a negative control.
+
+Neither is a substitute for re-running signoff; both exist so that the next
+deck drift has to announce itself.
+
+**Re-verifying a committed LVS report** against the currently-installed
+`klt` (cheap mode: re-hashes the layout, reference, and deck and diffs
+against what the report recorded — exit 3 on drift):
+
+```bash
+cd layout/lvs      # report paths are relative to the request document
+klt lvs --check ../lvs_reports/gf180_tmds_pad_v2.lvs.json
+klt lvs --check ../lvs_reports/gf180_tmds_pad_v2_shorted.lvs.json
+```
+
+**Do not add `--rerun`** (full mode: re-run the compare and diff the
+verdict) to either command above — it does not work for this cell in either
+direction, and its failure mode on the intact cell is misleading rather than
+loud. Full mode reconstructs the request from the report's own echoed
+fields, which record a single `top` and no `options`:
+
+- on the `_shorted` control, that one `top` is applied to both sides, so it
+  exits 1 with `top cell/subcircuit 'gf180_tmds_pad_v2_shorted' not found in
+  reference netlist` — every negative control in this repo compares a
+  `…_shorted` layout against the *intact* cell's reference netlist, so this
+  is structural, not a quirk of this cell;
+- on the intact cell, the dropped `options.combine_devices` makes it compare
+  all 20 un-folded fingers against the one combined `D1` reference card and
+  report `status: drifted` with 27 fresh mismatches — a confident,
+  detailed drift verdict about a compare nobody asked for, on evidence that
+  has not drifted at all (cheap mode on the same report says `[OK]` on all
+  three hashes).
+
+Filed generically at
+[klayout-tools#1205](https://github.com/2AMLogic/klayout-tools/issues/1205).
+Until it lands, `scripts/check_lvs_signoff.py` plus cheap-mode `--check` are
+the machine re-verification this repo relies on.
 
 **Scope**: this cell answers the capacitance-budget question at a real pad
 size with a real DR-0011-ratified clamp; it does not draw pad-ring

@@ -7,10 +7,15 @@
   "parameter_tolerance": null,
   "status": "mismatch",
   "mismatch_count": 7,
+  "error_count": 4,
   "category_counts": {
     "device.unmatched": 1,
     "net.unmatched": 3,
     "topology": 3
+  },
+  "category_error_counts": {
+    "device.unmatched": 1,
+    "net.unmatched": 3
   },
   "counts": {
     "nets": {
@@ -51,7 +56,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": null
   },
@@ -63,12 +68,15 @@
       "side": "reference",
       "net": null,
       "device": {
-        "layout": "$1",
+        "layout": "\\$1",
         "reference": "1",
         "class": "diode_nd2ps_06v0"
       },
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.unmatched",
@@ -81,7 +89,10 @@
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.unmatched",
@@ -94,7 +105,10 @@
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.unmatched",
@@ -107,7 +121,10 @@
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -117,7 +134,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -127,7 +147,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -137,7 +160,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": []
