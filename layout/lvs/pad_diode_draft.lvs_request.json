@@ -1,0 +1,4 @@
+{
+  "layout": {"file": "../gds/gf180_tmds_pad_diode_draft.gds", "deck": "gf180mcu"},
+  "reference": {"netlist": "gf180_tmds_pad_diode_draft.ref.spice", "top": "gf180_tmds_pad_diode_draft"}
+}

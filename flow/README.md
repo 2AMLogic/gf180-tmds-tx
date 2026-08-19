@@ -95,7 +95,12 @@ Synthesis and place-and-route recipes (Yosys, OpenROAD) driven through `klt`.
 From a clean checkout, with the gf180mcu PDK installed (same PDK-pinning
 convention as `sim/` -- see `sim/README.md`'s "PDK variant" and
 `sim/harness/README.md`'s "Prerequisites"; `sim/pdk.json` pins
-`gf180mcuD`, and PDK resolution here reuses `sim/harness/pdk.py` unchanged):
+`gf180mcuC` per DR-0010 (`spec/decisions/0010-pdk-variant.md`, issue #9),
+and PDK resolution here reuses `sim/harness/pdk.py` unchanged). This does
+not affect any digital-partition result already recorded under
+`flow/tmds_encoder/records/` -- DR-0010 found the standard-cell library's
+LEF/liberty are byte-identical between `gf180mcuC` and `gf180mcuD`, so only
+the citation, not the STA/PnR numbers, is stale in those records:
 
 ```bash
 python3 flow/synth_tmds_encoder.py
@@ -199,7 +204,7 @@ the authoritative convention for `flow/`'s own evidence records, mirroring
 | OpenSTA (bundled in the `openroad` binary above) | `26Q3-1278-g4421880472` for `sdf_tmds_encoder.py`'s SDF/SPEF extraction; `26Q3-1080-gab6fd26351` for `sta_tmds_encoder.py`'s timing analysis (the `openroad/orfs:latest` tag moved between the two runs -- each record cites the build it actually used, which is why the pin mechanism is the record, not this table) | recorded per-record in `tmds_encoder/records/<record-id>.md`; no separate install |
 | Icarus Verilog | 13.0, `gate_level_sim_tmds_encoder.py`'s SDF-annotated re-simulation | same pin as `verification/README.md`'s "Pinned toolchain" |
 | cocotb | 2.0.1, `gate_level_sim_tmds_encoder.py`'s SDF-annotated re-simulation | same pin as `verification/tmds_encoder/requirements.txt` |
-| gf180mcu PDK | `gf180mcuD`, open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` | `sim/pdk.json` (shared pin with the analog side) |
+| gf180mcu PDK | `gf180mcuC` (DR-0010, issue #9), open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` | `sim/pdk.json` (shared pin with the analog side) |
 | Python | 3.11+ | stdlib only -- no venv, no requirements.txt (same rule `sim/harness/README.md` states for the analog harness) |
 
 ### A `yowasp-yosys` filesystem-sandboxing gotcha

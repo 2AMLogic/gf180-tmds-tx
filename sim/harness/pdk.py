@@ -8,18 +8,22 @@ Resolution order (first hit wins):
 
 1. ``GF180_PDK_PATH``   -- absolute path to the *variant* directory
                            (the one containing ``libs.tech/``), e.g.
-                           ``~/.volare/gf180mcuD``.
-2. ``PDK_ROOT`` (+ ``PDK``, default ``gf180mcuD``) -- the conventional
+                           ``~/.volare/gf180mcuC``.
+2. ``PDK_ROOT`` (+ ``PDK``, default ``gf180mcuC``) -- the conventional
                            open_pdks / volare / OpenLane environment.
 3. ``sim/pdk.local.json`` -- machine-local override, git-ignored.
 4. ``sim/pdk.json``      -- committed defaults: variant + search roots.
 5. Built-in search roots -- volare store, open_pdks install prefixes.
 
-Ported unchanged from `2AMLogic/gf180-bandgap` (sim/harness/pdk.py) via
+Ported from `2AMLogic/gf180-bandgap` (sim/harness/pdk.py) via
 `2AMLogic/gf180-gate-driver`: PDK resolution has nothing to do with supply
 rails or transient stimulus, so neither sibling's adaptation touches this
-module, and this repo's own transient/rate-axis adaptation
+module's *logic*, and this repo's own transient/rate-axis adaptation
 (sim/harness/corners.py, sim/harness/testbench.py) does not need to either.
+The one deviation from "unchanged" is ``DEFAULT_VARIANT`` itself, below --
+this repo's own DR-0010 (`spec/decisions/0010-pdk-variant.md`, issue #9)
+pins `gf180mcuC` for this block specifically, distinct from whatever default
+either sibling repo carries for its own.
 """
 
 from __future__ import annotations
@@ -32,7 +36,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SIM_DIR = REPO_ROOT / "sim"
 
-DEFAULT_VARIANT = "gf180mcuD"
+DEFAULT_VARIANT = "gf180mcuC"
 
 # Search roots used when nothing else pins the PDK down. Each is a directory
 # that is expected to *contain* variant directories (gf180mcuA..D).
@@ -56,14 +60,14 @@ Install it with volare (recommended, ~5 GB):
 volare installs into ~/.volare/<variant> and this harness finds it there
 automatically. If your PDK lives somewhere else, point the harness at it:
 
-    export GF180_PDK_PATH=/path/to/gf180mcuD        # variant dir, contains libs.tech/
+    export GF180_PDK_PATH=/path/to/gf180mcuC        # variant dir, contains libs.tech/
     # or the conventional pair:
     export PDK_ROOT=/path/to/pdk-root
-    export PDK=gf180mcuD
+    export PDK=gf180mcuC
 
 ...or commit-free machine-local config in sim/pdk.local.json:
 
-    {"variant": "gf180mcuD", "search_roots": ["/my/pdks"]}
+    {"variant": "gf180mcuC", "search_roots": ["/my/pdks"]}
 """
 
 
@@ -75,8 +79,8 @@ class PdkNotFound(RuntimeError):
 class Pdk:
     """A located gf180mcu install."""
 
-    path: Path          # .../gf180mcuD
-    variant: str        # gf180mcuD
+    path: Path          # .../gf180mcuC
+    variant: str        # gf180mcuC
     source: str         # how we found it (for provenance in results)
 
     @property

@@ -1,0 +1,9 @@
+* Reference (schematic-equivalent) netlist for gf180_tmds_pad_diode_draft
+* (issue #9, DR-0011's diode-clamp extraction verification).
+* diode_nd2ps_06v0 ESD clamp: cathode=PAD, anode=substrate (vsubs).
+* Plain-element form per klt lvs's schematic-equivalent contract
+* (docs/cli/extract.md "Junction diodes (issue #542)": a D card naming the
+* klt-curated device class "diode_nd2ps_06v0" directly, anode first).
+.SUBCKT gf180_tmds_pad_diode_draft PAD vsubs
+D1 vsubs PAD diode_nd2ps_06v0
+.ENDS gf180_tmds_pad_diode_draft

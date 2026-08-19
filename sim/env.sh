@@ -5,7 +5,7 @@
 # runner uses. Safe to source from any directory.
 #
 #   PDK_ROOT                 parent of the variant dir (open_pdks convention)
-#   PDK                      variant, e.g. gf180mcuD
+#   PDK                      variant, e.g. gf180mcuC (DR-0010, issue #9)
 #   GF180_PDK_PATH           the variant dir itself
 #   GF180_MODELS             libs.tech/ngspice (design.ngspice, sm141064.ngspice)
 #   XSCHEM_USER_LIBRARY_PATH repo symbol/testbench dirs, honoured by the PDK xschemrc

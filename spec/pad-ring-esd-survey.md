@@ -1,8 +1,13 @@
 # gf180mcu pad-ring / ESD survey, and a minimal custom pad signoff
 
 Status: informational survey + first layout evidence, for issue #2. Not a
-decision record — the driver's final pad topology decision belongs to #1
-("Ratify the target spec"), which should draw on the findings here.
+decision record. The driver's final pad topology decision was originally
+pointed at #1 ("Ratify the target spec"), but #1 closed before this survey
+landed — that pointer was dangling. It has been picked up instead by
+**DR-0011** (`spec/decisions/0011-pad-esd-strategy.md`, issue #9), which
+rules on the clamp device, pad pitch/ring depth, DVDD/DVSS ring continuity,
+and substrate-tap questions this survey raises in §8, drawing directly on
+the findings below.
 
 This document does two things:
 

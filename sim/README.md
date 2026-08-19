@@ -34,44 +34,48 @@ fields, both called out explicitly below.
 
 ## PDK variant
 
-`sim/pdk.json` pins `gf180mcuD`, matching the variant `spec/tmds-tx.md`'s
-ratified decision records cite (DR-0002, DR-0005: `libs.tech/ngspice/
-sm141064.ngspice`, `gf180mcuD` / open_pdks `c6d73a35f524070e85faff4a6a9eef
-49553ebc2b`). **This is a pin, not a resolution of an open discrepancy**:
-`spec/pad-ring-esd-survey.md`'s preamble records that all of this repo's
-*existing layout evidence* (the DRC/LVS reports and GDS under `layout/` from
-issue #2) was produced against `~/.volare/gf180mcuC` — variant `gf180mcuC`,
-the *same* open_pdks commit but a different variant letter. gf180mcuA–D are
-documented to differ in metal stack; whether that difference matters for
-this block's devices/models (as opposed to layout) is not established here.
+`sim/pdk.json` pins `gf180mcuC`, per **DR-0010**
+(`spec/decisions/0010-pdk-variant.md`, issue #9), which resolved this
+section's previously-open `gf180mcuC`-vs-`gf180mcuD` discrepancy: `gf180mcuC`
+matches every layout artifact already committed under `layout/` (from issue
+#2 onward) and is the conservative (thinner, 0.9 um, top-metal) assumption
+for pad ESD margin. `spec/tmds-tx.md`'s DR-0002 citation of `gf180mcuD` is
+now qualified by DR-0010's Status-line note (DR-0005's own `gf180mcuD`
+citation is superseded in full, via DR-0011).
 
-**This is an open question owned by issue #9**, which rules on the PDK
-variant discrepancy as part of ratifying the PVT matrix (DR-0009, see
-below). Until #9 rules, every simulation-side record produced by this
-harness cites `gf180mcuD` (this file's pin); every layout-side artifact
-under `layout/` continues to cite `gf180mcuC` (unchanged by this issue,
-which does not touch `layout/`). A reader comparing a `sim/` record against
-a `layout/` DRC/LVS report should be aware the two were taken against
-different PDK variants until #9 resolves this.
+**This pin changes no numeric result already recorded by this harness.**
+DR-0010's own survey diffed both variants directly: `libs.tech/ngspice/`
+(the SPICE device models every `sim/` record actually reads) is
+byte-for-byte identical between `gf180mcuC` and `gf180mcuD`, and the Metal5
+parasitic-capacitance coefficients `design/esd-capacitance-budget.md`'s
+figures were computed from are likewise identical. The two variants differ
+*only* in Metal5 (top-metal) width/spacing/area DRC thresholds and sheet
+resistance — a layout-side concern, not a SPICE-model-side one. So every
+`sim/*/records/*.md` record minted before this pin landed, which still
+cites `gf180mcuD` in its own Environment/provenance section, remains valid
+evidence for the number it reports — only its citation string is stale, per
+this directory's own append-only convention (a correction references what
+it supersedes rather than rewriting history in place). New records should
+cite `gf180mcuC`, matching this file's pin, going forward.
 
-## The PVT matrix (working default, pending #9 ratification)
+## The PVT matrix (ratified — DR-0013)
 
-`spec/tmds-tx.md` does not state an operating temperature range, a supply
-tolerance, or a process-corner list — DR-0004's jitter budget derivation and
-DR-0005's ESD/capacitance targets do not require one, and no other decision
-record in that file fixes one either. **No PVT matrix is derivable from the
-ratified spec today.**
-
-This harness therefore ports `2AMLogic/gf180-bandgap`'s committed matrix
-verbatim as the working default — −40/27/125 °C, ±10% supply, the five
-classic MOS corners plus resistor/BJT skews (`sim/harness/corners.py`) — the
-same defaults `matrix_conformance()` enforces below. **This is a working
-default pending ratification, not a spec-derived requirement**: issue #9
-owns ratifying the PVT matrix as DR-0009. Do not narrow this matrix to make
-runs cheaper before #9 rules; every record in this repo mints evidence
-against the full matrix above unless it states a subset justification (see
+**DR-0013** (`spec/decisions/0013-operating-conditions.md`, issue #9)
+ratifies exactly the matrix this harness already used as a working default:
+**−40/27/125 °C, ±10% supply, the five classic MOS corners** (`tt`/`ff`/
+`ss`/`fs`/`sf`) as the minimum for every recorded result, **plus
+resistor/BJT skews** (`res_ff`/`res_ss`/`bjt_ff`/`bjt_ss`,
+`sim/harness/corners.py`'s `full` corner set) required specifically for any
+claim depending on resistor or BJT device parameters — the same defaults
+`matrix_conformance()` enforces below. This is now a **spec-derived
+requirement**, not merely a working default: do not narrow this matrix to
+make runs cheaper; every record in this repo mints evidence against the
+full matrix above unless it states a subset justification (see
 "Append-only rule" below), and a narrower default would silently weaken
-every future record's PVT coverage.
+every future record's PVT coverage. DR-0013 also fixes the nominal
+supply/tolerance for both this block's own 3.3 V domain and the
+receiver-side termination rail (`AVCC`) — see that record for the full
+table, and its enumerated pass/fail spec rows.
 
 ## The bit-rate axis
 
