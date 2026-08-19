@@ -11,7 +11,9 @@ name: CI
 # | RTL encoder + cocotb bench + negative control | iverilog/yosys/cocotb | `tmds-encoder-verification` |
 # | `.github/scripts/lint.sh`                     | python3      | `lint` (here)  |
 # | evidence-record format + append-only          | python3+git  | `lint` (here)  |
+# | LVS signoff verdicts + negative controls      | python3      | `lint` (here)  |
 # | testbench manifests load (`--list`)           | python3      | `test` (here)  |
+# | LVS signoff-guard unit tests (layout/tests)   | python3      | `test` (here)  |
 #
 # Deliberate exclusion: actually *running* the PVT (x rate) sweep needs
 # ngspice and the gf180mcu PDK, neither of which belongs on the
@@ -120,6 +122,14 @@ jobs:
 
       - name: Harness unit tests (no PDK, no ngspice required)
         run: python3 -m unittest discover -s sim/tests -v
+
+      - name: LVS signoff-guard unit tests (no PDK, no klt required)
+        # Covers layout/scripts/check_lvs_signoff.py, including the captured
+        # klayout-tools#1196 report pair (layout/tests/fixtures/) in which a
+        # deliberately-shorted negative control reported `status: match`.
+        # The guard must reject that pair; if this test stops failing on it,
+        # the guard has stopped guarding (issue #129).
+        run: python3 -m unittest discover -s layout/tests -v
 
       - name: Environment check (informational -- no PDK on this runner)
         # sim/harness/README.md's documented contract: --check-env exits 3

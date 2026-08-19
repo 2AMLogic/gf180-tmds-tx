@@ -58,7 +58,7 @@ collect() {
   done < <(git ls-files -z -- "$1" ':!:.loom/**' ':!:.claude/**' ':!:loom.sh')
 }
 
-echo "== 1/5 shellcheck (shell scripts) =="
+echo "== 1/6 shellcheck (shell scripts) =="
 collect '*.sh'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no shell scripts tracked"
@@ -76,7 +76,7 @@ else
 fi
 
 echo
-echo "== 2/5 python syntax =="
+echo "== 2/6 python syntax =="
 collect '*.py'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no python files tracked"
@@ -91,7 +91,7 @@ else
 fi
 
 echo
-echo "== 3/5 json well-formedness =="
+echo "== 3/6 json well-formedness =="
 collect '*.json'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no json files tracked"
@@ -120,7 +120,7 @@ sys.exit(1 if bad else 0)
 fi
 
 echo
-echo "== 4/5 generated DUT freshness (layout/sim) =="
+echo "== 4/6 generated DUT freshness (layout/sim) =="
 # layout/sim/cml_driver_core_dut.spice is mechanically derived from the
 # LVS-signed-off extracted netlist layout/gds/cml_driver_core.spice (model
 # binding, vsubs->VSS body tie, wrapper pin order) and is committed so an
@@ -135,7 +135,7 @@ if ! python3 layout/scripts/gen_cml_driver_core_dut.py --check; then
 fi
 
 echo
-echo "== 5/5 evidence records (sim/*/records) =="
+echo "== 5/6 evidence records (sim/*/records) =="
 # The schema in sim/README.md -- required fields (including the
 # conditionally-required Operating point / Transient settings pair for a
 # rate-bearing record), <record-id> naming, the corner-id grammar (including
@@ -145,6 +145,23 @@ echo "== 5/5 evidence records (sim/*/records) =="
 # --require-append-only) where that ref does not resolve.
 if ! python3 sim/check_records.py ${EVIDENCE_ARGS[@]+"${EVIDENCE_ARGS[@]}"}; then
   echo "FAIL: evidence records"
+  status=1
+fi
+
+echo
+echo "== 6/6 LVS signoff verdicts (layout/lvs_reports) =="
+# Every drawn cell is signed off with a pair of `klt lvs` runs: the intact
+# cell (must `match`) and its deliberately-shorted twin (must `mismatch`).
+# The second is the negative control -- the only evidence the first one's
+# `match` means anything. Issue #129: a drift in the installed klt's
+# extraction deck (klayout-tools#1196) silently flipped one `_shorted`
+# control to `match`, and nothing noticed, because a committed report saying
+# `match` looks like good news. Enforced here instead of merely documented:
+# a negative control that stops failing fails the build. No PDK, no klt, no
+# klayout -- reads the committed reports only.
+if ! python3 layout/scripts/check_lvs_signoff.py; then
+  echo "FAIL: LVS signoff verdicts"
+  echo "  inspect with: python3 layout/scripts/check_lvs_signoff.py --list"
   status=1
 fi
 
