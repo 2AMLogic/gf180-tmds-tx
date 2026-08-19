@@ -1,0 +1,136 @@
+* extracted by klt extract --deck gf180mcu
+* parasitic model (--parasitics):
+* - capacitance: net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net
+* - coupling: vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled
+* - resistance: single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star
+* - frequency: quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior
+
+* cell gf180_tmds_pad_v2
+* pin PAD
+* pin VSS
+.SUBCKT gf180_tmds_pad_v2 PAD VSS
+* device instance $1 r0 *1 1,0.5 diode_nd2ps_06v0
+D$1 VSS__t0 PAD__t0 diode_nd2ps_06v0 A=2P P=6U
+* device instance $2 r0 *1 3.6,0.5 diode_nd2ps_06v0
+D$2 VSS__t1 PAD__t1 diode_nd2ps_06v0 A=2P P=6U
+* device instance $3 r0 *1 6.2,0.5 diode_nd2ps_06v0
+D$3 VSS__t2 PAD__t2 diode_nd2ps_06v0 A=2P P=6U
+* device instance $4 r0 *1 8.8,0.5 diode_nd2ps_06v0
+D$4 VSS__t3 PAD__t3 diode_nd2ps_06v0 A=2P P=6U
+* device instance $5 r0 *1 11.4,0.5 diode_nd2ps_06v0
+D$5 VSS__t4 PAD__t4 diode_nd2ps_06v0 A=2P P=6U
+* device instance $6 r0 *1 14,0.5 diode_nd2ps_06v0
+D$6 VSS__t5 PAD__t5 diode_nd2ps_06v0 A=2P P=6U
+* device instance $7 r0 *1 16.6,0.5 diode_nd2ps_06v0
+D$7 VSS__t6 PAD__t6 diode_nd2ps_06v0 A=2P P=6U
+* device instance $8 r0 *1 19.2,0.5 diode_nd2ps_06v0
+D$8 VSS__t7 PAD__t7 diode_nd2ps_06v0 A=2P P=6U
+* device instance $9 r0 *1 21.8,0.5 diode_nd2ps_06v0
+D$9 VSS__t8 PAD__t8 diode_nd2ps_06v0 A=2P P=6U
+* device instance $10 r0 *1 24.4,0.5 diode_nd2ps_06v0
+D$10 VSS__t9 PAD__t9 diode_nd2ps_06v0 A=2P P=6U
+* device instance $11 r0 *1 27,0.5 diode_nd2ps_06v0
+D$11 VSS__t10 PAD__t19 diode_nd2ps_06v0 A=2P P=6U
+* device instance $12 r0 *1 29.6,0.5 diode_nd2ps_06v0
+D$12 VSS__t11 PAD__t10 diode_nd2ps_06v0 A=2P P=6U
+* device instance $13 r0 *1 32.2,0.5 diode_nd2ps_06v0
+D$13 VSS__t12 PAD__t11 diode_nd2ps_06v0 A=2P P=6U
+* device instance $14 r0 *1 34.8,0.5 diode_nd2ps_06v0
+D$14 VSS__t13 PAD__t12 diode_nd2ps_06v0 A=2P P=6U
+* device instance $15 r0 *1 37.4,0.5 diode_nd2ps_06v0
+D$15 VSS__t14 PAD__t13 diode_nd2ps_06v0 A=2P P=6U
+* device instance $16 r0 *1 40,0.5 diode_nd2ps_06v0
+D$16 VSS__t15 PAD__t14 diode_nd2ps_06v0 A=2P P=6U
+* device instance $17 r0 *1 42.6,0.5 diode_nd2ps_06v0
+D$17 VSS__t16 PAD__t15 diode_nd2ps_06v0 A=2P P=6U
+* device instance $18 r0 *1 45.2,0.5 diode_nd2ps_06v0
+D$18 VSS__t17 PAD__t16 diode_nd2ps_06v0 A=2P P=6U
+* device instance $19 r0 *1 47.8,0.5 diode_nd2ps_06v0
+D$19 VSS__t18 PAD__t17 diode_nd2ps_06v0 A=2P P=6U
+* device instance $20 r0 *1 50.4,0.5 diode_nd2ps_06v0
+D$20 VSS__t19 PAD__t18 diode_nd2ps_06v0 A=2P P=6U
+* device instance PAD_t0 r0 *1 0,0 
+RPAD_t0 PAD__t0 PAD 0.9861
+* device instance PAD_t1 r0 *1 0,0 
+RPAD_t1 PAD__t1 PAD 0.8823
+* device instance PAD_t2 r0 *1 0,0 
+RPAD_t2 PAD__t2 PAD 0.7785
+* device instance PAD_t3 r0 *1 0,0 
+RPAD_t3 PAD__t3 PAD 0.6747
+* device instance PAD_t4 r0 *1 0,0 
+RPAD_t4 PAD__t4 PAD 0.5709
+* device instance PAD_t5 r0 *1 0,0 
+RPAD_t5 PAD__t5 PAD 0.4671
+* device instance PAD_t6 r0 *1 0,0 
+RPAD_t6 PAD__t6 PAD 0.3633
+* device instance PAD_t7 r0 *1 0,0 
+RPAD_t7 PAD__t7 PAD 0.2595
+* device instance PAD_t8 r0 *1 0,0 
+RPAD_t8 PAD__t8 PAD 0.1557
+* device instance PAD_t9 r0 *1 0,0 
+RPAD_t9 PAD__t9 PAD 0.0519
+* device instance PAD_t10 r0 *1 0,0 
+RPAD_t10 PAD__t10 PAD 0.1557
+* device instance PAD_t11 r0 *1 0,0 
+RPAD_t11 PAD__t11 PAD 0.2595
+* device instance PAD_t12 r0 *1 0,0 
+RPAD_t12 PAD__t12 PAD 0.3633
+* device instance PAD_t13 r0 *1 0,0 
+RPAD_t13 PAD__t13 PAD 0.4671
+* device instance PAD_t14 r0 *1 0,0 
+RPAD_t14 PAD__t14 PAD 0.5709
+* device instance PAD_t15 r0 *1 0,0 
+RPAD_t15 PAD__t15 PAD 0.6747
+* device instance PAD_t16 r0 *1 0,0 
+RPAD_t16 PAD__t16 PAD 0.7785
+* device instance PAD_t17 r0 *1 0,0 
+RPAD_t17 PAD__t17 PAD 0.8823
+* device instance PAD_t18 r0 *1 0,0 
+RPAD_t18 PAD__t18 PAD 0.9861
+* device instance PAD_t19 r0 *1 0,0 
+RPAD_t19 PAD__t19 PAD 0.0519
+* device instance PAD r0 *1 0,0 
+CPAD PAD vsubs 1.2185218e-14
+* device instance VSS_t0 r0 *1 0,0 
+RVSS_t0 VSS__t0 VSS 0.00855
+* device instance VSS_t1 r0 *1 0,0 
+RVSS_t1 VSS__t1 VSS 0.00765
+* device instance VSS_t2 r0 *1 0,0 
+RVSS_t2 VSS__t2 VSS 0.00675
+* device instance VSS_t3 r0 *1 0,0 
+RVSS_t3 VSS__t3 VSS 0.00585
+* device instance VSS_t4 r0 *1 0,0 
+RVSS_t4 VSS__t4 VSS 0.00495
+* device instance VSS_t5 r0 *1 0,0 
+RVSS_t5 VSS__t5 VSS 0.00405
+* device instance VSS_t6 r0 *1 0,0 
+RVSS_t6 VSS__t6 VSS 0.00315
+* device instance VSS_t7 r0 *1 0,0 
+RVSS_t7 VSS__t7 VSS 0.00225
+* device instance VSS_t8 r0 *1 0,0 
+RVSS_t8 VSS__t8 VSS 0.00135
+* device instance VSS_t9 r0 *1 0,0 
+RVSS_t9 VSS__t9 VSS 0.001
+* device instance VSS_t10 r0 *1 0,0 
+RVSS_t10 VSS__t10 VSS 0.001
+* device instance VSS_t11 r0 *1 0,0 
+RVSS_t11 VSS__t11 VSS 0.00135
+* device instance VSS_t12 r0 *1 0,0 
+RVSS_t12 VSS__t12 VSS 0.00225
+* device instance VSS_t13 r0 *1 0,0 
+RVSS_t13 VSS__t13 VSS 0.00315
+* device instance VSS_t14 r0 *1 0,0 
+RVSS_t14 VSS__t14 VSS 0.00405
+* device instance VSS_t15 r0 *1 0,0 
+RVSS_t15 VSS__t15 VSS 0.00495
+* device instance VSS_t16 r0 *1 0,0 
+RVSS_t16 VSS__t16 VSS 0.00585
+* device instance VSS_t17 r0 *1 0,0 
+RVSS_t17 VSS__t17 VSS 0.00675
+* device instance VSS_t18 r0 *1 0,0 
+RVSS_t18 VSS__t18 VSS 0.00765
+* device instance VSS_t19 r0 *1 0,0 
+RVSS_t19 VSS__t19 VSS 0.00855
+* device instance VSS r0 *1 0,0 
+CVSS VSS vsubs 1.09321e-16
+.ENDS gf180_tmds_pad_v2

@@ -99,6 +99,70 @@ the original survey measured against the pre-#542 deck), and **LVS-clean**
 reference). See `spec/decisions/0011-pad-esd-strategy.md` for the full
 decision this verification supports.
 
+## `gf180_tmds_pad_v2` — realistic-pad-size, diode-clamped pad redesign (issue #87)
+
+Redesign of `gf180_tmds_pad_min` against the DR-0005/DR-0011 ≤2 pF
+pad-capacitance budget (`design/esd-capacitance-budget.md` Sec.9). Three
+changes relative to `gf180_tmds_pad_min`/`gf180_tmds_pad_diode_draft`: a
+real 25×25 µm Metal5 bond pad (the `gf180mcu_fd_io` I/O library's own
+established bond-pad-opening size — both prior cells drew a tiny
+via-landing or placeholder-sized pad only), a DR-0011-ratified
+`diode_nd2ps_06v0` clamp drawn as a 20-finger array (cathodes tied together
+on `PAD`, anodes on the deck's substrate global), and a real substrate tap
+(`Pplus`-covered `Comp` outside every `Nwell`, tied to a real `VSS` net) —
+closing DR-0011's flagged `device.body_unverified` gap: `klt extract`'s net
+list for this cell is `PAD`/`VSS`, both real pins, no anonymous `vsubs`.
+
+```
+scripts/gen_pad_v2.py                   generator (klayout.db, no PDK-PCell dependency)
+gds/gf180_tmds_pad_v2.gds               the redesigned pad cell
+gds/gf180_tmds_pad_v2_shorted.gds       LVS negative control (PAD shorted to VSS)
+gds/gf180_tmds_pad_v2.spice             klt extract's schematic-equivalent netlist
+drc_reports/gf180_tmds_pad_v2{,_shorted}.drc.{json,txt}   klt drc reports
+drc_reports/gf180_tmds_pad_v2.extract.json                klt extract report
+drc_reports/gf180_tmds_pad_v2.parasitics.json              klt extract --parasitics report
+lvs_reports/gf180_tmds_pad_v2{,_shorted}.lvs.{json,txt}    klt lvs reports
+lvs/gf180_tmds_pad_v2.ref.spice             hand-written reference netlist for LVS
+lvs/gf180_tmds_pad_v2.lvs_request{,_shorted}.json          klt lvs request documents
+```
+
+Regenerate and re-run signoff:
+
+```bash
+cd layout
+python3 scripts/gen_pad_v2.py -o gds/gf180_tmds_pad_v2.gds
+python3 scripts/gen_pad_v2.py -o gds/gf180_tmds_pad_v2_shorted.gds --shorted
+klt drc --deck gf180mcu gds/gf180_tmds_pad_v2.gds
+klt extract --deck gf180mcu gds/gf180_tmds_pad_v2.gds -o gds/gf180_tmds_pad_v2.spice
+klt extract --deck gf180mcu --parasitics --pdk gf180mcuC gds/gf180_tmds_pad_v2.gds --format json
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json
+klt lvs lvs/gf180_tmds_pad_v2.lvs_request_shorted.json   # expect status: mismatch (negative control)
+```
+
+Signoff status: **DRC-clean** (0 violations, including the
+`pad.enclosing.metal5.1`/`via*.width.1` rules DR-0011 flagged as a
+regression on the older `gf180_tmds_pad_min` cell — this cell is sized to
+clear both from the start), **extraction finds 20 real
+`diode_nd2ps_06v0` devices** on 2 real nets (`PAD`, `VSS` — no
+`body_unverified` warning), and **LVS-clean** (`status: match`, via
+`options.combine_devices` folding the 20-finger array back to one combined
+`D1 VSS PAD diode_nd2ps_06v0 A=40P P=120U` reference card, same convention
+`cml_driver_core.ref.spice` already established for folded MOS fingers).
+The `_shorted` negative control correctly reports `status: mismatch`
+against the same reference. `klt extract --parasitics` measures the real
+`PAD`-net parasitic capacitance at **12.185 fF** (byte-identical between
+`--pdk gf180mcuC`/`gf180mcuD`, confirming DR-0010) — see
+`design/esd-capacitance-budget.md` Sec.9 for the full capacitance-budget
+verdict (clamp capacitance swept separately in SPICE,
+`sim/esd-diode-clamp-cv`, and summed with this real pad/interconnect
+figure).
+
+**Scope**: this cell answers the capacitance-budget question at a real pad
+size with a real DR-0011-ratified clamp; it does not draw pad-ring
+continuity straps (DVDD/DVSS at DR-0011's 350/75 µm pitch) or a second
+(P-toward-VDD) clamp leg — both are block-level pad-ring assembly concerns
+(issue #86's scope, coordinated with, not duplicated, here).
+
 ## `cml_driver_core` — CML output driver core cell (issue #22)
 
 The differential switch pair (M1/M2) + tail current source (MT) + 1:20

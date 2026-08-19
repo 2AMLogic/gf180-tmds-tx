@@ -1,11 +1,34 @@
-# ESD clamp sizing vs. the DR-0005 capacitance budget — a measurement study
+# ESD clamp sizing vs. the DR-0005/DR-0011 capacitance budget — a measurement study
 
-Status: measurement study for issue #12, per the 2026-08-14 operator ruling
-on that issue. **Not a decision record and makes no change to `spec/`.**
-Per the operator's explicit guardrail, if the two targets this document
-validates prove incompatible, the trade-off is reported here with its
-evidence and returned to the operator — this document does not revise
-DR-0005 (or any other decision record) to make the numbers work.
+Status: measurement study, originally for issue #12 (2026-08-14 operator
+ruling on that issue), **redesigned and re-measured for issue #87**
+(2026-08-19) against DR-0011's ratified pad/ESD strategy. **Not a decision
+record and makes no change to `spec/`.** Per the original operator
+guardrail (still honoured here — issue #87's own guardrails restate it: "no
+spec edits"), this document reports whatever the real, measured numbers say
+and does not revise DR-0005/DR-0011 to make them work; it happens that,
+once a real-size pad and a real DR-0011-ratified diode clamp are actually
+drawn and measured (Sec.9), the numbers close the budget on their own —
+that is a measurement result, not a relaxation.
+
+**2026-08-19 (issue #87) headline correction, read this first**: Sec.4b's
+original "realistic 25×25 µm pad" figure below — reported as **6.36–7.13
+pF**, driving the document's original **7.95 pF** total and its "no
+intersection" verdict — carried a **units-label error**: the arithmetic
+itself (in `aF`, the PDK tech file's own native unit) was correct, but its
+final line divided by 1,000 (`aF`→`fF`) and then wrote the answer as
+**`pF`** instead of `fF`, overstating every headline figure in Sec.4b/5 by
+**exactly 1000×**. **Sec.9.1** below shows the correct arithmetic and an
+independent, real `klt extract --parasitics` measurement against an
+actually-drawn 25×25 µm Metal5 pad (not available when this document was
+first written) that confirms the corrected value to within 0.02%: the real
+figure is **6.36–7.13 fF** (0.00636–0.00713 pF), not pF — roughly three
+orders of magnitude *under* the 2 pF budget, not 3.2–3.6× over it. Sections
+0–8 below are preserved verbatim as the historical record of that
+measurement study and its (mistaken) conclusion; they are superseded by
+Sec.9's correction and redesign, not deleted, per this directory's
+evidentiary conventions. **Sec.9 is this document's current, authoritative
+verdict** — read it for the issue #87 redesign result.
 
 ## 0. What this document answers, and what it does not
 
@@ -48,6 +71,13 @@ survey.md` §4 flags this explicitly), the two targets *do* coexist with
 large margin. **The honest, realistic-pad-size reading is a "no
 intersection" result, and per the guardrail it is reported here rather
 than used to revise DR-0005.**
+
+> **Superseded 2026-08-19 (issue #87) — this verdict was a units-label bug,
+> not a real result.** "6.4–7.1 pF" above should read "6.4–7.1 **fF**"; see
+> the header correction and Sec.9.1 for the arithmetic and an independent
+> real-tool measurement confirming it. The realistic-pad-size reading is,
+> correctly measured, a **large-margin PASS**, not a "no intersection" —
+> Sec.9 is the current verdict.
 
 ## 1. Establishing the simulatable device (blocking step, per the issue)
 
@@ -420,6 +450,24 @@ per `libs.tech/magic/gf180mcuD.tech`'s three named process corners:
 capacitance at all**, and this is a lower bound against the PDK's own
 reference multi-layer bond-pad structure.
 
+> **Correction, 2026-08-19 (issue #87): units-label error, not a real
+> result.** Every number in the table and the paragraph above is
+> mislabelled by exactly 1000×. The arithmetic is right *in `aF`* — e.g.
+> "625×5.798 + 100×30.386 = 6662.9 aF" is correct — but the line then
+> divides by 1,000 (the correct `aF`→`fF` step) and writes the result as
+> **`pF`**. `6662.9 aF ÷ 1000 = 6.6629 **fF**` (0.0066629 pF), not "6.66
+> pF". The same slip repeats for all three corners and for the "6.4–7.1
+> pF"/"3.2–3.6×" summary above: it should read **6.4–7.1 fF**, roughly
+> **300×  *under*** the 2 pF budget, not 3.2–3.6× over it. Confirmed two
+> independent ways in Sec.9.1: by re-deriving the same `aF`→`fF` arithmetic
+> `klt` used correctly one paragraph earlier in Sec.4a's own cross-check
+> (which this table's final line failed to copy), and by an actual
+> `klt extract --parasitics` run against a real, drawn 25×25 µm Metal5
+> square (not available to draw against when this section was first
+> written, since no realistic-size pad geometry existed yet) —
+> `6.66235 fF`, matching the corrected nominal-corner hand figure to
+> 0.02%.
+
 ## 5. Budget split and verdict
 
 Total pad-node capacitance = clamp (§3, operating-bias-graded,
@@ -465,6 +513,21 @@ directly: DR-0005's ≤2 pF figure may need to be revisited against what a
 real bond pad actually costs, independent of any ESD-clamp trade-off,
 rather than as a clamp-vs-capacitance trade-off. That recommendation is
 offered here as input; per the guardrail, this document does not act on it.
+
+> **Correction, 2026-08-19 (issue #87): the "Fails by 5.95 pF" row above
+> inherits Sec.4b's units-label bug.** With the pad-parasitic term corrected
+> to fF (Sec.4b's callout, Sec.9.1), the realistic-bond-pad row's total is
+> **0.240–0.822 pF** (dominated entirely by the clamp; the pad-parasitic
+> term, 0.0000064–0.0000071 pF, is negligible against it) — comfortably
+> *inside* the 2 pF budget, with 1.18–1.76 pF of headroom (59–88%), not a
+> "no intersection". The two DR-0005 targets *do* coexist at a realistic
+> pad size, on this GGNMOS clamp's own already-real, already-PVT-swept
+> numbers (Sec.3) — no clamp resizing or GGNMOS-vs-diode substitution
+> needed to reach that conclusion; §3's own numbers already supported it,
+> it was Sec.4b's arithmetic-label error alone that hid it. Sec.9 re-derives
+> this cleanly against the issue #87 redesign (a real 25×25 µm pad, DR-0011's
+> ratified diode clamp instead of this GGNMOS, and a real substrate tap) and
+> is this document's authoritative, current verdict.
 
 ## 6. `klt` coverage limitations relevant to this result
 
@@ -531,3 +594,304 @@ issue #12. This document does not revise DR-0005, does not open a new
 decision-record issue on its own authority, and explicitly recommends (§5)
 that the pad-vs-clamp trade-off this finding implies be routed back to the
 operator as input, not decided here.
+
+*(Sections 0–8 above are the original issue-#12 measurement study and are
+preserved verbatim as historical evidence, per this repository's
+append-only-evidence convention — corrected in place only where a callout
+is inserted, never silently rewritten. Section 9 below is issue #87's
+redesign against DR-0011 and supersedes Sections 0–8's verdict; it does
+not touch `spec/` either.)*
+
+## 9. Issue #87 redesign: a real 25×25 µm pad, DR-0011's diode clamp, and the corrected verdict
+
+DR-0010 (`spec/decisions/0010-pdk-variant.md`, PDK variant `gf180mcuC`) and
+DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`, clamp device
+`diode_nd2ps_06v0`/`diode_pd2nw_06v0`, 350/75 µm pad pitch, ring continuity
+and a real substrate tap required) both ratified 2026-08-19 via #9/PR #122,
+closing the blocker this issue previously carried. This section redesigns
+the pad/ESD structure against those rulings and re-measures the capacitance
+budget the same way Sections 1–5 above did (clamp capacitance via SPICE AC
+sweep at 0 V/operating bias across the full PVT matrix; pad/interconnect
+parasitic capacitance via `klt extract --parasitics` against real, drawn
+geometry) — reproducing the existing methodology at a corrected geometry,
+not inventing a new one.
+
+### 9.1. The units-label correction, independently confirmed
+
+Sec.4b's original analytic "realistic 25×25 µm pad" figure (6.36–7.13 pF)
+was computed correctly in `aF` (the PDK tech file's own native unit,
+confirmed in Sec.4a's own already-correct cross-check) but its final line
+divided by only 1,000 (`aF`→`fF`) while labelling the result `pF` — a
+1000× overstatement. Two independent checks confirm the corrected value:
+
+1. **Re-derived arithmetic**, same coefficients, same method: for the
+   nominal corner, `625 µm² × 5.798 aF/µm² + 100 µm × 30.386 aF/µm =
+   6662.9 aF = 6.6629 fF` (not `6.66 pF`).
+2. **A real `klt extract --parasitics` measurement** against an actually
+   drawn 25×25 µm Metal5 square (a bare plate, no clamp, no via stack —
+   `/tmp/capcheck/test_pad25.gds` in this run, reproducible from any
+   25×25 µm Metal5 rectangle):
+
+   ```
+   $ klt extract --deck gf180mcu --parasitics --pdk gf180mcuC test_pad25.gds --format json
+   ...
+   "parasitics": {"nets": [{"net": "PAD", "capacitance_ff": 6.66235, ...}]}
+   ```
+
+   `6.66235 fF` against the corrected hand figure of `6.6629 fF` — a 0.02%
+   agreement, the same kind of cross-validation Sec.4a already used to
+   validate the coefficient table in the first place. Re-run against
+   `--pdk gf180mcuD` returns the same `6.66235 fF` — confirming DR-0010's
+   claim that the two PDK variants' parasitic-capacitance coefficients are
+   byte-identical (only Metal5 width/space/sheet-resistance *DRC*
+   thresholds differ between them, not this SPICE/parasitics-relevant
+   table).
+
+This alone flips Sec.5's headline verdict from "fails by 5.95 pF" to
+"passes with 1.18–1.76 pF of headroom" **without changing the clamp or the
+pad geometry at all** — see the Sec.0/4b/5 correction callouts. The
+remainder of this section goes further: it draws the real pad and the
+DR-0011-ratified clamp DR-0005 originally specified, rather than resting
+the redesign on a units correction to someone else's drawing.
+
+### 9.2. Redesigned cell: `gf180_tmds_pad_v2`
+
+`layout/scripts/gen_pad_v2.py` → `layout/gds/gf180_tmds_pad_v2.gds`. Three
+changes relative to `gf180_tmds_pad_min` (issue #2) and
+`gf180_tmds_pad_diode_draft` (issue #9/DR-0011's verification draft):
+
+1. **A real 25×25 µm Metal5 bond pad** — the `gf180mcu_fd_io` I/O
+   library's own established bond-pad-opening size (Sec.4b's own citation),
+   drawn for real for the first time (both prior cells drew a
+   via-landing-sized or placeholder-sized pad only), with a `pad.enclosing.
+   metal5.1`-clearing 2.5 µm opening margin.
+2. **A `diode_nd2ps_06v0` clamp**, per DR-0011's ratified device choice —
+   a 20-finger array (each finger 2.0×1.0 µm, DR-0011's own draft finger
+   geometry), all 20 cathodes tied to `PAD` through a shared Metal1 bus, all
+   20 anodes sharing the deck's `substrate_net` global. This is a real,
+   DRC/LVS-provable multi-finger structure, not yet the final HBM-2kV-sized
+   clamp — Sec.9.4 sizes the full clamp the same way Sec.1–3 sized the
+   GGNMOS (a SPICE sweep over total periphery, not a bigger drawn layout),
+   which is why the committed cell's own aggregate periphery (120 µm) is
+   smaller than the 222–667 µm HBM-sizing window discussed below.
+3. **A real substrate tap** (`Pplus`-covered `Comp` outside every `Nwell`,
+   tied to Metal1 and labelled `VSS`) — addressing DR-0011's flagged gap
+   (both prior cells carry an LVS `device.body_unverified` warning for
+   lack of one). Confirmed working, not just drawn: `klt extract`'s
+   `nets` list on this cell is `[{"name": "PAD", ...}, {"name": "VSS",
+   ...}]` — the diode's anode reports as `VSS`, a real net, not the
+   anonymous `vsubs` global `gf180_tmds_pad_min`/`gf180_tmds_pad_diode_draft`
+   both still carry; `klt extract`'s own warning list for this cell has no
+   `body_unverified`/`unbiased_pmos_body_nets`/`single_terminal_nets`
+   entries at all.
+
+Ring continuity (DVDD/DVSS straps at DR-0011's 350/75 µm pitch) and a
+second (P-toward-VDD) clamp leg are **not** drawn here — both are
+block-level pad-ring *assembly* concerns (issue #86's scope, which this
+issue's own body says to coordinate with, not duplicate). This cell answers
+"does a real-size pad plus a real diode ESD clamp fit the ≤2 pF budget",
+not "is this the final integrated pad".
+
+**Signoff** (`klt` 0.2.0, `klayout-tools` commit `9c71bb6741f20be19bf94b847832803505042ec6`,
+`gf180mcu` deck content hash `sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3`
+— the same build DR-0011's own verification used):
+
+- **`klt drc --deck gf180mcu`**: `status: clean`, `0` violations
+  (`layout/drc_reports/gf180_tmds_pad_v2.drc.{json,txt}`) — including the
+  `pad.enclosing.metal5.1`/`via*.width.1` rules DR-0011 flagged as a
+  regression against the *older* `gf180_tmds_pad_min` cell; this new cell
+  is sized to clear both from the start.
+- **`klt extract --deck gf180mcu`**: `status: extracted`, `devices: 20`,
+  `device_counts: {diode_nd2ps_06v0: 20}`, `nets: 2` (`PAD`, `VSS`, both
+  real pins) (`layout/drc_reports/gf180_tmds_pad_v2.extract.json`).
+- **`klt lvs`** against a hand-written, combined-device reference netlist
+  (`layout/lvs/gf180_tmds_pad_v2.ref.spice`: one `D1 VSS PAD
+  diode_nd2ps_06v0 A=40P P=120U` card, aggregate area/perimeter across all
+  20 fingers, folded via `options.combine_devices` the same way
+  `layout/lvs/cml_driver_core.ref.spice` already folds per-finger MOS
+  devices): **`status: match`** (`layout/lvs_reports/gf180_tmds_pad_v2.lvs.
+  {json,txt}`) — 2/2 nets, 1/1 devices (after folding), 2/2 pins matched;
+  the only reported mismatches are 3 benign `topology` warnings (unused
+  device classes present in the deck's vocabulary but instantiated on
+  neither side — the same class of informational warning every other
+  cell's LVS match in this repo already carries).
+- **Negative control** (`gf180_tmds_pad_v2_shorted.gds` —
+  `--shorted`, one extra Metal1 bridge shorting `PAD` to `VSS`): DRC-clean,
+  but `klt lvs` against the same unshorted reference correctly reports
+  **`status: mismatch`** (`device.unmatched`/`net.unmatched`/`topology`
+  findings — `layout/lvs_reports/gf180_tmds_pad_v2_shorted.lvs.{json,txt}`),
+  confirming the check actually distinguishes connected from disconnected,
+  same convention `gf180_tmds_pad_min_shorted`/`cml_driver_core_shorted`
+  already established.
+
+### 9.3. Real pad-plate + interconnect parasitic capacitance
+
+`klt extract --parasitics` against the actual assembled
+`gf180_tmds_pad_v2.gds` (25×25 µm Metal5 pad, the Metal1–Metal5 via stack,
+and the ~54 µm Metal1 cathode bus tying all 20 diode fingers to that via
+stack — i.e. real interconnect, not an idealized zero-length wire):
+
+```
+$ klt extract --deck gf180mcu --parasitics --pdk gf180mcuC gds/gf180_tmds_pad_v2.gds --format json
+...
+"nets": [
+  {"net": "PAD", "resistance_ohm": 10.38, "capacitance_ff": 12.185218},
+  {"net": "VSS", "resistance_ohm": 0.09,  "capacitance_ff": 0.109321}
+]
+```
+
+**`PAD`-net parasitic capacitance: 12.185 fF** — byte-identical against
+`--pdk gf180mcuD` (`layout/drc_reports/gf180_tmds_pad_v2.parasitics.json`),
+again confirming DR-0010's byte-identical-coefficients claim. This is
+higher than the bare-25×25-plate figure in Sec.9.1 (6.662 fF) because it
+also includes the real Metal1 bus/via-stack routing this cell actually
+draws — a more complete, more honest number than Sec.4b's plate-only
+analytic estimate, at the cost of being specific to this cell's own
+(deliberately compact, 20-finger) routing footprint. A much larger,
+HBM-sized clamp (Sec.9.4) would need a somewhat longer/wider Metal1 bus to
+gather current from more fingers, which would add some additional routing
+capacitance beyond this figure — bounded well within the budget's margin
+(Sec.9.5) even under generous assumptions, but not literally re-measured
+at every clamp size in this issue's scope (drawing a full HBM-qualified
+clamp layout is explicitly deferred to Sec.9.4's own note and to #86,
+consistent with how Sec.1–3 never drew the GGNMOS at its full sized width
+either).
+
+This is a genuinely new capability against Sec.4b's original constraint
+("there is no larger real-pad geometry to run `klt` against without
+drawing new layout") — that layout now exists, drawn by this issue.
+
+### 9.4. Diode clamp capacitance: real, PVT-swept, and reproducing Sec.3's method
+
+`sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice` — the diode
+counterpart of `sim/esd-clamp-cv` (Sec.3's GGNMOS testbench): three device
+sizes (`base` — the 20-finger array `gf180_tmds_pad_v2.gds` actually draws,
+`A=40 µm² P=120 µm` aggregate; `w222`/`w444` — the same 222/444 µm
+HBM-sizing-window total widths Sec.2b/3b already used, applying that same
+document's own `A=W×1µm, P=2×(W+1µm)` convention so the two clamp
+families' numbers sit on the same total-periphery axis) × two DC bias
+states (0 V, and the operating-bias proxy `vdd_val`, cathode=`PAD` positive
+— this diode is reverse-biased at the operating point, correct for a
+diode-to-ground ESD clamp under normal operation), same AC-probe method
+(100 MHz, `C = |Im(I)|/(2π·f·1 V)`), same full PVT matrix (`mos` corner set
+× 3 temperatures × 3 supplies = 45 points, 45/45 `ok`).
+
+**Record**: `sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md`.
+Binding corner (worst-case, largest capacitance), same as Sec.3b's GGNMOS
+study: `ss_125c_2.97v`. Operating-bias-graded results (the same bias point
+Sec.3b grades the budget on, for the same reason — DR-0005's budget exists
+to preserve eye margin while driving data, not at 0 V):
+
+| Device | 0 V, min–max | Operating bias, min–max (binding corner) |
+|---|---|---|
+| `base` (20×2.0/1.0 µm fingers, as drawn) | 44.94–65.83 fF | 31.27–45.03 fF |
+| `w222` (222 µm total width, 6 mA/µm HBM density) | 226.27–327.51 fF | 150.80–213.14 fF |
+| `w444` (444 µm total width, 3 mA/µm HBM density) | 452.32–654.67 fF | 301.39–425.94 fF |
+
+**Linear extrapolation to 667 µm (2 mA/µm, the conservative end of Sec.2b's
+density window)**, same justification Sec.3c used (the curve is linear in
+total width; `w444`/`w222` ratio matches `444/222` to within rounding):
+`425.94 fF × (667/444) ≈ 640.0 fF` operating-bias worst case (not
+simulated).
+
+The diode clamp costs *less* than the GGNMOS did at comparable total
+periphery (Sec.3b's GGNMOS `w444` operating-bias worst case was 547.1 fF
+vs. this diode's 425.9 fF) — expected, since a diode junction has no gate-
+overlap capacitance term the way a MOSFET drain does; not a claim this
+document treats as load-bearing, since the two devices' own uncertainty
+(literature-only ESD current-density figures, Sec.2b, reused unchanged
+here since no diode-specific density citation is available in this PDK's
+reach either) is wide enough that a small percentage difference between
+device families is not itself a distinguishing result.
+
+### 9.5. Verdict: real pad + real diode clamp vs. the 2 pF budget
+
+Total pad-node capacitance = real pad-plate/interconnect parasitic
+(Sec.9.3, fixed, PDK-variant-independent) + diode clamp (Sec.9.4,
+operating-bias-graded, `ss_125c_2.97v` binding corner, across the
+222–667 µm HBM-sizing window):
+
+| Reading | Pad + interconnect (Sec.9.3) | Clamp (Sec.9.4) | Total | vs. 2 pF budget |
+|---|---|---|---|---|
+| As-drawn (20 fingers, not yet HBM-sized) | 12.185 fF | 45.03 fF | 57.2 fF (0.057 pF) | Fits; not itself an HBM-qualified size — same caveat Sec.5 gave the GGNMOS `base` device |
+| 222 µm (6 mA/µm HBM density) | 12.185 fF | 213.14 fF | 225.3 fF (0.225 pF) | **Fits, 1.775 pF headroom (89%)** |
+| 444 µm (3 mA/µm HBM density) | 12.185 fF | 425.94 fF | 438.1 fF (0.438 pF) | **Fits, 1.562 pF headroom (78%)** |
+| 667 µm (2 mA/µm HBM density, extrapolated) | 12.185 fF | 640.0 fF | 652.2 fF (0.652 pF) | **Fits, 1.348 pF headroom (67%)** |
+
+**Verdict: at a realistic 25×25 µm pad size and DR-0011's ratified diode
+clamp, sized anywhere across Sec.2b's entire HBM-sizing window, the design
+comfortably fits the ≤2 pF budget — 0.652 pF worst case, 67% headroom.**
+This both corrects Sec.5's original (units-bug-driven) "fails by 5.95 pF"
+verdict and goes beyond the units correction alone (Sec.9.1) by drawing and
+measuring a real DR-0011-ratified pad/clamp rather than resting on a
+correction to someone else's drawing. The two DR-0005/DR-0011 targets
+(HBM/CDM robustness, Sec.2, and the ≤2 pF capacitance budget) do coexist at
+a realistic pad size — the original "no intersection" framing (Sec.0/5,
+inherited by every downstream reference to the 7.95 pF figure, including
+DR-0011's own citation of it as "untouched by this record") does not
+survive the corrected arithmetic or the new measurement.
+
+### 9.6. Acceptance criteria and #65 item 5
+
+- **Redesigned pad/ESD structure achieves ≤2 pF at a realistic pad size,
+  measured the same way**: yes — Sec.9.2's `gf180_tmds_pad_v2` (DRC-clean,
+  LVS-matched, real 25×25 µm pad, DR-0011's diode clamp, real substrate
+  tap) plus Sec.9.4's PVT-swept SPICE sizing sweep total 0.225–0.652 pF
+  across the full HBM-sizing window (Sec.9.5), reproducing Sec.1–5's own
+  split methodology (real-tool pad/interconnect measurement +
+  PVT-swept SPICE clamp sweep, summed) rather than inventing a new one.
+- **`design/esd-capacitance-budget.md` updated, citing the ratified PDK
+  variant and clamp device**: this section — DR-0010 (`gf180mcuC`, Sec.9.1
+  and Sec.9.3's byte-identical-coefficient re-confirmation) and DR-0011
+  (`diode_nd2ps_06v0`, Sec.9.2) are both cited directly against real
+  measurements taken this issue.
+- **`sim/pdk.json` and layout artifacts cite `gf180mcuC`**: re-verified —
+  `sim/pdk.json` still pins `gf180mcuC` (unchanged since PR #122);
+  `gf180_tmds_pad_v2`'s own signoff (Sec.9.2) was run with
+  `--pdk gf180mcuC` where a PDK variant applies (`klt extract
+  --parasitics`), and cross-checked byte-identical against `gf180mcuD`
+  (Sec.9.3).
+- **How #65 item 5's analog-capacitance sub-part would grade on a fresh
+  re-read**: #65's 2026-08-15 checklist (HEAD `f4de03b`) marked item 5's
+  analog partition FAIL because "`design/esd-capacitance-budget.md` reports
+  7.95 pF ... ~4.0× over budget ... reported not revised." On a fresh
+  re-read against this PR's HEAD, that specific finding no longer holds:
+  the 7.95 pF figure was a units-label bug (Sec.9.1) — the real number, on
+  the exact same GGNMOS clamp #65 was looking at, was always ≤0.822 pF —
+  and a real, DRC/LVS-clean, PVT-measured redesign against the DR-0011-
+  ratified diode clamp independently confirms a comfortably-in-budget
+  0.225–0.652 pF. Item 5's analog capacitance sub-part should read **PASS**
+  on a fresh re-read, not FAIL — with the caveat (stated plainly, not
+  hidden) that this is still a **design-margin estimate** (Sec.2's own
+  framing, unchanged): no tester, no parts, no PDK-sourced ESD
+  failure-current-density/breakdown data for either device family (Sec.2a,
+  reused unchanged for the diode in Sec.9.4), so "0.652 pF worst case" is a
+  measured capacitance against a literature-sized clamp, not an ESD
+  qualification claim. #65's *other* items (synthesis, STA, P&R,
+  post-layout, characterization rollup, and #86's separate block-level
+  assembly work) are unaffected by this correction and are out of this
+  issue's scope.
+
+### 9.7. Links (issue #87)
+
+- Redesigned cell: `layout/gds/gf180_tmds_pad_v2.gds`,
+  `layout/gds/gf180_tmds_pad_v2_shorted.gds`,
+  `layout/scripts/gen_pad_v2.py`.
+- Signoff artifacts: `layout/drc_reports/gf180_tmds_pad_v2.{drc,extract,
+  parasitics}.json`, `layout/lvs/gf180_tmds_pad_v2.ref.spice`,
+  `layout/lvs/gf180_tmds_pad_v2.lvs_request{,_shorted}.json`,
+  `layout/lvs_reports/gf180_tmds_pad_v2{,_shorted}.lvs.{json,txt}`.
+- Diode clamp capacitance testbench:
+  `sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice`,
+  `sim/esd-diode-clamp-cv/testbench/tb.json`.
+- Diode clamp capacitance record:
+  `sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md`.
+- Decision records consumed (not re-litigated): `spec/decisions/
+  0010-pdk-variant.md` (DR-0010), `spec/decisions/0011-pad-esd-strategy.md`
+  (DR-0011).
+- Prior art this section corrects/extends: Sections 0–8 of this document
+  (issue #12), `layout/gds/gf180_tmds_pad_min.gds` (issue #2),
+  `layout/gds/gf180_tmds_pad_diode_draft.gds` (issue #9/DR-0011).
+- Epic/checklist context: #65 (2026-08-15 T1/bronze checklist re-read,
+  item 5 analog partition), #81 (decomposition), #17 (epic tracker), #86
+  (sibling — block-level pad-ring assembly, coordinated not duplicated).

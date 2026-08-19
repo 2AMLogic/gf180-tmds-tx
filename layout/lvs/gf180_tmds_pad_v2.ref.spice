@@ -1,0 +1,14 @@
+* Reference (schematic-equivalent) netlist for gf180_tmds_pad_v2 (issue #87).
+* diode_nd2ps_06v0 ESD clamp, 20 fingers in parallel: cathode=PAD, anode=VSS
+* (a real, verified net -- this cell draws an explicit substrate tap, unlike
+* gf180_tmds_pad_min/gf180_tmds_pad_diode_draft, so the anode is no longer
+* the deck-synthesized "vsubs" global -- see gen_pad_v2.py's docstring).
+* One combined D-card, aggregate area/perimeter across all 20 fingers
+* (klt lvs's options.combine_devices folds the per-finger extraction back
+* into one device per schematic line, same convention
+* layout/lvs/cml_driver_core.ref.spice already established for M-cards):
+*   A_total = 20 * 2.0 um^2  = 40 um^2  -> A=40P
+*   P_total = 20 * 6.0 um    = 120 um   -> P=120U
+.SUBCKT gf180_tmds_pad_v2 PAD VSS
+D1 VSS PAD diode_nd2ps_06v0 A=40P P=120U
+.ENDS gf180_tmds_pad_v2

@@ -1,0 +1,25 @@
+{
+  "name": "esd-diode-clamp-cv",
+  "description": "Issue #87: small-signal AC capacitance at the PAD node of the diode_nd2ps_06v0 ESD clamp from layout/gds/gf180_tmds_pad_v2.gds (DR-0011's ratified clamp device), as a function of device size, at 0 V and at the TMDS operating bias, across the full PVT matrix. Diode counterpart of sim/esd-clamp-cv (issue #12's GGNMOS study); feeds the redesigned verdict in design/esd-capacitance-budget.md. Not itself an ESD qualification (no tester, no parts).",
+  "claim": "spec/decisions/0011-pad-esd-strategy.md -- the <=2 pF/pad budget (ESD clamp + pad parasitic combined, carried forward unrelaxed from DR-0005), specifically the diode clamp's own junction-capacitance contribution as a function of clamp size, at both 0 V and the DR-0002/DR-0006 2.8-3.3 V operating bias.",
+  "netlist": "esd_diode_clamp_cv.spice",
+  "corners": ["mos"],
+  "analyses": [
+    "ac lin 1 100meg 100meg"
+  ],
+  "measure": {
+    "cap_base_0v": "abs(imag(i(vpad_base_0v)))/(2*3.14159265358979*100meg)",
+    "cap_base_opv": "abs(imag(i(vpad_base_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w222_0v": "abs(imag(i(vpad_w222_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w222_opv": "abs(imag(i(vpad_w222_opv)))/(2*3.14159265358979*100meg)",
+    "cap_w444_0v": "abs(imag(i(vpad_w444_0v)))/(2*3.14159265358979*100meg)",
+    "cap_w444_opv": "abs(imag(i(vpad_w444_opv)))/(2*3.14159265358979*100meg)"
+  },
+  "checks": {
+    "cap_w444_opv": {
+      "min": 0,
+      "max": 5e-11,
+      "description": "sanity ceiling only (50 pF) -- catches a broken AC probe (open circuit / zero current), not a DR-0005/DR-0011 compliance gate. The 2 pF budget comparison is a design-doc computation across every corner's measured value, not a per-corner pass/fail on this record."
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "layout": {"file": "../gds/gf180_tmds_pad_v2_shorted.gds", "deck": "gf180mcu", "top": "gf180_tmds_pad_v2_shorted"},
+  "reference": {"netlist": "gf180_tmds_pad_v2.ref.spice", "top": "gf180_tmds_pad_v2"},
+  "options": {"combine_devices": true}
+}
