@@ -6,24 +6,29 @@
   "top": "gf180_tmds_pad_ring_assembly_shorted",
   "parameter_tolerance": null,
   "status": "mismatch",
-  "mismatch_count": 12,
+  "mismatch_count": 7,
+  "error_count": 5,
   "category_counts": {
-    "device.combine_incomplete": 1,
-    "device.unmatched": 6,
+    "device.unmatched": 2,
     "net.merged": 2,
     "net.split": 1,
     "topology": 2
+  },
+  "category_error_counts": {
+    "device.unmatched": 2,
+    "net.merged": 2,
+    "net.split": 1
   },
   "counts": {
     "nets": {
       "layout": 6,
       "reference": 7,
-      "matched": 2
+      "matched": 3
     },
     "devices": {
       "layout": 6,
       "reference": 6,
-      "matched": 2
+      "matched": 4
     },
     "pins": {
       "layout": 6,
@@ -43,7 +48,7 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.10",
-    "layout_sha256": "59f965254e249fed9093acd5e8cd7047dfd2b7ab6f3dfed8f32db5824145b9d4",
+    "layout_sha256": "6f2b1b9c2e08c3f8559d03ad7176a7f891fdbba68971ec9b6a0f1572ac643f44",
     "reference_sha256": "01326e1b4fc9f16f5becc102e4471f5697c0489709fe95832cb4a91f56e27bb0",
     "extracted_netlist": null
   },
@@ -53,104 +58,44 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": null
   },
   "mismatches": [
     {
-      "category": "device.combine_incomplete",
-      "severity": "warning",
-      "description": "options.combine_devices could not fully combine devices on the layout netlist: KLayout's Netlist.combine_devices() hit an internal-consistency error on a partial-match device group (instances sharing only some, not all, of their matching terminals) and stopped -- devices it had already combined before the error remain combined, but the rest of this netlist's devices were left uncombined (Internal error: Terminal still connected after removing device in device combination: name=, circuit=gf180_tmds_pad_ring_assembly_shorted, terminal=D in Netlist.combine_devices)",
-      "side": "layout",
-      "net": null,
-      "device": null,
-      "property": null,
-      "details": null
-    },
-    {
       "category": "device.unmatched",
       "severity": "error",
       "description": "device has no counterpart on the other side",
-      "side": "layout",
+      "side": "reference",
       "net": null,
       "device": {
-        "layout": "$1",
-        "reference": null,
+        "layout": "\\$201",
+        "reference": "1",
         "class": "nfet"
       },
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "device.unmatched",
       "severity": "error",
       "description": "device has no counterpart on the other side",
-      "side": "layout",
+      "side": "reference",
       "net": null,
       "device": {
-        "layout": "$339",
-        "reference": null,
+        "layout": "\\$339",
+        "reference": "1",
         "class": "diode_nd2ps_06v0"
       },
       "property": null,
-      "details": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "1",
-        "class": "DIODE_ND2PS_06V0"
-      },
-      "property": null,
-      "details": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "T",
-        "class": "NFET"
-      },
-      "property": null,
-      "details": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": "$201",
-        "reference": "1",
-        "class": "nfet"
-      },
-      "property": null,
-      "details": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": "$265",
-        "reference": "B",
-        "class": "nfet"
-      },
-      "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.merged",
@@ -159,11 +104,14 @@
       "side": "reference",
       "net": {
         "layout": null,
-        "reference": "IBIAS"
+        "reference": "INP"
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.merged",
@@ -176,7 +124,10 @@
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.split",
@@ -184,12 +135,15 @@
       "description": "a reference net's role is divided across multiple layout nets",
       "side": "layout",
       "net": {
-        "layout": "IBIAS",
+        "layout": "INP",
         "reference": null
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -199,7 +153,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -209,10 +166,18 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": [
+    {
+      "layout": "IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
     {
       "layout": "INN",
       "reference": "INN",

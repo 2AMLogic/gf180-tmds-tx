@@ -7,11 +7,16 @@
   "parameter_tolerance": null,
   "status": "mismatch",
   "mismatch_count": 5,
+  "error_count": 2,
   "category_counts": {
     "device.body_unverified": 1,
     "device.unmatched": 1,
     "net.merged": 1,
     "topology": 2
+  },
+  "category_error_counts": {
+    "device.unmatched": 1,
+    "net.merged": 1
   },
   "counts": {
     "nets": {
@@ -52,7 +57,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:457480f180361a41effd843a89ff899ef33adac2859675d52f7b38ac819a9b9d"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": null
   },
@@ -69,7 +74,10 @@
         "class": "nfet"
       },
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "device.unmatched",
@@ -78,12 +86,15 @@
       "side": "reference",
       "net": null,
       "device": {
-        "layout": "$201",
+        "layout": "\\$201",
         "reference": "1",
         "class": "nfet"
       },
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "net.merged",
@@ -96,7 +107,10 @@
       },
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -106,7 +120,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -116,7 +133,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": [

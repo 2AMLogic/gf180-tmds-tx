@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "file": "layout/gds/tmds_encoder.gds",
+  "file": "gds/tmds_encoder.gds",
   "deck": "gf180mcu",
   "dbu_um": 0.0005,
   "status": "clean",
@@ -23,6 +23,7 @@
       "42/0",
       "46/0",
       "53/0",
+      "55/0",
       "75/0",
       "81/0",
       "127/5"
@@ -40,6 +41,7 @@
       "41/0",
       "42/0",
       "46/0",
+      "55/0",
       "81/0"
     ],
     "layers_in_stream_without_rules": [
@@ -49,7 +51,6 @@
       "32/0",
       "34/10",
       "46/10",
-      "55/0",
       "63/63",
       "81/10",
       "112/1",
@@ -68,7 +69,7 @@
     "voltage_domain_warnings": [
       {
         "marker": "55/0",
-        "description": "Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck's DRC rules apply the 3.3V/_LV thresholds to geometry regardless of Dualgate's presence (e.g. DF.1a min COMP width 0.22 vs. the real 5V/6V DF.1a_MV 0.30, DF.3a min COMP space 0.28 vs. 0.36, DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate."
+        "description": "Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck models it for the DF.1a/DF.3a COMP width/space rules and (issue #1111) MOS device recognition/model binding (nfet_06v0/pfet_06v0 under --pdk) only; every other DRC rule still applies the 3.3V/_LV thresholds regardless of Dualgate's presence (e.g. DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um, and neither transcribed in this deck yet)."
       }
     ],
     "deck_scope": [
@@ -90,7 +91,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:e2726af899d1837fe8c9a99688483f145b23c92ded07323f54d627d06bdb2bbf"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": {
       "content_hash": "sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d"

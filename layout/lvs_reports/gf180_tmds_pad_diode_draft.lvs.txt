@@ -4,6 +4,7 @@ top: gf180_tmds_pad_diode_draft
 engine: klayout
 status: match
 mismatches: 3
+errors: 0
   nets: layout=2  reference=2  matched=2
   devices: layout=1  reference=1  matched=1
   pins: layout=2  reference=2  matched=2

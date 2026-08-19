@@ -3,10 +3,281 @@
   "file": "gds/gf180_tmds_pad_min_shorted.gds",
   "deck": "gf180mcu",
   "dbu_um": 0.001,
-  "status": "clean",
-  "violation_count": 0,
-  "rule_counts": {},
-  "violations": [],
+  "status": "violations",
+  "violation_count": 8,
+  "rule_counts": {
+    "pad.enclosing.metal5.1": 4,
+    "via1.width.1": 1,
+    "via2.width.1": 1,
+    "via3.width.1": 1,
+    "via4.width.1": 1
+  },
+  "violations": [
+    {
+      "rule": "pad.enclosing.metal5.1",
+      "description": "minimum top-metal (Metal5) overlap of pad opening",
+      "check": "enclosing",
+      "layer": "Metal5",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1590,
+        "bottom": 500,
+        "right": 1670,
+        "top": 1500
+      },
+      "polygon": [
+        [
+          1590,
+          500
+        ],
+        [
+          1590,
+          1500
+        ],
+        [
+          1670,
+          580
+        ],
+        [
+          1670,
+          1420
+        ]
+      ]
+    },
+    {
+      "rule": "pad.enclosing.metal5.1",
+      "description": "minimum top-metal (Metal5) overlap of pad opening",
+      "check": "enclosing",
+      "layer": "Metal5",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1590,
+        "bottom": 500,
+        "right": 2210,
+        "top": 580
+      },
+      "polygon": [
+        [
+          1590,
+          500
+        ],
+        [
+          2130,
+          580
+        ],
+        [
+          1670,
+          580
+        ],
+        [
+          2210,
+          500
+        ]
+      ]
+    },
+    {
+      "rule": "pad.enclosing.metal5.1",
+      "description": "minimum top-metal (Metal5) overlap of pad opening",
+      "check": "enclosing",
+      "layer": "Metal5",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1590,
+        "bottom": 1420,
+        "right": 2210,
+        "top": 1500
+      },
+      "polygon": [
+        [
+          1670,
+          1420
+        ],
+        [
+          2130,
+          1420
+        ],
+        [
+          1590,
+          1500
+        ],
+        [
+          2210,
+          1500
+        ]
+      ]
+    },
+    {
+      "rule": "pad.enclosing.metal5.1",
+      "description": "minimum top-metal (Metal5) overlap of pad opening",
+      "check": "enclosing",
+      "layer": "Metal5",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 2130,
+        "bottom": 500,
+        "right": 2210,
+        "top": 1500
+      },
+      "polygon": [
+        [
+          2210,
+          500
+        ],
+        [
+          2130,
+          1420
+        ],
+        [
+          2130,
+          580
+        ],
+        [
+          2210,
+          1500
+        ]
+      ]
+    },
+    {
+      "rule": "via1.width.1",
+      "description": "minimum via1 size (approximates official min/max size rule)",
+      "check": "width",
+      "layer": "Via1",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1790,
+        "bottom": 840,
+        "right": 2010,
+        "top": 1160
+      },
+      "polygon": [
+        [
+          1790,
+          840
+        ],
+        [
+          1790,
+          1160
+        ],
+        [
+          2010,
+          1160
+        ],
+        [
+          2010,
+          840
+        ]
+      ]
+    },
+    {
+      "rule": "via2.width.1",
+      "description": "minimum via2 size (approximates official min/max size rule)",
+      "check": "width",
+      "layer": "Via2",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1790,
+        "bottom": 840,
+        "right": 2010,
+        "top": 1160
+      },
+      "polygon": [
+        [
+          1790,
+          840
+        ],
+        [
+          1790,
+          1160
+        ],
+        [
+          2010,
+          1160
+        ],
+        [
+          2010,
+          840
+        ]
+      ]
+    },
+    {
+      "rule": "via3.width.1",
+      "description": "minimum via3 size (approximates official min/max size rule)",
+      "check": "width",
+      "layer": "Via3",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1790,
+        "bottom": 840,
+        "right": 2010,
+        "top": 1160
+      },
+      "polygon": [
+        [
+          1790,
+          840
+        ],
+        [
+          1790,
+          1160
+        ],
+        [
+          2010,
+          1160
+        ],
+        [
+          2010,
+          840
+        ]
+      ]
+    },
+    {
+      "rule": "via4.width.1",
+      "description": "minimum via4 size (approximates official min/max size rule)",
+      "check": "width",
+      "layer": "Via4",
+      "cell": "gf180_tmds_pad_min_shorted",
+      "source_cell": null,
+      "source_path": null,
+      "bbox": {
+        "left": 1790,
+        "bottom": 840,
+        "right": 2010,
+        "top": 1160
+      },
+      "polygon": [
+        [
+          1790,
+          840
+        ],
+        [
+          1790,
+          1160
+        ],
+        [
+          2010,
+          1160
+        ],
+        [
+          2010,
+          840
+        ]
+      ]
+    }
+  ],
   "coverage": {
     "deck_layers": [
       "21/0",
@@ -14,11 +285,16 @@
       "30/0",
       "33/0",
       "34/0",
+      "35/0",
       "36/0",
+      "37/0",
+      "38/0",
+      "40/0",
       "41/0",
       "42/0",
       "46/0",
       "53/0",
+      "55/0",
       "75/0",
       "81/0",
       "127/5"
@@ -28,7 +304,11 @@
       "30/0",
       "33/0",
       "34/0",
+      "35/0",
       "36/0",
+      "37/0",
+      "38/0",
+      "40/0",
       "41/0",
       "42/0",
       "46/0",
@@ -37,20 +317,32 @@
     "layers_in_stream_without_rules": [
       "32/0",
       "34/10",
-      "35/0",
-      "37/0",
-      "38/0",
-      "40/0",
       "81/10"
     ],
     "rules_skipped": [
       "bjt.separation.comp.1",
+      "comp.space.mv.1",
+      "comp.width.mv.1",
       "metaltop.space.1",
       "metaltop.width.1",
       "mim.enclosing.fusetop.1",
       "mim.enclosing.via4.1",
+      "mim.space.1",
       "nwell.enclosing.comp.1",
       "nwell.space.1"
+    ],
+    "voltage_domain_warnings": [],
+    "deck_scope": [
+      "10.4.2 MIM Option B",
+      "10.7 DRC_BJT Mark Layer",
+      "7.12 Contact",
+      "7.13 Metaln",
+      "7.14 Vian",
+      "7.15 MetalTop",
+      "7.4 Nwell",
+      "7.5 Comp",
+      "7.7 Poly2",
+      "9.1 Bond Pad"
     ]
   },
   "provenance": {
@@ -59,10 +351,10 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": {
-      "content_hash": "sha256:1723640fe09030ee74eae91fb897558795d56243b8b6033006d3c79a8687065d"
+      "content_hash": "sha256:79c4acc1183691ab2db6555a3721420365c5a01dd2781aec60e91e1712a22819"
     }
   }
 }

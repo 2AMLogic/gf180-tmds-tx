@@ -23,6 +23,7 @@
       "42/0",
       "46/0",
       "53/0",
+      "55/0",
       "75/0",
       "81/0",
       "127/5"
@@ -38,6 +39,8 @@
     ],
     "rules_skipped": [
       "bjt.separation.comp.1",
+      "comp.space.mv.1",
+      "comp.width.mv.1",
       "metal1.enclosing.via1.1",
       "metal2.enclosing.via1.1",
       "metal2.enclosing.via2.1",
@@ -89,7 +92,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:457480f180361a41effd843a89ff899ef33adac2859675d52f7b38ac819a9b9d"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": {
       "content_hash": "sha256:070f60f31776bc915e5e25779c391056c7c29efd62d37cc3f8b2302e84ebdbc2"

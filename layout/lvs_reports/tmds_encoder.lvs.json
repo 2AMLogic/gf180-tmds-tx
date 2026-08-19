@@ -7,7 +7,11 @@
   "parameter_tolerance": null,
   "status": "mismatch",
   "mismatch_count": 18,
+  "error_count": 18,
   "category_counts": {
+    "topology": 18
+  },
+  "category_error_counts": {
     "topology": 18
   },
   "counts": {
@@ -31,7 +35,7 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.10",
-    "layout_sha256": "4a46acfc0540743038d0da441d6ea8172d90747420e3e6c7d1c86cce1bcfa290",
+    "layout_sha256": "8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa",
     "reference_sha256": "73357dc3959a029ef100d3ec8037c220d3827a3c31014c6e07ccecea0b1b8e5d",
     "extracted_netlist": null
   },
@@ -51,7 +55,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "TMDS_ENCODER",
+        "reference": "TMDS_ENCODER"
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -61,7 +71,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__CLKBUF_12",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -71,7 +87,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__CLKBUF_16",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -81,7 +103,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__CLKINV_2",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -91,7 +119,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__DLYC_1",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -101,7 +135,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__ENDCAP",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -111,7 +151,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_1",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -121,7 +167,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_16",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -131,7 +183,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_2",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -141,7 +199,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_32",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -151,7 +215,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_4",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -161,7 +231,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_64",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -171,7 +247,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILL_8",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -181,7 +263,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__FILLTIE",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -191,7 +279,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__INV_3",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -201,7 +295,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__INV_4",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -211,7 +311,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__OAI21_2",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -221,7 +327,13 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__OAI31_2",
+        "reference": null
+      },
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": [

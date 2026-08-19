@@ -633,7 +633,7 @@ divided by only 1,000 (`aF`→`fF`) while labelling the result `pF` — a
    25×25 µm Metal5 rectangle):
 
    ```
-   $ klt extract --deck gf180mcu --parasitics --pdk gf180mcuC test_pad25.gds --format json
+   $ klt extract --deck gf180mcu --parasitics --pdk gf180mcuD test_pad25.gds --format json
    ...
    "parasitics": {"nets": [{"net": "PAD", "capacitance_ff": 6.66235, ...}]}
    ```
@@ -732,7 +732,7 @@ and the ~54 µm Metal1 cathode bus tying all 20 diode fingers to that via
 stack — i.e. real interconnect, not an idealized zero-length wire):
 
 ```
-$ klt extract --deck gf180mcu --parasitics --pdk gf180mcuC gds/gf180_tmds_pad_v2.gds --format json
+$ klt extract --deck gf180mcu --parasitics --pdk gf180mcuD gds/gf180_tmds_pad_v2.gds --format json
 ...
 "nets": [
   {"net": "PAD", "resistance_ohm": 10.38, "capacitance_ff": 12.185218},
@@ -845,16 +845,15 @@ survive the corrected arithmetic or the new measurement.
   and Sec.9.3's byte-identical-coefficient re-confirmation) and DR-0011
   (`diode_nd2ps_06v0`, Sec.9.2) are both cited directly against real
   measurements taken this issue.
-- **`sim/pdk.json` cites `gf180mcuD`; layout artifacts still cite
-  `gf180mcuC`, pending regeneration**: re-verified — `sim/pdk.json` now pins
-  `gf180mcuD`, per DR-0010 as corrected by the operator's amendment ruling
-  (2026-08-19T04:35:28Z); `gf180_tmds_pad_v2`'s own signoff (Sec.9.2) was run
-  with `--pdk gf180mcuC` where a PDK variant applies (`klt extract
-  --parasitics`), and cross-checked byte-identical against `gf180mcuD`
-  (Sec.9.3) — the layout itself has not yet been regenerated against
-  `gf180mcuD` (tracked separately, issue #127), so this discrepancy is
-  expected and does not affect the measured numbers (byte-identical either
-  way, per the cross-check just cited).
+- **`sim/pdk.json` and layout artifacts both cite `gf180mcuD`**:
+  re-verified — `sim/pdk.json` pins `gf180mcuD`, per DR-0010 as corrected by
+  the operator's amendment ruling (2026-08-19T04:35:28Z); `gf180_tmds_pad_v2`
+  (and every other `layout/` deliverable) has now been regenerated and
+  re-signed-off against `gf180mcuD` (issue #127) — this section's own
+  `klt extract --parasitics` invocations above now cite `--pdk gf180mcuD`
+  directly, and the byte-identical cross-check against `--pdk gf180mcuC`
+  (Sec.9.3) still holds against the regenerated cell, so the measured
+  numbers are unchanged either way.
 - **How #65 item 5's analog-capacitance sub-part would grade on a fresh
   re-read**: #65's 2026-08-15 checklist (HEAD `f4de03b`) marked item 5's
   analog partition FAIL because "`design/esd-capacitance-budget.md` reports

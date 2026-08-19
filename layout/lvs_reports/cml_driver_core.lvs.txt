@@ -4,6 +4,7 @@ top: cml_driver_core
 engine: klayout
 status: match
 mismatches: 3
+errors: 0
   nets: layout=8  reference=8  matched=8
   devices: layout=4  reference=4  matched=4
   pins: layout=8  reference=7  matched=8

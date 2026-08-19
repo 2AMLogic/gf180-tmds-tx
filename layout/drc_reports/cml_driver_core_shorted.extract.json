@@ -6167,6 +6167,7 @@
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
+  "matched_device_groups": [],
   "pdk": null,
   "provenance": {
     "klt_version": "0.2.0",
@@ -6174,11 +6175,12 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:457480f180361a41effd843a89ff899ef33adac2859675d52f7b38ac819a9b9d"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": {
       "content_hash": "sha256:070f60f31776bc915e5e25779c391056c7c29efd62d37cc3f8b2302e84ebdbc2"
     }
   },
-  "parasitics": null
+  "parasitics": null,
+  "spef_path": null
 }

@@ -4,6 +4,7 @@ top: gf180_tmds_pad_min_shorted
 engine: klayout
 status: mismatch
 mismatches: 9
+errors: 6
   nets: layout=2  reference=3  matched=0
   devices: layout=1  reference=1  matched=0
   pins: layout=2  reference=3  matched=5

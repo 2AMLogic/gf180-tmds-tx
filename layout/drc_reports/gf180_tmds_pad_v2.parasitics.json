@@ -297,42 +297,36 @@
     }
   ],
   "warnings": [
-    "MOS device geometry overlaps the '55/0' voltage-domain marker: Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck models it for the DF.1a/DF.3a COMP width/space rules only, which ship as _LV/_MV pairs (0.22/0.30 and 0.28/0.36 um) scoped to the marker; every other DRC rule still applies the 3.3V/_LV thresholds regardless of Dualgate's presence (e.g. DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um, and neither transcribed in this deck yet), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate.",
     "1 layer (37/0) carrying 1 shape is outside 'gf180mcu' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
-  "voltage_domain_warnings": [
-    {
-      "marker": "55/0",
-      "description": "Dualgate (55/0) marks gf180mcu's 5V/6V thick-oxide voltage domain. This curated deck models it for the DF.1a/DF.3a COMP width/space rules only, which ship as _LV/_MV pairs (0.22/0.30 and 0.28/0.36 um) scoped to the marker; every other DRC rule still applies the 3.3V/_LV thresholds regardless of Dualgate's presence (e.g. DF.6 COMP extend beyond gate 0.24 vs. 0.40, PL.5a/PL.5b field poly to COMP 0.10 vs. 0.30 -- all in um, and neither transcribed in this deck yet), and MOS extraction always binds the 3.3V models (nfet_03v3/pfet_03v3) even to a transistor drawn entirely inside Dualgate."
-    }
-  ],
+  "voltage_domain_warnings": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
   "pdk": {
-    "variant": "gf180mcuC",
-    "root": "/home/ubuntu/.ciel",
-    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+    "variant": "gf180mcuD",
+    "root": "/home/ubuntu/.volare",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
   },
   "provenance": {
     "klt_version": "0.2.0",
     "klayout_version": "0.30.10",
     "pdk": {
-      "name": "gf180mcuC",
-      "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+      "name": "gf180mcuD",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
     },
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": {
-      "content_hash": "sha256:2855877afe13e96e21482c323e37c126233b1edb79e7cf1a633679219b7c289e"
+      "content_hash": "sha256:6fb14679cc6068627638c59f9ce54c12b090da64cffa24e018f71cf81040baf7"
     }
   },
   "parasitics": {
@@ -491,7 +485,7 @@
             "device": "$1",
             "terminal": "A",
             "leg_net": "VSS__t0",
-            "resistance_ohm": 0.0086
+            "resistance_ohm": 0.0085
           },
           {
             "device": "$2",
@@ -587,13 +581,13 @@
             "device": "$17",
             "terminal": "A",
             "leg_net": "VSS__t16",
-            "resistance_ohm": 0.0059
+            "resistance_ohm": 0.0058
           },
           {
             "device": "$18",
             "terminal": "A",
             "leg_net": "VSS__t17",
-            "resistance_ohm": 0.0068
+            "resistance_ohm": 0.0067
           },
           {
             "device": "$19",
