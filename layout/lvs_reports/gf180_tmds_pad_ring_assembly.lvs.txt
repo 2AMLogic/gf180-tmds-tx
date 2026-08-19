@@ -2,25 +2,14 @@ layout: ../gds/gf180_tmds_pad_ring_assembly.gds
 reference: gf180_tmds_pad_ring_assembly.ref.spice
 top: gf180_tmds_pad_ring_assembly
 engine: klayout
-status: mismatch
-mismatches: 10
-  nets: layout=7  reference=7  matched=4
-  devices: layout=6  reference=6  matched=4
+status: match
+mismatches: 2
+  nets: layout=7  reference=7  matched=7
+  devices: layout=6  reference=6  matched=6
   pins: layout=7  reference=6  matched=7
 
 category_counts:
-  device.combine_incomplete: 1
-  device.property: 6
-  device.unmatched: 1
   topology: 2
 
-[warning] device.combine_incomplete  (layout)  options.combine_devices could not fully combine devices on the layout netlist: KLayout's Netlist.combine_devices() hit an internal-consistency error on a partial-match device group (instances sharing only some, not all, of their matching terminals) and stopped -- devices it had already combined before the error remain combined, but the rest of this netlist's devices were left uncombined (Internal error: Terminal still connected after removing device in device combination: name=, circuit=gf180_tmds_pad_ring_assembly, terminal=D in Netlist.combine_devices)
-[error] device.property  (both)  matched device parameter 'l_um' differs
-[error] device.property  (both)  matched device parameter 'w_um' differs
-[error] device.property  (both)  matched device parameter 'as' differs
-[error] device.property  (both)  matched device parameter 'ad' differs
-[error] device.property  (both)  matched device parameter 'ps' differs
-[error] device.property  (both)  matched device parameter 'pd' differs
-[error] device.unmatched  (reference)  device has no counterpart on the other side
 [warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
 [warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
