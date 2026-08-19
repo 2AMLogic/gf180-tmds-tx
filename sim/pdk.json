@@ -13,9 +13,10 @@
     "tape-out path for these canaries is D. DR-0010 also found the two variants'",
     "SPICE device models (libs.tech/ngspice) are byte-identical, so this pin",
     "does not itself invalidate any already-recorded sim/ result numerically",
-    "-- layout/ artifacts (drawn against gf180mcuC) still need regeneration and",
-    "re-signoff against gf180mcuD, tracked separately (see DR-0010's Consequences",
-    "and sim/README.md's 'PDK variant' section for the full account)."
+    "-- layout/ artifacts (originally drawn against gf180mcuC) have since been",
+    "regenerated and re-signed off against gf180mcuD (issue #127, closed, DR-0010's",
+    "amendment; see DR-0010's Consequences and sim/README.md's 'PDK variant'",
+    "section for the full account)."
   ],
   "variant": "gf180mcuD",
   "search_roots": []

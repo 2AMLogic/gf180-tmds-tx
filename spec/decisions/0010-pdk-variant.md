@@ -190,15 +190,16 @@ letter changes.
 
 ### Artifacts already committed
 
-- **`layout/` was produced against `gf180mcuC` and needs re-run.** Every
-  `layout/` DRC/LVS artifact committed to this repository through issue #2
-  onward was drawn and signed off against `gf180mcuC` — the variant this
-  record's original ruling pinned, matching what was already on disk at the
-  time. The operator's amendment (`## Decision` above) now requires
-  regenerating and re-signing off that work against `gf180mcuD` instead
-  (Metal5 pad geometry moves by the deltas measured in `## Context` above).
-  Tracked as sub-issue B of #123's decomposition (#127) — out of scope for
-  this citation-only correction (sub-issue A).
+- **`layout/` was originally produced against `gf180mcuC` and has since been
+  regenerated against `gf180mcuD`.** Every `layout/` DRC/LVS artifact
+  committed to this repository through issue #2 onward was first drawn and
+  signed off against `gf180mcuC` — the variant this record's original ruling
+  pinned, matching what was already on disk at the time. The operator's
+  amendment (`## Decision` above) required regenerating and re-signing off
+  that work against `gf180mcuD` instead (Metal5 pad geometry moves by the
+  deltas measured in `## Context` above); that regeneration is complete.
+  Tracked as sub-issue B of #123's decomposition (#127, closed) — out of
+  scope for this citation-only correction (sub-issue A).
 - **`sim/` (every analog SPICE record) and `flow/` (the digital synthesis/
   PnR/STA flow) cite `gf180mcuD`** (`sim/pdk.json`, `sim/harness/pdk.py`'s
   `DEFAULT_VARIANT`, `flow/README.md`) as of this correction, matching the
@@ -238,14 +239,14 @@ advertise the `gf180mcuD` stack, and TinyTapeout's GF shuttles also submit
 via wafer.space — every observed tape-out path for these canaries is `D`.
 
 Per the original anticipation of this scenario: every `layout/` artifact
-must be regenerated and re-signed off against `gf180mcuD` (Metal5 pad
-geometry moves by the deltas measured in `## Context` above), and `sim/`/
-`flow/` citations flip to match. That layout regeneration is tracked as
-sub-issue B of #123's decomposition (#127) — a much larger body of
-analog/DRC/LVS work, out of scope for this record's own citation-only
-correction (sub-issue A). Per the survey above, no *numeric* sim/flow result
-needs recomputation, only the layout/pad-adjacent geometry and its DRC/LVS
-signoff.
+has now been regenerated and re-signed off against `gf180mcuD` (Metal5 pad
+geometry moved by the deltas measured in `## Context` above), and `sim/`/
+`flow/` citations have flipped to match. That layout regeneration was
+tracked as sub-issue B of #123's decomposition (#127, closed) — a much
+larger body of analog/DRC/LVS work, out of scope for this record's own
+citation-only correction (sub-issue A) but now complete in its own right.
+Per the survey above, no *numeric* sim/flow result needed recomputation,
+only the layout/pad-adjacent geometry and its DRC/LVS signoff.
 
 ## Status
 
