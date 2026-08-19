@@ -131,7 +131,11 @@ DR-0003's choice to run the digital domain at 3.3 V rather than the
 standard-cell library's more commonly quoted 5 V corner (see below), so the
 digital-to-CML boundary does not need a level shifter.
 
-**Status**: Accepted.
+**Status**: Accepted. This record's PDK-variant citation (`gf180mcuD`) is
+qualified by DR-0010, which pins this block's design/verification target to
+`gf180mcuC` instead — see `spec/decisions/0010-pdk-variant.md`. No other
+content in this record changes: the device-family decision, and every
+number attached to it, stand as ratified.
 
 ### DR-0003: Serialization ratio and clocking — 10:1, synthesized-to-custom boundary
 
@@ -235,8 +239,14 @@ serializer/driver design margin) or by re-deriving the total 0.25 UI figure
 against actual measured eye-closure tolerance once encoder/driver
 verification exists.
 
-**Status**: Accepted, pending confirmation against the sibling PLL canary's
-own ratified spec once it exists.
+**Status**: Superseded by DR-0012 (`spec/decisions/0012-pll-interface-completion.md`)
+as the authoritative document for §2's PLL interface contract, pending
+confirmation against the sibling PLL canary's own ratified spec once it
+exists. This is a completion, not a reversal: DR-0012 adds the clocks,
+signal types, and duty-cycle/loading rows DR-0003 required but this record
+never supplied — this record's own derivations (reference-frequency choice,
+0.25/0.10/0.15 UI jitter split) are carried forward **unchanged** by
+DR-0012, not replaced.
 
 ### DR-0005: Pad cell and ESD strategy
 
@@ -303,7 +313,15 @@ record must be superseded (relax the capacitance budget with an eye-margin
 re-analysis, or relax the ESD target with an explicit handling-procedure
 justification) rather than silently proceeding on an invalidated number.
 
-**Status**: Accepted — provisional pending #2.
+**Status**: Superseded by DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`)
+— issue #2's PDK-rules survey (`spec/pad-ring-esd-survey.md`) landed after
+this record's provisional acceptance and left the clamp-device choice
+contested; DR-0011 resolves that contention (reaffirms the diode-based
+clamp this record decided on, backed by a real `klt` LVS verification) and
+rules on the pad pitch/ring-continuity/substrate-tap questions the survey
+raised but this record never addressed. This record's decision text above
+is preserved unedited, per `spec/README.md`'s "never delete a decision
+record" convention.
 
 ### DR-0006: DR-0002's common-mode window is a nominal-supply target, with an explicit supply-tracking tolerance
 
@@ -392,7 +410,15 @@ range at nominal supply), not hundreds of millivolts.
   supersede this one rather than leave two independently-ratified
   descriptions of the same tracking relationship.
 
-**Status**: Accepted.
+**Status**: Accepted. This record's own Consequences (above) anticipated
+issue #9's operating-conditions decision landing as "DR-0009" — it landed
+instead as **DR-0013** (`spec/decisions/0013-operating-conditions.md`;
+`DR-0009` was already taken by this repository's own four-stage pipeline
+record by the time issue #9 was built — see DR-0013's "Numbering note"). Per
+this record's own instruction, DR-0013 references rather than supersedes
+this one: both remain independently ratified, DR-0013 covering the general
+PVT-matrix/supply-spec question and this record covering the specific
+AVCC-tracking derivation.
 
 ### DR-0007: Synthesized-domain clock ceiling — timing-driven synthesis + CTS measured; full 720p60 closure requires an architecture change
 
@@ -816,3 +842,19 @@ DR-0008) is **closed for the encoder at 720p60**: the change DR-0007 called
 for has landed and the target closes at every 3.3 V corner. It is not closed
 for the block as a whole — the 10:1→2:1 serializer, which is where DR-0003's
 371.25 MHz intermediate rate actually lives, is still unwritten.
+
+### Further decision records (index)
+
+Per `spec/README.md`'s split clause — inline entries are the default until
+the document grows unwieldy, at which point new records move to
+`spec/decisions/NNNN-*.md` — decision records from DR-0010 onward live as
+individual files, linked here rather than inlined. DR-0001 through DR-0009
+above are **not** retroactively moved: relocating already-ratified inline
+text is its own churn this issue's own acceptance criteria excludes ("no
+other ratified text in this file changes"), so the split point is simply
+where new work landed, not backfilled onto history.
+
+- [`DR-0010: PDK variant and revision this block is designed and verified against`](decisions/0010-pdk-variant.md) — pins `gf180mcuC`; supersedes DR-0002's variant citation (Status-line note) and DR-0005 in full (via DR-0011).
+- [`DR-0011: Pad and ESD strategy after #2 (successor to DR-0005)`](decisions/0011-pad-esd-strategy.md) — reaffirms the diode-based ESD clamp (verified via a real `klt` LVS run), rules on pad pitch/ring depth/continuity/substrate tap, carries the HBM/CDM/capacitance targets forward unrelaxed. Supersedes DR-0005.
+- [`DR-0012: Completing the PLL interface contract (successor to DR-0004)`](decisions/0012-pll-interface-completion.md) — adds the half-rate/synthesized-domain clock derivation, output signal type/swing/common-mode, duty-cycle tolerance, and loading rows §2 lacked. Extends DR-0004 (numbers unchanged).
+- [`DR-0013: Operating conditions and the verifiable spec rows`](decisions/0013-operating-conditions.md) — ratifies the PVT matrix (−40/27/125 °C, ±10 % supply, process corners) and the supply spec, and enumerates the spec's pass/fail rows (citing existing evidence where it exists, marking `Proposed` where it does not).

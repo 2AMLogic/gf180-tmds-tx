@@ -6,14 +6,17 @@
     "  search_roots  extra directories that CONTAIN variant dirs, searched before",
     "                the built-in list (~/.volare, /usr/share/pdk, ...)",
     "",
-    "variant is pinned to gf180mcuD because that is the variant spec/tmds-tx.md's",
-    "ratified decision records (DR-0002, DR-0005) cite. This is a PIN, not a",
-    "resolution of the gf180mcuC-vs-gf180mcuD discrepancy against this repo's",
-    "existing layout evidence (spec/pad-ring-esd-survey.md, layout/ from #2, which",
-    "was produced against gf180mcuC) -- that discrepancy is an open question owned",
-    "by #9 and is intentionally NOT ruled on here. See sim/README.md's 'PDK",
-    "variant' section."
+    "variant is pinned to gf180mcuC per DR-0010 (spec/decisions/0010-pdk-variant.md,",
+    "issue #9), which resolved the gf180mcuC-vs-gf180mcuD discrepancy this file",
+    "previously pinned gf180mcuD around: gf180mcuC matches every layout artifact",
+    "already committed (layout/, from #2) and is the conservative (thinner top-",
+    "metal) assumption for pad ESD margin. DR-0010 also found the two variants'",
+    "SPICE device models (libs.tech/ngspice) are byte-identical, so this pin",
+    "change does not itself invalidate any already-recorded sim/ result numerically",
+    "-- only their citation strings are stale (see DR-0010's Consequences and",
+    "sim/README.md's 'PDK variant' section for the full account, including which",
+    "already-committed records still cite gf180mcuD)."
   ],
-  "variant": "gf180mcuD",
+  "variant": "gf180mcuC",
   "search_roots": []
 }

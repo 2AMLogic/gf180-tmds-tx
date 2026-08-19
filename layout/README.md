@@ -46,6 +46,59 @@ circuits are dropped entirely by `klt extract`/`klt lvs`) and
 [#541](https://github.com/2AMLogic/klayout-tools/issues/541) (no diode
 device class, which is why this cell uses an NMOS clamp instead).
 
+**Known regression (flagged, not fixed here — issue #9/DR-0011, 2026-08-19):**
+re-running `klt drc --deck gf180mcu` against this committed GDS under the
+currently-installed `klt` (built from a much newer `klayout-tools` checkout
+than existed at this cell's original signoff) reports **8 violations** —
+`pad.enclosing.metal5.1` (x4, a >=2.0 um Metal5-overlap-of-pad-opening rule
+that did not exist in the deck at signoff time) and `via{1,2,3,4}.width.1`
+(x1 each, a >=0.26 um via-size floor). The committed
+`drc_reports/gf180_tmds_pad_min.drc.json` above still (correctly, for its
+own time) reports `status: clean` — this is the deck gaining coverage after
+the fact, not a defect introduced by this file. Left as a known finding for
+whichever issue next redraws this cell (most likely #87's capacitance-budget
+redesign, which must redraw the pad regardless); see
+`spec/decisions/0011-pad-esd-strategy.md` for the full account.
+
+## `gf180_tmds_pad_diode_draft` — diode-clamp verification draft (issue #9, DR-0011)
+
+A `diode_nd2ps_06v0`-clamped counterpart to `gf180_tmds_pad_min` above,
+drawn specifically to verify `2AMLogic/klayout-tools#542`'s diode-device
+recognition (closed 2026-08-05) actually works end to end — the tool gap
+that forced `gf180_tmds_pad_min`'s GGNMOS redraw in the first place. Not a
+candidate final pad cell (no substrate tap, no ring continuity — see
+DR-0011's own caveats); its only job is proving `klt drc`/`klt extract`/
+`klt lvs` succeed against a real diode-clamp structure.
+
+```
+scripts/gen_pad_diode_draft.py          generator (klayout.db, no PDK-PCell dependency)
+gds/gf180_tmds_pad_diode_draft.gds      the diode-clamp draft cell
+gds/gf180_tmds_pad_diode_draft.spice    klt extract's schematic-equivalent netlist
+drc_reports/gf180_tmds_pad_diode_draft.{drc,extract}.json  klt drc/extract reports
+lvs_reports/gf180_tmds_pad_diode_draft.lvs.{json,txt}      klt lvs report
+lvs/gf180_tmds_pad_diode_draft.ref.spice    hand-written reference netlist for LVS
+lvs/pad_diode_draft.lvs_request.json        klt lvs request document
+```
+
+Regenerate and re-run signoff:
+
+```bash
+cd layout
+python3 scripts/gen_pad_diode_draft.py -o gds/gf180_tmds_pad_diode_draft.gds
+klt drc --deck gf180mcu gds/gf180_tmds_pad_diode_draft.gds
+klt extract --deck gf180mcu gds/gf180_tmds_pad_diode_draft.gds -o gds/gf180_tmds_pad_diode_draft.spice
+klt lvs lvs/pad_diode_draft.lvs_request.json
+```
+
+Signoff status: **DRC-clean** (0 violations, sized above every currently-
+checked rule with margin, including the `pad.enclosing.metal5.1`/
+`via*.width.1` rules the regression above surfaced), **extraction finds a
+real device** (`device_counts: {diode_nd2ps_06v0: 1}`, vs. `device_count: 0`
+the original survey measured against the pre-#542 deck), and **LVS-clean**
+(`status: match` against a hand-written `D1 vsubs PAD diode_nd2ps_06v0`
+reference). See `spec/decisions/0011-pad-esd-strategy.md` for the full
+decision this verification supports.
+
 ## `cml_driver_core` — CML output driver core cell (issue #22)
 
 The differential switch pair (M1/M2) + tail current source (MT) + 1:20

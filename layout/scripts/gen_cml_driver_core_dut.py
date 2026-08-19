@@ -21,7 +21,7 @@ mechanically resolves. Nothing here is a hand edit: run it and diff.
 
        X$1 TAIL IBIAS VSS vsubs nfet_03v3 L=0.5U W=2U AS=0.42P ...
 
-   `klt extract --pdk gf180mcuD` performs the same binding itself, but as of
+   `klt extract --pdk gf180mcuC` performs the same binding itself, but as of
    klt 0.2.0 its `--pdk` output **drops the per-device AS/AD/PS/PD** that the
    deck-class form carries, and `nfet_03v3` defaults those to zero -- i.e.
    zero drain-junction capacitance on OUTP/OUTN, the one post-layout loading

@@ -1,0 +1,9 @@
+* extracted by klt extract --deck gf180mcu
+
+* cell gf180_tmds_pad_diode_draft
+* pin PAD
+* pin vsubs
+.SUBCKT gf180_tmds_pad_diode_draft PAD vsubs
+* device instance $1 r0 *1 0.5,0.5 diode_nd2ps_06v0
+D$1 vsubs PAD diode_nd2ps_06v0 A=1P P=4U
+.ENDS gf180_tmds_pad_diode_draft

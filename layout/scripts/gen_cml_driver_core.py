@@ -69,13 +69,22 @@ clean/negative-control pair):
   `klt lvs` against the same reference netlist the unshorted cell passes.
 
 Requires `klt` (klayout-tools) on `$PATH` and a resolvable gf180mcu PDK
-install (`klt pdk find --pdk gf180mcuD`) -- see `klt gen`/`klt gen-compose`
+install (`klt pdk find --pdk gf180mcuC`) -- see `klt gen`/`klt gen-compose`
 docs (`docs/cli/gen.md`, `docs/cli/gen-compose.md` in klayout-tools) for the
 request/response contract this script drives via subprocess calls, and
-`spec/tmds-tx.md`'s own `gf180mcuD` pin (mirrored by `sim/pdk.json`) for why
-that variant, not another gf180mcu flavour, is this repo's default going
-forward (the earlier `gf180mcuC`-vs-`gf180mcuD` provenance question on
-`gf180_tmds_pad_min` itself is issue #9's open item, not resolved here).
+DR-0010 (`spec/decisions/0010-pdk-variant.md`, issue #9, mirrored by
+`sim/pdk.json`) for why `gf180mcuC`, not another gf180mcu flavour, is this
+repo's ratified default -- resolving the `gf180mcuC`-vs-`gf180mcuD`
+provenance question this docstring previously deferred as issue #9's open
+item. DR-0010's own survey confirmed `klt`'s DRC/extract rule thresholds are
+hard-coded in `klayout_tools`, not read per-variant from the PDK checkout
+(so `layout/`'s DRC/LVS signoff reports are unaffected by this default's
+correction either way); it did not separately re-verify `klt gen`'s own
+generator geometry against both variants, so this default change is not
+asserted to be geometry-neutral for `cml_driver_core.gds` the way it is for
+DRC/LVS -- re-running this script against the corrected default and
+diffing the result is a reasonable follow-up if that matters to a future
+consumer of this cell.
 """
 
 from __future__ import annotations
@@ -118,7 +127,7 @@ ROUTE_WIDTH_UM = 0.3
 # order of magnitude.
 VSS_WAYPOINT_X_UM = -3.0
 
-DEFAULT_PDK = "gf180mcuD"  # see module docstring's provenance note
+DEFAULT_PDK = "gf180mcuC"  # DR-0010 -- see module docstring's provenance note
 
 
 def _run_klt(klt: str, args: list[str]) -> dict[str, Any]:
