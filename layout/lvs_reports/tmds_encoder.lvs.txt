@@ -4,6 +4,7 @@ top: TMDS_ENCODER
 engine: klayout
 status: mismatch
 mismatches: 18
+errors: 18
   nets: layout=384  reference=357  matched=173
   devices: layout=0  reference=0  matched=0
   pins: layout=25  reference=25  matched=173

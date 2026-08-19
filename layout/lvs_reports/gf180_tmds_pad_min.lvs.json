@@ -4,12 +4,15 @@
   "layout": "../gds/gf180_tmds_pad_min.gds",
   "reference": "gf180_tmds_pad_min.ref.spice",
   "top": "gf180_tmds_pad_min",
+  "parameter_tolerance": null,
   "status": "match",
   "mismatch_count": 3,
+  "error_count": 0,
   "category_counts": {
     "device.body_unverified": 1,
     "topology": 2
   },
+  "category_error_counts": {},
   "counts": {
     "nets": {
       "layout": 3,
@@ -32,12 +35,14 @@
     "pfet",
     "bjt",
     "cap_mim_2f0_m4m5_noshield",
-    "resistor"
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
   ],
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.10",
-    "layout_sha256": "35bb3a6684254def78caa13cafe759cf430f2106943d2223a12778eb3d6bdc2d",
+    "layout_sha256": "5eac599ce6076326f42f3cc76e6f0d474683ac38737c8ad1dd33a3c273eb4feb",
     "reference_sha256": "9206dfa65c8d1cc5f2b5ffadfeb82b99261d1bc6bb4caa8a668e0d916b61a9b2",
     "extracted_netlist": null
   },
@@ -47,7 +52,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:1256c45b3e472635b03a1888d0730822c1872b4a912a2c90fc1e4e7cd14a3913"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": null
   },
@@ -64,7 +69,10 @@
         "class": "nfet"
       },
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -74,7 +82,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -84,7 +95,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": [

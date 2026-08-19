@@ -2,6 +2,25 @@
 
 GDS, generator scripts, and DRC/LVS signoff reports.
 
+**Which `klt` build, and why it matters (issue #127 finding):** the `klt`
+binary a stock `pip install klayout-tools` / `uv tool install
+klayout-tools` (no `--from <checkout>` override) resolves to reports the
+same `klt --version` (`0.2.0`) as a build from the current `klayout-tools`
+git checkout, but its bundled `gf180mcu` deck is a different, older
+snapshot (`content_hash sha256:1256c45b…` vs. the checkout build's
+`sha256:79e71a1e…`) that **has no diode device recognition at all** —
+`diode_nd2ps_06v0`/`diode_pd2nw_06v0` are entirely absent from
+`device_classes`, and a real diode structure silently extracts as
+`device_count: 0` rather than erroring. Every diode-bearing cell below
+(`gf180_tmds_pad_diode_draft`, `gf180_tmds_pad_v2`,
+`gf180_tmds_pad_ring_assembly`) needs a `klt` built from a current
+`klayout-tools` checkout (`uv tool install --from <checkout path>
+klayout-tools --force`) to regenerate correctly — the same requirement
+`cml_driver_core`'s own "Toolchain note" below already states for
+`gate_contact`, now known to be necessary for a second, unrelated reason.
+Filed generically at
+[klayout-tools#1209](https://github.com/2AMLogic/klayout-tools/issues/1209).
+
 ## Every LVS signoff is a pair, and the pair is enforced
 
 Each drawn cell below is signed off with **two** `klt lvs` runs: the intact
@@ -84,6 +103,17 @@ whichever issue next redraws this cell (most likely #87's capacitance-budget
 redesign, which must redraw the pad regardless); see
 `spec/decisions/0011-pad-esd-strategy.md` for the full account.
 
+**Re-signed-off against `gf180mcuD` (issue #127, DR-0010's amendment):** this
+generator takes no `--pdk` argument at all (pure `klayout.db` drawing, no PDK
+dependency), so its GDS is geometry-invariant by construction between
+`gf180mcuC`/`gf180mcuD` — confirmed by `klt stats` reporting an identical
+bbox/area/polygon/vertex count before and after regeneration (only the GDS
+library header's wall-clock timestamp changed). Re-running `klt drc`/`klt
+extract`/`klt lvs` reproduces the same **8-violation** known-regression
+finding above, unchanged (same 4×`pad.enclosing.metal5.1` + 4×
+`via{1,2,3,4}.width.1` set) — the deck-coverage gap is orthogonal to the C/D
+question and remains open, not silently resolved or reintroduced.
+
 ## `gf180_tmds_pad_diode_draft` — diode-clamp verification draft (issue #9, DR-0011)
 
 A `diode_nd2ps_06v0`-clamped counterpart to `gf180_tmds_pad_min` above,
@@ -123,6 +153,13 @@ the original survey measured against the pre-#542 deck), and **LVS-clean**
 reference). See `spec/decisions/0011-pad-esd-strategy.md` for the full
 decision this verification supports.
 
+**Re-signed-off against `gf180mcuD` (issue #127, DR-0010's amendment):** same
+as `gf180_tmds_pad_min` above, this generator takes no `--pdk` argument
+(geometry-invariant by construction) — `klt stats` confirms an identical
+bbox/area/polygon/vertex count, and DRC/extract/LVS results are unchanged
+(still DRC-clean, `device_counts: {diode_nd2ps_06v0: 1}`, LVS `status:
+match`).
+
 ## `gf180_tmds_pad_v2` — realistic-pad-size, diode-clamped pad redesign (issue #87)
 
 Redesign of `gf180_tmds_pad_min` against the DR-0005/DR-0011 ≤2 pF
@@ -158,7 +195,7 @@ python3 scripts/gen_pad_v2.py -o gds/gf180_tmds_pad_v2.gds
 python3 scripts/gen_pad_v2.py -o gds/gf180_tmds_pad_v2_shorted.gds --shorted
 klt drc --deck gf180mcu gds/gf180_tmds_pad_v2.gds
 klt extract --deck gf180mcu gds/gf180_tmds_pad_v2.gds -o gds/gf180_tmds_pad_v2.spice
-klt extract --deck gf180mcu --parasitics --pdk gf180mcuC gds/gf180_tmds_pad_v2.gds --format json
+klt extract --deck gf180mcu --parasitics --pdk gf180mcuD gds/gf180_tmds_pad_v2.gds --format json
 klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json --format json > lvs_reports/gf180_tmds_pad_v2.lvs.json
 klt lvs lvs/gf180_tmds_pad_v2.lvs_request.json --format text > lvs_reports/gf180_tmds_pad_v2.lvs.txt
 # expect status: mismatch (negative control) from both of the next two:
@@ -186,6 +223,15 @@ left with no layout counterpart, and the unmatched combined `D` card).
 verdict (clamp capacitance swept separately in SPICE,
 `sim/esd-diode-clamp-cv`, and summed with this real pad/interconnect
 figure).
+
+**Re-signed-off against `gf180mcuD` (issue #127, DR-0010's amendment):** this
+generator takes no `--pdk` argument (geometry-invariant by construction,
+like the two draft cells above) — GDS/DRC/extract were regenerated and are
+unchanged (still DRC-clean, `device_counts: {diode_nd2ps_06v0: 20}`). The
+`--pdk gf180mcuD` `extract --parasitics` invocation above reproduces the
+same **12.185 fF** figure the byte-identical cross-check already
+established. The LVS reports below were already re-signed-off against the
+current (post-#1196-fix) deck by issue #129/#130 and are unchanged here.
 
 **Deck-drift episode: this cell's negative control was silently defeated,
 and is now re-verified (issue #129, 2026-08-19).** The `PAD`/`VSS`
@@ -365,6 +411,20 @@ wired directly to VSS instead of left independent) correctly reports
 `status: mismatch` (a `net.merged` finding) against the same reference,
 confirming the LVS check actually distinguishes connected from
 disconnected.
+
+**Re-signed-off against `gf180mcuD` (issue #127, DR-0010's amendment):**
+`DEFAULT_PDK` in `scripts/gen_cml_driver_core.py` now reads `"gf180mcuD"`
+(previously `"gf180mcuC"`), and the committed GDS was actually regenerated
+against that new default, not just the constant flipped in place. This is
+the one cell in this repo whose generator *does* resolve real PDK-checkout
+paths per variant (`klt gen mos_array --pdk`), so the flip was verified, not
+assumed: a full per-layer `Region` XOR between a `--pdk gf180mcuC` build and
+a `--pdk gf180mcuD` build of this cell is empty on every layer, and `klt
+stats` reports an identical bbox/area/polygon/vertex count either way —
+expected, since `mos_array` here draws only diffusion/poly/contact/metal1/
+metal2 geometry, none of which is on the Metal5 layer DR-0010's survey found
+actually differs between the two variants. DRC/extract/LVS re-signoff above
+is unchanged (still DRC-clean, LVS `status: match`/`mismatch` as documented).
 
 ### Post-layout simulation of this cell (issue #34)
 
@@ -564,6 +624,18 @@ still out of scope to fix here since this assembly does not build on that
 cell (it uses the diode-clamped pad structure above instead, which is
 DRC-clean under the same current deck).
 
+**Re-signed-off against `gf180mcuD` (issue #127, DR-0010's amendment):** this
+generator takes no `--pdk` argument and imports `cml_driver_core.gds`
+(itself re-verified geometry-invariant between variants, see that section
+above), so this assembly's own geometry is unaffected by the C/D question.
+Regenerated GDS/DRC/extract/LVS above against the current, post-#1196-fix
+deck (`content_hash sha256:79e71a1e…`, the same "restored" deck
+`gf180_tmds_pad_v2`'s own episode section documents) — `status: match`/
+`mismatch` reproduced as documented, with the diode anode correctly binding
+to the drawn `VSS` net rather than a synthesized `vsubs` global (five
+repeated `klt lvs` re-runs against the intact cell all agreed `match`, no
+`#1185` flakiness observed this round).
+
 ## `tmds_encoder` — digital block-level place-and-route (issue #84)
 
 The digital partition's block-level layout: `flow/pnr_tmds_encoder.py`
@@ -661,3 +733,32 @@ section for the full root-cause finding and the klayout-tools issues filed
 ([#1029](https://github.com/2AMLogic/klayout-tools/issues/1029),
 [#1031](https://github.com/2AMLogic/klayout-tools/issues/1031) (superseded),
 [#1032](https://github.com/2AMLogic/klayout-tools/issues/1032)).
+
+**PDK-variant sensitivity, explicitly checked, not assumed (issue #127,
+DR-0010's amendment):** unlike the analog cells above, this cell's own PDK
+resolution goes through `sim/harness/pdk.py` (`flow/pnr_tmds_encoder.py`'s
+own docstring, "same PDK-pinning convention as `sim/`"), which has cited
+`gf180mcuD` in every `flow/tmds_encoder/records/*.md` evidence record from
+the start — this flow was never actually run against `gf180mcuC`, so there
+is nothing to flip here (unlike `cml_driver_core`'s `DEFAULT_PDK`). DR-0010's
+own survey found the standard-cell library's LEF/liberty (P&R's only
+PDK-derived inputs — floorplan, placement, routing, and timing all read
+these, not raw PDK geometry) are byte-identical between `gf180mcuC`/
+`gf180mcuD`; only the library's `.gds`/`.mag` differ, and only on Metal5,
+which standard cells do not route on. Re-running `python3
+flow/pnr_tmds_encoder.py` (P&R stage) reproduces a **byte-identical** routed
+DEF (`flow/tmds_encoder/pnr/tmds_encoder.def`, diffed directly against the
+committed file — zero bytes changed), confirming determinism and
+`gf180mcuD`-invariance directly rather than by inference alone. The DRC/LVS
+reports above were regenerated against `layout/gds/tmds_encoder.gds`
+unchanged (the GDS itself needs no regeneration, since P&R -- its only
+variant-sensitive stage -- reproduces byte-identically) under the current
+klt deck, reproducing the same DRC-clean / 18-mismatch LVS status documented
+above. The DEF -> GDS merge step itself (`merge_gds`, above) requires the
+pinned `openroad/orfs` Docker image's bundled KLayout tech file
+(`/OpenROAD-flow-scripts/flow/platforms/gf180/KLayout/gf180mcu_5LM_1TM_9K_9t.lyt`)
+and was not re-run in this pass (the image was not pullable in this
+environment) — not needed for this confirmation, since that step reads
+ORFS's own bundled, PDK-variant-agnostic tech file plus the (Metal5-free,
+byte-identical) standard-cell GDS library, and the DEF it would consume is
+itself confirmed unchanged.

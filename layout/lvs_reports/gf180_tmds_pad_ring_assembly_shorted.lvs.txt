@@ -3,23 +3,18 @@ reference: gf180_tmds_pad_ring_assembly_shorted.ref.spice
 top: gf180_tmds_pad_ring_assembly_shorted
 engine: klayout
 status: mismatch
-mismatches: 12
-  nets: layout=6  reference=7  matched=2
-  devices: layout=6  reference=6  matched=2
+mismatches: 7
+errors: 5
+  nets: layout=6  reference=7  matched=3
+  devices: layout=6  reference=6  matched=4
   pins: layout=6  reference=6  matched=8
 
 category_counts:
-  device.combine_incomplete: 1
-  device.unmatched: 6
+  device.unmatched: 2
   net.merged: 2
   net.split: 1
   topology: 2
 
-[warning] device.combine_incomplete  (layout)  options.combine_devices could not fully combine devices on the layout netlist: KLayout's Netlist.combine_devices() hit an internal-consistency error on a partial-match device group (instances sharing only some, not all, of their matching terminals) and stopped -- devices it had already combined before the error remain combined, but the rest of this netlist's devices were left uncombined (Internal error: Terminal still connected after removing device in device combination: name=, circuit=gf180_tmds_pad_ring_assembly_shorted, terminal=D in Netlist.combine_devices)
-[error] device.unmatched  (layout)  device has no counterpart on the other side
-[error] device.unmatched  (layout)  device has no counterpart on the other side
-[error] device.unmatched  (reference)  device has no counterpart on the other side
-[error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] net.merged  (reference)  multiple reference nets were collapsed into one layout net

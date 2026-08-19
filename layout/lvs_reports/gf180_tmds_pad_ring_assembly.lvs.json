@@ -7,9 +7,11 @@
   "parameter_tolerance": null,
   "status": "match",
   "mismatch_count": 2,
+  "error_count": 0,
   "category_counts": {
     "topology": 2
   },
+  "category_error_counts": {},
   "counts": {
     "nets": {
       "layout": 7,
@@ -39,7 +41,7 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.10",
-    "layout_sha256": "43176701db1d796a3a482a530976604664993e8a4815ebe2deb34dfeb0d5380d",
+    "layout_sha256": "8b2f3090ba1cdd6f6dcfefcfcf10da1aaaf69d9018e43828d2f202c53e53902e",
     "reference_sha256": "1f0777032102afd504d50b56a5f34e55ee685d506761ef8a1152052828004554",
     "extracted_netlist": null
   },
@@ -49,7 +51,7 @@
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:6a323622d93c1b4716a7874c37ee3d825bd08398c3c030c85175e44e2cc229a3"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
     },
     "input": null
   },
@@ -62,7 +64,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     },
     {
       "category": "topology",
@@ -72,7 +77,10 @@
       "net": null,
       "device": null,
       "property": null,
-      "details": null
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
     }
   ],
   "net_correspondence": [

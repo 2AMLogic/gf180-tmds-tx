@@ -1,6 +1,22 @@
 file: gds/gf180_tmds_pad_min_shorted.gds
 deck: gf180mcu
 dbu_um: 0.001
-status: clean
-violations: 0
-unchecked layers in stream: 7
+status: violations
+violations: 8
+unchecked layers in stream: 3
+
+rule_counts:
+  pad.enclosing.metal5.1: 4
+  via1.width.1: 1
+  via2.width.1: 1
+  via3.width.1: 1
+  via4.width.1: 1
+
+pad.enclosing.metal5.1  gf180_tmds_pad_min_shorted  Metal5  (1590,500)-(1670,1500)  minimum top-metal (Metal5) overlap of pad opening
+pad.enclosing.metal5.1  gf180_tmds_pad_min_shorted  Metal5  (1590,500)-(2210,580)  minimum top-metal (Metal5) overlap of pad opening
+pad.enclosing.metal5.1  gf180_tmds_pad_min_shorted  Metal5  (1590,1420)-(2210,1500)  minimum top-metal (Metal5) overlap of pad opening
+pad.enclosing.metal5.1  gf180_tmds_pad_min_shorted  Metal5  (2130,500)-(2210,1500)  minimum top-metal (Metal5) overlap of pad opening
+via1.width.1  gf180_tmds_pad_min_shorted  Via1  (1790,840)-(2010,1160)  minimum via1 size (approximates official min/max size rule)
+via2.width.1  gf180_tmds_pad_min_shorted  Via2  (1790,840)-(2010,1160)  minimum via2 size (approximates official min/max size rule)
+via3.width.1  gf180_tmds_pad_min_shorted  Via3  (1790,840)-(2010,1160)  minimum via3 size (approximates official min/max size rule)
+via4.width.1  gf180_tmds_pad_min_shorted  Via4  (1790,840)-(2010,1160)  minimum via4 size (approximates official min/max size rule)
