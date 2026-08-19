@@ -604,7 +604,7 @@ not touch `spec/` either.)*
 
 ## 9. Issue #87 redesign: a real 25×25 µm pad, DR-0011's diode clamp, and the corrected verdict
 
-DR-0010 (`spec/decisions/0010-pdk-variant.md`, PDK variant `gf180mcuC`) and
+DR-0010 (`spec/decisions/0010-pdk-variant.md`, PDK variant `gf180mcuD`) and
 DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`, clamp device
 `diode_nd2ps_06v0`/`diode_pd2nw_06v0`, 350/75 µm pad pitch, ring continuity
 and a real substrate tap required) both ratified 2026-08-19 via #9/PR #122,
@@ -841,16 +841,20 @@ survive the corrected arithmetic or the new measurement.
   split methodology (real-tool pad/interconnect measurement +
   PVT-swept SPICE clamp sweep, summed) rather than inventing a new one.
 - **`design/esd-capacitance-budget.md` updated, citing the ratified PDK
-  variant and clamp device**: this section — DR-0010 (`gf180mcuC`, Sec.9.1
+  variant and clamp device**: this section — DR-0010 (`gf180mcuD`, Sec.9.1
   and Sec.9.3's byte-identical-coefficient re-confirmation) and DR-0011
   (`diode_nd2ps_06v0`, Sec.9.2) are both cited directly against real
   measurements taken this issue.
-- **`sim/pdk.json` and layout artifacts cite `gf180mcuC`**: re-verified —
-  `sim/pdk.json` still pins `gf180mcuC` (unchanged since PR #122);
-  `gf180_tmds_pad_v2`'s own signoff (Sec.9.2) was run with
-  `--pdk gf180mcuC` where a PDK variant applies (`klt extract
+- **`sim/pdk.json` cites `gf180mcuD`; layout artifacts still cite
+  `gf180mcuC`, pending regeneration**: re-verified — `sim/pdk.json` now pins
+  `gf180mcuD`, per DR-0010 as corrected by the operator's amendment ruling
+  (2026-08-19T04:35:28Z); `gf180_tmds_pad_v2`'s own signoff (Sec.9.2) was run
+  with `--pdk gf180mcuC` where a PDK variant applies (`klt extract
   --parasitics`), and cross-checked byte-identical against `gf180mcuD`
-  (Sec.9.3).
+  (Sec.9.3) — the layout itself has not yet been regenerated against
+  `gf180mcuD` (tracked separately, issue #127), so this discrepancy is
+  expected and does not affect the measured numbers (byte-identical either
+  way, per the cross-check just cited).
 - **How #65 item 5's analog-capacitance sub-part would grade on a fresh
   re-read**: #65's 2026-08-15 checklist (HEAD `f4de03b`) marked item 5's
   analog partition FAIL because "`design/esd-capacitance-budget.md` reports
