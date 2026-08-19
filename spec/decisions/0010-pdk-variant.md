@@ -140,16 +140,21 @@ already used are all identical either way.
 
 ## Decision
 
-**This block is designed and verified against `gf180mcuC`** — matching
-every layout artifact and every `klt drc`/`klt extract`/`klt lvs` signoff
-report already committed to this repository (`layout/`, from issue #2
-onward), and matching `gf180mcuC`'s thinner (0.9 um) top metal, which is the
-**conservative** assumption for pad ESD margin: a thinner top-metal bond pad
-carries less current-handling headroom under an ESD strike than a thicker
-one at the same drawn width, so designing and DRC-closing against the
-thinner variant does not silently understate the block's ESD risk the way
-designing against the thicker variant and shipping on the thinner one
-would.
+**This block is designed and verified against `gf180mcuD`** — per the
+operator's ruling amendment on issue #9 (2026-08-19T04:35:28Z), which
+explicitly supersedes this record's original `gf180mcuC` ruling. The
+amendment's own stated rationale: the product landscape record documents
+that wafer.space's GF180MCU shuttle runs advertise the `gf180mcuD` stack,
+and TinyTapeout's GF shuttles also submit via wafer.space — every observed
+tape-out path for these canaries is `D`. This is exactly the scenario the
+original ruling's own contingency anticipated ("revisit this pin only if a
+future tape-out shuttle explicitly mandates `gf180mcuD`," see `##
+Contingency` below) — it fired within the same review cycle that ratified
+the original ruling, six minutes before PR #122 (which carried the original
+`gf180mcuC` text) merged, but the amendment was not seen before that merge
+landed (see the correction note trailing this section's history: PR #122
+was created 2026-08-19T04:35:08Z, twenty seconds before the amendment
+posted, and merged 2026-08-19T04:41:03Z without incorporating it).
 
 `open_pdks` commit `c6d73a35f524070e85faff4a6a9eef49553ebc2b`, as checked
 out via volare, is unchanged from the existing citations — only the variant
@@ -157,13 +162,19 @@ letter changes.
 
 ## Alternatives considered
 
-- **Pin `gf180mcuD`** (matching the *existing* spec citations in DR-0002/
-  DR-0005, and matching every `sim/`/`flow/` record already on disk) was
-  considered. Rejected: it is the *thicker*, less conservative top-metal
-  assumption for ESD margin, and it would require re-running and
-  re-signing-off every `layout/` artifact instead — a strictly larger
-  practical cost than re-citing `sim/`/`flow/`, for a strictly worse ESD
-  assumption.
+- **Pin `gf180mcuC`** (matching every layout artifact and every `klt
+  drc`/`klt extract`/`klt lvs` signoff report already committed to this
+  repository at the time of the original ruling, and matching `gf180mcuC`'s
+  thinner (0.9 um) top metal, the more conservative assumption for pad ESD
+  margin) was this record's *original* ruling. **Superseded** by the
+  operator's amendment above: matching the actual tape-out shuttle stack
+  (`gf180mcuD`, per wafer.space's advertised GF180MCU runs, which both this
+  program's and TinyTapeout's GF shuttles submit through) takes priority
+  over avoiding a `layout/` re-run. Every `layout/` artifact must now be
+  regenerated and re-signed off against `gf180mcuD` — a strictly larger
+  practical cost than the citation-only re-cite this correction performs,
+  but the cost the amendment ruling accepts as correct (tracked as sub-issue
+  B of #123's decomposition, filed as #127).
 - **Leave the discrepancy unresolved and let each future issue pick locally**
   was considered and rejected outright — this is exactly the ambiguity
   issue #9 exists to close, and it directly blocks #12/#87's ESD-capacitance
@@ -179,15 +190,19 @@ letter changes.
 
 ### Artifacts already committed
 
-- **`layout/` needs no re-run.** It was already produced against
-  `gf180mcuC`; this record ratifies what was already true in practice. Its
-  DRC/LVS reports remain valid evidence for this decision (subject to a
-  separate, out-of-scope-here finding recorded in DR-0011 about `klt`'s own
-  deck having grown new rules since those reports were minted).
+- **`layout/` was produced against `gf180mcuC` and needs re-run.** Every
+  `layout/` DRC/LVS artifact committed to this repository through issue #2
+  onward was drawn and signed off against `gf180mcuC` — the variant this
+  record's original ruling pinned, matching what was already on disk at the
+  time. The operator's amendment (`## Decision` above) now requires
+  regenerating and re-signing off that work against `gf180mcuD` instead
+  (Metal5 pad geometry moves by the deltas measured in `## Context` above).
+  Tracked as sub-issue B of #123's decomposition (#127) — out of scope for
+  this citation-only correction (sub-issue A).
 - **`sim/` (every analog SPICE record) and `flow/` (the digital synthesis/
-  PnR/STA flow) currently cite `gf180mcuD`** (`sim/pdk.json`,
-  `sim/harness/pdk.py`'s `DEFAULT_VARIANT`, `flow/README.md`) and need
-  **re-citing, not re-running**, per the survey above:
+  PnR/STA flow) cite `gf180mcuD`** (`sim/pdk.json`, `sim/harness/pdk.py`'s
+  `DEFAULT_VARIANT`, `flow/README.md`) as of this correction, matching the
+  ratified pin — no further re-citing needed there:
   - Every analog record's underlying SPICE device models
     (`sm141064.ngspice`) are byte-identical between variants, so no
     `sim/*/records/*.md` result changes numerically. `design/
@@ -197,20 +212,14 @@ letter changes.
   - Every digital-flow record's underlying LEF/liberty are byte-identical
     between variants, so DR-0007/0008/0009's 720p60 closure results are
     unaffected in value.
-  - What *is* wrong today is purely the citation string in these already-
-    committed evidence documents (`sim/pdk.json`'s `"variant":
-    "gf180mcuD"`, `sim/README.md`'s "PDK variant" section, `flow/README.md`'s
-    PDK row, and every individual `sim/*/records/*.md` /
-    `flow/tmds_encoder/records/*.md` file's own citation line) — each of
-    those should be corrected to `gf180mcuC` (with a note that the
-    correction is citation-only, evidenced by this record, not a
-    re-simulation) as a **follow-up bookkeeping issue**, not blocking this
-    decision record. This PR updates `sim/pdk.json` and `sim/README.md`'s
-    forward-looking guidance (so every *future* record is minted against
-    the ratified variant) but does not rewrite the historical, append-only
-    `sim/*/records/*.md`/`flow/*/records/*.md` files themselves — per
-    `sim/README.md`'s own append-only convention, a correction references
-    what it supersedes rather than overwriting history in place.
+  - This correction updates `sim/pdk.json`, `sim/harness/pdk.py`'s
+    `DEFAULT_VARIANT`, `sim/README.md`, `sim/harness/README.md`,
+    `sim/env.sh`, `flow/README.md`, `spec/tmds-tx.md`'s Status-line note, and
+    the live-pin passages of `design/esd-capacitance-budget.md` — but does
+    not rewrite the historical, append-only `sim/*/records/*.md`/
+    `flow/*/records/*.md` files themselves — per `sim/README.md`'s own
+    append-only convention, a correction references what it supersedes
+    rather than overwriting history in place.
 - **No numeric result recorded anywhere in this repository is invalidated**
   by this ruling — the survey above establishes that every place C and D
   actually differ (Metal5 width/spacing/area/resistance, and the I/O
@@ -220,13 +229,23 @@ letter changes.
 
 ### Contingency
 
-Revisit this pin only if a future tape-out shuttle explicitly mandates
-`gf180mcuD` (or another variant). If that happens: every `layout/` artifact
-must be regenerated and re-signed off against the mandated variant (Metal5
-pad geometry moves by the deltas measured above), and `sim/`/`flow/`
-citations flip back — but per the survey above, no *numeric* sim/flow result
-would need recomputation, only the layout/pad-adjacent geometry and its
-DRC/LVS signoff.
+**Fired.** The original text of this section read: "Revisit this pin only
+if a future tape-out shuttle explicitly mandates `gf180mcuD` (or another
+variant)." The operator's amendment ruling on issue #9 (2026-08-19T04:35:28Z,
+see `## Decision` above) fired this contingency immediately: the product
+landscape record documents that wafer.space's GF180MCU shuttle runs
+advertise the `gf180mcuD` stack, and TinyTapeout's GF shuttles also submit
+via wafer.space — every observed tape-out path for these canaries is `D`.
+
+Per the original anticipation of this scenario: every `layout/` artifact
+must be regenerated and re-signed off against `gf180mcuD` (Metal5 pad
+geometry moves by the deltas measured in `## Context` above), and `sim/`/
+`flow/` citations flip to match. That layout regeneration is tracked as
+sub-issue B of #123's decomposition (#127) — a much larger body of
+analog/DRC/LVS work, out of scope for this record's own citation-only
+correction (sub-issue A). Per the survey above, no *numeric* sim/flow result
+needs recomputation, only the layout/pad-adjacent geometry and its DRC/LVS
+signoff.
 
 ## Status
 

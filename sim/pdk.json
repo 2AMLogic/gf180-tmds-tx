@@ -6,17 +6,17 @@
     "  search_roots  extra directories that CONTAIN variant dirs, searched before",
     "                the built-in list (~/.volare, /usr/share/pdk, ...)",
     "",
-    "variant is pinned to gf180mcuC per DR-0010 (spec/decisions/0010-pdk-variant.md,",
-    "issue #9), which resolved the gf180mcuC-vs-gf180mcuD discrepancy this file",
-    "previously pinned gf180mcuD around: gf180mcuC matches every layout artifact",
-    "already committed (layout/, from #2) and is the conservative (thinner top-",
-    "metal) assumption for pad ESD margin. DR-0010 also found the two variants'",
+    "variant is pinned to gf180mcuD per DR-0010 (spec/decisions/0010-pdk-variant.md,",
+    "issue #9), per the operator's amendment ruling (2026-08-19T04:35:28Z):",
+    "wafer.space's GF180MCU shuttle runs advertise the gf180mcuD stack, and",
+    "TinyTapeout's GF shuttles also submit via wafer.space -- every observed",
+    "tape-out path for these canaries is D. DR-0010 also found the two variants'",
     "SPICE device models (libs.tech/ngspice) are byte-identical, so this pin",
-    "change does not itself invalidate any already-recorded sim/ result numerically",
-    "-- only their citation strings are stale (see DR-0010's Consequences and",
-    "sim/README.md's 'PDK variant' section for the full account, including which",
-    "already-committed records still cite gf180mcuD)."
+    "does not itself invalidate any already-recorded sim/ result numerically",
+    "-- layout/ artifacts (drawn against gf180mcuC) still need regeneration and",
+    "re-signoff against gf180mcuD, tracked separately (see DR-0010's Consequences",
+    "and sim/README.md's 'PDK variant' section for the full account)."
   ],
-  "variant": "gf180mcuC",
+  "variant": "gf180mcuD",
   "search_roots": []
 }

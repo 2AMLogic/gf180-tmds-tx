@@ -133,7 +133,7 @@ digital-to-CML boundary does not need a level shifter.
 
 **Status**: Accepted. This record's PDK-variant citation (`gf180mcuD`) is
 qualified by DR-0010, which pins this block's design/verification target to
-`gf180mcuC` instead — see `spec/decisions/0010-pdk-variant.md`. No other
+`gf180mcuD` — see `spec/decisions/0010-pdk-variant.md`. No other
 content in this record changes: the device-family decision, and every
 number attached to it, stand as ratified.
 
@@ -854,7 +854,7 @@ text is its own churn this issue's own acceptance criteria excludes ("no
 other ratified text in this file changes"), so the split point is simply
 where new work landed, not backfilled onto history.
 
-- [`DR-0010: PDK variant and revision this block is designed and verified against`](decisions/0010-pdk-variant.md) — pins `gf180mcuC`; supersedes DR-0002's variant citation (Status-line note) and DR-0005 in full (via DR-0011).
+- [`DR-0010: PDK variant and revision this block is designed and verified against`](decisions/0010-pdk-variant.md) — pins `gf180mcuD`; supersedes DR-0002's variant citation (Status-line note) and DR-0005 in full (via DR-0011).
 - [`DR-0011: Pad and ESD strategy after #2 (successor to DR-0005)`](decisions/0011-pad-esd-strategy.md) — reaffirms the diode-based ESD clamp (verified via a real `klt` LVS run), rules on pad pitch/ring depth/continuity/substrate tap, carries the HBM/CDM/capacitance targets forward unrelaxed. Supersedes DR-0005.
 - [`DR-0012: Completing the PLL interface contract (successor to DR-0004)`](decisions/0012-pll-interface-completion.md) — adds the half-rate/synthesized-domain clock derivation, output signal type/swing/common-mode, duty-cycle tolerance, and loading rows §2 lacked. Extends DR-0004 (numbers unchanged).
 - [`DR-0013: Operating conditions and the verifiable spec rows`](decisions/0013-operating-conditions.md) — ratifies the PVT matrix (−40/27/125 °C, ±10 % supply, process corners) and the supply spec, and enumerates the spec's pass/fail rows (citing existing evidence where it exists, marking `Proposed` where it does not).

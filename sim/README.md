@@ -34,14 +34,16 @@ fields, both called out explicitly below.
 
 ## PDK variant
 
-`sim/pdk.json` pins `gf180mcuC`, per **DR-0010**
-(`spec/decisions/0010-pdk-variant.md`, issue #9), which resolved this
-section's previously-open `gf180mcuC`-vs-`gf180mcuD` discrepancy: `gf180mcuC`
-matches every layout artifact already committed under `layout/` (from issue
-#2 onward) and is the conservative (thinner, 0.9 um, top-metal) assumption
-for pad ESD margin. `spec/tmds-tx.md`'s DR-0002 citation of `gf180mcuD` is
-now qualified by DR-0010's Status-line note (DR-0005's own `gf180mcuD`
-citation is superseded in full, via DR-0011).
+`sim/pdk.json` pins `gf180mcuD`, per **DR-0010**
+(`spec/decisions/0010-pdk-variant.md`, issue #9) as corrected by the
+operator's amendment ruling (2026-08-19T04:35:28Z): every observed tape-out
+path for these canaries runs through wafer.space's GF180MCU shuttle, whose
+advertised stack is `gf180mcuD`. `layout/` artifacts committed under
+`layout/` (from issue #2 onward) were drawn against `gf180mcuC` and need
+regeneration and re-signoff against `gf180mcuD` — tracked separately (issue
+#127), not blocking this `sim/`-side re-citation. `spec/tmds-tx.md`'s
+DR-0002 citation of `gf180mcuD` is qualified by DR-0010's Status-line note
+(DR-0005's own `gf180mcuD` citation is superseded in full, via DR-0011).
 
 **This pin changes no numeric result already recorded by this harness.**
 DR-0010's own survey diffed both variants directly: `libs.tech/ngspice/`
@@ -51,12 +53,11 @@ parasitic-capacitance coefficients `design/esd-capacitance-budget.md`'s
 figures were computed from are likewise identical. The two variants differ
 *only* in Metal5 (top-metal) width/spacing/area DRC thresholds and sheet
 resistance — a layout-side concern, not a SPICE-model-side one. So every
-`sim/*/records/*.md` record minted before this pin landed, which still
-cites `gf180mcuD` in its own Environment/provenance section, remains valid
-evidence for the number it reports — only its citation string is stale, per
-this directory's own append-only convention (a correction references what
-it supersedes rather than rewriting history in place). New records should
-cite `gf180mcuC`, matching this file's pin, going forward.
+`sim/*/records/*.md` record's citation, whichever variant it names, remains
+valid evidence for the number it reports — per this directory's own
+append-only convention, a correction references what it supersedes rather
+than rewriting history in place. New records should cite `gf180mcuD`,
+matching this file's pin, going forward.
 
 ## The PVT matrix (ratified — DR-0013)
 

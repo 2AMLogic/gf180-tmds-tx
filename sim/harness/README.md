@@ -45,17 +45,17 @@ python3 sim/check_records.py               # check every record against sim/READ
 | Tool | Why | Install |
 |---|---|---|
 | `ngspice` | simulation | `brew install ngspice` / `apt-get install ngspice` |
-| gf180mcu PDK (`gf180mcuC`, DR-0010) | device models | `pip install volare && volare enable --pdk gf180mcu <hash>` |
+| gf180mcu PDK (`gf180mcuD`, DR-0010) | device models | `pip install volare && volare enable --pdk gf180mcu <hash>` |
 | `xschem` | schematic capture (optional for simulation) | `brew install xschem` / distro package |
 | python3 ≥ 3.9 | the harness | stdlib only, no packages |
 
 The harness never hardcodes a PDK path. It resolves one, in order:
 
-1. `GF180_PDK_PATH` — the *variant* directory, e.g. `~/.volare/gf180mcuC`
+1. `GF180_PDK_PATH` — the *variant* directory, e.g. `~/.volare/gf180mcuD`
    (the one containing `libs.tech/`).
-2. `PDK_ROOT` (+ `PDK`, default `gf180mcuC`) — the open_pdks / OpenLane convention.
+2. `PDK_ROOT` (+ `PDK`, default `gf180mcuD`) — the open_pdks / OpenLane convention.
 3. `sim/pdk.local.json` — machine-local, git-ignored.
-4. `sim/pdk.json` — committed default: `gf180mcuC` (see `sim/README.md`'s
+4. `sim/pdk.json` — committed default: `gf180mcuD` (see `sim/README.md`'s
    "PDK variant" section, and DR-0010, for why this variant).
 5. Built-in search roots: `~/.volare`, `~/.ciel`, `/usr/share/pdk`,
    `/usr/local/share/pdk`, `~/share/pdk`, `/opt/pdk`.
