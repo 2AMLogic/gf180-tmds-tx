@@ -181,45 +181,60 @@ than summarized as "done" or omitted.
 | 4 | DRC | **Disclosed FAIL** | same record (`layout/drc_reports/tmds_encoder.drc.json`) | `status: violations`, 188 violations, all rule `mim.space.1` — a Metal4-to-Metal4 spacing check the curated gf180mcu deck cannot distinguish from a real MiM capacitor's bottom plate; this design has zero capacitor devices. Filed generically upstream per this repo's friction protocol: [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033). |
 | 5 | LVS | **Disclosed FAIL** | same record (`layout/lvs_reports/tmds_encoder.lvs.json`) | `status: mismatch`, 10 topology mismatches; 281/281 nets and 25/25 pins otherwise match. All 10 are P&R-inserted filler/tap/endcap standard-cell *types* carrying no logic, which the pre-P&R reference netlist has no counterpart for by construction — full accounting in `layout/scripts/filter_pnr_utility_cells.py`'s docstring. |
 | 6 | Post-layout verification (SDF-back-annotated gate-level re-simulation) | **PASS, scope-limited** | [`flow/tmds_encoder/records/20260816-080228-185a5d3.md`](../flow/tmds_encoder/records/20260816-080228-185a5d3.md) (SDF extraction), [`flow/tmds_encoder/records/20260816-080524-185a5d3.md`](../flow/tmds_encoder/records/20260816-080524-185a5d3.md) (re-simulation) | The unmodified `verification/tmds_encoder/test_tmds_encoder.py` bench, run against the SDF-annotated post-route netlist: 3/3 tests PASS. SDF extracted at a single corner (`tt_025C_3v30`, OpenRCX), no PVT sweep, no CTS/SDC. No formal setup/hold timing-closure verdict is made at this stage — that is item 7/8 below. |
-| 7 | Static timing analysis — setup, 720p60 target (74.25 MHz) | **Disclosed FAIL** | [`flow/tmds_encoder/records/20260816-172539-930e864.md`](../flow/tmds_encoder/records/20260816-172539-930e864.md) | Setup **FAILs at 4 of 5** 3.3 V liberty corners (`tt_025C_3v30`, `ss_125C_3v00`, `ss_n40C_3v00`, `ff_125C_3v60` fail; `ff_n40C_3v60` passes). Measured Fmax: **22.70 MHz worst-corner, 45.88 MHz typical**, against the 74.25 MHz requirement. Setup at the 480p fallback (27.000 MHz) also FAILs, at 1 of the 5 corners (slow/hot, `ss_125C_3v00`). Root cause: item 2's synthesis carried no timing constraint and item 3's P&R ran no CTS — this measures *this specific netlist as built*, not the library's achievable ceiling for this RTL. |
-| 8 | Static timing analysis — hold, all corners, both targets | **PASS** | same record | Hold met at every one of the 5 corners, at both the 720p60 and 480p targets (hold is clock-period-independent, so both targets give the same answer). Worst hold margin +0.3179 ns (`ff_n40C_3v60`). |
+| 7 | Static timing analysis — setup, 720p60 target (74.25 MHz) | **PASS** | [`flow/tmds_encoder/records/20260817-110611-37e197a.md`](../flow/tmds_encoder/records/20260817-110611-37e197a.md) | Setup **met at all 5** 3.3 V liberty corners (`tt_025C_3v30`, `ss_125C_3v00`, `ss_n40C_3v00`, `ff_125C_3v60`, `ff_n40C_3v60`). Measured Fmax: **75.83 MHz worst-corner** (`ss_125C_3v00`), 148.96 MHz typical. Setup at the 480p fallback (27.000 MHz) also PASSes at all 5 corners. **Supersedes** the earlier pre-timing-driven-synthesis/pre-CTS record ([`20260816-172539-930e864.md`](../flow/tmds_encoder/records/20260816-172539-930e864.md)), which reported setup FAIL at 4/5 corners and 22.70 MHz worst-corner Fmax against an unconstrained, CTS-free netlist — that gap is now closed by issue #100's timing-driven-synthesis/CTS/timing-repair machinery combined with issue #115's DR-0009 four-stage pipeline restructuring (S1 popcount/threshold, S2 parallel-prefix transition-minimized word, S3 accumulator-independent DC-balance candidates, S4 decision + accumulator recurrence). The worst-corner margin is narrow (+0.2799 ns, 2.1 % of the 13.4680 ns period, at `ss_125C_3v00`) — closed, not closed with headroom. |
+| 8 | Static timing analysis — hold, all corners, both targets | **PASS** | same record | Hold met at every one of the 5 corners, at both the 720p60 and 480p targets (hold is clock-period-independent, so both targets give the same answer). Worst hold margin +0.2703 ns (`ff_n40C_3v60`). |
 
 **What this means.** The digital partition's RTL-level functional
-verification, synthesis, layout existence, and post-layout gate-level
-re-simulation are clean PASSes (items 1–3, 6 above). Its DRC, LVS, and
-setup-timing closure at the 720p60 target are disclosed FAILs with named
-causes: DRC's `mim.space.1` false-positive is a deck-level klayout-tools gap
-([#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)), LVS's 10
-mismatches are accounted for entirely by P&R-inserted utility cells with no
-netlist counterpart, and the timing-closure gap traces to an
-area-oriented, unconstrained synthesis plus a CTS-free P&R run — not to a
-library or architecture ceiling. Closing the timing gap (timing-driven
-synthesis, CTS, RTL pipelining if needed) is tracked separately by
-**#100**; this rollup's job is to report the current, disclosed state, not
-to fix it. Per CLAUDE.md's "720p60 is the target" scope discipline, the
-setup-timing FAIL at 4/5 corners against the 74.25 MHz requirement is the
-single most load-bearing fact in this section, not a footnote.
+verification, synthesis, layout existence, post-layout gate-level
+re-simulation, and setup/hold timing closure at the 720p60 target are clean
+PASSes (items 1–3, 6–8 above). Its DRC and LVS are disclosed FAILs with
+named causes: DRC's `mim.space.1` false-positive is a deck-level
+klayout-tools gap ([#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)),
+and LVS's mismatches are accounted for by P&R-inserted utility cells
+(fill/tap/endcap/CTS buffers/hold-repair/resized cells) with no counterpart
+in the pre-P&R reference netlist by construction — closing this (updating
+the LVS reference netlist to include the expected P&R utility cells) is
+real open engineering work, not yet filed as its own issue. Timing closure
+was achieved by issue #100's timing-driven-synthesis/CTS/timing-repair
+machinery plus issue #115's DR-0009 four-stage pipeline; this rollup's job
+is to report the current, disclosed state, not to re-derive it. Per
+CLAUDE.md's "720p60 is the target" scope discipline, this closes what was
+previously the single most load-bearing fact in this section — 720p60
+setup timing is now met at every corner — though the worst-corner margin
+(2.1 % of the period) is narrow, not comfortable.
 
 ## 3. What is not yet covered (named explicitly)
 
 Per the coverage-honesty requirement this document exists to meet, the
 following gaps are stated by name rather than left as silent omissions:
 
-1. **Item 5 — PVT-vs-ratified-spec, gated by #9.** `sim/README.md`'s own
-   working PVT matrix (−40/27/125 °C, ±10 % supply, 5 process corners) is
-   explicitly **not yet ratified** — it is "a working default pending
-   ratification, not a spec-derived requirement" (`sim/README.md`, "The PVT
-   matrix" section). Issue #9 owns ratifying this matrix as DR-0009, and
-   also owns resolving a PDK-variant discrepancy between this repo's `sim/`
-   evidence (pinned to `gf180mcuD`) and its `layout/` evidence (produced
-   against `gf180mcuC`, per `sim/README.md`'s "PDK variant" section and
-   issue #9's own body). Until #9 rules, every PASS verdict in §1 above is
-   graded against a **working-default, not-yet-ratified** PVT matrix, and
-   the `sim/`-vs-`layout/` PDK-variant mismatch is unresolved. This is an
-   operator-only item per CLAUDE.md's "agents do not relax the ratified
-   spec" instruction and this repo's own `loom:operator-only` gating on #9
-   — not something this document, or any other agent-authored artifact, can
-   close.
+1. **PVT matrix — now ratified.** `sim/README.md`'s own working PVT matrix
+   (−40/27/125 °C, ±10 % supply tolerance, the 5 classic MOS process
+   corners plus `res_ff`/`res_ss`/`bjt_ff`/`bjt_ss` for resistor/BJT-
+   dependent claims, both bit-rate targets) is **ratified**:
+   [`spec/decisions/0013-operating-conditions.md`](../spec/decisions/0013-operating-conditions.md)
+   (**Accepted**, 2026-08-18) ratifies the existing working-default matrix
+   verbatim and unchanged — a tightening/formalizing move, not a new
+   requirement, so no existing evidence in §1 above is invalidated or needs
+   re-running. Issue #9 (closed, merged via PR #122) is the issue that
+   originally opened this question; DR-0013 is its resolution, landed under
+   a renumbered decision-record slot (see that record's own "Numbering
+   note"). Every PASS verdict in §1 above is now graded against a
+   spec-derived requirement, not a working default. The PDK-variant
+   discrepancy this item previously flagged (`sim/` pinned `gf180mcuD`,
+   `layout/` produced against `gf180mcuC`) is likewise resolved: DR-0010
+   (Accepted) ratifies `gf180mcuD`, and every `layout/` artifact has since
+   been regenerated and re-signed off against it (#127, closed) — per
+   DR-0010's own survey, no numeric result recorded in this repository
+   changes value as a result. DR-0013 also ratifies an 11-row
+   verifiable-spec-row table (its own §3); three of those rows remain
+   genuine open gaps, unchanged by this ratification and **not** resolved
+   by it: row 6 (combined swing+jitter eye-mask criterion) has no
+   testbench yet; row 10 (pad-capacitance budget, ≤ 2 pF) **FAILs at ~4×
+   over budget** against a realistic 25×25 µm bond pad (see §1's DR-0005
+   table above); row 11 (ESD HBM/CDM qualification) is not yet
+   independently simulated. These three remain tracked by Epic #17's own
+   T1 checklist item 5, not closed by this record.
 2. **Post-layout re-simulation — device-level done, parasitic RC not.**
    The DR-0002 rows in §1 now carry a **Netlist provenance: extracted**
    record as well as the schematic one
@@ -235,11 +250,22 @@ following gaps are stated by name rather than left as silent omissions:
    run does show (§1) is a lower bound on the post-layout capacitance story,
    not the whole of it. Two further scope limits are equally unclosed by
    that record: it covers **the core driver cell only** — no pad, no ESD
-   clamp, no package, no board — and the layout it extracts was produced
-   against `gf180mcuC` while the simulation uses `gf180mcuD` models (item 1
-   above, issue #9). A parasitic-RC re-run, and a post-layout run of the
-   driver *with* its pad/ESD structure once that cell exists, are both still
-   outstanding and neither has an evidence record.
+   clamp, no package, no board. The layout-vs-simulation PDK-variant
+   question (item 1 above) is now resolved (DR-0010, `layout/` regenerated
+   against `gf180mcuD`). The driver-plus-pad/ESD assembled cell itself now
+   exists:
+   [`layout/gds/gf180_tmds_pad_ring_assembly.gds`](../layout/gds/gf180_tmds_pad_ring_assembly.gds)
+   (#86, landed 2026-08-19) integrates the driver core cell with two
+   diode-clamped bond pads and DR-0011's pad-ring/ESD structure, and is
+   itself DRC-clean (0 violations) and LVS-matched (`status: match`, 2
+   warning-only findings) — so "no pad/ESD post-layout evidence because the
+   cell doesn't exist yet" is no longer the gap. **What remains
+   outstanding**: no electrical/PVT simulation of that assembled cell has
+   been run — only its structural DRC/LVS signoff exists, not a
+   `sim/`-style corner-matrix electrical record. A parasitic-RC re-run of
+   the bare driver core, and a first post-layout electrical simulation of
+   the assembled driver+pad+ESD cell, are both still outstanding and
+   neither has an evidence record.
 3. **Monte Carlo evidence.** No record in `sim/` today carries a
    **Statistical convention** field with a seed, sample count, and a
    deterministic negative control — every record in §1 is a corner-matrix

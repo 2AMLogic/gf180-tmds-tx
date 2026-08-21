@@ -5,18 +5,24 @@ open PDK — serializer plus current-mode line driver — designed by AI agents
 driving [klayout-tools](https://github.com/2AMLogic/klayout-tools), xschem +
 ngspice on the analog side and Yosys/OpenROAD on the digital side.
 
-**Status: spec ratified, driver core cell laid out and signed off.** The
-TMDS encoder RTL is verified (`rtl/`, `verification/`). The CML output
-driver's schematic is captured, sized, and PVT-swept against the ratified
-spec's electrical targets (`design/`, `sim/cml-driver-eye/`), and its core
-cell is now laid out, DRC-clean, and LVS-matched against that schematic
-(`layout/gds/cml_driver_core.gds`). A minimal custom pad cell — proving the
-DRC/LVS flow at the pad boundary, not yet the final driver pad — is
-DRC-clean and LVS-matched, and its ESD-clamp capacitance has been measured
-against the spec's budget (`layout/`, `sim/esd-clamp-cv/`). The driver core
-cell has not yet been assembled with the pad cell/ESD structure, and
-post-layout (extracted-netlist) simulation against the spec suite is in
-progress.
+**Status: spec ratified, driver core cell assembled with its pad-ring/ESD
+structure and signed off.** The TMDS encoder RTL is verified (`rtl/`,
+`verification/`). The CML output driver's schematic is captured, sized, and
+PVT-swept against the ratified spec's electrical targets (`design/`,
+`sim/cml-driver-eye/`), and its core cell is laid out, DRC-clean, and
+LVS-matched against that schematic (`layout/gds/cml_driver_core.gds`);
+post-layout (extracted-netlist) simulation of that core cell against the
+full PVT suite has landed. A minimal custom pad cell — proving the DRC/LVS
+flow at the pad boundary, not the final driver pad — is DRC-clean and
+LVS-matched, and its ESD-clamp capacitance has been measured against the
+spec's budget (`layout/`, `sim/esd-clamp-cv/`). The driver core cell has
+since been assembled with a diode-clamped pad-ring/ESD structure per
+DR-0011 — the block-level `layout/gds/gf180_tmds_pad_ring_assembly.gds` —
+which is itself DRC-clean and LVS-matched, though that assembled block has
+no electrical/PVT simulation of its own yet (only structural DRC/LVS
+signoff), and the pad-capacitance budget (≤ 2 pF) still FAILs at ~4× over
+against a realistic 25×25 µm bond pad. See
+`measurements/characterization.md` for the full, per-row accounting.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -67,12 +73,17 @@ second source of truth.
 Maturity ladder: spec ratified → encoder verified → driver simulated across
 PVT → pad cell DRC-clean → assembled and LVS-clean → shuttle seat → measured
 silicon. **Current position: spec ratified, encoder verified, and the CML
-driver schematic simulated across the full PVT matrix — the pad-ring flow
-has separately been proven DRC-clean/LVS-matched on a minimal proof-of-flow
-cell, and the driver core cell itself is now laid out and DRC-clean/
-LVS-matched, but it has not yet been assembled with the pad cell/ESD
-structure, so the "assembled and LVS-clean" rung and later remain open for
-the actual block.**
+driver schematic and its layout both simulated across the full PVT matrix —
+the pad-ring flow has separately been proven DRC-clean/LVS-matched on a
+minimal proof-of-flow cell, and the driver core cell itself is laid out,
+DRC-clean, and LVS-matched. The driver core cell is now assembled with the
+pad cell/ESD structure, and that assembly (`gf180_tmds_pad_ring_assembly`)
+is itself DRC-clean and LVS-matched — reaching the "assembled and
+LVS-clean" rung. What remains open: the assembled block has no
+electrical/PVT simulation of its own yet, the pad-capacitance budget still
+FAILs against a realistic bond pad, and ESD HBM/CDM qualification is not
+yet simulated (see `measurements/characterization.md`); the "shuttle seat"
+rung and later remain open for the actual block.**
 
 ## Repo layout
 
