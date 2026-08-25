@@ -12,6 +12,6 @@ M1 OUTP INP TAIL VSS nfet L=0.28U W=128U
 M2 OUTN INN TAIL VSS nfet L=0.28U W=128U
 MT TAIL IBIAS VSS VSS nfet L=0.5U W=400U
 MB IBIAS IBIAS VSS VSS nfet L=0.5U W=20U
-D1 VSS OUTP diode_nd2ps_06v0
-D2 VSS OUTN diode_nd2ps_06v0
+D1 VSS OUTP diode_nd2ps_06v0 A=40P P=120U
+D2 VSS OUTN diode_nd2ps_06v0 A=40P P=120U
 .ENDS gf180_tmds_pad_ring_assembly_shorted

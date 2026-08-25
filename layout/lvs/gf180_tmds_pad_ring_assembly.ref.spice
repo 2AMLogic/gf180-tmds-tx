@@ -26,9 +26,15 @@
 *
 * The two ESD clamps: diode_nd2ps_06v0, cathode = the protected output
 * (OUTP / OUTN), anode = VSS (same substrate/VSS net the tap above ties
-* together) -- gen_pad_ring_assembly.py's `_draw_diode_pad`, reusing
-* gen_pad_diode_draft.py's own DRC/LVS-verified geometry (issue #9/DR-0011)
-* translated per pad.
+* together) -- gen_pad_ring_assembly.py's `_draw_production_pad`, reusing
+* gen_pad_v2.py's own DRC/LVS-verified 20-finger clamp array geometry
+* (issue #87/#143/#149), translated per pad. One combined D-card per pad,
+* aggregate area/perimeter across all 20 fingers (klt lvs's
+* options.combine_devices folds the per-finger extraction back into one
+* device per schematic line -- same convention
+* layout/lvs/gf180_tmds_pad_v2.ref.spice already established):
+*   A_total = 20 * 2.0 um^2  = 40 um^2  -> A=40P
+*   P_total = 20 * 6.0 um    = 120 um   -> P=120U
 *
 * Not modelled here (see gen_pad_ring_assembly.py's own module docstring
 * for the full scope note): the DVDD ring strap (drawn for ring continuity,
@@ -42,6 +48,6 @@ M1 OUTP INP TAIL VSS nfet L=0.28U W=128U
 M2 OUTN INN TAIL VSS nfet L=0.28U W=128U
 MT TAIL IBIAS VSS VSS nfet L=0.5U W=400U
 MB IBIAS IBIAS VSS VSS nfet L=0.5U W=20U
-D1 VSS OUTP diode_nd2ps_06v0
-D2 VSS OUTN diode_nd2ps_06v0
+D1 VSS OUTP diode_nd2ps_06v0 A=40P P=120U
+D2 VSS OUTN diode_nd2ps_06v0 A=40P P=120U
 .ENDS gf180_tmds_pad_ring_assembly

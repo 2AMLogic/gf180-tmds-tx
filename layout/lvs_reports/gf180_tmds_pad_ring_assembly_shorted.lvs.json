@@ -4,7 +4,15 @@
   "layout": "../gds/gf180_tmds_pad_ring_assembly_shorted.gds",
   "reference": "gf180_tmds_pad_ring_assembly_shorted.ref.spice",
   "top": "gf180_tmds_pad_ring_assembly_shorted",
+  "reference_top": "GF180_TMDS_PAD_RING_ASSEMBLY_SHORTED",
   "parameter_tolerance": null,
+  "options": {
+    "combine_devices": true,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null
+  },
   "status": "mismatch",
   "mismatch_count": 7,
   "error_count": 5,
@@ -47,18 +55,19 @@
   ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.10",
-    "layout_sha256": "6f2b1b9c2e08c3f8559d03ad7176a7f891fdbba68971ec9b6a0f1572ac643f44",
-    "reference_sha256": "01326e1b4fc9f16f5becc102e4471f5697c0489709fe95832cb4a91f56e27bb0",
+    "engine_version": "0.30.11",
+    "layout_sha256": "2b3483e2e070a851a8d2dfdda6bbd52685525909f2e31967dcd302b4cf018bd2",
+    "reference_sha256": "9f90303156f635138a74aaa94fdcbea0cf3a7724221577f90aaf173f22f57422",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.2.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.3.0",
+    "klayout_version": "0.30.11",
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
+      "released": true
     },
     "input": null
   },
@@ -70,7 +79,7 @@
       "side": "reference",
       "net": null,
       "device": {
-        "layout": "\\$201",
+        "layout": "\\$2",
         "reference": "1",
         "class": "nfet"
       },
@@ -87,7 +96,7 @@
       "side": "reference",
       "net": null,
       "device": {
-        "layout": "\\$339",
+        "layout": "\\$5",
         "reference": "1",
         "class": "diode_nd2ps_06v0"
       },

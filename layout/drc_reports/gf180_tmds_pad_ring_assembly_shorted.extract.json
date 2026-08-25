@@ -5,13 +5,13 @@
   "top": "gf180_tmds_pad_ring_assembly_shorted",
   "dbu_um": 0.001,
   "netlist_path": "gds/gf180_tmds_pad_ring_assembly_shorted.spice",
-  "netlist_sha256": "d0ea4db78ed78bf25c8366ec9481f27cd58a236463bcc71781f7542390cfb11f",
+  "netlist_sha256": "e003cbd2a4048d7187c5469b288e7a0685e698aa5e20c2396de46d2c469b481b",
   "status": "extracted",
-  "device_count": 340,
+  "device_count": 378,
   "net_count": 6,
   "pin_count": 6,
   "device_counts": {
-    "diode_nd2ps_06v0": 2,
+    "diode_nd2ps_06v0": 40,
     "nfet": 338
   },
   "dummy_devices_dropped": 0,
@@ -4840,8 +4840,8 @@
         "c": "OUTP|VSS"
       },
       "params": {
-        "area_um2": 1.0,
-        "perimeter_um": 4.0
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
       }
     },
     {
@@ -4867,11 +4867,119 @@
       "class": "diode_nd2ps_06v0",
       "nets": {
         "a": "OUTP|VSS",
-        "c": "OUTN"
+        "c": "OUTP|VSS"
       },
       "params": {
-        "area_um2": 1.0,
-        "perimeter_um": 4.0
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$341",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$342",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$343",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$344",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$345",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$346",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$347",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$348",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$349",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
       }
     },
     {
@@ -4893,6 +5001,126 @@
       }
     },
     {
+      "name": "$350",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$351",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$352",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$353",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$354",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$355",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$356",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$357",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$358",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTP|VSS"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$359",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
       "name": "$36",
       "class": "nfet",
       "nets": {
@@ -4911,6 +5139,126 @@
       }
     },
     {
+      "name": "$360",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$361",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$362",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$363",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$364",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$365",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$366",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$367",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$368",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$369",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
       "name": "$37",
       "class": "nfet",
       "nets": {
@@ -4926,6 +5274,114 @@
         "ad_um2": 0.42,
         "ps_um": 2.42,
         "pd_um": 2.42
+      }
+    },
+    {
+      "name": "$370",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$371",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$372",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$373",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$374",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$375",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$376",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$377",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$378",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "OUTP|VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
       }
     },
     {
@@ -6172,12 +6628,12 @@
     {
       "name": "OUTN",
       "pin": true,
-      "device_count": 65
+      "device_count": 84
     },
     {
       "name": "OUTP|VSS",
       "pin": true,
-      "device_count": 615
+      "device_count": 672
     },
     {
       "name": "TAIL",
@@ -6613,15 +7069,16 @@
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.2.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.3.0",
+    "klayout_version": "0.30.11",
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:6f2b1b9c2e08c3f8559d03ad7176a7f891fdbba68971ec9b6a0f1572ac643f44"
+      "content_hash": "sha256:2b3483e2e070a851a8d2dfdda6bbd52685525909f2e31967dcd302b4cf018bd2"
     }
   },
   "parasitics": null,
