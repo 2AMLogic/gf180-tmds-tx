@@ -207,6 +207,55 @@ demonstrably fires; the PASS above is not vacuous.
 - **Swing and common mode only** — no statistical claim is made about jitter,
   device stress, or tail current, and none is made about any other spec row.
 
+### DR-0013 row 6 — passing-eye criterion (combined swing+jitter eye mask)
+
+[`sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md`](../sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md)
+(issue #144) closes the gap §3 item 5 previously named: DR-0013 row 6
+(`spec/decisions/0013-operating-conditions.md`) grades a single combined
+criterion — eye height >= 200 mV **and** eye width >= 0.75 UI, measured
+simultaneously at the eye's widest opening, no fixed sampling instant
+assumed — and until this record, no testbench in this repository evaluated
+it directly. This bench drives a genuine PRBS7 (ITU-T O.150, period 127)
+pattern, long enough to develop real inter-symbol interference, unlike
+`sim/cml-driver-eye`'s fixed single-transition measurements (rows 1 and 4
+above).
+
+| Sub-claim | Verdict | Evidence record | Notes |
+|---|---|---|---|
+| DR-0013 row 6: eye height >= 200 mV AND eye width >= 0.75 UI, simultaneously, at the eye's widest opening | **PASS** | same record | Full PVT (5 process corners x 3 temperatures x 3 supply points) x both rates x 0/1/2 pF pad cap (90 points). Worst-case per-window (0.75 UI) minimum vertical opening ("eyemask_margin"): **0.871–1.033 V** at 2 pF pad (the tightest load), **0.958–1.033 V** at 1 pF, **0.962–1.033 V** at 0 pF — every measured point clears the 0.2 V floor by >= 4x. Worst single corner: `ss_125c_2.97v_742p5mbps` at 2 pF pad, 0.871 V (still 4.4x the floor). |
+
+**Methodology, briefly** (full derivation in
+`sim/cml-driver-eye-mask/gen_testbench.py`'s module docstring). Each of the
+127 measured PRBS7 bits is preceded by a 20-bit rolling-history prefix (the
+sequence's own tail) so no measured bit starts from an arbitrary settle-in
+state. Each unit interval is tiled into 8 equal phase bins; per bin, the
+worst-case vertical opening is (minimum sampled level over every measured
+"1" bit at that phase) minus (maximum sampled level over every measured "0"
+bit at that phase) — the standard worst-case-ISI eye-height construction. A
+6-of-8-bin (0.75 UI) sliding window is then scanned across every start
+offset, and the largest per-window minimum height is the eyemask margin:
+the tallest box that fits the width floor somewhere in the open eye, which
+is exactly DR-0013 row 6's test — no fixed sampling instant is assumed.
+
+**What this does not cover**, stated rather than left to be inferred:
+
+- **Schematic-level, not extracted.** Like `sim/cml-driver-eye`'s own
+  schematic record, this bench uses `sim/cml-driver-eye/testbench/
+  cml_driver_dut.spice` — no post-layout eye-mask run exists yet.
+- **`mos` corner set only** (tt/ff/ss/fs/sf), matching `sim/cml-driver-eye`'s
+  own precedent — row 6's claim does not depend on resistor/BJT device-
+  family parameters, so the resistor/BJT skew corners are not required for
+  this claim.
+- **No statistical (Monte Carlo) eye-mask claim.** The driver's Monte Carlo
+  evidence above (swing/common mode under local device mismatch) does not
+  extend to a combined eye-mask construction; none is made here.
+- **8 phase bins (12.5 % UI resolution)**, chosen for runtime rather than
+  rigor — a finer grid did not double runtime when doubled, it took a
+  single PVT point from ~4 s to over 180 s. Given every measured margin
+  above clears the 0.2 V floor by >= 4x, a finer grid is very unlikely to
+  change the verdict; see the generator's own docstring for the full
+  reasoning.
+
 ### DR-0005 — pad cell and ESD strategy (clamp capacitance)
 
 | Sub-claim | Verdict | Evidence record | Notes |
@@ -292,24 +341,28 @@ following gaps are stated by name rather than left as silent omissions:
    been regenerated and re-signed off against it (#127, closed) — per
    DR-0010's own survey, no numeric result recorded in this repository
    changes value as a result. DR-0013 also ratifies an 11-row
-   verifiable-spec-row table (its own §3); two of those rows remain
-   genuine open gaps, unchanged by this ratification and **not** resolved
-   by it: row 6 (combined swing+jitter eye-mask criterion) has no
-   testbench yet, and row 11 (ESD HBM/CDM qualification) is not yet
-   independently simulated — and per §1's DR-0005 table, structurally
-   cannot be, pre-silicon. Row 10 (pad-capacitance budget, ≤ 2 pF) was
-   listed here as a third gap, **FAILing at ~4× over budget** against a
-   realistic 25×25 µm bond pad; **that is no longer the state** — the
-   figure behind it was a units-label bug, and a real drawn pad now
-   measures 0.225–0.652 pF against the 2 pF budget (§1's DR-0005 table
-   above, `design/esd-capacitance-budget.md` §9). Row 10 is closed at cell
-   level; what remains for it is block-level integration, item 4 below.
-   Rows 6 and 11 are **not** closed by this record, and each now has its own
-   tracking issue: row 6 is issue #144 (item 5 below), row 11 is issue #145.
+   verifiable-spec-row table (its own §3); at ratification time two of
+   those rows were genuine open gaps: row 6 (combined swing+jitter
+   eye-mask criterion) had no testbench yet, and row 11 (ESD HBM/CDM
+   qualification) is not yet independently simulated — and per §1's
+   DR-0005 table, structurally cannot be, pre-silicon. Row 10
+   (pad-capacitance budget, ≤ 2 pF) was listed here as a third gap,
+   **FAILing at ~4× over budget** against a realistic 25×25 µm bond pad;
+   **that is no longer the state** — the figure behind it was a
+   units-label bug, and a real drawn pad now measures 0.225–0.652 pF
+   against the 2 pF budget (§1's DR-0005 table above,
+   `design/esd-capacitance-budget.md` §9). Row 10 is closed at cell level;
+   what remains for it is block-level integration, item 4 below. **Row 6
+   is likewise no longer a gap**: `sim/cml-driver-eye-mask/records/
+   20260825-040412-4b0c9f6.md` (issue #144) grades it directly and
+   **PASSes** across the full PVT matrix, both rates, 0/1/2 pF pad cap —
+   see §1's new DR-0013 row 6 subsection above and item 5 below. **Row 11
+   remains the one open gap** of the original two, tracked as issue #145.
    They were previously listed here as tracked by Epic #17's own T1
    checklist item 5; #17 closed COMPLETED on 2026-08-21, so that pointer no
    longer resolves to anything open and has been replaced by the two live
-   issues.
+   issues — row 6's (#144) now resolved by this update, row 11's (#145)
+   still open.
 2. **Post-layout re-simulation — device-level done, parasitic RC not.**
    The DR-0002 rows in §1 now carry a **Netlist provenance: extracted**
    record as well as the schematic one
@@ -388,14 +441,22 @@ following gaps are stated by name rather than left as silent omissions:
    **unchecked**. This is an open, named gap, not a closed one; it is
    filed as its own investigation issue (#143) rather than asserted either
    way here.
-5. **Eye-mask criterion (DR-0013 row 6) — no testbench.** Item 1 above
-   names this; restating it here because it is a *testbench* gap, not a
-   result gap. `sim/cml-driver-eye/` records swing, common mode, and
-   rise/fall time separately, and `design/cml-driver-sizing.md` derives
-   eye margin from them, but no committed testbench evaluates a combined
-   swing+jitter eye mask as a single pass/fail criterion. Per CLAUDE.md's
-   "no claim without a testbench", this document makes no eye-mask claim.
-   Tracked as issue #144.
+5. **Eye-mask criterion (DR-0013 row 6) — now evidenced.** Item 1 above
+   previously named this as one of DR-0013's two live gaps; it no longer
+   is. `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md`
+   (issue #144) drives a genuine PRBS7 pattern, builds the eye by tiling
+   each UI into phase bins and scanning every 0.75 UI window position for
+   the worst-case vertical opening, and grades it directly against row 6's
+   own wording (height >= 200 mV AND width >= 0.75 UI, simultaneously, no
+   fixed sampling instant assumed): **PASS**, full PVT matrix, both rates,
+   0/1/2 pF pad cap, worst-case margin 0.871 V (>= 4x the 0.2 V floor).
+   See §1's new "DR-0013 row 6" subsection above for the full table and
+   this record's own stated coverage limits. **What this does not cover**:
+   schematic-level only (no post-layout eye-mask run yet), and no Monte
+   Carlo/mismatch eye-mask claim (the driver's Monte Carlo evidence, item 3
+   above, covers swing/common mode only, not a combined eye construction).
+   Row 11 (ESD HBM/CDM qualification) remains DR-0013's one other open gap,
+   unaffected by this record, tracked as issue #145.
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all. The encoder/serializer digital domain (DR-0003) is verified

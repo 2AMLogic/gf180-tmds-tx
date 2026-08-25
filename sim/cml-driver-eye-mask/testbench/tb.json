@@ -1,0 +1,77 @@
+{
+  "name": "cml-driver-eye-mask",
+  "description": "DR-0013 row 6 (combined swing+jitter passing-eye criterion) for one lane of the CML output driver (design/cml_driver.sch), against the DR-0002 load, swept over pad capacitance 0/1/2 pF in-deck, at both spec/tmds-tx.md #1 operating points, across the full PVT matrix. Drives a genuine PRBS7 (period 127) pattern -- long enough to develop real ISI, unlike sim/cml-driver-eye's fixed 16-bit pattern -- tiles each UI into 8 phase bins, and grades whether a 200 mV x 0.75 UI eye-mask box fits anywhere in the resulting open eye.",
+  "claim": "spec/decisions/0013-operating-conditions.md#row-6 -- eye height >= 200 mV AND eye width >= 0.75 UI, measured simultaneously at the eye's widest opening, no fixed sampling instant assumed, at both spec/tmds-tx.md #1 operating points (742.5 Mbps/lane target, 270 Mbps/lane fallback).",
+  "netlist": "cml_driver_eye_mask.spice",
+  "dut": "sim/cml-driver-eye/testbench/cml_driver_dut.spice",
+  "corners": [
+    "mos"
+  ],
+  "rates_mbps": [
+    742.5,
+    270.0
+  ],
+  "transient": {
+    "tstep_s": 2e-11,
+    "tstop_s": 5.6e-07,
+    "tmax_s": 4e-11,
+    "reltol": 1e-06,
+    "abstol": 1e-09,
+    "vntol": 1e-06,
+    "pattern": "prbs7 (ITU-T O.150, x^7+x^6+1, all-ones seed, period 127), preceded by a 20-bit rolling-history prefix (the sequence's own tail) so the measured period starts fully settled; 150 bits driven, 127 measured -- see sim/cml-driver-eye-mask/gen_testbench.py"
+  },
+  "analyses": [
+    "tran 20e-12 560e-9 0 40e-12"
+  ],
+  "measure": {
+    "ui_ref": "TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=1",
+    "height_c0_0": "vecmin(v(vd_c0)+10*(1-v(comb1_0)))-vecmax(v(vd_c0)-10*(1-v(comb0_0)))",
+    "height_c0_1": "vecmin(v(vd_c0)+10*(1-v(comb1_1)))-vecmax(v(vd_c0)-10*(1-v(comb0_1)))",
+    "height_c0_2": "vecmin(v(vd_c0)+10*(1-v(comb1_2)))-vecmax(v(vd_c0)-10*(1-v(comb0_2)))",
+    "height_c0_3": "vecmin(v(vd_c0)+10*(1-v(comb1_3)))-vecmax(v(vd_c0)-10*(1-v(comb0_3)))",
+    "height_c0_4": "vecmin(v(vd_c0)+10*(1-v(comb1_4)))-vecmax(v(vd_c0)-10*(1-v(comb0_4)))",
+    "height_c0_5": "vecmin(v(vd_c0)+10*(1-v(comb1_5)))-vecmax(v(vd_c0)-10*(1-v(comb0_5)))",
+    "height_c0_6": "vecmin(v(vd_c0)+10*(1-v(comb1_6)))-vecmax(v(vd_c0)-10*(1-v(comb0_6)))",
+    "height_c0_7": "vecmin(v(vd_c0)+10*(1-v(comb1_7)))-vecmax(v(vd_c0)-10*(1-v(comb0_7)))",
+    "eyeh_max_c0": "max(max(max(max(max(max(max(m_height_c0_0,m_height_c0_1),m_height_c0_2),m_height_c0_3),m_height_c0_4),m_height_c0_5),m_height_c0_6),m_height_c0_7)",
+    "eyemask_margin_c0": "max(max(min(min(min(min(min(m_height_c0_0,m_height_c0_1),m_height_c0_2),m_height_c0_3),m_height_c0_4),m_height_c0_5),min(min(min(min(min(m_height_c0_1,m_height_c0_2),m_height_c0_3),m_height_c0_4),m_height_c0_5),m_height_c0_6)),min(min(min(min(min(m_height_c0_2,m_height_c0_3),m_height_c0_4),m_height_c0_5),m_height_c0_6),m_height_c0_7))",
+    "height_c1_0": "vecmin(v(vd_c1)+10*(1-v(comb1_0)))-vecmax(v(vd_c1)-10*(1-v(comb0_0)))",
+    "height_c1_1": "vecmin(v(vd_c1)+10*(1-v(comb1_1)))-vecmax(v(vd_c1)-10*(1-v(comb0_1)))",
+    "height_c1_2": "vecmin(v(vd_c1)+10*(1-v(comb1_2)))-vecmax(v(vd_c1)-10*(1-v(comb0_2)))",
+    "height_c1_3": "vecmin(v(vd_c1)+10*(1-v(comb1_3)))-vecmax(v(vd_c1)-10*(1-v(comb0_3)))",
+    "height_c1_4": "vecmin(v(vd_c1)+10*(1-v(comb1_4)))-vecmax(v(vd_c1)-10*(1-v(comb0_4)))",
+    "height_c1_5": "vecmin(v(vd_c1)+10*(1-v(comb1_5)))-vecmax(v(vd_c1)-10*(1-v(comb0_5)))",
+    "height_c1_6": "vecmin(v(vd_c1)+10*(1-v(comb1_6)))-vecmax(v(vd_c1)-10*(1-v(comb0_6)))",
+    "height_c1_7": "vecmin(v(vd_c1)+10*(1-v(comb1_7)))-vecmax(v(vd_c1)-10*(1-v(comb0_7)))",
+    "eyeh_max_c1": "max(max(max(max(max(max(max(m_height_c1_0,m_height_c1_1),m_height_c1_2),m_height_c1_3),m_height_c1_4),m_height_c1_5),m_height_c1_6),m_height_c1_7)",
+    "eyemask_margin_c1": "max(max(min(min(min(min(min(m_height_c1_0,m_height_c1_1),m_height_c1_2),m_height_c1_3),m_height_c1_4),m_height_c1_5),min(min(min(min(min(m_height_c1_1,m_height_c1_2),m_height_c1_3),m_height_c1_4),m_height_c1_5),m_height_c1_6)),min(min(min(min(min(m_height_c1_2,m_height_c1_3),m_height_c1_4),m_height_c1_5),m_height_c1_6),m_height_c1_7))",
+    "height_c2_0": "vecmin(v(vd_c2)+10*(1-v(comb1_0)))-vecmax(v(vd_c2)-10*(1-v(comb0_0)))",
+    "height_c2_1": "vecmin(v(vd_c2)+10*(1-v(comb1_1)))-vecmax(v(vd_c2)-10*(1-v(comb0_1)))",
+    "height_c2_2": "vecmin(v(vd_c2)+10*(1-v(comb1_2)))-vecmax(v(vd_c2)-10*(1-v(comb0_2)))",
+    "height_c2_3": "vecmin(v(vd_c2)+10*(1-v(comb1_3)))-vecmax(v(vd_c2)-10*(1-v(comb0_3)))",
+    "height_c2_4": "vecmin(v(vd_c2)+10*(1-v(comb1_4)))-vecmax(v(vd_c2)-10*(1-v(comb0_4)))",
+    "height_c2_5": "vecmin(v(vd_c2)+10*(1-v(comb1_5)))-vecmax(v(vd_c2)-10*(1-v(comb0_5)))",
+    "height_c2_6": "vecmin(v(vd_c2)+10*(1-v(comb1_6)))-vecmax(v(vd_c2)-10*(1-v(comb0_6)))",
+    "height_c2_7": "vecmin(v(vd_c2)+10*(1-v(comb1_7)))-vecmax(v(vd_c2)-10*(1-v(comb0_7)))",
+    "eyeh_max_c2": "max(max(max(max(max(max(max(m_height_c2_0,m_height_c2_1),m_height_c2_2),m_height_c2_3),m_height_c2_4),m_height_c2_5),m_height_c2_6),m_height_c2_7)",
+    "eyemask_margin_c2": "max(max(min(min(min(min(min(m_height_c2_0,m_height_c2_1),m_height_c2_2),m_height_c2_3),m_height_c2_4),m_height_c2_5),min(min(min(min(min(m_height_c2_1,m_height_c2_2),m_height_c2_3),m_height_c2_4),m_height_c2_5),m_height_c2_6)),min(min(min(min(min(m_height_c2_2,m_height_c2_3),m_height_c2_4),m_height_c2_5),m_height_c2_6),m_height_c2_7))"
+  },
+  "checks": {
+    "ui_ref": {
+      "min_spread_pct": 50.0,
+      "description": "Harness-integrity check, not a design claim: the measured unit interval must differ across the rate grid, confirming rate_val actually reached the stimulus (same convention as sim/cml-driver-eye)."
+    },
+    "eyemask_margin_c0": {
+      "min": 0.2,
+      "description": "DR-0013 row 6 (spec/decisions/0013-operating-conditions.md): does a 200 mV x 0.75 UI box fit somewhere in the open eye, 0 pF pad. Scanned over every 6-of-8-bin window position (no fixed sampling instant assumed); PASS iff the best achievable per-window minimum vertical opening is >= 0.2 V."
+    },
+    "eyemask_margin_c1": {
+      "min": 0.2,
+      "description": "DR-0013 row 6 (spec/decisions/0013-operating-conditions.md): does a 200 mV x 0.75 UI box fit somewhere in the open eye, 1 pF pad. Scanned over every 6-of-8-bin window position (no fixed sampling instant assumed); PASS iff the best achievable per-window minimum vertical opening is >= 0.2 V."
+    },
+    "eyemask_margin_c2": {
+      "min": 0.2,
+      "description": "DR-0013 row 6 (spec/decisions/0013-operating-conditions.md): does a 200 mV x 0.75 UI box fit somewhere in the open eye, 2 pF pad. Scanned over every 6-of-8-bin window position (no fixed sampling instant assumed); PASS iff the best achievable per-window minimum vertical opening is >= 0.2 V."
+    }
+  }
+}
