@@ -893,18 +893,25 @@ flow/tmds_encoder/netlist/tmds_encoder.pnr.v    post-P&R netlist (the LVS refere
 layout/gds/tmds_encoder.gds             the merged block-level GDS
 layout/gds/tmds_encoder.spice           klt extract's plain (transistor-level) netlist
 layout/gds/tmds_encoder.lvs_extracted.spice   klt extract --abstract-cells netlist (LVS side)
+layout/gds/tmds_encoder_shorted.gds     the committed GDS plus one Metal4 bridge shorting
+                                         ctrl[0]/data[3] -- the layout-side negative control
+                                         (issue #146), top cell renamed tmds_encoder_shorted
+layout/gds/tmds_encoder_shorted.lvs_extracted.spice   its klt extract --abstract-cells netlist
 layout/lvs/tmds_encoder.ref.spice       LVS reference, mechanically derived from the
                                          post-P&R netlist (layout/scripts/gen_tmds_encoder_ref.py)
 layout/lvs/tmds_encoder_negctl.ref.spice      the same reference with one deliberate
-                                         break -- the LVS negative control
+                                         break -- the reference-side negative control (issue #142)
 layout/lvs/tmds_encoder.lvs_request.json      klt lvs request document
-layout/lvs/tmds_encoder.lvs_request_negctl.json  negative-control request document
+layout/lvs/tmds_encoder.lvs_request_negctl.json  reference-side negative-control request document
+layout/lvs/tmds_encoder.lvs_request_shorted.json layout-side negative-control request document
 layout/scripts/gen_tmds_encoder_ref.py  reference-netlist generator (+ --negative-control)
+layout/scripts/gen_tmds_encoder_shorted.py  layout-side negative-control GDS generator (issue #146)
 layout/scripts/filter_pnr_utility_cells.py    optional utility-cell filter (not used in the
                                          primary flow below -- see its own docstring)
 drc_reports/tmds_encoder.drc.{json,txt}       klt drc reports
 lvs_reports/tmds_encoder.lvs.{json,txt}       klt lvs reports
-lvs_reports/tmds_encoder_negctl.lvs.{json,txt}   negative-control reports
+lvs_reports/tmds_encoder_negctl.lvs.{json,txt}   reference-side negative-control reports
+lvs_reports/tmds_encoder_shorted.lvs.{json,txt}  layout-side negative-control reports
 ```
 
 Regenerate (requires OpenROAD on `PATH`, run via the pinned `openroad/orfs`
@@ -933,20 +940,37 @@ klt lvs layout/lvs/tmds_encoder.lvs_request.json --format json > layout/lvs_repo
 klt lvs layout/lvs/tmds_encoder.lvs_request.json --format text > layout/lvs_reports/tmds_encoder.lvs.txt
 klt lvs layout/lvs/tmds_encoder.lvs_request_negctl.json --format json > layout/lvs_reports/tmds_encoder_negctl.lvs.json
 klt lvs layout/lvs/tmds_encoder.lvs_request_negctl.json --format text > layout/lvs_reports/tmds_encoder_negctl.lvs.txt
+
+# Layout-side negative control (issue #146): a real Metal4 bridge shorting
+# ctrl[0]/data[3], derived from the routed DEF's own PINS block, not
+# hardcoded (see gen_tmds_encoder_shorted.py's own docstring).
+python3 layout/scripts/gen_tmds_encoder_shorted.py \
+  --def flow/tmds_encoder/pnr/tmds_encoder.def \
+  --gds layout/gds/tmds_encoder.gds \
+  -o layout/gds/tmds_encoder_shorted.gds
+klt extract --deck gf180mcu layout/gds/tmds_encoder_shorted.gds --top tmds_encoder_shorted \
+  --abstract-cells 'gf180mcu_fd_sc_mcu9t5v0__*' -o layout/gds/tmds_encoder_shorted.lvs_extracted.spice
+klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format json > layout/lvs_reports/tmds_encoder_shorted.lvs.json
+klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format text > layout/lvs_reports/tmds_encoder_shorted.lvs.txt
 ```
 
-> **Do not regenerate `tmds_encoder.lvs_extracted.spice` with `klt` 0.3.0.**
-> The committed artifact was produced by `klt` 0.2.0 and is clean.
-> Re-extracting the identical GDS under 0.3.0 mis-binds abstracted cell pins
-> to nets — 26 instances get a ground pin bound to the power net and 100 get
-> an output bound to one of their own inputs, neither of which is physically
-> realizable, and neither of which the 0.2.0 artifact contains. Same
-> `.SUBCKT` headers, same instance set, 147 of 1339 bindings changed. Filed
-> upstream as
-> [klayout-tools#1366](https://github.com/2AMLogic/klayout-tools/issues/1366).
-> The `klt lvs` *comparison* (netlist vs netlist, no extraction) is
-> unaffected, which is why the reports above are 0.3.0-produced against the
-> 0.2.0-produced layout netlist.
+> **`klt` 0.3.0 needed the `klayout-tools#1366` fix (upstream PR #1374,
+> commit `01c86d1`) before any of the recipe above -- extraction included --
+> could be trusted.** Every artifact and report in this section was
+> regenerated against a `klt` build carrying that fix, and re-verified
+> byte-for-byte against the previously-committed, 0.2.0-produced
+> `tmds_encoder.lvs_extracted.spice` before being trusted (issue #146's own
+> required "control on the control" step -- see that issue for the exact
+> command). **This is no longer a do-not-regenerate warning**: a pre-#1374
+> `klt` 0.3.0 mis-bound abstracted-cell pins on this design (26 instances
+> with a ground pin bound to the power net, 100 with an output bound to one
+> of their own inputs -- neither physically realizable, and neither present
+> in the fixed build's output), which is why this section used to tell
+> readers not to re-extract under 0.3.0 at all. Filed upstream as
+> [klayout-tools#1366](https://github.com/2AMLogic/klayout-tools/issues/1366),
+> now closed. If you are re-running this recipe with an older `klt` build,
+> re-do that byte-for-byte check yourself before trusting the result --
+> `klt --version` should report a build at or after `01c86d1`.
 
 **Scope**: place-and-route only, per issue #84 (issue #100 added
 clock-tree synthesis and hold repair to this same driver; issue #115 added a
@@ -995,20 +1019,49 @@ against the unmodified RTL bench) and by
 `flow/sta_tmds_encoder.py`'s `assert_def_matches_netlist`. Neither question
 subsumes the other, and neither is being claimed here as the other.
 
-**Negative control** (`layout/README.md`'s "Every LVS signoff is a pair"
-invariant, enforced by `layout/scripts/check_lvs_signoff.py`):
-`tmds_encoder_negctl` compares the **unchanged** committed layout netlist
-against a reference with exactly one deliberate fault — the `ctrl[0]`
-top-level input merged into `data[3]` — and correctly reports `status:
-mismatch` with 3 error-severity findings, the first being
-`net.unmatched: CTRL[0]`. Unlike every other cell in this repo, this
-control breaks the *reference* rather than shipping a `_shorted` GDS twin,
-because the layout-side twin cannot currently be extracted cleanly:
-klayout-tools#1366 (above) corrupts `--abstract-cells` extraction on this
-design under the installed `klt` 0.3.0, and a control whose failure might
-be the tool's rather than the injected fault's is not a control. Restoring
-a layout-side `_shorted` twin is tracked as its own follow-up, blocked on
-that upstream issue.
+**Negative controls, two of them** (`layout/README.md`'s "Every LVS signoff
+is a pair" invariant, enforced by `layout/scripts/check_lvs_signoff.py`):
+
+- `tmds_encoder_negctl` (issue #142) compares the **unchanged** committed
+  layout netlist against a reference with exactly one deliberate fault — the
+  `ctrl[0]` top-level input merged into `data[3]` — and correctly reports
+  `status: mismatch` with 3 error-severity findings, the first being
+  `net.unmatched: CTRL[0]`. This breaks the *reference*, not the layout, so
+  it exercises only `klt lvs`'s netlist-vs-netlist comparison — it never
+  runs `klt extract --abstract-cells` at all.
+- `tmds_encoder_shorted` (issue #146) is the layout-side twin every other
+  cell in this repo ships: the committed GDS plus one real Metal4 bridge
+  shorting the same `ctrl[0]`/`data[3]` pair, generated by
+  `layout/scripts/gen_tmds_encoder_shorted.py`. Unlike `_negctl`, this one
+  *does* run `klt extract --abstract-cells` on the modified geometry, so it
+  is the control that can catch an extraction-side regression — which is
+  exactly what klayout-tools#1366 was, and exactly why this twin could not
+  be shipped until that issue was fixed (see the `klt` 0.3.0 note above).
+  Extracting the shorted GDS correctly reports `net 'ctrl[0]|data[3]' merges
+  2 distinct labels`, and `klt lvs` against the unshorted reference reports
+  `status: mismatch` with 2 error-severity findings (`net.merged`,
+  `topology`).
+
+`gen_tmds_encoder_shorted.py` derives the bridge geometry from the routed
+DEF's own `PINS` block every time it runs, rather than hard-coding
+coordinates — and fails loudly (`ShortGeometryError`) if `ctrl[0]`/`data[3]`
+have moved, changed layer, stopped being row-aligned, or stopped being
+laterally adjacent (a third pin between them), or if the DEF-implied pin
+location no longer lands on real drawn metal in the GDS. This is deliberate:
+a bridge that silently shorts nothing produces a negative control that
+*passes*, which is the failure mode issue #129 is about, applied to this
+control's own generator rather than to the tool.
+
+**Both controls are kept, rather than retiring `_negctl` now that
+`_shorted` exists.** They test different paths — `_negctl` is the narrower,
+extraction-independent check that `klt lvs`'s comparison itself can tell two
+netlists apart; `_shorted` is the fuller, drawn-geometry check that the
+whole extract-then-compare pipeline can. Keeping both costs one extra
+committed report pair and one extra `check_lvs_signoff.py` entry, and buys
+back exactly the coverage klayout-tools#1366 showed can silently go missing
+from the fuller check alone (a tool that returns a `_shorted` control's own
+`status: mismatch` for a spurious reason unrelated to the injected short
+would still leave `_negctl` unaffected, since it never re-extracts).
 
 For the record, the 18 mismatches that used to be reported here — 17
 standard-cell *types* present in the layout that the pre-P&R reference had
