@@ -12,6 +12,7 @@ name: CI
 # | `.github/scripts/lint.sh`                     | python3      | `lint` (here)  |
 # | evidence-record format + append-only          | python3+git  | `lint` (here)  |
 # | LVS signoff verdicts + negative controls      | python3      | `lint` (here)  |
+# | characterization report cites every record    | python3+git  | `lint` (here)  |
 # | testbench manifests load (`--list`)           | python3      | `test` (here)  |
 # | LVS signoff-guard unit tests (layout/tests)   | python3      | `test` (here)  |
 #

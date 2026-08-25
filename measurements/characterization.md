@@ -148,6 +148,65 @@ wrong: nothing in the schematic record is corrected here, and both remain
 citable (the schematic record is the one that states `NRD`/`NRS`; this one is
 the one taken against the drawn geometry).
 
+#### DR-0002, Monte Carlo device-mismatch corroboration
+
+[`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md`](../sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md)
+(issue #23, landed 2026-08-15) adds **statistical** evidence on top of the
+deterministic corner sweep above: gf180mcu's own Pelgrom-law local
+(intra-die) mismatch injection (`nfet_03v3_dss` with `sw_stat_mismatch=1`) on
+all four transistors of the CML driver, **N = 30 independent samples per
+process corner × 5 process corners = 150 statistical points**, plus one
+`mismatch=0` reference per corner and one deterministic negative control
+(156 ngspice invocations, all completed).
+
+| Sub-claim | Verdict | Evidence record | Notes |
+|---|---|---|---|
+| Single-ended swing 400–600 mV under local device mismatch | **PASS** | [`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md`](../sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md) | Worst observed sample across all 150 points: **456.8 mV** (`ss`) to **485.3 mV** (`ff`) — inside the window at every sample, with 56.8 mV of margin to the 400 mV floor. Per-corner 1σ ≤ 1.32 mV. |
+| Common mode 2.8–3.3 V under local device mismatch | **PASS** | same record | Worst observed sample: **3.0573 V** (`ff`) to **3.0716 V** (`ss`) — inside the window at every sample. Per-corner 1σ ≤ 0.66 mV. |
+
+**How it is graded, and why that matters.** The PASS/FAIL roll-up uses the
+**observed min/max across the N samples**, not a σ-projection from the
+per-corner mean — so a heavy-tailed sample cannot be hidden behind a Gaussian
+assumption. Per-corner σ is reported alongside, but is not what the verdict
+rests on.
+
+**Reproducibility.** Every sample's seed is derived deterministically —
+base seed `20260814`, sample `i` at process-corner index `k` uses
+`.option seed = 20260814 + k*1000 + i` — so any individual sample is
+independently re-runnable, not just the aggregate.
+
+**Negative control** (`tt_mcneg_27c_3.30v`, excluded from the statistics and
+from the roll-up): the same unmodified vendor mismatch mechanism is driven
+with `par_tail_val=0.0001` on the tail-mirror device, which scales only the
+Pelgrom-law area term the mismatch σ is drawn against — not the transistor's
+real electrical `w`/`l`/`nf`/`m`. Measured **swing 117.3 mV — FAILS** the
+400–600 mV window (vcm 3.2414 V still passes). The pass/fail check therefore
+demonstrably fires; the PASS above is not vacuous.
+
+**What this record does not cover**, stated rather than left to be inferred:
+
+- **Temperature and supply are held at nominal** (27 °C, 3.30 V); the swept
+  axis is process corner × sample count. This is a deliberate subset of the
+  DR-0013 PVT matrix, justified in the record's own **Corner matrix run**
+  field: `sim/cml-driver-eye` already carries this driver's swing/common-mode
+  claim deterministically across the full −40/27/125 °C × ±10 % supply ×
+  process grid (90 points, both rates), and re-running that T×V grid × N=30
+  is a 9× cost multiplier that adds no new axis. Read the two records
+  together — statistical evidence **combined with**, not replacing, the
+  corner sweep, which is exactly what the T1 ladder's Monte Carlo item asks
+  for.
+- **Schematic-level, not extracted.** No layout-extracted Monte Carlo run
+  exists. The mismatch DUT's `nfet_03v3_dss` wrapper also adds small, real
+  routing-resistance parasitics the un-wrapped `nfet_03v3` omits, so the
+  `mismatch=0` reference rows are *comparable* to the `cml-driver-eye`
+  deterministic rows but not numerically identical to them.
+- **N = 30 per corner** is enough to bound the observed spread at the σ
+  magnitudes measured here (σ ≈ 1 mV against a 200 mV-wide window), not to
+  substantiate a parts-per-million tail claim. No yield number is claimed
+  anywhere in this repository.
+- **Swing and common mode only** — no statistical claim is made about jitter,
+  device stress, or tail current, and none is made about any other spec row.
+
 ### DR-0005 — pad cell and ESD strategy (clamp capacitance)
 
 | Sub-claim | Verdict | Evidence record | Notes |
@@ -245,8 +304,12 @@ following gaps are stated by name rather than left as silent omissions:
    measures 0.225–0.652 pF against the 2 pF budget (§1's DR-0005 table
    above, `design/esd-capacitance-budget.md` §9). Row 10 is closed at cell
    level; what remains for it is block-level integration, item 4 below.
-   Rows 6 and 11 remain tracked by Epic #17's own T1 checklist item 5, not
-   closed by this record.
+   Rows 6 and 11 are **not** closed by this record, and each now has its own
+   tracking issue: row 6 is issue #144 (item 5 below), row 11 is issue #145.
+   They were previously listed here as tracked by Epic #17's own T1
+   checklist item 5; #17 closed COMPLETED on 2026-08-21, so that pointer no
+   longer resolves to anything open and has been replaced by the two live
+   issues.
 2. **Post-layout re-simulation — device-level done, parasitic RC not.**
    The DR-0002 rows in §1 now carry a **Netlist provenance: extracted**
    record as well as the schematic one
@@ -278,16 +341,36 @@ following gaps are stated by name rather than left as silent omissions:
    the bare driver core, and a first post-layout electrical simulation of
    the assembled driver+pad+ESD cell, are both still outstanding and
    neither has an evidence record.
-3. **Monte Carlo evidence.** No record in `sim/` today carries a
-   **Statistical convention** field with a seed, sample count, and a
-   deterministic negative control — every record in §1 is a corner-matrix
-   claim (`Statistical convention: N/A`), not a distribution claim. The T1
-   evidence ladder requires Monte Carlo mismatch evidence, combined with
-   (not replacing) the existing process-corner sweep, for the driver's
-   swing/common-mode. This is tracked separately by **issue #23** ("Add
-   Monte Carlo mismatch evidence for the CML driver's swing/common-mode"),
-   the sibling Monte Carlo issue in this same Epic #17 phase, and has not
-   landed as of this document.
+3. **Monte Carlo evidence — landed for the driver's swing/common mode;
+   nothing else carries a distribution claim.** This item previously stated
+   that *"no record in `sim/` today carries a **Statistical convention**
+   field with a seed, sample count, and a deterministic negative control"*
+   and that issue #23 *"has not landed as of this document"*. **Both were
+   false**, and had been since 2026-08-15:
+   [`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md`](../sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md)
+   (issue #23, closed COMPLETED 2026-08-15) carries exactly that field —
+   base seed `20260814` with a per-sample derivation, N = 30 samples × 5
+   process corners, and a deterministic negative control that correctly
+   FAILs — and it is now indexed in §1 above under DR-0002, where it
+   belongs. The T1 ladder's Monte Carlo item asks for mismatch evidence
+   *combined with* (not replacing) the process-corner sweep for the driver's
+   swing/common mode; that is what the two records together are, and that
+   item is **met**. Lint step 7 (`sim/check_record_citations.py`) now fails
+   the build if any tracked `sim/*/records/*.md` is missing from this
+   document, so this particular class of omission cannot recur silently.
+
+   **What is still not covered statistically** — the genuine remainder of
+   this item, as distinct from the stale claim above: every *other* verdict
+   in §1 and §2 is a corner-matrix claim (`Statistical convention: N/A`),
+   not a distribution claim. There is no Monte Carlo evidence for jitter,
+   device stress, tail current, the ESD clamp's capacitance, or anything in
+   the digital partition; the mismatch run is schematic-level, with no
+   extracted-netlist Monte Carlo counterpart; and it holds temperature and
+   supply at nominal (see §1's own statement of that record's limits). No
+   yield or parts-per-million claim is made anywhere in this repository, and
+   none of the above is required by the T1 ladder — they are named here so
+   the coverage boundary is explicit rather than inferred from the single
+   PASS in §1.
 4. **Pad-ring integration of the budget-passing pad geometry — not done.**
    §1's DR-0005 row now reports a PASS, but it is a **cell-level** PASS:
    the 0.225–0.652 pF result is measured against `gf180_tmds_pad_v2`, a
@@ -338,4 +421,11 @@ here by design (DR-0001/CLAUDE.md scope discipline).
 - Digital evidence-record convention: [`flow/README.md`](../flow/README.md)
 - Digital verification convention (three-leg plan): [`verification/README.md`](../verification/README.md)
 - Digital timing-closure follow-up (§2 items 7/8's disclosed setup FAIL): #100
-- Epic tracking the gap to T1 sim-validated (bronze): #17
+- Coverage self-check for this document (lint step 7): `sim/check_record_citations.py`
+- Gap to T1 sim-validated (bronze): originally Epic #17 (**closed COMPLETED
+  2026-08-21**), continued by #142; the individually-dispatchable remainder
+  is #143 (block-level pad-ring integration of the budget-passing pad
+  geometry, §3 item 4), #144 (eye-mask testbench, §3 item 5), #145 (whether
+  ESD HBM/CDM qualification is schedulable work or a permanent pre-silicon
+  limitation, §1's DR-0005 table) and #146 (restore a layout-side `_shorted`
+  LVS negative control for `tmds_encoder`, §2 item 5)

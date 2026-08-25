@@ -262,7 +262,7 @@ the append-only guarantee is what makes `sim/` usable as an evidence trail;
 ## Enforcement
 
 This convention is checked, not merely documented. `sim/check_records.py`
-(implementation: `sim/harness/evidence_lint.py`) runs as step 4 of
+(implementation: `sim/harness/evidence_lint.py`) runs as step 5 of
 `.github/scripts/lint.sh`, so `npm run lint` and the CI `lint` job both
 execute it on every PR. It reads tracked files only, needs nothing but
 `python3` and `git`, and fails on:
@@ -295,6 +295,30 @@ runs it.
 If the checker and this document ever disagree, this document wins and the
 checker is the thing that gets fixed. The evidence is never the thing that
 gets fixed.
+
+### A record that exists but is never cited
+
+Minting a well-formed record is only half the job: an evidence trail nobody
+can find from the rollup does not substantiate anything. So a **second**
+check, `sim/check_record_citations.py` (step 7 of `.github/scripts/lint.sh`),
+enforces the other direction — **every tracked `sim/<slug>/records/*.md`
+must be cited by `measurements/characterization.md`**, and every record path
+that document cites must resolve to a file that exists.
+
+This exists because the failure is real, not hypothetical (issue #142).
+`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md` — the Monte
+Carlo mismatch record, landed 2026-08-15 by issue #23 — was never added to
+the rollup, and the rollup's own "what is not yet covered" section went on
+stating that no record in `sim/` carried a **Statistical convention** field
+and that issue #23 had not landed. That was false for ten days, and
+survived five separate subsequent revisions of the file. The
+report did not merely omit the evidence; it denied the evidence existed.
+
+Like the format checker, it reads tracked files only and needs nothing but
+`python3` and `git`. It is a *presence* check by design: it cannot tell a
+record cited against the spec row it substantiates from one name-dropped in
+a footnote, and does not try. Noticing that the rollup forgot a record
+entirely is the half worth automating.
 
 ## Worked example: sim/smoke-cml-pair
 
