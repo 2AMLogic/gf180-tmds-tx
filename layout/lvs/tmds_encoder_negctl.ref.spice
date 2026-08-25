@@ -136,7 +136,7 @@
 .SUBCKT gf180mcu_fd_sc_mcu9t5v0__xor3_1 A1 A2 A3 VDD VSS Z
 .ENDS gf180mcu_fd_sc_mcu9t5v0__xor3_1
 
-.SUBCKT tmds_encoder clk de rst ctrl[1] ctrl[0] data[7] data[6] data[5] data[4] data[3] data[2] data[1] data[0] tmds[9] tmds[8] tmds[7] tmds[6] tmds[5] tmds[4] tmds[3] tmds[2] tmds[1] tmds[0] VDD VSS
+.SUBCKT tmds_encoder clk de rst ctrl[1] data[3] data[7] data[6] data[5] data[4] data[3] data[2] data[1] data[0] tmds[9] tmds[8] tmds[7] tmds[6] tmds[5] tmds[4] tmds[3] tmds[2] tmds[1] tmds[0] VDD VSS
 XFILLER_0_10 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_4
 XFILLER_0_109 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_32
 XFILLER_0_14 VDD VSS gf180mcu_fd_sc_mcu9t5v0__fill_2
@@ -1465,7 +1465,7 @@ Xclkload3 clknet_3_3__leaf_clk VDD VSS clkload3__ZN__unconnected gf180mcu_fd_sc_
 Xclkload4 clknet_3_4__leaf_clk VDD VSS clkload4__ZN__unconnected gf180mcu_fd_sc_mcu9t5v0__inv_3
 Xclkload5 clknet_3_6__leaf_clk VDD VSS clkload5__Z__unconnected gf180mcu_fd_sc_mcu9t5v0__clkbuf_12
 Xclkload6 clknet_3_7__leaf_clk VDD VSS clkload6__ZN__unconnected gf180mcu_fd_sc_mcu9t5v0__inv_4
-Xhold1 ctrl[0] VDD VSS net1 gf180mcu_fd_sc_mcu9t5v0__dlyc_1
+Xhold1 data[3] VDD VSS net1 gf180mcu_fd_sc_mcu9t5v0__dlyc_1
 Xhold10 data[3] VDD VSS net10 gf180mcu_fd_sc_mcu9t5v0__dlyc_1
 Xhold11 data[4] VDD VSS net11 gf180mcu_fd_sc_mcu9t5v0__dlyc_1
 Xhold2 ctrl[1] VDD VSS net2 gf180mcu_fd_sc_mcu9t5v0__dlyc_1

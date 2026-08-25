@@ -75,14 +75,25 @@ REPORT_DIR = REPO_ROOT / "layout" / "lvs_reports"
 # Intact (non-``_shorted``) cells whose committed report is a ``mismatch``
 # on purpose, each with the reason and where it is argued in full. Adding an
 # entry here is a review decision: it silences rule 3 for exactly one report.
-DOCUMENTED_MISMATCHES = {
-    "tmds_encoder": (
-        "P&R-inserted standard-cell types (fill/tie/endcap/CTS/hold- and "
-        "setup-repair) that the pre-P&R reference netlist has no counterpart "
-        "for; enumerated and attributed in layout/README.md's "
-        "`tmds_encoder` section (issue #84/#115)."
-    ),
+DOCUMENTED_MISMATCHES: dict[str, str] = {
+    # `tmds_encoder` lived here until issue #142. Its mismatch was the 18
+    # P&R-inserted standard-cell types (fill/tie/endcap/CTS/hold- and
+    # setup-repair) that the *pre*-P&R reference netlist had no counterpart
+    # for. The reference is now derived from the post-P&R netlist instead
+    # (`layout/scripts/gen_tmds_encoder_ref.py --from-pnr`), the report is a
+    # real `match`, and the entry is deliberately not replaced by a weaker
+    # one -- an allowlist entry that outlives the mismatch it excused is how
+    # the next genuine regression gets waved through.
 }
+
+# Suffixes marking a report as a deliberately-broken twin rather than an
+# intact cell. `_shorted` is the layout-side convention (an extra metal
+# bridge in the GDS: `gen_pad_v2.py --shorted`). `_negctl` marks a
+# reference-side break, used where a layout-side twin cannot currently be
+# extracted cleanly -- see `layout/README.md`'s `tmds_encoder` section and
+# `gen_tmds_encoder_ref.py`'s `break_one_net()` for when that applies and why
+# it is still a valid control.
+NEGATIVE_CONTROL_SUFFIXES = ("_shorted", "_negctl")
 
 # Header lines `klt lvs --format text` writes, e.g. "status: mismatch" and
 # "mismatches: 7".
@@ -120,14 +131,25 @@ def _parse_txt_header(text: str) -> dict:
 def _is_negative_control(report: dict, stem: str) -> bool:
     """True for a deliberately-broken twin.
 
-    Keyed on the report's own recorded layout ``top`` cell where present (the
-    authoritative name), falling back to the file stem so a report missing
-    that field is still classified rather than silently treated as an intact
-    cell.
+    Classified from the report's own recorded layout ``top`` cell **or** the
+    file stem -- either one carrying a `NEGATIVE_CONTROL_SUFFIXES` marker is
+    enough. Both are consulted rather than only the authoritative ``top``,
+    because a *reference*-side control (``_negctl``) leaves the layout ``top``
+    at the intact cell's name by construction: the whole point is that the
+    layout half is unchanged. Keying on ``top`` alone would misfile such a
+    report as an intact cell reporting ``mismatch`` and fail the build for
+    the control doing exactly its job.
+
+    Erring toward classifying-as-control is the safe direction here only
+    because rule 2 then *demands* the report fail; a misclassified intact
+    cell that actually matches would be caught by rule 2's `expected
+    'mismatch'` branch rather than slipping through.
     """
     top = report.get("top")
-    name = top if isinstance(top, str) and top else stem
-    return name.endswith("_shorted")
+    names = [stem]
+    if isinstance(top, str) and top:
+        names.append(top)
+    return any(n.endswith(s) for n in names for s in NEGATIVE_CONTROL_SUFFIXES)
 
 
 def check_report(path: Path) -> tuple[list[str], dict]:

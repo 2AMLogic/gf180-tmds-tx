@@ -162,15 +162,78 @@ class SyntheticCaseTest(unittest.TestCase):
         self.assertIn("DOCUMENTED_MISMATCHES", output)
 
     def test_documented_intact_mismatch_passes(self):
-        """tmds_encoder's accepted mismatch is allowlisted, not ignored."""
-        self.assertIn("tmds_encoder", check_lvs_signoff.DOCUMENTED_MISMATCHES)
+        """An allowlisted mismatch is excused; the allowlist still works.
+
+        Exercised against a *synthetic* entry rather than whichever cell
+        happens to be allowlisted today. ``DOCUMENTED_MISMATCHES`` is empty as
+        of issue #142 (``tmds_encoder``'s entry went away when its reference
+        netlist started coming from the post-P&R netlist and its report became
+        a real ``match``), and a test that asserts a specific cell is
+        allowlisted turns "we fixed the mismatch" into a test failure -- which
+        is backwards.
+        """
         for suffix in (".json", ".txt"):
             shutil.copy(
-                COMMITTED_REPORTS / f"tmds_encoder.lvs{suffix}",
-                self.tmp / f"tmds_encoder.lvs{suffix}",
+                COMMITTED_REPORTS / f"gf180_tmds_pad_v2.lvs{suffix}",
+                self.tmp / f"gf180_tmds_pad_v2.lvs{suffix}",
             )
-        code, output = run_checker(self.tmp)
+        path = self.tmp / "gf180_tmds_pad_v2.lvs.json"
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report["status"] = "mismatch"
+        path.write_text(json.dumps(report), encoding="utf-8")
+        txt = self.tmp / "gf180_tmds_pad_v2.lvs.txt"
+        txt.write_text(
+            txt.read_text(encoding="utf-8").replace("status: match", "status: mismatch"),
+            encoding="utf-8",
+        )
+
+        original = dict(check_lvs_signoff.DOCUMENTED_MISMATCHES)
+        check_lvs_signoff.DOCUMENTED_MISMATCHES["gf180_tmds_pad_v2"] = "synthetic test entry"
+        try:
+            code, output = run_checker(self.tmp)
+        finally:
+            check_lvs_signoff.DOCUMENTED_MISMATCHES.clear()
+            check_lvs_signoff.DOCUMENTED_MISMATCHES.update(original)
+        # Exit 0 is the whole claim: the identical report *without* the
+        # allowlist entry exits 1 (test_undocumented_intact_mismatch_fails).
         self.assertEqual(code, 0, output)
+
+    def test_reference_side_control_is_classified_as_a_control(self):
+        """A `_negctl` report is a control even though its layout `top` is not.
+
+        A reference-side control breaks the *reference* netlist and leaves the
+        layout half untouched, so the report's recorded layout ``top`` is the
+        intact cell's name. Classification must therefore also consult the
+        file stem -- otherwise the control is misread as an intact cell
+        reporting ``mismatch`` and fails the build for working correctly.
+        """
+        report = {"top": "tmds_encoder", "status": "mismatch"}
+        self.assertTrue(
+            check_lvs_signoff._is_negative_control(report, "tmds_encoder_negctl")
+        )
+        self.assertFalse(
+            check_lvs_signoff._is_negative_control(report, "tmds_encoder")
+        )
+
+    def test_reference_side_control_that_passes_fails_the_build(self):
+        """The #129 invariant, applied to the reference-side control kind."""
+        for suffix in (".json", ".txt"):
+            shutil.copy(
+                COMMITTED_REPORTS / f"tmds_encoder_negctl.lvs{suffix}",
+                self.tmp / f"tmds_encoder_negctl.lvs{suffix}",
+            )
+        path = self.tmp / "tmds_encoder_negctl.lvs.json"
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report["status"] = "match"
+        path.write_text(json.dumps(report), encoding="utf-8")
+        txt = self.tmp / "tmds_encoder_negctl.lvs.txt"
+        txt.write_text(
+            txt.read_text(encoding="utf-8").replace("status: mismatch", "status: match"),
+            encoding="utf-8",
+        )
+        code, output = run_checker(self.tmp)
+        self.assertEqual(code, 1, output)
+        self.assertIn("DEFEATED", output)
 
 
 if __name__ == "__main__":

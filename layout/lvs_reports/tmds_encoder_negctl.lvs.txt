@@ -1,0 +1,18 @@
+layout: ../gds/tmds_encoder.lvs_extracted.spice
+reference: tmds_encoder_negctl.ref.spice
+top: TMDS_ENCODER
+engine: klayout
+status: mismatch
+mismatches: 3
+errors: 3
+  nets: layout=384  reference=383  matched=610
+  devices: layout=0  reference=0  matched=0
+  pins: layout=25  reference=25  matched=254
+
+category_counts:
+  net.unmatched: 1
+  topology: 2
+
+[error] net.unmatched  (layout)  layout net has no reference counterpart
+[error] topology  (layout)  subcircuit instance could not be matched to a counterpart
+[error] topology  (reference)  subcircuit instance could not be matched to a counterpart

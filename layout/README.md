@@ -651,17 +651,24 @@ record convention (same as `flow/README.md`'s synthesis records).
 ```
 flow/pnr_tmds_encoder.py                driver (OpenROAD P&R + in-process GDS merge)
 flow/tmds_encoder/pnr/tmds_encoder.def  routed DEF
+flow/gen_pnr_netlist.py                 routed DEF -> post-P&R gate-level netlist
+flow/tmds_encoder/netlist/tmds_encoder.synth.v  pre-P&R synthesized netlist (P&R's input)
+flow/tmds_encoder/netlist/tmds_encoder.pnr.v    post-P&R netlist (the LVS reference's input)
 layout/gds/tmds_encoder.gds             the merged block-level GDS
 layout/gds/tmds_encoder.spice           klt extract's plain (transistor-level) netlist
 layout/gds/tmds_encoder.lvs_extracted.spice   klt extract --abstract-cells netlist (LVS side)
 layout/lvs/tmds_encoder.ref.spice       LVS reference, mechanically derived from the
-                                         synthesized netlist (layout/scripts/gen_tmds_encoder_ref.py)
+                                         post-P&R netlist (layout/scripts/gen_tmds_encoder_ref.py)
+layout/lvs/tmds_encoder_negctl.ref.spice      the same reference with one deliberate
+                                         break -- the LVS negative control
 layout/lvs/tmds_encoder.lvs_request.json      klt lvs request document
-layout/scripts/gen_tmds_encoder_ref.py  reference-netlist generator
+layout/lvs/tmds_encoder.lvs_request_negctl.json  negative-control request document
+layout/scripts/gen_tmds_encoder_ref.py  reference-netlist generator (+ --negative-control)
 layout/scripts/filter_pnr_utility_cells.py    optional utility-cell filter (not used in the
                                          primary flow below -- see its own docstring)
 drc_reports/tmds_encoder.drc.{json,txt}       klt drc reports
 lvs_reports/tmds_encoder.lvs.{json,txt}       klt lvs reports
+lvs_reports/tmds_encoder_negctl.lvs.{json,txt}   negative-control reports
 ```
 
 Regenerate (requires OpenROAD on `PATH`, run via the pinned `openroad/orfs`
@@ -673,12 +680,37 @@ python3 flow/pnr_tmds_encoder.py
 klt drc --deck gf180mcu layout/gds/tmds_encoder.gds --format json > layout/drc_reports/tmds_encoder.drc.json
 klt extract --deck gf180mcu layout/gds/tmds_encoder.gds --top tmds_encoder \
   --abstract-cells 'gf180mcu_fd_sc_mcu9t5v0__*' -o layout/gds/tmds_encoder.lvs_extracted.spice
+
+# Post-P&R netlist, derived from the committed routed DEF -- no P&R re-run.
+python3 flow/gen_pnr_netlist.py
+
 python3 layout/scripts/gen_tmds_encoder_ref.py \
-  --netlist flow/tmds_encoder/netlist/tmds_encoder.synth.v \
+  --netlist flow/tmds_encoder/netlist/tmds_encoder.pnr.v --from-pnr \
   --subckt-headers-from layout/gds/tmds_encoder.lvs_extracted.spice \
   -o layout/lvs/tmds_encoder.ref.spice
+python3 layout/scripts/gen_tmds_encoder_ref.py \
+  --netlist flow/tmds_encoder/netlist/tmds_encoder.pnr.v --from-pnr --negative-control \
+  --subckt-headers-from layout/gds/tmds_encoder.lvs_extracted.spice \
+  -o layout/lvs/tmds_encoder_negctl.ref.spice
+
 klt lvs layout/lvs/tmds_encoder.lvs_request.json --format json > layout/lvs_reports/tmds_encoder.lvs.json
+klt lvs layout/lvs/tmds_encoder.lvs_request.json --format text > layout/lvs_reports/tmds_encoder.lvs.txt
+klt lvs layout/lvs/tmds_encoder.lvs_request_negctl.json --format json > layout/lvs_reports/tmds_encoder_negctl.lvs.json
+klt lvs layout/lvs/tmds_encoder.lvs_request_negctl.json --format text > layout/lvs_reports/tmds_encoder_negctl.lvs.txt
 ```
+
+> **Do not regenerate `tmds_encoder.lvs_extracted.spice` with `klt` 0.3.0.**
+> The committed artifact was produced by `klt` 0.2.0 and is clean.
+> Re-extracting the identical GDS under 0.3.0 mis-binds abstracted cell pins
+> to nets — 26 instances get a ground pin bound to the power net and 100 get
+> an output bound to one of their own inputs, neither of which is physically
+> realizable, and neither of which the 0.2.0 artifact contains. Same
+> `.SUBCKT` headers, same instance set, 147 of 1339 bindings changed. Filed
+> upstream as
+> [klayout-tools#1366](https://github.com/2AMLogic/klayout-tools/issues/1366).
+> The `klt lvs` *comparison* (netlist vs netlist, no extraction) is
+> unaffected, which is why the reports above are 0.3.0-produced against the
+> 0.2.0-produced layout netlist.
 
 **Scope**: place-and-route only, per issue #84 (issue #100 added
 clock-tree synthesis and hold repair to this same driver; issue #115 added a
@@ -693,14 +725,60 @@ GDS -- superseding the DR-0008 numbers this section used to cite, same
 from the DR-0008 GDS; the `mim.space.1` false positives this section used to
 report before that, 188 of them, remain absent, consistent with
 [klayout-tools#1033](https://github.com/2AMLogic/klayout-tools/issues/1033)
-having been addressed upstream) and **LVS mismatch** (18 topology
-mismatches; nets/pins otherwise match fully) -- fully attributed and
-explained, not silently worked around:
+having been addressed upstream) and **LVS match** (`status: match`, 0
+mismatches; nets 384/384, pins 25/25), with a negative control that
+correctly fails.
 
-- The LVS mismatches are 17 standard-cell *types* present in the layout that
-  the pre-P&R reference netlist has no counterpart for, plus one top-level
-  rollup mismatch (17 + 1 = 18). Diffed directly against the reference
-  netlist's own `.subckt` set, not assumed:
+**LVS was a disclosed 18-mismatch FAIL until issue #142; here is what
+changed.** The mismatches were never a layout defect — they were an
+artifact of comparing a *routed* layout against a **pre**-P&R reference
+netlist. `gen_tmds_encoder_ref.py` derived the reference from
+`tmds_encoder.synth.v`, which by construction contains none of the cells
+place-and-route inserts: fill, tap/endcap, CTS buffers, hold-repair delay
+cells and inverters, and setup-repair resized gates. Every one of those
+showed up as a layout-only cell type with no counterpart.
+
+The fix is to compare against the netlist the layout was actually built
+from. `flow/gen_pnr_netlist.py` reads the committed routed DEF — the same
+DEF `layout/gds/tmds_encoder.gds` was streamed from — and writes
+`tmds_encoder.pnr.v`, the post-P&R gate-level netlist, which does contain
+all 1339 instances. `gen_tmds_encoder_ref.py --from-pnr` then derives the
+reference from that. No layout, no netlist, and no P&R setting changed;
+only which netlist the layout is graded against.
+
+**What this LVS run does and does not prove.** It proves the DEF -> GDS
+merge and the extraction preserved connectivity: every one of the 1339
+instances and 384 nets in the routed DEF is present, with the same
+topology, in the extracted layout. That is not a vacuous check — this exact
+step has had two real, found-and-fixed DBU-mismatch defects (below) that
+silently dropped via geometry. It does **not** prove that place-and-route
+preserved the *synthesized* netlist's intent; that is a different question,
+answered separately by the SDF-back-annotated post-route gate-level
+re-simulation (`flow/gate_level_sim_tmds_encoder.py`, 3/3 tests pass
+against the unmodified RTL bench) and by
+`flow/sta_tmds_encoder.py`'s `assert_def_matches_netlist`. Neither question
+subsumes the other, and neither is being claimed here as the other.
+
+**Negative control** (`layout/README.md`'s "Every LVS signoff is a pair"
+invariant, enforced by `layout/scripts/check_lvs_signoff.py`):
+`tmds_encoder_negctl` compares the **unchanged** committed layout netlist
+against a reference with exactly one deliberate fault — the `ctrl[0]`
+top-level input merged into `data[3]` — and correctly reports `status:
+mismatch` with 3 error-severity findings, the first being
+`net.unmatched: CTRL[0]`. Unlike every other cell in this repo, this
+control breaks the *reference* rather than shipping a `_shorted` GDS twin,
+because the layout-side twin cannot currently be extracted cleanly:
+klayout-tools#1366 (above) corrupts `--abstract-cells` extraction on this
+design under the installed `klt` 0.3.0, and a control whose failure might
+be the tool's rather than the injected fault's is not a control. Restoring
+a layout-side `_shorted` twin is tracked as its own follow-up, blocked on
+that upstream issue.
+
+For the record, the 18 mismatches that used to be reported here — 17
+standard-cell *types* present in the layout that the pre-P&R reference had
+no counterpart for, plus one top-level rollup (17 + 1 = 18). Diffed
+directly against the reference netlist's own `.subckt` set, not assumed.
+All are now matched, since the post-P&R reference contains them:
   - **13 P&R-inserted utility/clock-tree/timing-repair types** that carry no
     logic or that no netlist instance names --
     `gf180mcu_fd_sc_mcu9t5v0__fill_{1,2,4,8,16,32,64}`, `__filltie`,
@@ -752,9 +830,12 @@ committed file — zero bytes changed), confirming determinism and
 `gf180mcuD`-invariance directly rather than by inference alone. The DRC/LVS
 reports above were regenerated against `layout/gds/tmds_encoder.gds`
 unchanged (the GDS itself needs no regeneration, since P&R -- its only
-variant-sensitive stage -- reproduces byte-identically) under the current
-klt deck, reproducing the same DRC-clean / 18-mismatch LVS status documented
-above. The DEF -> GDS merge step itself (`merge_gds`, above) requires the
+variant-sensitive stage -- reproduces byte-identically) under the klt deck
+current at the time (0.2.0), reproducing the same DRC-clean / 18-mismatch
+LVS status this section documented then. The 18 mismatches were closed by
+issue #142 by re-pointing the reference netlist at the post-P&R netlist (see
+above); that change touched no layout artifact, so this determinism finding
+is unaffected by it. The DEF -> GDS merge step itself (`merge_gds`, above) requires the
 pinned `openroad/orfs` Docker image's bundled KLayout tech file
 (`/OpenROAD-flow-scripts/flow/platforms/gf180/KLayout/gf180mcu_5LM_1TM_9K_9t.lyt`)
 and was not re-run in this pass (the image was not pullable in this

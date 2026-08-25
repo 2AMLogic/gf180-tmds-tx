@@ -2,7 +2,7 @@
   "schema_version": 1,
   "engine": "klayout",
   "layout": "../gds/tmds_encoder.lvs_extracted.spice",
-  "reference": "tmds_encoder.ref.spice",
+  "reference": "tmds_encoder_negctl.ref.spice",
   "top": "TMDS_ENCODER",
   "reference_top": "TMDS_ENCODER",
   "parameter_tolerance": null,
@@ -13,16 +13,22 @@
     "netgen_setup": null,
     "parameter_tolerance": null
   },
-  "status": "match",
-  "mismatch_count": 0,
-  "error_count": 0,
-  "category_counts": {},
-  "category_error_counts": {},
+  "status": "mismatch",
+  "mismatch_count": 3,
+  "error_count": 3,
+  "category_counts": {
+    "net.unmatched": 1,
+    "topology": 2
+  },
+  "category_error_counts": {
+    "net.unmatched": 1,
+    "topology": 2
+  },
   "counts": {
     "nets": {
       "layout": 384,
-      "reference": 384,
-      "matched": 612
+      "reference": 383,
+      "matched": 610
     },
     "devices": {
       "layout": 0,
@@ -32,7 +38,7 @@
     "pins": {
       "layout": 25,
       "reference": 25,
-      "matched": 253
+      "matched": 254
     }
   },
   "device_classes": null,
@@ -40,7 +46,7 @@
     "engine": "klayout",
     "engine_version": "0.30.10",
     "layout_sha256": "8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa",
-    "reference_sha256": "db153464bef515370b619d97d0360e31a2add37564b554da4543c8644eb52677",
+    "reference_sha256": "9e5b6faa127b31adca8d9dd2215d9b122593bd0e412220876fd123c163b46d3c",
     "extracted_netlist": null
   },
   "provenance": {
@@ -50,7 +56,68 @@
     "deck": null,
     "input": null
   },
-  "mismatches": [],
+  "mismatches": [
+    {
+      "category": "net.unmatched",
+      "severity": "error",
+      "description": "layout net has no reference counterpart",
+      "side": "layout",
+      "net": {
+        "layout": "CTRL[0]",
+        "reference": null
+      },
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "subcircuit instance could not be matched to a counterpart",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": {
+        "layout": "TMDS_ENCODER",
+        "reference": null
+      },
+      "instance": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__DLYC_1_8",
+        "reference": null
+      },
+      "subcircuit": {
+        "layout": "GF180MCU_FD_SC_MCU9T5V0__DLYC_1",
+        "reference": null
+      }
+    },
+    {
+      "category": "topology",
+      "severity": "error",
+      "description": "subcircuit instance could not be matched to a counterpart",
+      "side": "reference",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": {
+        "layout": null,
+        "reference": "TMDS_ENCODER"
+      },
+      "instance": {
+        "layout": null,
+        "reference": "HOLD1"
+      },
+      "subcircuit": {
+        "layout": null,
+        "reference": "GF180MCU_FD_SC_MCU9T5V0__DLYC_1"
+      }
+    }
+  ],
   "net_correspondence": [
     {
       "layout": "A1",
@@ -608,11 +675,6 @@
       "pin": false
     },
     {
-      "layout": "CTRL[0]",
-      "reference": "CTRL[0]",
-      "pin": true
-    },
-    {
       "layout": "CTRL[1]",
       "reference": "CTRL[1]",
       "pin": true
@@ -665,11 +727,6 @@
     {
       "layout": "DATA[2]",
       "reference": "DATA[2]",
-      "pin": true
-    },
-    {
-      "layout": "DATA[3]",
-      "reference": "DATA[3]",
       "pin": true
     },
     {
