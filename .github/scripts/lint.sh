@@ -58,7 +58,7 @@ collect() {
   done < <(git ls-files -z -- "$1" ':!:.loom/**' ':!:.claude/**' ':!:loom.sh')
 }
 
-echo "== 1/6 shellcheck (shell scripts) =="
+echo "== 1/7 shellcheck (shell scripts) =="
 collect '*.sh'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no shell scripts tracked"
@@ -76,7 +76,7 @@ else
 fi
 
 echo
-echo "== 2/6 python syntax =="
+echo "== 2/7 python syntax =="
 collect '*.py'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no python files tracked"
@@ -91,7 +91,7 @@ else
 fi
 
 echo
-echo "== 3/6 json well-formedness =="
+echo "== 3/7 json well-formedness =="
 collect '*.json'
 if [ "${#files[@]}" -eq 0 ]; then
   echo "no json files tracked"
@@ -120,7 +120,7 @@ sys.exit(1 if bad else 0)
 fi
 
 echo
-echo "== 4/6 generated DUT freshness (layout/sim) =="
+echo "== 4/7 generated DUT freshness (layout/sim) =="
 # layout/sim/cml_driver_core_dut.spice is mechanically derived from the
 # LVS-signed-off extracted netlist layout/gds/cml_driver_core.spice (model
 # binding, vsubs->VSS body tie, wrapper pin order) and is committed so an
@@ -135,7 +135,7 @@ if ! python3 layout/scripts/gen_cml_driver_core_dut.py --check; then
 fi
 
 echo
-echo "== 5/6 evidence records (sim/*/records) =="
+echo "== 5/7 evidence records (sim/*/records) =="
 # The schema in sim/README.md -- required fields (including the
 # conditionally-required Operating point / Transient settings pair for a
 # rate-bearing record), <record-id> naming, the corner-id grammar (including
@@ -149,7 +149,7 @@ if ! python3 sim/check_records.py ${EVIDENCE_ARGS[@]+"${EVIDENCE_ARGS[@]}"}; the
 fi
 
 echo
-echo "== 6/6 LVS signoff verdicts (layout/lvs_reports) =="
+echo "== 6/7 LVS signoff verdicts (layout/lvs_reports) =="
 # Every drawn cell is signed off with a pair of `klt lvs` runs: the intact
 # cell (must `match`) and its deliberately-shorted twin (must `mismatch`).
 # The second is the negative control -- the only evidence the first one's
@@ -162,6 +162,23 @@ echo "== 6/6 LVS signoff verdicts (layout/lvs_reports) =="
 if ! python3 layout/scripts/check_lvs_signoff.py; then
   echo "FAIL: LVS signoff verdicts"
   echo "  inspect with: python3 layout/scripts/check_lvs_signoff.py --list"
+  status=1
+fi
+
+echo
+echo "== 7/7 characterization-report coverage (measurements) =="
+# measurements/characterization.md calls itself "the single aggregated,
+# current summary ... citing every evidence record". That completeness claim
+# is the whole value of the artifact: a spec row absent from it is supposed
+# to mean no evidence exists, not that nobody updated the rollup. Issue #142:
+# the Monte Carlo mismatch record (#23, landed 2026-08-15) was never added,
+# and the report's own coverage section went on asserting no such record
+# existed for ten days and five subsequent revisions. Enforced here instead of
+# documented: a tracked evidence record the rollup does not cite fails the
+# build. No PDK, no ngspice -- reads committed files only.
+if ! python3 sim/check_record_citations.py; then
+  echo "FAIL: characterization-report coverage"
+  echo "  inspect with: python3 sim/check_record_citations.py --list"
   status=1
 fi
 
