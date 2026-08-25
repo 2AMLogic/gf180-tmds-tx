@@ -111,7 +111,7 @@ target" instruction.
 | 3 | Total TMDS output jitter (informative, DVI-class) | <= 0.25 UI p-p | DR-0004 (Accepted, informative — not independently re-derived from a formal DVI 1.0 citation) | Not directly measured as a single end-to-end number in this repo (the PLL side does not exist yet); this block's own contribution is measured (row 4 below) |
 | 4 | This block's own jitter contribution | <= 0.15 UI p-p | DR-0004 (Accepted) | Same eye record: **PASS**, deterministic-jitter contribution 2.97e-6–3.56e-5 UI matched-leg, 1.337e-3 UI worst deliberately-mismatched-leg probe — margin >=100x the allocation in every measured case |
 | 5 | 10–90 % output rise/fall time | **<= 20 % of the operating UI** (≈ 269 ps @ 742.5 Mbps, ≈ 741 ps @ 270 Mbps) | `Proposed` — engineering judgement: a common serial-link rule of thumb bounding transition time to a fraction of the unit interval so eye opening is not consumed by transition slope, not derived from a formal DVI 1.0 rise/fall citation (none is cited anywhere in this repository) | `design/cml-driver-sizing.md` §5/§8: measured 40.5–59.3 ps (0 pF pad) rising to 205.9–251.6 ps (2 pF pad, DR-0005/0011's full capacitance budget) across the full matrix, both rates. **PASS at every measured point against the `Proposed` bound above** — worst case (251.6 ps @ 742.5 Mbps) is 93 % of the 269 ps bound, i.e. a real but narrow (~7 %) margin at the tightest pad-cap point and target rate; comfortably passing at 270 Mbps (741 ps bound) |
-| 6 | Passing-eye criterion | `Proposed` — eye height >= 50 % of the row-1 swing floor (>= 200 mV, using the 400 mV DR-0002 minimum) **and** eye width >= (1 − row-3's 0.25 UI budget) = **>= 0.75 UI**, both measured simultaneously at the eye's widest opening, no fixed sampling instant assumed | `Proposed` — derived arithmetically from already-ratified rows 1 and 3 (not an independent citation; no formal DVI 1.0 eye-mask figure is cited anywhere in this repository) | No existing record in this repository constructs a full statistical eye (ISI + random-pattern) combining swing and jitter simultaneously — `sim/cml-driver-eye/` measures swing and deterministic jitter as separate quantities (rows 1 and 4), not a combined eye-mask pass/fail. This is a genuine gap flagged, not silently closed, by this record — a future eye-diagram testbench should grade against this row directly |
+| 6 | Passing-eye criterion | `Proposed` — eye height >= 50 % of the row-1 swing floor (>= 200 mV, using the 400 mV DR-0002 minimum) **and** eye width >= (1 − row-3's 0.25 UI budget) = **>= 0.75 UI**, both measured simultaneously at the eye's widest opening, no fixed sampling instant assumed | `Proposed` — derived arithmetically from already-ratified rows 1 and 3 (not an independent citation; no formal DVI 1.0 eye-mask figure is cited anywhere in this repository) | `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md` (issue #144): **PASS**, worst-case per-window (0.75 UI) minimum vertical eye opening 0.871–1.033 V across the full PVT matrix, both rates, 0/1/2 pF pad cap — every measured point clears the 0.2 V floor by >= 4x. Drives a genuine PRBS7 (period 127) pattern long enough to develop real ISI, tiles each UI into 8 phase bins, and scans every 0.75 UI window position for the widest opening, so no fixed sampling instant is assumed. See this record's own "Row 6's evidence gap is closed" Status note below |
 | 7 | Single-ended output impedance / return loss | **N/A by design, not `Proposed`** — see rationale below | Measured (`design/cml-driver-sizing.md` §8): `ro_leg` (single-ended small-signal output resistance looking back into each leg) = 11.0–56.8 kOhm across the full matrix, always **>= 220x** the 50 Ω external termination | See below |
 | 8 | Device voltage stress (`Vgs`/`Vgd`/`Vds`) | <= 3.63 V rated (3.3 V core devices, +10 % supply corner), positive margin required | DR-0002 (device family), this record (rating basis) | `design/cml-driver-sizing.md` §7: **PASS**, worst measured 2.761 V (`vds_sw_max`, `ss_-40c_2.97v`) against the 3.63 V rating |
 | 9 | Tail current | 8–12 mA (this cell's own derived tolerance around the ~10 mA nominal §1 states) | §1 (Accepted, nominal only) / `design/cml-driver-sizing.md` §2 (tolerance derivation) | Same eye record: **PASS**, 9.822–10.327 mA across the full matrix (rate-independent) |
@@ -214,3 +214,30 @@ carried by `measurements/characterization.md` §1's DR-0005 table and by
 `design/esd-capacitance-budget.md` §9. The passing result is **cell-level** —
 the block-level `gf180_tmds_pad_ring_assembly` does not yet use that pad
 geometry (#143).
+
+**Row 6's evidence gap is closed (2026-08-25, issue #144).** §3 row 6's
+"Existing evidence" cell previously stated *"No existing record in this
+repository constructs a full statistical eye ... this is a genuine gap
+flagged, not silently closed"*. Unlike row 10's correction above, this was
+not a factual claim being retracted — it was a documented absence, and
+row 6's own Target/Citation columns already anticipated closure ("a future
+eye-diagram testbench should grade against this row directly"), so the
+"Status lines only" convention (reserved for correcting a stated result)
+does not apply here: the cell itself is updated in place to cite the new
+evidence. `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md`
+grades DR-0013 row 6 directly — height >= 200 mV AND width >= 0.75 UI,
+simultaneously, at the eye's widest opening, no fixed sampling instant
+assumed — by driving a genuine PRBS7 pattern (long enough to develop real
+inter-symbol interference, unlike `sim/cml-driver-eye`'s single-transition
+measurements), tiling each unit interval into phase bins, and scanning
+every 0.75 UI window position for the tallest box that fits. **Result:
+PASS**, full PVT matrix (5 process corners x 3 temperatures x 3 supply
+points), both bit-rate targets, 0/1/2 pF pad capacitance — worst-case
+margin 0.871 V at the 2 pF/125 C/2.97 V/742.5 Mbps corner, still >= 4x the
+0.2 V floor. Row 6's **target and citation columns are unchanged** — the
+criterion itself remains `Proposed` (an arithmetic derivation from rows 1
+and 3, not an independently ratified figure); only the evidence for
+grading against it is new. Row 11 (ESD HBM/CDM qualification) remains
+DR-0013's one other open gap, tracked as issue #145 and structurally
+unresolvable pre-silicon per `measurements/characterization.md` §1's
+DR-0005 table.
