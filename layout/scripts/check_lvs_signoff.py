@@ -88,11 +88,14 @@ DOCUMENTED_MISMATCHES: dict[str, str] = {
 
 # Suffixes marking a report as a deliberately-broken twin rather than an
 # intact cell. `_shorted` is the layout-side convention (an extra metal
-# bridge in the GDS: `gen_pad_v2.py --shorted`). `_negctl` marks a
-# reference-side break, used where a layout-side twin cannot currently be
-# extracted cleanly -- see `layout/README.md`'s `tmds_encoder` section and
-# `gen_tmds_encoder_ref.py`'s `break_one_net()` for when that applies and why
-# it is still a valid control.
+# bridge in the GDS: `gen_pad_v2.py --shorted`, `gen_tmds_encoder_shorted.py`
+# -- issue #146). `_negctl` marks a reference-side break instead
+# (`gen_tmds_encoder_ref.py`'s `break_one_net()`, issue #142) -- originally
+# used for `tmds_encoder` only because its layout-side twin could not yet be
+# extracted cleanly (klayout-tools#1366), but kept alongside `_shorted` even
+# after that was fixed: the two exercise different parts of the pipeline
+# (`_negctl` never runs `klt extract --abstract-cells`; `_shorted` does), see
+# `layout/README.md`'s `tmds_encoder` section for the full rationale.
 NEGATIVE_CONTROL_SUFFIXES = ("_shorted", "_negctl")
 
 # Header lines `klt lvs --format text` writes, e.g. "status: mismatch" and

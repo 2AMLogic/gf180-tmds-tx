@@ -215,6 +215,38 @@ class SyntheticCaseTest(unittest.TestCase):
             check_lvs_signoff._is_negative_control(report, "tmds_encoder")
         )
 
+    def test_tmds_encoder_shorted_pair_is_the_issue_146_verdict(self):
+        """The layout-side `tmds_encoder_shorted` control, pinned both ways.
+
+        Restored by issue #146 once klayout-tools#1366 (the `--abstract-cells`
+        pin-binding regression that made a layout-side twin untrustworthy for
+        this cell) was fixed upstream. `tmds_encoder_negctl` (the
+        reference-side control #142 shipped while #146 was blocked) is kept
+        alongside it rather than retired -- the two exercise different parts
+        of the pipeline: `_negctl` never runs `klt extract --abstract-cells`
+        at all (it only compares two netlists), while `_shorted` does, so
+        only `_shorted` can catch an extraction-side regression like #1366
+        itself. Both are checked here.
+        """
+        intact = json.loads(
+            (COMMITTED_REPORTS / "tmds_encoder.lvs.json").read_text(encoding="utf-8")
+        )
+        shorted = json.loads(
+            (COMMITTED_REPORTS / "tmds_encoder_shorted.lvs.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        negctl = json.loads(
+            (COMMITTED_REPORTS / "tmds_encoder_negctl.lvs.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(intact["status"], "match")
+        self.assertEqual(shorted["status"], "mismatch")
+        self.assertGreaterEqual(check_lvs_signoff._error_count(shorted), 1)
+        self.assertEqual(negctl["status"], "mismatch")
+        self.assertGreaterEqual(check_lvs_signoff._error_count(negctl), 1)
+
     def test_reference_side_control_that_passes_fails_the_build(self):
         """The #129 invariant, applied to the reference-side control kind."""
         for suffix in (".json", ".txt"):

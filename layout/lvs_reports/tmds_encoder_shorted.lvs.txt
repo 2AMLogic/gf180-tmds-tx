@@ -1,0 +1,18 @@
+layout: ../gds/tmds_encoder_shorted.lvs_extracted.spice
+reference: tmds_encoder.ref.spice
+top: TMDS_ENCODER_SHORTED
+reference top: TMDS_ENCODER
+engine: klayout
+status: mismatch
+mismatches: 2
+errors: 2
+  nets: layout=383  reference=384  matched=610
+  devices: layout=0  reference=0  matched=0
+  pins: layout=24  reference=25  matched=253
+
+category_counts:
+  net.merged: 1
+  topology: 1
+
+[error] net.merged  (reference)  multiple reference nets were collapsed into one layout net
+[error] topology  (both)  subcircuit instance could not be matched to a counterpart
