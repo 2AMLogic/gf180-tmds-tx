@@ -194,3 +194,23 @@ own "Numbering note" and DR-0010's "Renumbering note" for why); DR-0006's
 Status line is updated with a pointer to this record rather than its
 Consequences prose being rewritten, per the "Status lines only" edit
 convention this issue's own acceptance criteria establishes.
+
+**Row 10's evidence snapshot is superseded (2026-08-25, issue #142).** §3
+row 10's "Existing evidence" cell records the state as of this record's own
+acceptance: *"full budget against a realistic 25x25 um bond pad **FAILS**
+(7.95 pF, ~4.0x over)"*. That finding was **retracted** by issue #87 / PR
+#124 (2026-08-19) and does not survive: `design/esd-capacitance-budget.md`
+**§9 supersedes its §5**, having found the 7.95 pF figure to rest on a
+1000× units-label bug (`aF`→`fF` divided correctly, then labelled `pF`) and
+having independently re-measured a real drawn 25×25 µm pad plus DR-0011's
+ratified `diode_nd2ps_06v0` clamp at **0.225–0.652 pF across the full
+HBM-sizing window — inside the ≤ 2 pF budget with 67–89 % headroom** (§9.5).
+Row 10's **target and citation columns are unchanged and unrelaxed**: the
+requirement is still `<= 2 pF per data/clock pad` per DR-0005/0011, and this
+note changes only which evidence currently substantiates it. Per the "Status
+lines only" convention above, row 10's own cell is left as the historical
+snapshot it is rather than rewritten in place; the current verdict is
+carried by `measurements/characterization.md` §1's DR-0005 table and by
+`design/esd-capacitance-budget.md` §9. The passing result is **cell-level** —
+the block-level `gf180_tmds_pad_ring_assembly` does not yet use that pad
+geometry (#143).

@@ -153,7 +153,7 @@ the one taken against the drawn geometry).
 | Sub-claim | Verdict | Evidence record | Notes |
 |---|---|---|---|
 | ESD clamp capacitance vs. size, at 0 V and at the DR-0002/DR-0006 operating bias, full PVT | **Measured, reported — no simple PASS/FAIL against the ≤ 2 pF budget** | [`sim/esd-clamp-cv/records/20260814-193222-dd48630.md`](../sim/esd-clamp-cv/records/20260814-193222-dd48630.md) | Full PVT (45 points, process × temp × supply). The record itself is a corner-matrix capacitance-vs-width sweep, not a spec pass/fail claim — its own **Claim** field cites DR-0005 without asserting a verdict. The verdict synthesis lives in `design/esd-capacitance-budget.md` (see next row), which combines this record with the pad's own parasitic capacitance. Taken against a dirty working tree (see the record's own **Netlist provenance** field); not citable as a clean-tree result on its own, but `sim/README.md`'s cold-start reproducibility audit (issue #25) re-ran this experiment from a clean checkout and got a bit-for-bit match — the underlying data is not in question. |
-| DR-0005's ≤ 2 pF/pad budget (clamp + pad parasitic combined), against the real drawn pad cell | **Clamp alone: PASS, large margin. Full budget (clamp + realistic bond pad): FAILS, reported not revised** | `design/esd-capacitance-budget.md` §5, backed by the same clamp record plus a `klt`-extracted/analytic pad-parasitic figure | Clamp sized to the HBM 2 kV target (222–667 µm total width, per the document's §2b HBM-density estimate) costs 0.240–0.822 pF at the worst measured/extrapolated PVT corner (`ss_125c_2.97v`) — well inside the 2 pF budget on its own. Against the **literal as-drawn pad geometry** (`layout/gds/gf180_tmds_pad_min.gds`'s 0.62×1.00 µm via-landing shape, not a real bond pad), the combined total is 0.822 pF and fits with large margin. Against a **realistic 25×25 µm bond-pad** assumption (the gf180mcu_fd_io library's own established pad-opening size), the pad's own Metal5 parasitic alone costs 6.4–7.1 pF — the combined total (7.95 pF worst case) is 4.0× over the 2 pF budget. Per the operator's 2026-08-14 guardrail on issue #12, this shortfall is reported as a finding, not used to silently relax DR-0005. Backed by the same dirty-working-tree `esd-clamp-cv` record cited above; not citable as a clean-tree result on its own, but `sim/README.md`'s cold-start reproducibility audit (issue #25) confirms a bit-for-bit match from a clean checkout — the underlying data is not in question. |
+| DR-0005's ≤ 2 pF/pad budget (clamp + pad parasitic combined), against the real drawn pad cell | **PASS at a realistic 25×25 µm pad — 0.225–0.652 pF across the full HBM-sizing window (67–89 % headroom)** | [`design/esd-capacitance-budget.md` §9](../design/esd-capacitance-budget.md) (§9.3 pad/interconnect, §9.4 clamp PVT sweep, §9.5 verdict), backed by [`sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md`](../sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md) and `layout/drc_reports/gf180_tmds_pad_v2.parasitics.json` | **§9 supersedes §5; this row previously reported §5's "7.95 pF worst case, 4.0× over budget" FAIL and no longer does.** §5's verdict fell on two independent grounds, both established by issue #87 / PR #124 (2026-08-19): (a) §4b's analytic "realistic bond pad" figure carried a **1000× units-label bug** — the `aF` arithmetic was right but the result was divided by 1,000 (`aF`→`fF`) and then labelled `pF`, so the real bare-25×25 µm-Metal5-plate figure is **6.66 fF, not 6.66 pF** (§9.1, confirmed twice: re-derived arithmetic at 6.6629 fF and an independent `klt extract --parasitics` measurement at 6.66235 fF, 0.02 % agreement); and (b) rather than rest on that correction, §9 draws the pad for real — `gf180_tmds_pad_v2` (`layout/gds/gf180_tmds_pad_v2.gds`), a 25×25 µm Metal5 bond pad with DR-0011's ratified `diode_nd2ps_06v0` clamp and a real substrate tap, DRC-clean (0 violations) and LVS-matched with its `_shorted` negative control correctly mismatching. Measured: **12.185 fF** pad-plate + via-stack + Metal1 bus parasitic (§9.3, `klt extract --parasitics` against the drawn cell, byte-identical across `gf180mcuC`/`gf180mcuD`) plus a full-PVT diode-clamp CV sweep (§9.4, 45/45 points, binding corner `ss_125c_2.97v`, operating-bias-graded) over §2b's HBM-sizing window: **0.225 pF at 222 µm, 0.438 pF at 444 µm, 0.652 pF at 667 µm** (the last linearly extrapolated, §9.4). DR-0005 is met, not relaxed — the operator's 2026-08-14 guardrail on issue #12 is satisfied by correcting the measurement, not the budget. **Two caveats, stated rather than hidden**: the *capacitance* is measured but the *clamp width* it is graded at still comes from literature-sourced HBM current density, not PDK data (§2a — see the next row); and `gf180_tmds_pad_v2` is a standalone proof-of-concept cell — the block-level `gf180_tmds_pad_ring_assembly` (#86) still uses `gen_pad_diode_draft.py`'s smaller, non-production 2×2 µm pad-opening geometry, so this PASS is a cell-level result at a realistic pad size, **not yet an integrated block-level pad-ring result**. That integration gap is tracked separately (see §3 item 4). |
 | HBM ≥ 2 kV / CDM ≥ 500 V ESD qualification | **Not evidenced — design-margin estimate only, explicitly not a qualification** | `design/esd-capacitance-budget.md` §2 | No PDK source (SPICE models or DRC deck) characterizes ESD failure current density, breakdown voltage, or snapback/trigger behavior for any device family in gf180mcu (§2a of that document). The HBM sizing figures (222/444/667 µm clamp widths) are order-of-magnitude estimates from general ESD-design literature, explicitly marked as not PDK-sourced. CDM is reported as "the source is silent" — no CDM-driven width number exists. This repo has no tester and no fabricated parts (`measurements/` stays empty by design, per CLAUDE.md); real ESD qualification cannot happen until silicon exists. |
 
 ### Harness/machinery self-verification (not a spec-row claim)
@@ -229,14 +229,20 @@ following gaps are stated by name rather than left as silent omissions:
    been regenerated and re-signed off against it (#127, closed) — per
    DR-0010's own survey, no numeric result recorded in this repository
    changes value as a result. DR-0013 also ratifies an 11-row
-   verifiable-spec-row table (its own §3); three of those rows remain
+   verifiable-spec-row table (its own §3); two of those rows remain
    genuine open gaps, unchanged by this ratification and **not** resolved
    by it: row 6 (combined swing+jitter eye-mask criterion) has no
-   testbench yet; row 10 (pad-capacitance budget, ≤ 2 pF) **FAILs at ~4×
-   over budget** against a realistic 25×25 µm bond pad (see §1's DR-0005
-   table above); row 11 (ESD HBM/CDM qualification) is not yet
-   independently simulated. These three remain tracked by Epic #17's own
-   T1 checklist item 5, not closed by this record.
+   testbench yet, and row 11 (ESD HBM/CDM qualification) is not yet
+   independently simulated — and per §1's DR-0005 table, structurally
+   cannot be, pre-silicon. Row 10 (pad-capacitance budget, ≤ 2 pF) was
+   listed here as a third gap, **FAILing at ~4× over budget** against a
+   realistic 25×25 µm bond pad; **that is no longer the state** — the
+   figure behind it was a units-label bug, and a real drawn pad now
+   measures 0.225–0.652 pF against the 2 pF budget (§1's DR-0005 table
+   above, `design/esd-capacitance-budget.md` §9). Row 10 is closed at cell
+   level; what remains for it is block-level integration, item 4 below.
+   Rows 6 and 11 remain tracked by Epic #17's own T1 checklist item 5, not
+   closed by this record.
 2. **Post-layout re-simulation — device-level done, parasitic RC not.**
    The DR-0002 rows in §1 now carry a **Netlist provenance: extracted**
    record as well as the schematic one
@@ -278,6 +284,31 @@ following gaps are stated by name rather than left as silent omissions:
    Monte Carlo mismatch evidence for the CML driver's swing/common-mode"),
    the sibling Monte Carlo issue in this same Epic #17 phase, and has not
    landed as of this document.
+4. **Pad-ring integration of the budget-passing pad geometry — not done.**
+   §1's DR-0005 row now reports a PASS, but it is a **cell-level** PASS:
+   the 0.225–0.652 pF result is measured against `gf180_tmds_pad_v2`, a
+   standalone proof-of-concept cell drawn by issue #87 to answer "can a
+   realistic-size pad plus DR-0011's clamp fit the budget at all". The
+   block-level pad ring this design would actually tape out —
+   [`layout/gds/gf180_tmds_pad_ring_assembly.gds`](../layout/gds/gf180_tmds_pad_ring_assembly.gds)
+   (#86) — does **not** use that geometry. It reuses
+   `layout/scripts/gen_pad_diode_draft.py`'s 2×2 µm pad opening, which
+   `layout/README.md` itself calls "DRC-legal but not a production
+   wire-bond target". So no capacitance-budget number has ever been
+   measured against a block-level pad ring carrying production-sized pads,
+   and whether `gf180_tmds_pad_v2`'s 25×25 µm pad can be tiled at
+   DR-0011's ratified 350 µm pad pitch with ring continuity intact is
+   **unchecked**. This is an open, named gap, not a closed one; it is
+   filed as its own investigation issue (#143) rather than asserted either
+   way here.
+5. **Eye-mask criterion (DR-0013 row 6) — no testbench.** Item 1 above
+   names this; restating it here because it is a *testbench* gap, not a
+   result gap. `sim/cml-driver-eye/` records swing, common mode, and
+   rise/fall time separately, and `design/cml-driver-sizing.md` derives
+   eye margin from them, but no committed testbench evaluates a combined
+   swing+jitter eye mask as a single pass/fail criterion. Per CLAUDE.md's
+   "no claim without a testbench", this document makes no eye-mask claim.
+   Tracked as issue #144.
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all. The encoder/serializer digital domain (DR-0003) is verified
