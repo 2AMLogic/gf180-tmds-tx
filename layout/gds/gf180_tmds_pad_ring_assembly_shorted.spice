@@ -1022,8 +1022,84 @@ M$337 OUTN INN TAIL OUTP|VSS nfet L=0.28U W=2U AS=0.42P AD=0.42P PS=2.42U
 * device instance $338 r0 *1 468.335,-18.72 nfet
 M$338 TAIL INN OUTN OUTP|VSS nfet L=0.28U W=2U AS=0.42P AD=0.84P PS=2.42U
 + PD=4.84U
-* device instance $339 r0 *1 175,25.5 diode_nd2ps_06v0
-D$339 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=1P P=4U
-* device instance $340 r0 *1 525,25.5 diode_nd2ps_06v0
-D$340 OUTP|VSS OUTN diode_nd2ps_06v0 A=1P P=4U
+* device instance $339 r0 *1 143.3,30.5 diode_nd2ps_06v0
+D$339 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $340 r0 *1 145.9,30.5 diode_nd2ps_06v0
+D$340 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $341 r0 *1 148.5,30.5 diode_nd2ps_06v0
+D$341 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $342 r0 *1 151.1,30.5 diode_nd2ps_06v0
+D$342 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $343 r0 *1 153.7,30.5 diode_nd2ps_06v0
+D$343 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $344 r0 *1 156.3,30.5 diode_nd2ps_06v0
+D$344 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $345 r0 *1 158.9,30.5 diode_nd2ps_06v0
+D$345 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $346 r0 *1 161.5,30.5 diode_nd2ps_06v0
+D$346 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $347 r0 *1 164.1,30.5 diode_nd2ps_06v0
+D$347 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $348 r0 *1 166.7,30.5 diode_nd2ps_06v0
+D$348 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $349 r0 *1 169.3,30.5 diode_nd2ps_06v0
+D$349 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $350 r0 *1 171.9,30.5 diode_nd2ps_06v0
+D$350 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $351 r0 *1 174.5,30.5 diode_nd2ps_06v0
+D$351 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $352 r0 *1 177.1,30.5 diode_nd2ps_06v0
+D$352 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $353 r0 *1 179.7,30.5 diode_nd2ps_06v0
+D$353 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $354 r0 *1 182.3,30.5 diode_nd2ps_06v0
+D$354 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $355 r0 *1 184.9,30.5 diode_nd2ps_06v0
+D$355 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $356 r0 *1 187.5,30.5 diode_nd2ps_06v0
+D$356 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $357 r0 *1 190.1,30.5 diode_nd2ps_06v0
+D$357 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $358 r0 *1 192.7,30.5 diode_nd2ps_06v0
+D$358 OUTP|VSS OUTP|VSS diode_nd2ps_06v0 A=2P P=6U
+* device instance $359 r0 *1 493.3,30.5 diode_nd2ps_06v0
+D$359 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $360 r0 *1 495.9,30.5 diode_nd2ps_06v0
+D$360 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $361 r0 *1 498.5,30.5 diode_nd2ps_06v0
+D$361 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $362 r0 *1 501.1,30.5 diode_nd2ps_06v0
+D$362 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $363 r0 *1 503.7,30.5 diode_nd2ps_06v0
+D$363 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $364 r0 *1 506.3,30.5 diode_nd2ps_06v0
+D$364 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $365 r0 *1 508.9,30.5 diode_nd2ps_06v0
+D$365 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $366 r0 *1 511.5,30.5 diode_nd2ps_06v0
+D$366 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $367 r0 *1 514.1,30.5 diode_nd2ps_06v0
+D$367 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $368 r0 *1 516.7,30.5 diode_nd2ps_06v0
+D$368 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $369 r0 *1 519.3,30.5 diode_nd2ps_06v0
+D$369 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $370 r0 *1 521.9,30.5 diode_nd2ps_06v0
+D$370 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $371 r0 *1 524.5,30.5 diode_nd2ps_06v0
+D$371 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $372 r0 *1 527.1,30.5 diode_nd2ps_06v0
+D$372 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $373 r0 *1 529.7,30.5 diode_nd2ps_06v0
+D$373 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $374 r0 *1 532.3,30.5 diode_nd2ps_06v0
+D$374 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $375 r0 *1 534.9,30.5 diode_nd2ps_06v0
+D$375 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $376 r0 *1 537.5,30.5 diode_nd2ps_06v0
+D$376 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $377 r0 *1 540.1,30.5 diode_nd2ps_06v0
+D$377 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
+* device instance $378 r0 *1 542.7,30.5 diode_nd2ps_06v0
+D$378 OUTP|VSS OUTN diode_nd2ps_06v0 A=2P P=6U
 .ENDS gf180_tmds_pad_ring_assembly_shorted

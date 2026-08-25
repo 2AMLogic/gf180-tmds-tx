@@ -1038,19 +1038,55 @@ Three readings worth stating rather than leaving implicit:
   CML driver, no driver→pad routing and no LVS negative control — it answers a
   geometric-fit and parasitic-capacitance question. There is no `klt lvs`
   signoff for these tiles and none is claimed.
-- **The block-level assembly still carries the old placeholder pad.**
-  `layout/gds/gf180_tmds_pad_ring_assembly.gds` keeps its 2×2 µm opening;
-  adopting the production geometry there is #149, blocked on a `klt lvs`
-  regression (klayout-tools#1370) under which that cell's committed
-  `status: match` no longer reproduces at all — 40/40 fresh runs return
-  `mismatch` against the *unchanged, committed* GDS. Full evidence in
-  `layout/README.md` § "The block-level LVS signoff no longer reproduces".
+- **Resolved (issue #149): the block-level assembly now carries the
+  production pad.** `layout/gds/gf180_tmds_pad_ring_assembly.gds` was
+  redrawn on `gen_pad_v2.py`'s 25×25 µm plate / 20-finger clamp geometry
+  once the `klt lvs` `Netlist.combine_devices()` regression
+  (klayout-tools#1370) that blocked the redraw was fixed upstream
+  ([klayout-tools#1380](https://github.com/2AMLogic/klayout-tools/pull/1380),
+  merged). §10.5 below reports the integrated (driver-included) capacitance
+  measurement against the landed geometry; full DRC/LVS evidence is in
+  `layout/README.md`'s `gf180_tmds_pad_ring_assembly` section.
 - **It is still a design-margin estimate on the ESD side**, exactly as §9.6
   says: the *capacitance* is measured, but the clamp *width* it is graded at
   comes from literature-sourced HBM current density (§2a), not PDK data. No
   tester, no parts, no qualification claim.
 
-### 10.5. Links (issue #143)
+### 10.5. Issue #149: the landed, integrated (driver-included) measurement
+
+§10.3 measured `pad_pitch_fit_study.py`'s idealized two-slot tile — ring
+straps, substrate tap, and production pads, but **no CML driver and no
+driver→pad routing**. Issue #149 folded the production pad geometry into
+`gen_pad_ring_assembly.py` itself, which draws all of that; `klt extract
+--parasitics --pdk gf180mcuD` against the landed
+`gf180_tmds_pad_ring_assembly.gds` (20-finger clamp, `gf180_tmds_pad_v2`'s
+own as-drawn size) measures each output net's *own* interconnect
+capacitance — now including `cml_driver_core`'s internal M1/M2 output
+routing on that net, since the net spans the whole path from driver drain to
+bond pad, not just the pad structure:
+
+| Net | Pad + interconnect + driver routing (§10.5) | Clamp, `ss_125c_2.97v`, operating bias (§9.4) | Total | vs. 2 pF budget |
+|---|---|---|---|---|
+| `OUTP` | 48.733 fF | 45.03 fF | 93.76 fF (0.094 pF) | **Fits, 1.906 pF headroom (95 %)** |
+| `OUTN` | 30.453 fF | 45.03 fF | 75.48 fF (0.075 pF) | **Fits, 1.925 pF headroom (96 %)** |
+
+`OUTP`/`OUTN` no longer measure identically the way §10.3's idealized tile
+did: the two driver→pad routes differ in length (`_route`'s Manhattan jog
+geometry in `gen_pad_ring_assembly.py`), so their interconnect capacitance
+differs too. Both are still small relative to §10.3's own as-drawn (20
+fingers) reading (12.185 fF pad-only) — the driver's own internal routing
+adds tens of fF, not hundreds — and both comfortably clear the 2 pF budget
+with headroom exceeding every reading in §10.3's own table. This is,
+consistent with #143's own framing, a confirmation at the as-drawn 20-finger
+clamp size, not a re-measurement of the full HBM-sizing window: an
+HBM-sized clamp folded into this assembly (via `N_FINGERS`) would need its
+own `klt extract --parasitics` run to confirm the interconnect term at that
+size, though §10.3's tile-level sweep already bounds it (≤ 95.071 fF
+pad-only at 668 µm) well inside the budget.
+
+Artifacts: `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json`.
+
+### 10.6. Links (issues #143, #149)
 
 - Fit-study generator: `layout/scripts/pad_pitch_fit_study.py`.
 - Drawn tiles: `layout/gds/pad_pitch_fit_n{20,111,222,334}.gds`,
@@ -1061,6 +1097,11 @@ Three readings worth stating rather than leaving implicit:
   continuity).
 - Clamp capacitance re-used unchanged from §9.4:
   `sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md`.
+- Landed block-level assembly generator (issue #149):
+  `layout/scripts/gen_pad_ring_assembly.py`.
+- Evidence: `layout/drc_reports/gf180_tmds_pad_ring_assembly*.{drc,extract}.json`,
+  `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json`,
+  `layout/lvs_reports/gf180_tmds_pad_ring_assembly*.lvs.{json,txt}`.
 - Decision records consumed, not re-litigated: `spec/decisions/0011-pad-esd-strategy.md`
   (DR-0011, the 350/75 µm pitch and ring-continuity requirements this is
   checked against), `spec/decisions/0010-pdk-variant.md` (DR-0010).

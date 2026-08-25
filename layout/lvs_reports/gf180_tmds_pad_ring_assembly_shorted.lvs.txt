@@ -1,6 +1,7 @@
 layout: ../gds/gf180_tmds_pad_ring_assembly_shorted.gds
 reference: gf180_tmds_pad_ring_assembly_shorted.ref.spice
 top: gf180_tmds_pad_ring_assembly_shorted
+reference top: GF180_TMDS_PAD_RING_ASSEMBLY_SHORTED
 engine: klayout
 status: mismatch
 mismatches: 7

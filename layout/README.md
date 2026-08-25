@@ -496,9 +496,13 @@ Structure, per DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`):
 
 - **Two integrated, diode-clamped bond pads** (`diode_nd2ps_06v0`, pad
   cathode / VSS anode), one per driver output, placed at DR-0011's ratified
-  **350 um pad pitch**. Each pad reuses `gen_pad_diode_draft.py`'s own
-  DRC/LVS-verified cathode + via-stack + bond-pad geometry (issue #9/
-  DR-0011), translated and relabelled per pad rather than re-derived.
+  **350 um pad pitch**. Each pad is a **production 25×25 µm Metal5 bond pad**
+  with a 20×20 µm opening (2.5 µm `pad.enclosing.metal5.1`-clearing margin)
+  and a 20-finger `diode_nd2ps_06v0` clamp array folded onto a shared Metal1
+  gather bus — `gen_pad_v2.py`'s own DRC/LVS-verified geometry (issue #87),
+  landed here via `pad_pitch_fit_study.py`'s already-validated block-level
+  reference implementation (issue #143/#149), translated and relabelled per
+  pad rather than re-derived.
 - **DVDD/DVSS ring continuity**: Metal3/Metal4/Metal5 supply straps drawn
   continuously across the full two-pad span (not stopping at either pad's
   own footprint) and via-stitched every 50 um so the three metal levels
@@ -524,26 +528,27 @@ ring-continuity's own sake, but carries no clamp leg or other connection in
 this increment, and `klt extract` correctly reports it as disconnected
 "dead metal", not a missing connection: see the Signoff section below).
 `INP`/`INN`/`IBIAS` (driver inputs) are not routed to pads — out of scope
-for the *output* pad-ring integration this issue targets. Pad-opening size
-(2x2 um, matching the verified diode draft) is DRC-legal but not a
-production wire-bond target; sizing the pad opening for a real bond process,
-and the VDD clamp leg, and the multi-lane ring, are follow-up work (#87's
-capacitance-budget redesign is the most likely owner for the pad-sizing
-question specifically).
+for the *output* pad-ring integration this issue targets. Clamp size is
+`N_FINGERS` (20 fingers, `gf180_tmds_pad_v2`'s own as-drawn array) — a
+representative, DRC/LVS-provable size, not yet the final HBM-qualified one
+(`design/esd-capacitance-budget.md` §2a/9.6, still literature-bounded); the
+row-fold `gen_pad_ring_assembly.py` ports from `pad_pitch_fit_study.py`
+(`clamp_rows`, plus a hard `ValueError` guard if a requested clamp cannot be
+folded to fit DR-0011's ratified pitch — the fold widens, never the pitch)
+means a future larger clamp is a constant change, not a redesign. Sizing the
+VDD clamp leg and the multi-lane ring remain follow-up work.
 
-**Update (issue #143): the production pad geometry does fit, and this cell
-still does not carry it.** The `pad_pitch_fit_*` study below answers the
-pad-sizing question this paragraph left open — `gf180_tmds_pad_v2`'s
+**Update (issue #149): the production pad geometry is now landed.** Issue
+#143's `pad_pitch_fit_*` study (below) established that `gf180_tmds_pad_v2`'s
 production 25×25 µm pad **fits DR-0011's ratified 350 µm pitch**, drawn and
-DRC-clean, across the whole HBM clamp-sizing window. Folding that geometry
-into *this* generator could not land in the same pass: the block-level LVS
-signoff below no longer reproduces under the currently-installed `klt`
-(see "The block-level LVS signoff no longer reproduces" below), so replacing
-this cell's GDS would have meant committing a signoff pair in which **both**
-halves report `mismatch` — a defeated negative control, which is exactly the
-failure mode `check_lvs_signoff.py` exists to prevent. The redraw is
-therefore filed as its own implementation issue (#149), blocked on the
-upstream fix, rather than forced through here.
+DRC-clean, across the whole HBM clamp-sizing window — folding that geometry
+into *this* generator was deferred only because the block-level LVS signoff
+did not reproduce under the `klt` build current at that time (see "The
+block-level LVS signoff regression" below, now resolved). Once
+[klayout-tools#1380](https://github.com/2AMLogic/klayout-tools/pull/1380)
+landed the fix, this generator was redrawn on the current geometry — see
+"Current signoff status" below for the fresh DRC/LVS/capacitance evidence
+against the *landed* GDS.
 
 ```
 scripts/gen_pad_ring_assembly.py                     generator (klayout.db; imports gds/cml_driver_core.gds)
@@ -552,6 +557,7 @@ gds/gf180_tmds_pad_ring_assembly_shorted.gds          LVS negative control (OUTP
 gds/gf180_tmds_pad_ring_assembly.spice                klt extract's schematic-equivalent netlist
 gds/gf180_tmds_pad_ring_assembly_shorted.spice        klt extract's schematic-equivalent netlist (shorted variant)
 drc_reports/gf180_tmds_pad_ring_assembly*.{drc,extract}.json(.txt)  klt drc/extract reports, both cells
+drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json            klt extract --parasitics report (pad-node capacitance)
 lvs_reports/gf180_tmds_pad_ring_assembly*.lvs.{json,txt}            klt lvs reports, both cells
 lvs/gf180_tmds_pad_ring_assembly*.ref.spice           hand-written reference netlists for LVS
 lvs/gf180_tmds_pad_ring_assembly*.lvs_request.json    klt lvs request documents
@@ -567,6 +573,8 @@ klt drc --deck gf180mcu gds/gf180_tmds_pad_ring_assembly.gds
 klt extract --deck gf180mcu gds/gf180_tmds_pad_ring_assembly.gds --top gf180_tmds_pad_ring_assembly -o gds/gf180_tmds_pad_ring_assembly.spice
 klt lvs lvs/gf180_tmds_pad_ring_assembly.lvs_request.json                   # expect status: match
 klt lvs lvs/gf180_tmds_pad_ring_assembly_shorted.lvs_request.json           # expect status: mismatch (negative control)
+klt extract --deck gf180mcu --parasitics --pdk gf180mcuD gds/gf180_tmds_pad_ring_assembly.gds \
+    --top gf180_tmds_pad_ring_assembly --format json > drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json
 ```
 
 **Current signoff status**: **DRC-clean** (0 violations, both the clean
@@ -584,37 +592,49 @@ the DVDD strap's three 700x4um (~2800 um² each) Metal3/Metal4/Metal5
 rectangles (plus its via3/via4 stitches) as
 disclosed, expected "dead metal" — connected to no device or labelled net in
 this single-driver-instance increment, exactly as the Scope note above
-states.
+states. `klt extract`'s `device_counts` reports `diode_nd2ps_06v0: 40` (20
+fingers per pad × 2 pads, up from the pre-#149 placeholder's `2`) and
+`nfet: 338`, unchanged from `cml_driver_core`'s own device count.
 
-**Tool gap, friction protocol (nondeterministic LVS)**: re-running the
-*identical* `klt lvs` invocation against the unshorted assembly repeatedly
-(same GDS/reference content hash every time) intermittently — roughly 1-in-5
-runs, observed directly — flips `status` from `match` to `mismatch`, driven
-by an internal KLayout `Netlist.combine_devices()` consistency error
-(`"Internal error: Terminal still connected after removing device in device
-combination"`) that partially folds one multi-finger device before
-aborting, cascading into spurious `device.property`/`device.unmatched`
-findings against an unchanged reference. Filed generically (no design-
-specific detail) at
-[klayout-tools#1185](https://github.com/2AMLogic/klayout-tools/issues/1185).
+**Pad-node capacitance vs. DR-0005's ≤ 2 pF budget (issue #149)**: `klt
+extract --parasitics --pdk gf180mcuD` against the landed assembly measures
+each output net's own interconnect capacitance — **48.733 fF (`OUTP`)** and
+**30.453 fF (`OUTN`)** — which, unlike `pad_pitch_fit_study.py`'s idealized
+two-slot tile (§ below, `OUTP`/`OUTN` measure identically there), also
+includes `cml_driver_core`'s own internal M1/M2 output routing on that net,
+not just the bond pad and its own via stack: the two pads' routes to the
+driver differ in length, so the two nets are no longer symmetric. Adding
+`design/esd-capacitance-budget.md` §9.4's PVT-swept 20-finger clamp
+capacitance (45.03 fF, `ss_125c_2.97v` binding corner, operating bias) gives
+a **total pad-node capacitance of 93.76 fF (`OUTP`) / 75.48 fF (`OUTN`) —
+0.094 pF / 0.075 pF, ≥ 95 % headroom against the 2 pF budget.** This is a
+confirmation, not an open question: issue #143's standalone-tile study
+already established the whole HBM-sizing window (up to 0.735 pF) fits: see
+`design/esd-capacitance-budget.md` §10 for the full accounting.
 
-`klt lvs` emits one format per invocation (`--format text` or `--format
-json`, no combined mode), so the committed `.txt`/`.json` pair for a cell is
-necessarily produced by **two** separate `klt lvs` runs — and under this bug
-those two runs can land on *different* outcomes, leaving a committed pair
-that contradicts itself. The pair committed here
-(`lvs_reports/gf180_tmds_pad_ring_assembly.lvs.{json,txt}`) was therefore
-regenerated by looping both invocations until a single round produced
-`status: match` from **both** formats, and the two files were then checked
-against each other before committing: both report `status: match`, `2`
-findings, both `severity: warning` `topology`, `nets 7/7 matched 7`, `devices
-6/6 matched 6`, `pins layout=7 reference=6 matched=7`. **Anyone regenerating
-these two files must re-do that agreement check** — do not commit a `.txt`
-and a `.json` from rounds that disagree. Re-running either command above is
-expected to reproduce `match` most of the time but not always, until that
-issue is resolved upstream; a lone `mismatch` re-run carrying
-`device.combine_incomplete` is this bug, not a real LVS failure (a real
-failure looks like the `_shorted` control's `net.merged`/`net.split`).
+**The block-level LVS signoff regression (issue #143 finding) is resolved
+(issue #149).** The redraw below was blocked on a `klt lvs`
+`Netlist.combine_devices()` regression under which the committed `status:
+match` on the *pre-#149 placeholder geometry* stopped reproducing (40/40
+consecutive runs returned `mismatch`, see the historical record in the next
+section). The fix landed upstream as
+[klayout-tools#1380](https://github.com/2AMLogic/klayout-tools/pull/1380)
+(merged, closing
+[klayout-tools#1370](https://github.com/2AMLogic/klayout-tools/issues/1370)),
+and this generator was redrawn on the current geometry against a `klt` build
+carrying that fix. Re-running the *identical* `klt lvs` invocation against
+the landed assembly **15 of 15** consecutive times returns `status: match`
+with the same `2`-finding, `0`-error result each time — no flakiness
+observed, a marked change from the pre-fix behaviour the historical section
+below documents. `klt lvs` still emits one format per invocation (`--format
+text` or `--format json`, no combined mode), so the committed
+`.txt`/`.json` pair is still produced by two separate runs; both were
+checked to agree (`status: match`, `2` findings, both `severity: warning`
+`topology`, `nets 7/7 matched 7`, `devices 6/6 matched 6`, `pins layout=7
+reference=6 matched=7`) before committing, per the same discipline the
+historical section describes — that discipline is retained even though the
+underlying flakiness this build exhibits appears resolved, since a
+regenerated report pair should always be cross-checked regardless.
 
 Note also that `scripts/gen_pad_ring_assembly.py` writes GDSII, whose header
 carries a modification timestamp, so a regenerated GDS has a different
@@ -623,11 +643,9 @@ even when the geometry is byte-for-byte equivalent — the committed report's
 `layout_sha256` matches the committed GDS as of this commit, but do not read
 a hash difference after a regen as a geometry change on its own.
 
-The `_shorted` negative control's `mismatch`
-result is unaffected by this flakiness in practice (observed stable across
-five repeated runs) since its `net.merged`/`net.split` findings alone
-already force `status: mismatch` regardless of how `combine_devices`
-resolves.
+The `_shorted` negative control's `mismatch` result reproduced correctly on
+every repeated run observed (`net.merged`/`net.split` findings force
+`status: mismatch` regardless of how `combine_devices` resolves).
 
 Also re-verified while assembling this block, per DR-0011's own flagged
 regression: `klt drc --deck gf180mcu` against the already-committed
@@ -650,12 +668,21 @@ to the drawn `VSS` net rather than a synthesized `vsubs` global (five
 repeated `klt lvs` re-runs against the intact cell all agreed `match`, no
 `#1185` flakiness observed this round).
 
-### The block-level LVS signoff no longer reproduces (issue #143 finding)
+### The block-level LVS signoff regression (issue #143 finding), historical record — resolved (issue #149)
+
+**Resolved as of issue #149** (see the "block-level LVS signoff regression
+... is resolved" note above) via
+[klayout-tools#1380](https://github.com/2AMLogic/klayout-tools/pull/1380).
+This section is kept as the historical record of the regression that
+blocked issue #143's redraw from landing directly — it describes the
+*pre-#149 placeholder geometry's* `klt lvs` behaviour under the build
+current at the time, not the landed assembly's current status (see "Current
+signoff status" above for that).
 
 Under `klt 0.3.0+g634e074ff484` (git commit `634e074f`, KLayout 0.30.10, the
 build installed as of 2026-08-24), the committed `status: match` above
-**does not reproduce**. This is a regression in the tool, not in the layout —
-it is measured against the *unchanged, committed* GDS, and it is stated here
+**did not reproduce**. This was a regression in the tool, not in the layout —
+it was measured against the *unchanged, committed* GDS, and it is stated here
 rather than left for the next reader to rediscover:
 
 - `klt lvs` against `lvs/gf180_tmds_pad_ring_assembly.lvs_request.json`
@@ -683,17 +710,22 @@ rather than left for the next reader to rediscover:
   block-level netlist.
 
 Filed generically (tool gap only, no design detail) at
-[klayout-tools#1370](https://github.com/2AMLogic/klayout-tools/issues/1370).
-The committed report pair is left exactly as it is: it is internally
-consistent, and it was produced by a build that did reproduce it. Replacing
-it with a fresh pair would defeat the negative control outright — under this
-build the `_shorted` twin still reports `mismatch` (correctly, on
-`net.merged`/`net.split`, checked 3/3) but so now does the intact cell, so a
-fresh pair would say `mismatch` on **both** halves and prove nothing about
-`klt lvs`'s ability to tell a short from an intact cell. That is the precise
-failure `scripts/check_lvs_signoff.py` (issue #129) exists to catch. This is also why
-issue #143's pad redraw is filed as follow-up work (#149) rather than landed
-against this cell; see the next section.
+[klayout-tools#1370](https://github.com/2AMLogic/klayout-tools/issues/1370),
+closed by the merged
+[klayout-tools#1380](https://github.com/2AMLogic/klayout-tools/pull/1380).
+At the time, the committed report pair (for the pre-#149 placeholder
+geometry) was left exactly as it was: it was internally consistent, and it
+was produced by a build that did reproduce it. Replacing it with a fresh
+pair would have defeated the negative control outright — under the
+regression-era build the `_shorted` twin still reported `mismatch`
+(correctly, on `net.merged`/`net.split`, checked 3/3) but so did the intact
+cell, so a fresh pair would have said `mismatch` on **both** halves and
+proven nothing about `klt lvs`'s ability to tell a short from an intact
+cell. That is the precise failure `scripts/check_lvs_signoff.py` (issue
+#129) exists to catch, and exactly why issue #143's pad redraw waited for
+the upstream fix rather than landing against this cell while the regression
+held. See "Current signoff status" above for the redrawn assembly's own
+report pair, produced under the fixed `klt` build.
 
 ## `pad_pitch_fit_*` — does the production pad fit DR-0011's 350 µm pitch? (issue #143)
 
@@ -867,10 +899,11 @@ It draws no CML driver, no driver→pad routing, and no LVS negative control —
 it answers a geometric-fit and parasitic-capacitance question, not "is this
 the final integrated block". There is therefore **no `klt lvs` signoff for
 these tiles and none is claimed**; `check_lvs_signoff.py` correctly sees no
-report pair for them. Folding this geometry into
-`gen_pad_ring_assembly.py` — where it *would* need an LVS pair — is
-**#149**, blocked on the `klt lvs` regression documented in the previous
-section.
+report pair for them. Folding this geometry into `gen_pad_ring_assembly.py`
+— where it *does* need an LVS pair — is **#149**, landed once the `klt lvs`
+regression documented in the previous section was resolved upstream; see the
+`gf180_tmds_pad_ring_assembly` section above for the integrated block's own
+DRC/LVS/capacitance evidence.
 
 ## `tmds_encoder` — digital block-level place-and-route (issue #84)
 
