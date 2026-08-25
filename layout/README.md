@@ -531,6 +531,20 @@ and the VDD clamp leg, and the multi-lane ring, are follow-up work (#87's
 capacitance-budget redesign is the most likely owner for the pad-sizing
 question specifically).
 
+**Update (issue #143): the production pad geometry does fit, and this cell
+still does not carry it.** The `pad_pitch_fit_*` study below answers the
+pad-sizing question this paragraph left open — `gf180_tmds_pad_v2`'s
+production 25×25 µm pad **fits DR-0011's ratified 350 µm pitch**, drawn and
+DRC-clean, across the whole HBM clamp-sizing window. Folding that geometry
+into *this* generator could not land in the same pass: the block-level LVS
+signoff below no longer reproduces under the currently-installed `klt`
+(see "The block-level LVS signoff no longer reproduces" below), so replacing
+this cell's GDS would have meant committing a signoff pair in which **both**
+halves report `mismatch` — a defeated negative control, which is exactly the
+failure mode `check_lvs_signoff.py` exists to prevent. The redraw is
+therefore filed as its own implementation issue (#149), blocked on the
+upstream fix, rather than forced through here.
+
 ```
 scripts/gen_pad_ring_assembly.py                     generator (klayout.db; imports gds/cml_driver_core.gds)
 gds/gf180_tmds_pad_ring_assembly.gds                  the assembled block
@@ -635,6 +649,228 @@ deck (`content_hash sha256:79e71a1e…`, the same "restored" deck
 to the drawn `VSS` net rather than a synthesized `vsubs` global (five
 repeated `klt lvs` re-runs against the intact cell all agreed `match`, no
 `#1185` flakiness observed this round).
+
+### The block-level LVS signoff no longer reproduces (issue #143 finding)
+
+Under `klt 0.3.0+g634e074ff484` (git commit `634e074f`, KLayout 0.30.10, the
+build installed as of 2026-08-24), the committed `status: match` above
+**does not reproduce**. This is a regression in the tool, not in the layout —
+it is measured against the *unchanged, committed* GDS, and it is stated here
+rather than left for the next reader to rediscover:
+
+- `klt lvs` against `lvs/gf180_tmds_pad_ring_assembly.lvs_request.json`
+  returned `status: mismatch` on **40 of 40** consecutive runs. Every run
+  carries `device.combine_incomplete`, i.e. klayout-tools#1185's
+  `Netlist.combine_devices()` internal-consistency error, cascading into
+  spurious `device.property`/`device.unmatched` findings against an unchanged
+  reference. `klt lvs` already retries that call five times against
+  independent `Netlist.dup()` copies, so 40 invocations is ~200 sampled
+  attempts, all failing. The ~1-in-5 flake this README documented above has
+  become deterministic for this netlist.
+- `klt lvs --rerun --check lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json`
+  agrees: the layout/reference/deck hashes are all `[OK]` (nothing about the
+  inputs drifted) while the fresh compare returns 362 mismatches / 360 errors
+  against the committed report's 2 warnings / 0 errors.
+- It is **not** the ESD diodes. Removing every `diode_nd2ps_06v0` device from
+  the extracted netlist before combining still fails; so does rebinding the
+  NMOS body terminals off the drawn `VSS` tap onto a separate net; so does
+  keeping `cml_driver_core` as an unflattened subcircuit instance. Each of
+  the two constituent cells combines cleanly on its own — `cml_driver_core`
+  (338 `nfet`) and `gf180_tmds_pad_v2` (20 `diode_nd2ps_06v0`) both still
+  report `status: match` under this same build — and their extracted `nfet`
+  parameter multisets are identical inside and outside the assembly, so the
+  trigger is purely a connectivity/ordering property of the combined
+  block-level netlist.
+
+Filed generically (tool gap only, no design detail) at
+[klayout-tools#1370](https://github.com/2AMLogic/klayout-tools/issues/1370).
+The committed report pair is left exactly as it is: it is internally
+consistent, and it was produced by a build that did reproduce it. Replacing
+it with a fresh pair would defeat the negative control outright — under this
+build the `_shorted` twin still reports `mismatch` (correctly, on
+`net.merged`/`net.split`, checked 3/3) but so now does the intact cell, so a
+fresh pair would say `mismatch` on **both** halves and prove nothing about
+`klt lvs`'s ability to tell a short from an intact cell. That is the precise
+failure `scripts/check_lvs_signoff.py` (issue #129) exists to catch. This is also why
+issue #143's pad redraw is filed as follow-up work (#149) rather than landed
+against this cell; see the next section.
+
+## `pad_pitch_fit_*` — does the production pad fit DR-0011's 350 µm pitch? (issue #143)
+
+**The question, and why it needed drawing rather than estimating.**
+`design/esd-capacitance-budget.md` §9 established that a production 25×25 µm
+bond pad plus DR-0011's ratified `diode_nd2ps_06v0` clamp fits DR-0005's
+≤ 2 pF budget — but it established it against `gf180_tmds_pad_v2`, a
+*standalone* cell that deliberately draws no ring straps, no substrate tap in
+a ring context, and no second pad at pitch (§9.2's own scope note). The
+block-level ring above still carries a 2×2 µm placeholder opening. So the
+load-bearing question — *does that validated geometry survive being tiled at
+DR-0011's ratified 350 µm pitch / 75 µm depth, next to the DVDD/DVSS straps
+and an HBM-sized clamp array?* — had never been checked. CLAUDE.md's framing
+("the pad ring is the point, and the risk") makes an estimate the wrong
+answer here, so it was drawn.
+
+```
+scripts/pad_pitch_fit_study.py                     generator (klayout.db; no PDK-PCell dependency)
+gds/pad_pitch_fit_n{20,111,222,334}.gds            two-slot ring tile, one per clamp size
+gds/pad_pitch_fit_n334_wide_bus.gds                the same top-of-window tile with a 4 µm gather bus
+drc_reports/pad_pitch_fit_*.fit.json               computed fit report (x/y margins, fold, clearances)
+drc_reports/pad_pitch_fit_*.drc.{json,txt}         klt drc reports
+drc_reports/pad_pitch_fit_*.parasitics.json        klt extract --parasitics reports
+drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json  the same, with lateral coupling enabled on both pad nets
+drc_reports/pad_pitch_fit_n{20,334}.components.json  klt components ring-continuity reports
+```
+
+No separate `*.extract.json` is committed for these tiles, and no extracted
+`*.spice`: `klt extract --parasitics`'s report is a strict superset of the
+plain `klt extract` report (same `device_counts`/`devices`/`nets`, plus the
+`parasitics` block), and the netlist itself is re-derivable with `-o` and is
+cited by nothing here. At 668 diodes per tile the duplicates are ~1 MB of
+committed JSON that no claim in this section rests on.
+
+```
+```
+
+Reproduce (from `layout/`, `klt` built from a current `klayout-tools`
+checkout — see this file's opening note on which build):
+
+```bash
+for n in 20 111 222 334; do
+  python3 scripts/pad_pitch_fit_study.py -o gds/pad_pitch_fit_n$n.gds \
+      --clamp-fingers $n --report drc_reports/pad_pitch_fit_n$n.fit.json
+  klt drc --deck gf180mcu gds/pad_pitch_fit_n$n.gds --format json > drc_reports/pad_pitch_fit_n$n.drc.json
+  klt drc --deck gf180mcu gds/pad_pitch_fit_n$n.gds --format text > drc_reports/pad_pitch_fit_n$n.drc.txt
+  klt extract --deck gf180mcu --parasitics --pdk gf180mcuD gds/pad_pitch_fit_n$n.gds \
+      --top gf180_tmds_pad_pitch_fit --format json > drc_reports/pad_pitch_fit_n$n.parasitics.json
+done
+
+# The top-of-window tile again with an 8.3x wider Metal1 gather bus.
+python3 scripts/pad_pitch_fit_study.py -o gds/pad_pitch_fit_n334_wide_bus.gds \
+    --clamp-fingers 334 --bus-width 4.0 --report drc_reports/pad_pitch_fit_n334_wide_bus.fit.json
+
+# Ring continuity, and the lateral-coupling cross-check (see below).
+for n in 20 334; do
+  klt components gds/pad_pitch_fit_n$n.gds --top gf180_tmds_pad_pitch_fit \
+      --conductors '[{"name":"m3","layer":[42,0]},{"name":"m4","layer":[46,0]},{"name":"m5","layer":[81,0]}]' \
+      --vias '[{"name":"via3","layer":[40,0],"between":["m3","m4"]},{"name":"via4","layer":[41,0],"between":["m4","m5"]}]' \
+      --format json > drc_reports/pad_pitch_fit_n$n.components.json
+  klt extract --deck gf180mcu --parasitics --pdk gf180mcuD --critical-net OUTP --critical-net OUTN \
+      gds/pad_pitch_fit_n$n.gds --top gf180_tmds_pad_pitch_fit --format json \
+      > drc_reports/pad_pitch_fit_n$n.parasitics_critical_net.json
+done
+```
+
+The fit report itself needs no `klt` and no KLayout — `pad_pitch_fit_study.py`
+without `-o` prints it from stdlib arithmetic alone, and
+`layout/tests/test_pad_pitch_fit_study.py` re-derives every committed
+`*.fit.json` in CI's PDK-free job.
+
+Each finger contributes 2.0 µm of clamp width, so 111 / 222 / 334 fingers are
+the 222 / 444 / 667 µm points `design/esd-capacitance-budget.md` §2b/§9.4
+grades the HBM sizing window at (334 fingers is 668 µm — the nearest integer
+above 667, i.e. very slightly conservative), and 20 is `gf180_tmds_pad_v2`'s
+own as-drawn array.
+
+### The answer: **yes, with two required changes**
+
+| Clamp | Rows | Structure width in the 350 µm slot | Slot margin | Metal5 plate | DVDD-strap clearance | `klt drc` |
+|---|---|---|---|---|---|---|
+| 20 fingers (40 µm) | 1 | 65.4 µm | 284.6 µm (142.3 each side) | y 18.0–43.0 | 2.0 µm | `clean`, 0 |
+| 111 fingers (222 µm) | 1 | 302.0 µm | 48.0 µm (24.0 each side) | y 18.0–43.0 | 2.0 µm | `clean`, 0 |
+| 222 fingers (444 µm) | 2 | 325.4 µm | 24.6 µm (12.3 each side) | y 18.8–43.8 | 2.8 µm | `clean`, 0 |
+| 334 fingers (668 µm) | 3 | 325.4 µm | 24.6 µm (12.3 each side) | y 19.6–44.6 | 3.6 µm | `clean`, 0 |
+
+The two changes are not optional, and neither was visible before drawing:
+
+1. **The clamp array must fold into rows above ~125 fingers.** A single row
+   of `n` 2.0 µm fingers on a 2.6 µm pitch spans `(n-1)·2.6 + 2.0` µm, and the
+   structure needs a further 14.0 µm of x past the last finger for the via
+   stack and the Metal5 plate centred on it. At the top of the HBM window
+   (334 fingers) a single row is **881.8 µm — 2.5× DR-0011's ratified
+   pitch**. `pad_pitch_fit_study.py` folds at 120 fingers/row, which holds
+   every point in the window to 325.4 µm with 24.6 µm of slot margin. The
+   study raises `ValueError` rather than silently overrunning if a clamp
+   cannot be folded to fit: DR-0011 is ratified, so the fold widens, never
+   the pitch.
+2. **The pad structure must sit higher in the ring depth than the current
+   assembly places it.** The 25 µm-tall Metal5 plate is centred on the clamp
+   array; at the pre-#143 y-origin its lower edge would land at y = 13.0 µm,
+   straight through the DVDD strap band (y 12–16). Moving the array origin to
+   y = 30 µm puts the plate at y 18.0–43.0, clearing the strap by 2.0 µm
+   (7× `metal5.space.1`'s 0.28 µm floor) and leaving 30–32 µm of the 75 µm
+   ring depth still unused at every clamp size.
+
+**Ring continuity is intact, checked mechanically not by eye.** `klt
+components` over the M3/M4/M5 conductor stack with via3/via4 declared reports
+exactly **four** components on the largest tile
+(`drc_reports/pad_pitch_fit_n334.components.json`): the DVSS strap as one
+connected component spanning the full two-slot span (`bbox` x 0→700, y 2→6),
+the DVDD strap likewise (x 0→700, y 12→16), and the two 25×25 µm pad plates
+as their own separate components. The production-size pads neither bridge the
+two supply straps nor interrupt either one — DR-0011's ring-continuity
+requirement survives the larger pad. The same check on the tightest-clearance
+tile (`n20`, 2.0 µm plate-to-DVDD gap) gives the same four-component answer.
+
+**No spec change is needed, and none is made.** DR-0011's ratified 350 µm
+pitch / 75 µm depth and its ring-continuity and substrate-tap requirements
+are all met by the production geometry as drawn. This study checks against
+DR-0011; it does not amend it.
+
+### Block-level capacitance, measured for the first time
+
+`klt extract --parasitics --pdk gf180mcuD` against these tiles gives the
+pad-node interconnect capacitance the block-level ring has never had a number
+for (per pad; `OUTP` and `OUTN` are symmetric and measure identically):
+
+| Clamp | Pad-node C (pad plate + via stack + gather bus) | Pad-node R | Clamp C, `ss_125c_2.97v`, operating bias (§9.4) | Total | vs. 2 pF |
+|---|---|---|---|---|---|
+| 20 fingers (40 µm) | 12.185 fF | 10.4 Ω | 45.03 fF | 57.2 fF | fits (not HBM-sized) |
+| 111 fingers (222 µm) | 34.251 fF | 54.7 Ω | 213.14 fF | 247.4 fF (0.247 pF) | **fits, 88 % headroom** |
+| 222 fingers (444 µm) | 65.752 fF | 117.6 Ω | 425.94 fF | 491.7 fF (0.492 pF) | **fits, 75 % headroom** |
+| 334 fingers (668 µm) | 95.071 fF | 176.0 Ω | 640.0 fF (extrapolated) | 735.1 fF (0.735 pF) | **fits, 63 % headroom** |
+| 334 fingers, 4 µm gather bus | 195.627 fF | 21.6 Ω | 640.0 fF (extrapolated) | 835.6 fF (0.836 pF) | **fits, 58 % headroom** |
+
+Two things worth reading off that table rather than skipping:
+
+- **The 20-finger row reproduces §9.3's cell-level 12.185 fF exactly.** The
+  same geometry measures the same capacitance placed in a 350 µm ring slot
+  beside the straps as it does standing alone — a useful cross-check of §9.3,
+  and a bounded one. It was checked rather than assumed: re-running with
+  lateral coupling explicitly enabled on both pad nets
+  (`--critical-net OUTP --critical-net OUTN`,
+  `drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`) returns
+  `cc_count: 0`, `total_coupling_capacitance_ff: 0.0` and identical per-net
+  figures. The reason is geometric: the Metal5 pad plate and the Metal5
+  supply straps are 2.0 µm apart, far outside the layer's own
+  minimum-spacing lookback that `klt`'s lateral-coupling pass uses, and they
+  nowhere vertically overlap (the unconditional coupling case). So the straps
+  contribute no coupling term *under this extractor's model at this
+  separation* — which is a statement about a 2.0 µm gap and a quasi-static
+  per-net model, not a claim that a physical ring has no pad-to-strap
+  coupling. §6's `klt` coverage limitations apply unchanged.
+- **The wide-bus row closes §9.3's open caveat with a measurement.** §9.3
+  said an HBM-sized clamp "would need a somewhat longer/wider Metal1 bus …
+  which would add some additional routing capacitance beyond this figure …
+  not literally re-measured at every clamp size". It now is: an 8.3× wider
+  (4.0 µm) gather bus at the top of the window costs **+100.6 fF** of pad-node
+  capacitance and buys an **8.1× lower** gather-bus resistance (176.0 → 21.6 Ω).
+  Both endpoints fit the budget with ≥ 58 % headroom, so the bus-width choice
+  is an ESD-current-density decision, not a capacitance-budget one. Note the
+  0.48 µm default bus is `gf180_tmds_pad_v2`'s own and its 176 Ω is **not** a
+  defensible HBM current path — sizing it is part of the clamp design that
+  `design/esd-capacitance-budget.md` §2a still flags as literature-bounded,
+  not PDK-bounded.
+
+### What this study is not
+
+It draws no CML driver, no driver→pad routing, and no LVS negative control —
+it answers a geometric-fit and parasitic-capacitance question, not "is this
+the final integrated block". There is therefore **no `klt lvs` signoff for
+these tiles and none is claimed**; `check_lvs_signoff.py` correctly sees no
+report pair for them. Folding this geometry into
+`gen_pad_ring_assembly.py` — where it *would* need an LVS pair — is
+**#149**, blocked on the `klt lvs` regression documented in the previous
+section.
 
 ## `tmds_encoder` — digital block-level place-and-route (issue #84)
 

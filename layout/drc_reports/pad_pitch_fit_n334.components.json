@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "file": "gds/pad_pitch_fit_n334.gds",
+  "conductors": [
+    {
+      "name": "m3",
+      "layer": [
+        42,
+        0
+      ]
+    },
+    {
+      "name": "m4",
+      "layer": [
+        46,
+        0
+      ]
+    },
+    {
+      "name": "m5",
+      "layer": [
+        81,
+        0
+      ]
+    }
+  ],
+  "vias": [
+    {
+      "name": "via3",
+      "layer": [
+        40,
+        0
+      ],
+      "between": [
+        "m3",
+        "m4"
+      ]
+    },
+    {
+      "name": "via4",
+      "layer": [
+        41,
+        0
+      ],
+      "between": [
+        "m4",
+        "m5"
+      ]
+    }
+  ],
+  "label_layers": [],
+  "region_um": null,
+  "top": "gf180_tmds_pad_pitch_fit",
+  "dbu_um": 0.001,
+  "component_count": 4,
+  "components": [
+    {
+      "id": "gf180_tmds_pad_pitch_fit:0",
+      "cell": "gf180_tmds_pad_pitch_fit",
+      "bbox_um": {
+        "left": 0.0,
+        "bottom": 2.0,
+        "right": 700.0,
+        "top": 6.0
+      },
+      "conductors": [
+        {
+          "name": "m3",
+          "layer": [
+            42,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        },
+        {
+          "name": "m4",
+          "layer": [
+            46,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        },
+        {
+          "name": "m5",
+          "layer": [
+            81,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        }
+      ],
+      "vias": [
+        {
+          "name": "via3",
+          "layer": [
+            40,
+            0
+          ],
+          "shape_count": 14,
+          "area_um2": 1.26
+        },
+        {
+          "name": "via4",
+          "layer": [
+            41,
+            0
+          ],
+          "shape_count": 14,
+          "area_um2": 1.26
+        }
+      ],
+      "labels": [],
+      "touches_crop_boundary": false
+    },
+    {
+      "id": "gf180_tmds_pad_pitch_fit:1",
+      "cell": "gf180_tmds_pad_pitch_fit",
+      "bbox_um": {
+        "left": 0.0,
+        "bottom": 12.0,
+        "right": 700.0,
+        "top": 16.0
+      },
+      "conductors": [
+        {
+          "name": "m3",
+          "layer": [
+            42,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        },
+        {
+          "name": "m4",
+          "layer": [
+            46,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        },
+        {
+          "name": "m5",
+          "layer": [
+            81,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 2800.0
+        }
+      ],
+      "vias": [
+        {
+          "name": "via3",
+          "layer": [
+            40,
+            0
+          ],
+          "shape_count": 14,
+          "area_um2": 1.26
+        },
+        {
+          "name": "via4",
+          "layer": [
+            41,
+            0
+          ],
+          "shape_count": 14,
+          "area_um2": 1.26
+        }
+      ],
+      "labels": [],
+      "touches_crop_boundary": false
+    },
+    {
+      "id": "gf180_tmds_pad_pitch_fit:2",
+      "cell": "gf180_tmds_pad_pitch_fit",
+      "bbox_um": {
+        "left": 312.7,
+        "bottom": 19.6,
+        "right": 337.7,
+        "top": 44.6
+      },
+      "conductors": [
+        {
+          "name": "m3",
+          "layer": [
+            42,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 1.44
+        },
+        {
+          "name": "m4",
+          "layer": [
+            46,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 1.44
+        },
+        {
+          "name": "m5",
+          "layer": [
+            81,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 625.0
+        }
+      ],
+      "vias": [
+        {
+          "name": "via3",
+          "layer": [
+            40,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 0.09
+        },
+        {
+          "name": "via4",
+          "layer": [
+            41,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 0.09
+        }
+      ],
+      "labels": [],
+      "touches_crop_boundary": false
+    },
+    {
+      "id": "gf180_tmds_pad_pitch_fit:3",
+      "cell": "gf180_tmds_pad_pitch_fit",
+      "bbox_um": {
+        "left": 662.7,
+        "bottom": 19.6,
+        "right": 687.7,
+        "top": 44.6
+      },
+      "conductors": [
+        {
+          "name": "m3",
+          "layer": [
+            42,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 1.44
+        },
+        {
+          "name": "m4",
+          "layer": [
+            46,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 1.44
+        },
+        {
+          "name": "m5",
+          "layer": [
+            81,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 625.0
+        }
+      ],
+      "vias": [
+        {
+          "name": "via3",
+          "layer": [
+            40,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 0.09
+        },
+        {
+          "name": "via4",
+          "layer": [
+            41,
+            0
+          ],
+          "shape_count": 1,
+          "area_um2": 0.09
+        }
+      ],
+      "labels": [],
+      "touches_crop_boundary": false
+    }
+  ]
+}

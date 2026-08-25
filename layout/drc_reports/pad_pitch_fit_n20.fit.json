@@ -1,0 +1,31 @@
+{
+  "bbox_um": [
+    0.0,
+    1.84,
+    700.0,
+    43.0
+  ],
+  "bus_width_um": 0.48,
+  "clamp_fingers": 20,
+  "clamp_width_um": 40.0,
+  "dvdd_strap_clearance_um": 2.0,
+  "fits_pitch": true,
+  "fits_ring_depth": true,
+  "gds": "gds/pad_pitch_fit_n20.gds",
+  "pad_pitch_um": 350.0,
+  "pad_plate_y_um": [
+    18.0,
+    43.0
+  ],
+  "ring_depth_headroom_um": 32.0,
+  "ring_depth_um": 75.0,
+  "row_count": 1,
+  "rows": [
+    20
+  ],
+  "slot_margin_each_side_um": 142.3,
+  "slot_margin_um": 284.6,
+  "struct_width_um": 65.4,
+  "unfolded_fits_pitch": true,
+  "unfolded_width_um": 65.4
+}

@@ -898,3 +898,173 @@ survive the corrected arithmetic or the new measurement.
 - Epic/checklist context: #65 (2026-08-15 T1/bronze checklist re-read,
   item 5 analog partition), #81 (decomposition), #17 (epic tracker), #86
   (sibling — block-level pad-ring assembly, coordinated not duplicated).
+
+## 10. Issue #143: the same budget, at block level, at DR-0011's ratified pad pitch
+
+Section 9 closed the ≤ 2 pF question at **cell** level: a real 25×25 µm bond
+pad plus DR-0011's ratified `diode_nd2ps_06v0` clamp measures 0.225–0.652 pF
+across §2b's whole HBM-sizing window, 67–89 % inside budget. Section 9.2
+states its own boundary plainly — ring continuity and pad-pitch tiling were
+"block-level pad-ring *assembly* concerns", deliberately not drawn.
+
+That boundary left two things unmeasured, and issue #143 measured them:
+
+1. Whether that geometry **fits** DR-0011's ratified 350 µm pad pitch / 75 µm
+   ring depth at all, once the DVDD/DVSS straps, a substrate tap and an
+   HBM-sized clamp array are competing for the same slot.
+2. What the pad-node capacitance actually is **in** that slot, rather than
+   standing alone — including §9.3's own open caveat that an HBM-sized clamp
+   "would need a somewhat longer/wider Metal1 bus … which would add some
+   additional routing capacitance beyond this figure … not literally
+   re-measured at every clamp size".
+
+### 10.1. Method
+
+`layout/scripts/pad_pitch_fit_study.py` draws a two-slot block-level ring tile
+at DR-0011's ratified pitch carrying everything that competes for the slot:
+DVDD/DVSS Metal3/Metal4/Metal5 straps drawn continuously across the full
+two-slot span and via-stitched every 50 µm, a Pplus/Comp substrate tap wired
+into the DVSS strap, and per slot `gen_pad_v2.py`'s production pad geometry
+verbatim — 25×25 µm Metal5 plate, 20×20 µm opening (a 2.5 µm margin over
+`pad.enclosing.metal5.1`'s 2.0 µm floor), Metal1–Metal5 via stack, and a
+`diode_nd2ps_06v0` finger array (2.0 × 1.0 µm fingers on a 2.6 µm pitch)
+gathered onto a shared Metal1 bus.
+
+Each finger contributes 2.0 µm of clamp width, so `--clamp-fingers`
+111 / 222 / 334 are §2b/§9.4's 222 / 444 / 667 µm sizing points (334 fingers is
+668 µm — the nearest integer above 667, i.e. marginally conservative), and 20
+reproduces `gf180_tmds_pad_v2`'s own as-drawn array. Capacitance is measured
+the same way §9.3 measured it — `klt extract --parasitics --pdk gf180mcuD`
+against the drawn geometry — and summed against §9.4's unchanged, PVT-swept
+clamp sweep at its binding `ss_125c_2.97v` corner, operating-bias-graded. No
+new SPICE work: this section re-measures the interconnect term at block level
+and re-uses §9.4's clamp term as-is.
+
+Artifacts: `layout/gds/pad_pitch_fit_n{20,111,222,334}.gds`,
+`layout/gds/pad_pitch_fit_n334_wide_bus.gds`, and their
+`layout/drc_reports/pad_pitch_fit_*.{fit,drc,extract,parasitics,components}.json`
+reports. Full walkthrough in `layout/README.md` § "`pad_pitch_fit_*`".
+
+### 10.2. The fit: yes, with two required changes
+
+Every tile is `klt drc --deck gf180mcu` **`status: clean`, 0 violations**.
+
+| Clamp | Rows | Structure width in the 350 µm slot | Slot margin | DVDD-strap clearance |
+|---|---|---|---|---|
+| 20 fingers (40 µm) | 1 | 65.4 µm | 284.6 µm | 2.0 µm |
+| 111 fingers (222 µm) | 1 | 302.0 µm | 48.0 µm | 2.0 µm |
+| 222 fingers (444 µm) | 2 | 325.4 µm | 24.6 µm | 2.8 µm |
+| 334 fingers (668 µm) | 3 | 325.4 µm | 24.6 µm | 3.6 µm |
+
+The two changes, neither visible before drawing:
+
+- **The clamp array must fold into rows above ~125 fingers.** A single row of
+  334 fingers plus the via stack and plate spans **881.8 µm — 2.5×** the
+  ratified pitch. Folding at 120 fingers/row holds every point in the window
+  to 325.4 µm.
+- **The pad structure must sit higher in the ring depth.** The 25 µm-tall
+  plate is centred on the clamp array; at the block assembly's current
+  y-origin its lower edge would land at y = 13.0 µm, through the DVDD strap
+  band (y 12–16). At y = 30 µm the plate sits at 18.0–43.0 µm, clearing the
+  strap by 2.0 µm and leaving 30–32 µm of the 75 µm ring depth unused.
+
+**Ring continuity survives the larger pad, checked mechanically.**
+`klt components` over the M3/M4/M5 stack with via3/via4 declared reports
+exactly four components on the largest tile: the DVSS strap as one connected
+component spanning x 0→700 µm, the DVDD strap likewise, and the two pad plates
+as their own separate components — the pads neither bridge the two supply
+straps nor interrupt either one.
+
+**DR-0011 is met, not amended.** Its ratified 350 µm pitch, 75 µm depth,
+ring-continuity requirement and real-substrate-tap requirement are all
+satisfied by the production geometry as drawn. No decision record is opened,
+narrowed or relaxed by this section.
+
+### 10.3. Block-level capacitance vs. the 2 pF budget
+
+Per pad (`OUTP` and `OUTN` measure identically). Clamp column is §9.4's,
+unchanged; only the interconnect column is new.
+
+| Reading | Pad + interconnect (block-level, §10.1) | Clamp (§9.4) | Total | vs. 2 pF budget |
+|---|---|---|---|---|
+| As-drawn (20 fingers, not HBM-sized) | 12.185 fF | 45.03 fF | 57.2 fF (0.057 pF) | Fits; not an HBM-qualified size — same caveat §9.5 gives |
+| 222 µm (6 mA/µm HBM density) | 34.251 fF | 213.14 fF | 247.4 fF (0.247 pF) | **Fits, 1.753 pF headroom (88 %)** |
+| 444 µm (3 mA/µm HBM density) | 65.752 fF | 425.94 fF | 491.7 fF (0.492 pF) | **Fits, 1.508 pF headroom (75 %)** |
+| 668 µm (2 mA/µm HBM density, clamp term extrapolated) | 95.071 fF | 640.0 fF | 735.1 fF (0.735 pF) | **Fits, 1.265 pF headroom (63 %)** |
+| 668 µm with a 4 µm Metal1 gather bus | 195.627 fF | 640.0 fF | 835.6 fF (0.836 pF) | **Fits, 1.164 pF headroom (58 %)** |
+
+**Verdict: DR-0005's ≤ 2 pF budget holds at block level, at DR-0011's
+ratified pad pitch, across §2b's entire HBM-sizing window — 0.735 pF worst
+case at the drawn gather-bus width, 0.836 pF with an 8.3× wider one.** The
+cell-level PASS §9.5 recorded is now an integrated-geometry PASS as well, and
+the "no capacitance-budget number has ever been measured against a
+block-level pad ring carrying production-sized pads" gap
+(`measurements/characterization.md` §3 item 4) is closed on the measurement
+side.
+
+Three readings worth stating rather than leaving implicit:
+
+1. **The 20-finger row reproduces §9.3's 12.185 fF exactly.** The same
+   geometry measures the same pad-node capacitance in a 350 µm ring slot
+   beside the straps as it does standing alone. That agreement was checked,
+   not assumed: re-running with `klt`'s lateral (same-layer, sidewall)
+   coupling pass explicitly enabled on both pad nets
+   (`--critical-net OUTP --critical-net OUTN`, committed as
+   `layout/drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`)
+   returns `cc_count: 0`, `total_coupling_capacitance_ff: 0.0`, and per-net
+   figures identical to the table above. The reason is geometric — the Metal5
+   pad plate sits 2.0 µm from the Metal5 supply straps, well outside the
+   layer's own minimum-spacing lookback that pass uses, and the two nowhere
+   vertically overlap (the coupling case `klt` computes unconditionally). So
+   the straps contribute no coupling term *under this extractor's
+   quasi-static per-net model at this separation*; that is not a claim that a
+   physical ring has no pad-to-strap coupling. §6's coverage limitations apply
+   unchanged, and a fuller field solve would only add to these numbers.
+2. **§9.3's wider-gather-bus caveat is now a number, not a caveat.** An 8.3×
+   wider (4.0 µm) Metal1 gather bus at the top of the window costs **+100.6 fF**
+   of pad-node capacitance and buys an **8.1× lower** gather-bus resistance
+   (176.0 Ω → 21.6 Ω). Both endpoints fit with ≥ 58 % headroom, so gather-bus
+   width is an ESD-current-density decision, not a capacitance-budget one.
+3. **The default 0.48 µm bus is not a defensible HBM current path**, and this
+   section does not claim it is. 176 Ω in series with the clamp is a
+   clamping-voltage problem (§2c), not a capacitance problem; sizing it
+   properly is part of the clamp design §2a still flags as literature-bounded
+   rather than PDK-bounded. What §10.3 establishes is that doing so does not
+   put the capacitance budget at risk.
+
+### 10.4. What this section does not establish
+
+- **It is not the block-level assembly.** `pad_pitch_fit_study.py` draws no
+  CML driver, no driver→pad routing and no LVS negative control — it answers a
+  geometric-fit and parasitic-capacitance question. There is no `klt lvs`
+  signoff for these tiles and none is claimed.
+- **The block-level assembly still carries the old placeholder pad.**
+  `layout/gds/gf180_tmds_pad_ring_assembly.gds` keeps its 2×2 µm opening;
+  adopting the production geometry there is #149, blocked on a `klt lvs`
+  regression (klayout-tools#1370) under which that cell's committed
+  `status: match` no longer reproduces at all — 40/40 fresh runs return
+  `mismatch` against the *unchanged, committed* GDS. Full evidence in
+  `layout/README.md` § "The block-level LVS signoff no longer reproduces".
+- **It is still a design-margin estimate on the ESD side**, exactly as §9.6
+  says: the *capacitance* is measured, but the clamp *width* it is graded at
+  comes from literature-sourced HBM current density (§2a), not PDK data. No
+  tester, no parts, no qualification claim.
+
+### 10.5. Links (issue #143)
+
+- Fit-study generator: `layout/scripts/pad_pitch_fit_study.py`.
+- Drawn tiles: `layout/gds/pad_pitch_fit_n{20,111,222,334}.gds`,
+  `layout/gds/pad_pitch_fit_n334_wide_bus.gds`.
+- Evidence: `layout/drc_reports/pad_pitch_fit_*.fit.json` (computed fit
+  margins), `*.drc.{json,txt}` (DRC), `*.extract.json` (device recognition),
+  `*.parasitics.json` (capacitance/resistance), `*.components.json` (ring
+  continuity).
+- Clamp capacitance re-used unchanged from §9.4:
+  `sim/esd-diode-clamp-cv/records/20260819-053140-72b44e8.md`.
+- Decision records consumed, not re-litigated: `spec/decisions/0011-pad-esd-strategy.md`
+  (DR-0011, the 350/75 µm pitch and ring-continuity requirements this is
+  checked against), `spec/decisions/0010-pdk-variant.md` (DR-0010).
+- Tool gap filed under CLAUDE.md's friction protocol:
+  [klayout-tools#1370](https://github.com/2AMLogic/klayout-tools/issues/1370).
+- Follow-up implementation issue: #149 (adopt this geometry in
+  `gf180_tmds_pad_ring_assembly`). Parent decomposition: #142.
