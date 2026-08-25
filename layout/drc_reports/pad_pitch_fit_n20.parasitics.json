@@ -1,0 +1,1536 @@
+{
+  "schema_version": 2,
+  "file": "gds/pad_pitch_fit_n20.gds",
+  "deck": "gf180mcu",
+  "top": "gf180_tmds_pad_pitch_fit",
+  "dbu_um": 0.001,
+  "netlist_path": "gds/pad_pitch_fit_n20.spice",
+  "netlist_sha256": "0ccb88c82880f68c14fd86819a3a6410e905cda350b53360ab393a13312e31de",
+  "status": "extracted",
+  "device_count": 40,
+  "net_count": 3,
+  "pin_count": 3,
+  "device_counts": {
+    "diode_nd2ps_06v0": 40
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [
+    {
+      "layer": 37,
+      "datatype": 0,
+      "shapes": 2
+    }
+  ],
+  "device_recognition_only_layers": [
+    {
+      "layer": 55,
+      "datatype": 0,
+      "shapes": 2
+    },
+    {
+      "layer": 115,
+      "datatype": 5,
+      "shapes": 2
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$10",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$11",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$12",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$13",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$14",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$15",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$16",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$17",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$18",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$19",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$2",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$20",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$21",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$22",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$23",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$24",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$25",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$26",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$27",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$28",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$29",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$3",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$30",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$31",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$32",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$33",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$34",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$35",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$36",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$37",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$38",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$39",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$4",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$40",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTN"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$5",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$6",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$7",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$8",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    },
+    {
+      "name": "$9",
+      "class": "diode_nd2ps_06v0",
+      "nets": {
+        "a": "VSS",
+        "c": "OUTP"
+      },
+      "params": {
+        "area_um2": 2.0,
+        "perimeter_um": 6.0
+      }
+    }
+  ],
+  "nets": [
+    {
+      "name": "OUTN",
+      "pin": true,
+      "device_count": 20
+    },
+    {
+      "name": "OUTP",
+      "pin": true,
+      "device_count": 20
+    },
+    {
+      "name": "VSS",
+      "pin": true,
+      "device_count": 40
+    }
+  ],
+  "warnings": [
+    "31 routing-stack clusters (31 shapes on 40/0, 41/0, 42/0, 46/0, 81/0) join no extracted net -- no via lands on this geometry and no same-layer wiring touches it, so it is invisible to the extracted netlist and to every downstream `klt lvs`/`klt sim` view; deliberate dead metal (artwork, fill) is expected here, unexplained dead metal usually means the connection you intended is missing -- see dead_metal[] for the per-cluster layer/bbox/shape count.",
+    "1 layer (37/0) carrying 2 shapes is outside 'gf180mcu' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "voltage_domain_warnings": [],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 24.85,
+        "bottom": 13.85,
+        "right": 25.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 74.85,
+        "bottom": 13.85,
+        "right": 75.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 124.85,
+        "bottom": 13.85,
+        "right": 125.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 174.85,
+        "bottom": 13.85,
+        "right": 175.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 224.85,
+        "bottom": 13.85,
+        "right": 225.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 274.85,
+        "bottom": 13.85,
+        "right": 275.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 324.85,
+        "bottom": 13.85,
+        "right": 325.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 374.85,
+        "bottom": 13.85,
+        "right": 375.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 424.85,
+        "bottom": 13.85,
+        "right": 425.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 474.85,
+        "bottom": 13.85,
+        "right": 475.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 524.85,
+        "bottom": 13.85,
+        "right": 525.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 574.85,
+        "bottom": 13.85,
+        "right": 575.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 624.85,
+        "bottom": 13.85,
+        "right": 625.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via2",
+      "layer": 40,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 674.85,
+        "bottom": 13.85,
+        "right": 675.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 24.85,
+        "bottom": 13.85,
+        "right": 25.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 74.85,
+        "bottom": 13.85,
+        "right": 75.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 124.85,
+        "bottom": 13.85,
+        "right": 125.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 174.85,
+        "bottom": 13.85,
+        "right": 175.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 224.85,
+        "bottom": 13.85,
+        "right": 225.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 274.85,
+        "bottom": 13.85,
+        "right": 275.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 324.85,
+        "bottom": 13.85,
+        "right": 325.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 374.85,
+        "bottom": 13.85,
+        "right": 375.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 424.85,
+        "bottom": 13.85,
+        "right": 425.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 474.85,
+        "bottom": 13.85,
+        "right": 475.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 524.85,
+        "bottom": 13.85,
+        "right": 525.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 574.85,
+        "bottom": 13.85,
+        "right": 575.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 624.85,
+        "bottom": 13.85,
+        "right": 625.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "via3",
+      "layer": 41,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 674.85,
+        "bottom": 13.85,
+        "right": 675.15,
+        "top": 14.15
+      },
+      "shapes": 1,
+      "area_um2": 0.09
+    },
+    {
+      "role": "metal2",
+      "layer": 42,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 0.0,
+        "bottom": 12.0,
+        "right": 700.0,
+        "top": 16.0
+      },
+      "shapes": 1,
+      "area_um2": 2800.0
+    },
+    {
+      "role": "metal3",
+      "layer": 46,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 0.0,
+        "bottom": 12.0,
+        "right": 700.0,
+        "top": 16.0
+      },
+      "shapes": 1,
+      "area_um2": 2800.0
+    },
+    {
+      "role": "metal4",
+      "layer": 81,
+      "datatype": 0,
+      "bbox_um": {
+        "left": 0.0,
+        "bottom": 12.0,
+        "right": 700.0,
+        "top": 16.0
+      },
+      "shapes": 1,
+      "area_um2": 2800.0
+    }
+  ],
+  "matched_device_groups": [],
+  "pdk": {
+    "variant": "gf180mcuD",
+    "root": "/Users/rwalters/.volare",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "provenance": {
+    "klt_version": "0.3.0",
+    "klayout_version": "0.30.10",
+    "pdk": {
+      "name": "gf180mcuD",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:3ec5e117c7c9ed028fa34db582b018a620fe8e82e1c9581fa95e5849d65d1a8c"
+    }
+  },
+  "parasitics": {
+    "r_count": 80,
+    "c_count": 3,
+    "cc_count": 0,
+    "l_count": 0,
+    "total_resistance_ohm": 63.0906,
+    "total_capacitance_ff": 215.159531,
+    "total_coupling_capacitance_ff": 0.0,
+    "total_inductance_nh": 0.0,
+    "nets": [
+      {
+        "net": "OUTN",
+        "net_id": 4,
+        "resistance_ohm": 10.38,
+        "capacitance_ff": 12.185218,
+        "inductance_nh": 0.0,
+        "hub_net": "OUTN",
+        "rc_model": "lumped",
+        "terminals": [
+          {
+            "device": "$40",
+            "terminal": "C",
+            "leg_net": "OUTN__t0",
+            "resistance_ohm": 0.9861
+          },
+          {
+            "device": "$39",
+            "terminal": "C",
+            "leg_net": "OUTN__t1",
+            "resistance_ohm": 0.8823
+          },
+          {
+            "device": "$38",
+            "terminal": "C",
+            "leg_net": "OUTN__t2",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$37",
+            "terminal": "C",
+            "leg_net": "OUTN__t3",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$36",
+            "terminal": "C",
+            "leg_net": "OUTN__t4",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$35",
+            "terminal": "C",
+            "leg_net": "OUTN__t5",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$34",
+            "terminal": "C",
+            "leg_net": "OUTN__t6",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$33",
+            "terminal": "C",
+            "leg_net": "OUTN__t7",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$32",
+            "terminal": "C",
+            "leg_net": "OUTN__t8",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$31",
+            "terminal": "C",
+            "leg_net": "OUTN__t9",
+            "resistance_ohm": 0.0519
+          },
+          {
+            "device": "$30",
+            "terminal": "C",
+            "leg_net": "OUTN__t10",
+            "resistance_ohm": 0.0519
+          },
+          {
+            "device": "$29",
+            "terminal": "C",
+            "leg_net": "OUTN__t11",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$28",
+            "terminal": "C",
+            "leg_net": "OUTN__t12",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$27",
+            "terminal": "C",
+            "leg_net": "OUTN__t13",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$26",
+            "terminal": "C",
+            "leg_net": "OUTN__t14",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$25",
+            "terminal": "C",
+            "leg_net": "OUTN__t15",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$24",
+            "terminal": "C",
+            "leg_net": "OUTN__t16",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$23",
+            "terminal": "C",
+            "leg_net": "OUTN__t17",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$22",
+            "terminal": "C",
+            "leg_net": "OUTN__t18",
+            "resistance_ohm": 0.8823
+          },
+          {
+            "device": "$21",
+            "terminal": "C",
+            "leg_net": "OUTN__t19",
+            "resistance_ohm": 0.9861
+          }
+        ],
+        "segments": [],
+        "coupled": []
+      },
+      {
+        "net": "OUTP",
+        "net_id": 3,
+        "resistance_ohm": 10.38,
+        "capacitance_ff": 12.185218,
+        "inductance_nh": 0.0,
+        "hub_net": "OUTP",
+        "rc_model": "lumped",
+        "terminals": [
+          {
+            "device": "$1",
+            "terminal": "C",
+            "leg_net": "OUTP__t0",
+            "resistance_ohm": 0.9861
+          },
+          {
+            "device": "$20",
+            "terminal": "C",
+            "leg_net": "OUTP__t1",
+            "resistance_ohm": 0.9861
+          },
+          {
+            "device": "$19",
+            "terminal": "C",
+            "leg_net": "OUTP__t2",
+            "resistance_ohm": 0.8823
+          },
+          {
+            "device": "$18",
+            "terminal": "C",
+            "leg_net": "OUTP__t3",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$17",
+            "terminal": "C",
+            "leg_net": "OUTP__t4",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$16",
+            "terminal": "C",
+            "leg_net": "OUTP__t5",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$15",
+            "terminal": "C",
+            "leg_net": "OUTP__t6",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$14",
+            "terminal": "C",
+            "leg_net": "OUTP__t7",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$13",
+            "terminal": "C",
+            "leg_net": "OUTP__t8",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$12",
+            "terminal": "C",
+            "leg_net": "OUTP__t9",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$11",
+            "terminal": "C",
+            "leg_net": "OUTP__t10",
+            "resistance_ohm": 0.0519
+          },
+          {
+            "device": "$10",
+            "terminal": "C",
+            "leg_net": "OUTP__t11",
+            "resistance_ohm": 0.0519
+          },
+          {
+            "device": "$9",
+            "terminal": "C",
+            "leg_net": "OUTP__t12",
+            "resistance_ohm": 0.1557
+          },
+          {
+            "device": "$8",
+            "terminal": "C",
+            "leg_net": "OUTP__t13",
+            "resistance_ohm": 0.2595
+          },
+          {
+            "device": "$7",
+            "terminal": "C",
+            "leg_net": "OUTP__t14",
+            "resistance_ohm": 0.3633
+          },
+          {
+            "device": "$6",
+            "terminal": "C",
+            "leg_net": "OUTP__t15",
+            "resistance_ohm": 0.4671
+          },
+          {
+            "device": "$5",
+            "terminal": "C",
+            "leg_net": "OUTP__t16",
+            "resistance_ohm": 0.5709
+          },
+          {
+            "device": "$4",
+            "terminal": "C",
+            "leg_net": "OUTP__t17",
+            "resistance_ohm": 0.6747
+          },
+          {
+            "device": "$3",
+            "terminal": "C",
+            "leg_net": "OUTP__t18",
+            "resistance_ohm": 0.7785
+          },
+          {
+            "device": "$2",
+            "terminal": "C",
+            "leg_net": "OUTP__t19",
+            "resistance_ohm": 0.8823
+          }
+        ],
+        "segments": [],
+        "coupled": []
+      },
+      {
+        "net": "VSS",
+        "net_id": 5,
+        "resistance_ohm": 42.3306,
+        "capacitance_ff": 190.789095,
+        "inductance_nh": 0.0,
+        "hub_net": "VSS",
+        "rc_model": "lumped",
+        "terminals": [
+          {
+            "device": "$1",
+            "terminal": "A",
+            "leg_net": "VSS__t0",
+            "resistance_ohm": 1.2076
+          },
+          {
+            "device": "$2",
+            "terminal": "A",
+            "leg_net": "VSS__t1",
+            "resistance_ohm": 1.1919
+          },
+          {
+            "device": "$3",
+            "terminal": "A",
+            "leg_net": "VSS__t2",
+            "resistance_ohm": 1.1762
+          },
+          {
+            "device": "$4",
+            "terminal": "A",
+            "leg_net": "VSS__t3",
+            "resistance_ohm": 1.1605
+          },
+          {
+            "device": "$5",
+            "terminal": "A",
+            "leg_net": "VSS__t4",
+            "resistance_ohm": 1.1447
+          },
+          {
+            "device": "$6",
+            "terminal": "A",
+            "leg_net": "VSS__t5",
+            "resistance_ohm": 1.129
+          },
+          {
+            "device": "$7",
+            "terminal": "A",
+            "leg_net": "VSS__t6",
+            "resistance_ohm": 1.1133
+          },
+          {
+            "device": "$8",
+            "terminal": "A",
+            "leg_net": "VSS__t7",
+            "resistance_ohm": 1.0976
+          },
+          {
+            "device": "$9",
+            "terminal": "A",
+            "leg_net": "VSS__t8",
+            "resistance_ohm": 1.0818
+          },
+          {
+            "device": "$10",
+            "terminal": "A",
+            "leg_net": "VSS__t9",
+            "resistance_ohm": 1.0661
+          },
+          {
+            "device": "$11",
+            "terminal": "A",
+            "leg_net": "VSS__t10",
+            "resistance_ohm": 1.0504
+          },
+          {
+            "device": "$12",
+            "terminal": "A",
+            "leg_net": "VSS__t11",
+            "resistance_ohm": 1.0347
+          },
+          {
+            "device": "$13",
+            "terminal": "A",
+            "leg_net": "VSS__t12",
+            "resistance_ohm": 1.019
+          },
+          {
+            "device": "$14",
+            "terminal": "A",
+            "leg_net": "VSS__t13",
+            "resistance_ohm": 1.0032
+          },
+          {
+            "device": "$15",
+            "terminal": "A",
+            "leg_net": "VSS__t14",
+            "resistance_ohm": 0.9875
+          },
+          {
+            "device": "$16",
+            "terminal": "A",
+            "leg_net": "VSS__t15",
+            "resistance_ohm": 0.9718
+          },
+          {
+            "device": "$17",
+            "terminal": "A",
+            "leg_net": "VSS__t16",
+            "resistance_ohm": 0.9561
+          },
+          {
+            "device": "$18",
+            "terminal": "A",
+            "leg_net": "VSS__t17",
+            "resistance_ohm": 0.9403
+          },
+          {
+            "device": "$19",
+            "terminal": "A",
+            "leg_net": "VSS__t18",
+            "resistance_ohm": 0.9246
+          },
+          {
+            "device": "$20",
+            "terminal": "A",
+            "leg_net": "VSS__t19",
+            "resistance_ohm": 0.9089
+          },
+          {
+            "device": "$21",
+            "terminal": "A",
+            "leg_net": "VSS__t20",
+            "resistance_ohm": 0.9089
+          },
+          {
+            "device": "$22",
+            "terminal": "A",
+            "leg_net": "VSS__t21",
+            "resistance_ohm": 0.9246
+          },
+          {
+            "device": "$23",
+            "terminal": "A",
+            "leg_net": "VSS__t22",
+            "resistance_ohm": 0.9403
+          },
+          {
+            "device": "$24",
+            "terminal": "A",
+            "leg_net": "VSS__t23",
+            "resistance_ohm": 0.9561
+          },
+          {
+            "device": "$25",
+            "terminal": "A",
+            "leg_net": "VSS__t24",
+            "resistance_ohm": 0.9718
+          },
+          {
+            "device": "$26",
+            "terminal": "A",
+            "leg_net": "VSS__t25",
+            "resistance_ohm": 0.9875
+          },
+          {
+            "device": "$27",
+            "terminal": "A",
+            "leg_net": "VSS__t26",
+            "resistance_ohm": 1.0032
+          },
+          {
+            "device": "$28",
+            "terminal": "A",
+            "leg_net": "VSS__t27",
+            "resistance_ohm": 1.019
+          },
+          {
+            "device": "$29",
+            "terminal": "A",
+            "leg_net": "VSS__t28",
+            "resistance_ohm": 1.0347
+          },
+          {
+            "device": "$30",
+            "terminal": "A",
+            "leg_net": "VSS__t29",
+            "resistance_ohm": 1.0504
+          },
+          {
+            "device": "$31",
+            "terminal": "A",
+            "leg_net": "VSS__t30",
+            "resistance_ohm": 1.0661
+          },
+          {
+            "device": "$32",
+            "terminal": "A",
+            "leg_net": "VSS__t31",
+            "resistance_ohm": 1.0818
+          },
+          {
+            "device": "$33",
+            "terminal": "A",
+            "leg_net": "VSS__t32",
+            "resistance_ohm": 1.0976
+          },
+          {
+            "device": "$34",
+            "terminal": "A",
+            "leg_net": "VSS__t33",
+            "resistance_ohm": 1.1133
+          },
+          {
+            "device": "$35",
+            "terminal": "A",
+            "leg_net": "VSS__t34",
+            "resistance_ohm": 1.129
+          },
+          {
+            "device": "$36",
+            "terminal": "A",
+            "leg_net": "VSS__t35",
+            "resistance_ohm": 1.1447
+          },
+          {
+            "device": "$37",
+            "terminal": "A",
+            "leg_net": "VSS__t36",
+            "resistance_ohm": 1.1605
+          },
+          {
+            "device": "$38",
+            "terminal": "A",
+            "leg_net": "VSS__t37",
+            "resistance_ohm": 1.1762
+          },
+          {
+            "device": "$39",
+            "terminal": "A",
+            "leg_net": "VSS__t38",
+            "resistance_ohm": 1.1919
+          },
+          {
+            "device": "$40",
+            "terminal": "A",
+            "leg_net": "VSS__t39",
+            "resistance_ohm": 1.2076
+          }
+        ],
+        "segments": [],
+        "coupled": []
+      }
+    ],
+    "substrate_dc_tie": {
+      "resistance_ohm": 1000000000000.0,
+      "nets": [
+        {
+          "net": "vsubs",
+          "device": "Rvsubs_dctie"
+        }
+      ]
+    },
+    "metals_without_coefficient": [],
+    "overlap_pairs_without_coefficient": [],
+    "critical_nets": [],
+    "distributed_rc": false,
+    "model": {
+      "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+      "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+      "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+      "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+    },
+    "mom_crosscheck": null,
+    "mom_rlc_override": null
+  },
+  "spef_path": null
+}
