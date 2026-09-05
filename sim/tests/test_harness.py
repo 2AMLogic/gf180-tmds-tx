@@ -29,7 +29,9 @@ if str(SIM_DIR) not in sys.path:
 
 from harness import corners as corners_mod  # noqa: E402
 from harness import evidence_lint as lint_mod  # noqa: E402
+from harness import pdk as pdk_mod  # noqa: E402
 from harness import report as report_mod  # noqa: E402
+from harness import runner as runner_mod  # noqa: E402
 from harness import testbench as tb_mod  # noqa: E402
 
 
@@ -386,6 +388,107 @@ class GitProvenanceTests(unittest.TestCase):
         self.assertEqual(prov["short"], "unknown")
         self.assertEqual(prov["branch"], "unknown")
         self.assertFalse(prov["dirty"])
+
+
+class ComposeDeckSaveLineTests(unittest.TestCase):
+    """Issue #154: ``compose_deck`` emits an explicit ``.save`` line naming
+    only the vectors ``tb.measure``'s expressions actually reference,
+    instead of relying on ngspice's default of saving every node -- see
+    ``sim/harness/runner.py``'s own module docstring for why (the "memory
+    required ... is more than memory available" allocation guard on a
+    large post-layout-extracted DUT). No PDK, no ngspice: ``compose_deck``
+    only renders text, it does not invoke ngspice or read the netlist
+    fragment/PDK files it names.
+    """
+
+    def _pdk(self) -> pdk_mod.Pdk:
+        # A nonexistent path is fine -- compose_deck only ever renders
+        # pdk.variant/pdk.version/pdk.design_include/pdk.model_lib into
+        # `.include`/`.lib` *text*, it never reads these files itself.
+        return pdk_mod.Pdk(
+            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
+        )
+
+    def _point(self, rate_mbps=None) -> corners_mod.PvtPoint:
+        return corners_mod.PvtPoint(
+            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
+        )
+
+    def _tb(self, measure: dict) -> tb_mod.Testbench:
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "exp" / "testbench"
+            directory.mkdir(parents=True)
+            (directory / "frag.spice").write_text("* fragment\n")
+            manifest = {"netlist": "frag.spice", "measure": measure, "analyses": ["op"]}
+            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
+            return tb_mod.load(directory)
+
+    def test_measure_vector_refs_collects_let_expression_vectors(self):
+        tb = self._tb({"swing": "vecmax(v(outp))-vecmin(v(outn))", "icc": "i(vsens)"})
+        self.assertEqual(
+            runner_mod._measure_vector_refs(tb), ["v(outp)", "v(outn)", "i(vsens)"]
+        )
+
+    def test_measure_vector_refs_collects_raw_meas_fragment_vectors(self):
+        # A "TRIG ... TARG ..." raw meas fragment (rise/fall time), not a
+        # `let` vector expression -- both forms must be scanned.
+        tb = self._tb(
+            {"trise": "TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1"}
+        )
+        self.assertEqual(runner_mod._measure_vector_refs(tb), ["v(vdiff)"])
+
+    def test_measure_vector_refs_deduplicates_in_first_seen_order(self):
+        tb = self._tb(
+            {
+                "a": "v(x)-v(y)",
+                "b": "v(y)-v(x)",
+                "c": "v(z)",
+            }
+        )
+        self.assertEqual(runner_mod._measure_vector_refs(tb), ["v(x)", "v(y)", "v(z)"])
+
+    def test_measure_vector_refs_is_case_insensitive_and_comma_tolerant(self):
+        # A differential two-terminal probe V(a,b) must be captured whole,
+        # not split into two single-terminal refs, and V()/I() in any case
+        # must both be recognized.
+        tb = self._tb({"vdiff": "V(a,b)", "icc": "I(Vsens)"})
+        self.assertEqual(runner_mod._measure_vector_refs(tb), ["V(a,b)", "I(Vsens)"])
+
+    def test_compose_deck_emits_save_line_naming_every_referenced_vector(self):
+        tb = self._tb({"swing": "v(outp)-v(outn)"})
+        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        self.assertIn("save v(outp) v(outn)", deck)
+
+    def test_compose_deck_save_line_precedes_the_analysis_line(self):
+        # ngspice's `save` must be issued before the `.tran`/`.op`/etc.
+        # analysis it applies to, or nothing is actually restricted.
+        tb = self._tb({"swing": "v(outp)-v(outn)"})
+        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        lines = deck.splitlines()
+        save_idx = next(i for i, line in enumerate(lines) if line.strip().startswith("save "))
+        op_idx = next(i for i, line in enumerate(lines) if line.strip() == "op")
+        self.assertLess(save_idx, op_idx)
+
+    def test_compose_deck_save_line_does_not_change_which_measurements_are_printed(self):
+        # The optimization must be invisible to every downstream `let`/`meas`
+        # line -- same measure keys, same `print m_<name>` lines, regardless
+        # of whether `.save` narrows what ngspice additionally stores.
+        tb = self._tb(
+            {
+                "swing": "v(outp)-v(outn)",
+                "trise": "TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1",
+            }
+        )
+        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        self.assertIn("let m_swing = v(outp)-v(outn)", deck)
+        self.assertIn(
+            "meas tran m_trise TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1",
+            deck,
+        )
+        self.assertIn("print m_swing", deck)
+        # trise is a raw `meas` fragment -- it prints via `meas` itself, no
+        # separate `print` line (see compose_deck's own comment).
+        self.assertNotIn("print m_trise", deck)
 
 
 class DeviceEvidenceAppendOnlyTests(unittest.TestCase):

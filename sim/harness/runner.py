@@ -19,6 +19,28 @@ control-block command instead of a ``let m_<name> = <value>`` vector
 expression -- e.g. ``"trise_10_90": "TRIG v(vdiff) VAL=-0.4 RISE=1 TARG
 v(vdiff) VAL=0.4 RISE=1"``. Every other ``tb.measure`` entry (the
 gf180-bandgap convention) is unaffected.
+
+A third adaptation, added for issue #154 (Epic #542 Phase 3's assembled
+driver+pad-ring+ESD block PVT run): ``compose_deck`` now emits an explicit
+``.save`` line naming only the vectors ``tb.measure``'s expressions actually
+reference (``_measure_vector_refs``), instead of relying on ngspice's
+default of saving every node in the circuit. This changes no measured
+result -- every ``v(...)``/``i(...)`` reference any ``measure`` expression
+needs is still saved, so every ``let``/``meas`` line resolves identically --
+it only stops ngspice from also storing the (unused) voltage of every other
+node in the deck across every timestep. That default became a real problem
+once a post-layout-extracted DUT much larger than the schematic (thousands
+of internal parasitic-extraction nodes, not ~50) was swept over a multi-copy
+transient testbench: ngspice's tran analysis pre-allocates storage for
+*every* saved vector at *every* print step, and with no ``.save`` that is
+every node in an 8-instance copy of the DUT, not just the ~29 nodes any
+`measure` entry actually reads -- large enough to hit ngspice's own
+"memory required ... is more than memory available" allocation guard
+(confirmed while developing `sim/cml-driver-eye`'s
+`gf180_tmds_pad_ring_assembly` post-layout record; the guard's own "memory
+available" figure is an internal ngspice allocation-probe result, not this
+machine's real free RAM, which is why the fix is fewer requested vectors,
+not more memory).
 """
 
 from __future__ import annotations
@@ -46,6 +68,27 @@ DEFAULT_TIMEOUT_S = 300
 # `meas`'s own `targ=`/`trig=` sub-fields (neither starts with `m_`).
 _MEAS_RE = re.compile(r"^\s*m_(\w+)\s*=\s*([-+]?[0-9.]+(?:[eE][-+]?[0-9]+)?)")
 _ERROR_RE = re.compile(r"^\s*(?:Error|ERROR|Fatal|fatal error|doAnalyses:)", re.MULTILINE)
+
+# `v(node)` / `i(vsource)` / `v(node_a,node_b)` -- every vector-reference
+# form used by this repo's `measure` expressions (both `let ... = <expr>`
+# and raw `TRIG ...`/`TARG ...` fragments). Deliberately case-insensitive
+# and comma-tolerant so a differential two-terminal probe `v(a,b)` is
+# captured whole, not split.
+_VECTOR_REF_RE = re.compile(r"\b[vi]\(([^)]*)\)", re.IGNORECASE)
+
+
+def _measure_vector_refs(tb: Testbench) -> list[str]:
+    """Every distinct `v(...)`/`i(...)` vector this testbench's `measure`
+    expressions reference, in first-seen order. Feeds the `.save` line
+    `compose_deck` emits so ngspice's tran analysis only pre-allocates
+    storage for vectors something actually reads -- see this module's
+    docstring for why that matters for a large post-layout-extracted DUT.
+    """
+    seen: dict[str, None] = {}
+    for expr in tb.measure.values():
+        for match in _VECTOR_REF_RE.finditer(expr):
+            seen.setdefault(match.group(0), None)
+    return list(seen.keys())
 
 
 class NgspiceMissing(RuntimeError):
@@ -128,6 +171,9 @@ def compose_deck(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
         "set numdgt=10",
         "set noaskquit",
     ]
+    save_targets = _measure_vector_refs(tb)
+    if save_targets:
+        lines.append("  save " + " ".join(save_targets))
     lines += [f"  {analysis}" for analysis in tb.analyses]
     for name, expr in tb.measure.items():
         if _is_raw_meas_expr(expr):

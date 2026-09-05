@@ -668,6 +668,62 @@ to the drawn `VSS` net rather than a synthesized `vsubs` global (five
 repeated `klt lvs` re-runs against the intact cell all agreed `match`, no
 `#1185` flakiness observed this round).
 
+### Post-layout electrical/PVT simulation of this assembly (issue #154)
+
+Everything above is structural signoff (DRC/LVS/parasitic-capacitance
+extraction) — until issue #154 (Epic #542 Phase 3A), no electrical/PVT
+simulation of this *assembled* block existed; only `cml_driver_core`'s bare
+device-level extraction had one (see that cell's own "Post-layout
+simulation" section above).
+
+`gds/gf180_tmds_pad_ring_assembly.spice` is a `klt extract --deck gf180mcu
+--parasitics` netlist, not a simulatable deck: every device is already
+bound to a real PDK subcircuit (`nfet_03v3`, `diode_nd2ps_06v0` — unlike
+`cml_driver_core.spice`'s bare `nfet`/no-parasitics extraction), but the
+diode cards carry the extraction deck's own `A`/`P` parameter names, which
+`nfet_03v3`'s ngspice model does not recognize (it wants `AREA`/`PJ`), and
+the per-finger parasitic-resistance star gives every device terminal its
+own uniquely-suffixed node (`OUTP__t16`, not `OUTP`) rather than the
+schematic net name directly.
+
+`scripts/gen_pad_ring_assembly_dut.py` mechanically derives a simulatable
+DUT fragment: renames the diode parameters, and wraps the extraction in a
+`cml_driver`-named subcircuit presenting the schematic cell boundary — the
+same `sim/cml-driver-eye` testbench that already produced the schematic and
+core-extracted records runs unchanged against this assembly DUT too, one
+level deeper (assembly, not just the bare core):
+
+```bash
+python3 layout/scripts/gen_pad_ring_assembly_dut.py   # writes layout/sim/gf180_tmds_pad_ring_assembly_dut.spice
+python3 layout/scripts/gen_pad_ring_assembly_dut.py --check   # CI: committed output is not stale
+python3 sim/run_corners.py cml-driver-eye --dut layout/sim/gf180_tmds_pad_ring_assembly_dut.spice
+```
+
+Nothing in that fragment is hand-written: `sim/tests/test_pad_ring_assembly_dut.py`
+re-derives it (25 tests) and independently asserts the translation against
+`lvs/gf180_tmds_pad_ring_assembly.ref.spice` (folded per-finger nfet widths
+and diode area/perimeter, correct diode parameter renaming, no transposed
+leg, correct VSS-star body handling, the internal `vsubs` DC-tie surviving
+unedited) — the same class of translation mistake
+`sim/tests/test_extracted_dut.py` guards against for the core-only cell.
+
+**What this newly models, relative to the existing `cml_driver_core`
+post-layout record**: the real diode-clamp ESD structure in circuit with the
+driver (previously simulated only in isolation,
+`sim/esd-diode-clamp-cv`), and the real interconnect R/C
+`klt extract --parasitics` measures (DR-0005's budget itself, §10.5 above)
+— a genuine interconnect-RC extraction, unlike `cml_driver_core.spice`'s
+device-only extraction. **What it still does not model**: package, board,
+or bond wire (only the drawn on-die pad's own parasitics are captured), and
+no HBM/CDM ESD pulse event (the clamp diodes sit in the small-signal/
+operating-point circuit only — issue #145's separate, pre-silicon-only gap).
+
+**Record**: see `measurements/characterization.md`'s DR-0002 "block-level
+(assembly, extracted-with-parasitics) corroboration" subsection for the
+result (18-point `tt`-corner × rate grid, 18/18 PASS) and its own stated
+coverage limits, including the disclosed `tt`-only scope (issue #161 tracks
+extending to `ff`/`ss`/`fs`/`sf`).
+
 ### The block-level LVS signoff regression (issue #143 finding), historical record — resolved (issue #149)
 
 **Resolved as of issue #149** (see the "block-level LVS signoff regression

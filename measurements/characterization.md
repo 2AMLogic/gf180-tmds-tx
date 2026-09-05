@@ -148,6 +148,78 @@ wrong: nothing in the schematic record is corrected here, and both remain
 citable (the schematic record is the one that states `NRD`/`NRS`; this one is
 the one taken against the drawn geometry).
 
+#### DR-0002, block-level (assembly, extracted-with-parasitics) corroboration
+
+[`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../sim/cml-driver-eye/records/20260905-193624-231b75c.md)
+(issue #154 / Epic #542 Phase 3A, landed 2026-09-05) runs **the same
+testbench deck, manifest, measurements and checks** as the two records
+above, against a third, strictly larger-coverage DUT: the **assembled**
+driver+pad-ring/ESD block
+([`layout/gds/gf180_tmds_pad_ring_assembly.gds`](../layout/gds/gf180_tmds_pad_ring_assembly.gds),
+issue #86/#149), extracted **with interconnect parasitic R/C**
+(`klt extract --deck gf180mcu --parasitics`), bound to a simulatable form
+by `layout/scripts/gen_pad_ring_assembly_dut.py` →
+`layout/sim/gf180_tmds_pad_ring_assembly_dut.spice`. This is the first
+electrical/PVT record of the assembled block — until this record, only its
+structural DRC/LVS signoff existed (§3 item 2's stated gap, now closed for
+the `tt` corner; see the scope caveat below for what remains).
+
+| Sub-claim | Verdict | Notes |
+|---|---|---|
+| Single-ended swing 400–600 mV | **PASS** | 493.6–511.7 mV across the `tt`-corner grid below (0/1/2 pF pad cap, both rates) |
+| Common mode 2.8–3.3 V at nominal AVCC | **PASS** | 3.0434–3.0506 V |
+| Common mode across the ±10 % supply-corner sweep | **PASS, against DR-0006's qualified reading** | 2.7139–2.7208 V / 3.3735–3.3804 V at AVCC = 2.97 V/3.63 V — same DR-0006 supply-tracking qualification as the core-cell records above |
+| Worst device stress vs. the 3.63 V rated ceiling | **PASS** | Worst measured 2.6322 V (`vds_sw_max`, `tt_-40c_2.97v_742p5mbps`) — positive margin, consistent with the core-extracted record's own 2.757 V worst case |
+| Driver's own deterministic jitter, ≤ 0.15 UI p-p | **PASS** | ≤ 9.578×10⁻⁵ UI worst case (2 pF pad) — three orders of magnitude inside budget |
+| Tail-current tolerance (8–12 mA, informative) | **PASS** | 9.970–10.200 mA |
+
+**Scope caveat, stated per this document's own coverage-honesty
+requirement: this record covers the `tt` (typical) process corner only —
+18 of the mandated 90-point `mos` corner-set × rate grid** (temperature
+and supply are fully swept: −40/27/125 °C × 2.97/3.30/3.63 V × both rates).
+The record's own **Corner matrix run** field states this explicitly with a
+written justification (`sim/README.md`'s subset-reason convention, used for
+the first time in this repository): the run was minted on a machine
+observed at load average 50+ from unrelated concurrent jobs during this
+session, and completing the full 5-corner matrix in one invocation risked
+an unbounded multi-hour run on contended hardware. **This is not a claim
+that `ff`/`ss`/`fs`/`sf` pass** — it is a disclosed, honest subset, not a
+narrowed target; landing the remaining four corners as additional appended
+records (this experiment's own append-only convention) is tracked as a
+follow-up (issue #161).
+
+**What this newly models, relative to the core-only post-layout record
+above** (stated per the coverage-honesty requirement, same as that
+record's own disclosure):
+
+- **The real diode-clamp ESD structure** (`diode_nd2ps_06v0`, 40 fingers —
+  20 per pad), previously simulated only in isolation
+  (`sim/esd-diode-clamp-cv`), now in circuit with the driver.
+- **Real interconnect parasitic R/C** (`klt extract --parasitics`) — the
+  gap the core-only record's own disclosure names by name ("no interconnect
+  parasitic R/C"): 338 extracted per-finger `nfet_03v3` devices plus ~1400
+  parasitic resistors and 10 coupling/ground capacitors, DR-0005's own
+  budget-measurement extraction (`design/esd-capacitance-budget.md` §10.5).
+- **The real drawn 25×25 µm bond pad**, not an idealized in-deck
+  capacitance sweep standing in for it — the testbench's own 0/1/2 pF
+  `c0`/`c1`/`c2` copies now stack on top of this DUT's real on-die parasitic
+  (≈0.094 pF `OUTP` / 0.075 pF `OUTN`, §1's DR-0005 table above), rather
+  than approximating the whole pad as they did against the bare-core DUT.
+
+**What this does not add** (same two limits the core-only record's own
+disclosure already names, unaffected by this record): no package, no board,
+no bond wire; no HBM/CDM ESD pulse event (the clamp diodes are in the
+small-signal/operating-point circuit only, issue #145's separate,
+structurally-unaddressable pre-silicon gap).
+
+This record's own netlist was **taken against a dirty working tree** (its
+own **Netlist provenance** field states this) — the same caveat several
+earlier records in this table carry (e.g. `sim/esd-clamp-cv`'s own record);
+not citable as a clean-tree result on its own, but nothing about the DUT
+translation itself is tree-state-dependent (`sim/tests/test_pad_ring_assembly_dut.py`'s
+25 tests assert the translation mechanically, independent of any particular
+commit).
+
 #### DR-0002, Monte Carlo device-mismatch corroboration
 
 [`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md`](../sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md)
@@ -392,13 +464,22 @@ following gaps are stated by name rather than left as silent omissions:
    diode-clamped bond pads and DR-0011's pad-ring/ESD structure, and is
    itself DRC-clean (0 violations) and LVS-matched (`status: match`, 2
    warning-only findings) — so "no pad/ESD post-layout evidence because the
-   cell doesn't exist yet" is no longer the gap. **What remains
-   outstanding**: no electrical/PVT simulation of that assembled cell has
-   been run — only its structural DRC/LVS signoff exists, not a
-   `sim/`-style corner-matrix electrical record. A parasitic-RC re-run of
-   the bare driver core, and a first post-layout electrical simulation of
-   the assembled driver+pad+ESD cell, are both still outstanding and
-   neither has an evidence record.
+   cell doesn't exist yet" is no longer the gap. **Electrical/PVT
+   simulation of the assembled cell has now landed (issue #154)** —
+   [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../sim/cml-driver-eye/records/20260905-193624-231b75c.md)
+   (§1's new "block-level (assembly, extracted-with-parasitics)
+   corroboration" subsection above), extracted **with** interconnect
+   parasitic R/C (`klt extract --parasitics`), closing both this item's
+   "no electrical/PVT simulation" gap and the parasitic-RC gap in one
+   record, for the assembled block. **What remains outstanding**: that
+   record covers the `tt` process corner only (18 of the mandated 90-point
+   `mos` corner-set × rate grid, a disclosed subset per `sim/README.md`'s
+   subset-reason convention) — `ff`/`ss`/`fs`/`sf` still have no
+   electrical/PVT evidence for the assembly, tracked as issue #161. A
+   parasitic-RC re-run of the *bare* driver core cell in isolation (as
+   opposed to the assembly) remains separately unaddressed, though the
+   assembly record now covers a strict superset of that cell's own
+   circuitry.
 3. **Monte Carlo evidence — landed for the driver's swing/common mode;
    nothing else carries a distribution claim.** This item previously stated
    that *"no record in `sim/` today carries a **Statistical convention**

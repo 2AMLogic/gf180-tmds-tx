@@ -5,24 +5,37 @@ open PDK — serializer plus current-mode line driver — designed by AI agents
 driving [klayout-tools](https://github.com/2AMLogic/klayout-tools), xschem +
 ngspice on the analog side and Yosys/OpenROAD on the digital side.
 
-**Status: spec ratified, driver core cell assembled with its pad-ring/ESD
-structure and signed off.** The TMDS encoder RTL is verified (`rtl/`,
-`verification/`). The CML output driver's schematic is captured, sized, and
-PVT-swept against the ratified spec's electrical targets (`design/`,
-`sim/cml-driver-eye/`), and its core cell is laid out, DRC-clean, and
-LVS-matched against that schematic (`layout/gds/cml_driver_core.gds`);
-post-layout (extracted-netlist) simulation of that core cell against the
-full PVT suite has landed. A minimal custom pad cell — proving the DRC/LVS
-flow at the pad boundary, not the final driver pad — is DRC-clean and
-LVS-matched, and its ESD-clamp capacitance has been measured against the
-spec's budget (`layout/`, `sim/esd-clamp-cv/`). The driver core cell has
-since been assembled with a diode-clamped pad-ring/ESD structure per
-DR-0011 — the block-level `layout/gds/gf180_tmds_pad_ring_assembly.gds` —
-which is itself DRC-clean and LVS-matched, though that assembled block has
-no electrical/PVT simulation of its own yet (only structural DRC/LVS
-signoff), and the pad-capacitance budget (≤ 2 pF) still FAILs at ~4× over
-against a realistic 25×25 µm bond pad. See
-`measurements/characterization.md` for the full, per-row accounting.
+**Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
+and now electrically post-layout-verified for its first process corner.**
+The TMDS encoder RTL is
+verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
+timing-closed at 720p60 (`flow/`). The CML output driver's schematic is
+captured, sized, and PVT-swept against the ratified spec's electrical
+targets (`design/`, `sim/cml-driver-eye/`), and its core cell is laid out,
+DRC-clean, and LVS-matched against that schematic
+(`layout/gds/cml_driver_core.gds`); post-layout (extracted-netlist)
+simulation of that core cell against the full PVT suite has landed. A
+minimal custom pad cell — proving the DRC/LVS flow at the pad boundary, not
+the final driver pad — is DRC-clean and LVS-matched, and its ESD-clamp
+capacitance has been measured against the spec's budget (`layout/`,
+`sim/esd-clamp-cv/`). The driver core cell has since been assembled with a
+diode-clamped pad-ring/ESD structure per DR-0011, drawn at the production
+25×25 µm pad geometry — the block-level
+`layout/gds/gf180_tmds_pad_ring_assembly.gds` — which is DRC-clean and
+LVS-matched, and its pad-capacitance budget (≤ 2 pF) **is met**: 0.094 pF
+(`OUTP`) / 0.075 pF (`OUTN`), 95–96 % headroom (an earlier self-reported
+~4× "over budget" figure was a units-label bug, corrected and re-measured
+against the real drawn geometry, not a relaxed target). **The assembled
+block now also has its first electrical/PVT simulation** — an 18-point
+full temperature/supply/rate sweep at the `tt` (typical) process corner,
+18/18 PASS, layout-extracted with real interconnect parasitic R/C and the
+real diode-clamp ESD array in circuit with the driver — closing the "no
+electrical/PVT simulation of its own yet" gap for that corner; the
+remaining four process corners (`ff`/`ss`/`fs`/`sf`) are tracked as a
+follow-up (issue #161), not yet run. See `measurements/characterization.md`
+for the full, per-row accounting, and
+[`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
+for the brief-conformant proposal document.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -71,19 +84,36 @@ README does not keep its own copy of the numbers, to avoid a driftable
 second source of truth.
 
 Maturity ladder: spec ratified → encoder verified → driver simulated across
-PVT → pad cell DRC-clean → assembled and LVS-clean → shuttle seat → measured
-silicon. **Current position: spec ratified, encoder verified, and the CML
-driver schematic and its layout both simulated across the full PVT matrix —
-the pad-ring flow has separately been proven DRC-clean/LVS-matched on a
-minimal proof-of-flow cell, and the driver core cell itself is laid out,
-DRC-clean, and LVS-matched. The driver core cell is now assembled with the
-pad cell/ESD structure, and that assembly (`gf180_tmds_pad_ring_assembly`)
-is itself DRC-clean and LVS-matched — reaching the "assembled and
-LVS-clean" rung. What remains open: the assembled block has no
-electrical/PVT simulation of its own yet, the pad-capacitance budget still
-FAILs against a realistic bond pad, and ESD HBM/CDM qualification is not
-yet simulated (see `measurements/characterization.md`); the "shuttle seat"
-rung and later remain open for the actual block.**
+PVT → pad cell DRC-clean → assembled and LVS-clean → assembly PVT-verified
+→ shuttle seat → measured silicon. **Current position: spec ratified,
+encoder verified/synthesized/placed-and-routed/timing-closed, the CML
+driver schematic and its core-cell layout both simulated across the full
+PVT matrix, and the driver+pad-ring/ESD assembly
+(`gf180_tmds_pad_ring_assembly`) DRC-clean, LVS-matched, and now
+electrically PVT-verified post-layout — with real interconnect parasitics
+and the real ESD clamp array in circuit — for its first process corner (18
+temperature/supply/rate points, `tt`, all PASS), reaching the "assembly
+PVT-verified" rung for that corner. The pad-capacitance budget (≤ 2 pF) is
+met with 95–96 % headroom. What remains open: the remaining four process
+corners (`ff`/`ss`/`fs`/`sf`) have no electrical/PVT evidence yet for the
+assembly (issue #161), ESD HBM/CDM qualification is not simulated (no PDK
+source characterizes the needed device parameters pre-silicon — see
+`measurements/characterization.md`), no post-layout eye-mask run exists yet
+against the extracted assembly (issue #160), and the 10:1→2:1 serializer
+joining the digital and analog partitions is not yet designed (issue #159).
+The "shuttle seat" rung and later remain open for the actual block; see
+[`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
+for the current brief-conformant proposal.**
+
+## Chipalooza
+
+This block is proposed against Open Circuit Design's
+[Chipalooza](https://opencircuitdesign.com/chipalooza/) Challenge #5
+(GF180MCU / Wafer.Space): see
+[`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
+for the brief-conformant proposal document — I/O mapped to the slot budget,
+functional description, spec table re-derived from `sim/` at the brief's
+rails, and bench test plan.
 
 ## Repo layout
 
