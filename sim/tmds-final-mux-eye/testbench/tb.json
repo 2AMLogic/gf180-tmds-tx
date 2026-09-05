@@ -1,0 +1,79 @@
+{
+  "name": "tmds-final-mux-eye",
+  "description": "The DR-0003 custom final 2:1 (DDR) multiplexer (design/tmds_final_mux.sch), measured against the interface design/cml-driver-sizing.md section 4.1 levies on it -- single-ended levels 0.85/0.55 x VDD, common mode 0.70 x VDD, an 80 ps edge at both rates -- while driving a REAL cml_driver instance's gates rather than a lumped capacitor. Three copies of the same cell in one deck: the nominal one (clock-steered switching, the same 16-bit output pattern sim/cml-driver-eye drives), a word-alternating copy that exercises the data pairs instead of the clock pair, and an unloaded copy that isolates the driver gate load's own cost in swing and edge rate. Swept over the full PVT matrix at both spec/tmds-tx.md #1 operating points.",
+  "claim": "design/cml-driver-sizing.md section 4.1's input-swing assumption -- the requirement levied on the DR-0003 final multiplexer that every existing sim/cml-driver-eye* record models as an ideal source -- measured against the real cell for the first time, plus section 4.2's derived >=0.8 V differential full-commutation floor for the driver's W=128u/nf=64 switch pair, at both spec/tmds-tx.md #1 operating points (742.5 Mbps/lane target, 270 Mbps/lane fallback).",
+  "netlist": "tmds_final_mux_eye.spice",
+  "dut": "sim/dut/tmds_output_stage.spice",
+  "corners": ["mos"],
+  "rates_mbps": [742.5, 270.0],
+  "transient": {
+    "tstep_s": 10e-12,
+    "tstop_s": 61e-9,
+    "tmax_s": 20e-12,
+    "reltol": 1e-6,
+    "abstol": 1e-9,
+    "vntol": 1e-6,
+    "pattern": "mixed-run-length-16b (1111111110101010, MSB first at t=0) at the mux OUTPUT, produced from a constant D0 word and a single-transition D1 word on the half-rate DDR clock; a second in-deck copy runs word-alternating data (0011 repeating) so the data pairs commutate too"
+  },
+  "analyses": [
+    "tran 10e-12 61e-9 0 20e-12"
+  ],
+  "measure": {
+    "ui_ref": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=5",
+    "spa_in": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 FALL=7",
+    "spb_in": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=6",
+
+    "spa_m": "TRIG v(vd_m) VAL=0 FALL=1 TARG v(vd_m) VAL=0 FALL=3",
+    "spb_m": "TRIG v(vd_m) VAL=0 FALL=1 TARG v(vd_m) VAL=0 RISE=2",
+    "dj_ui_m": "(max(max(m_spa_m-m_spa_in,m_spb_m-m_spb_in),0)-min(min(m_spa_m-m_spa_in,m_spb_m-m_spb_in),0))/m_ui_ref",
+    "trise_m": "TRIG v(vdg_m) VAL=-0.6 RISE=1 TARG v(vdg_m) VAL=0.6 RISE=2",
+    "tfall_m": "TRIG v(vdg_m) VAL=0.6 FALL=1 TARG v(vdg_m) VAL=-0.6 FALL=1",
+
+    "vih_m": "vecmax(v(outp_m)*v(winc))",
+    "vil_m": "vecmin(v(outp_m)+10*(1-v(winc)))",
+    "vswing_m": "vecmax(v(outp_m)*v(winc))-vecmin(v(outp_m)+10*(1-v(winc)))",
+    "vih_m_frac": "vecmax(v(outp_m)*v(winc))/vecmax(v(vdd))",
+    "vil_m_frac": "vecmin(v(outp_m)+10*(1-v(winc)))/vecmax(v(vdd))",
+    "vcm_m_frac": "(vecmax(v(outp_m)*v(winc))+vecmin(v(outp_m)+10*(1-v(winc)))+vecmax(v(outn_m)*v(winc))+vecmin(v(outn_m)+10*(1-v(winc))))/(4*vecmax(v(vdd)))",
+
+    "vswing_s": "vecmax(v(outp_s)*v(winc))-vecmin(v(outp_s)+10*(1-v(winc)))",
+    "vglitch_m": "vecmin(v(vdn_m)+10*(1-v(winr)))",
+
+    "vswing_n": "vecmax(v(outp_n)*v(winc))-vecmin(v(outp_n)+10*(1-v(winc)))",
+    "trise_n": "TRIG v(vdg_n) VAL=-0.6 RISE=1 TARG v(vdg_n) VAL=0.6 RISE=2",
+
+    "vswing_dc": "vecmax(v(outn_z))-vecmax(v(outp_z))",
+    "vcm_dc_frac": "(vecmax(v(outn_z))+vecmax(v(outp_z)))/(2*vecmax(v(vdd)))",
+    "icell_dc": "vecmax(abs(i(vsens_z)))",
+
+    "vgs_mu_max": "vecmax((v(d0p)-v(xmux_m.sa))*v(win))",
+    "vds_mu_max": "vecmax((v(outp_m)-v(xmux_m.sa))*v(win))",
+    "vds_mt_max": "vecmax(v(xmux_m.tail)*v(win))"
+  },
+  "checks": {
+    "vswing_m": {
+      "min": 0.8,
+      "description": "Differential drive this cell actually delivers to the CML driver's switch pair, measured on one leg as (max high level - min low level) over the mid-bit sampling comb of the maximum-transition-density section. Graded against 0.8 V because that is design/cml-driver-sizing.md section 4.2's own MEASURED >99.9 % full-commutation point for the driver's chosen W=128u/nf=64 switch pair -- the floor below which the driver stops steering its whole tail current, which is the assumption every DR-0002 swing/common-mode number in sim/cml-driver-eye rests on. This is a bound derived from an existing recorded measurement, not a newly invented target; section 4.1's own 0.891-0.99 V assumed range sits above it."
+    },
+    "vswing_s": {
+      "min": 0.8,
+      "description": "Same floor, same cell, word-alternating data -- the copy in which the DATA pairs commutate at the half rate instead of staying static. A cell that meets the floor only when its data words are DC has not met it."
+    },
+    "vgs_mu_max": {
+      "max": 3.63,
+      "description": "Upper (data) pair Vgs against the 3.3 V core devices' rated terminal voltage, adopting the same 3.63 V (nominal + 10 %) rated ceiling and the same citation sim/cml-driver-eye's own device-stress rows use."
+    },
+    "vds_mu_max": {
+      "max": 3.63,
+      "description": "Upper (data) pair Vds against the same 3.63 V rated ceiling."
+    },
+    "vds_mt_max": {
+      "max": 3.63,
+      "description": "Tail-device Vds (the TAIL node) against the same 3.63 V rated ceiling; also the steering devices' source-bulk reverse bias, since every bulk is tied to VSS."
+    },
+    "ui_ref": {
+      "min_spread_pct": 50.0,
+      "description": "Harness-integrity check, not a design claim: the measured unit interval must differ by more than 50 % across the grid, which it can only do if rate_val actually reached the stimulus. A flat ui_ref would mean the bit-rate axis silently failed to apply and every jitter number was normalised by the wrong UI."
+    }
+  }
+}

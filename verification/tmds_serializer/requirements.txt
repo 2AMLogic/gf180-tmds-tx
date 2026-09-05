@@ -1,0 +1,5 @@
+# Pinned verification toolchain (Python side). Same pin as
+# verification/tmds_encoder/requirements.txt -- one cocotb version across the
+# repository. See verification/README.md for the pinned Icarus Verilog /
+# Yosys versions this was verified against.
+cocotb==2.0.1

@@ -1,0 +1,163 @@
+{
+  "name": "cml-driver-eye-realmux",
+  "description": "sim/cml-driver-eye's graded driver rows -- DR-0002's single-ended swing and common-mode windows, spec/tmds-tx.md #2's <= 0.15 UI jitter allocation, the tail-current window and the device-stress ceilings -- re-measured with the REAL DR-0003 final multiplexer (design/tmds_final_mux.sch) substituted for the ideal differential source those records model it as. Same driver cell, same DR-0002 load, same 0/1/2 pF in-deck pad-capacitance sweep, same leg-mismatch and termination-rail sensitivity copies, same measurement windows, same full PVT x bit-rate grid. Does NOT supersede sim/cml-driver-eye: it is a second, harder experiment on the same cell (jitter is referenced to the ideal clock, so it is the mux-plus-driver contribution, not the driver's alone).",
+  "claim": "spec/tmds-tx.md#dr-0002 -- single-ended swing 400-600 mV and common mode 2.8-3.3 V into 50 ohm/leg with a ~10 mA tail, plus the Vgs/Vgd/Vds margin against the 3.3 V core devices' rated limit -- and spec/tmds-tx.md #2's remaining-jitter row (<= 0.15 UI peak-to-peak), at both #1 operating points, now with the DR-0003 multiplexer's REAL output rather than the ideal-source assumption design/cml-driver-sizing.md section 4.1 levied on it.",
+  "netlist": "cml_driver_eye_realmux.spice",
+  "dut": "sim/dut/tmds_output_stage.spice",
+  "corners": ["mos"],
+  "rates_mbps": [742.5, 270.0],
+  "transient": {
+    "tstep_s": 10e-12,
+    "tstop_s": 61e-9,
+    "tmax_s": 20e-12,
+    "reltol": 1e-6,
+    "abstol": 1e-9,
+    "vntol": 1e-6,
+    "pattern": "mixed-run-length-16b (1111111110101010, MSB first at t=0) -- the same output pattern sim/cml-driver-eye drives, synthesised through the half-rate DDR mux from a constant D0 word and a single-transition D1 word"
+  },
+  "analyses": [
+    "tran 10e-12 61e-9 0 20e-12"
+  ],
+  "measure": {
+    "ui_ref": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=5",
+    "spa_in": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 FALL=7",
+    "spb_in": "TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=6",
+
+    "spa_c0": "TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 FALL=3",
+    "spb_c0": "TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 RISE=2",
+    "trise_c0": "TRIG v(vd_c0) VAL=-0.4 RISE=1 TARG v(vd_c0) VAL=0.4 RISE=1",
+    "tfall_c0": "TRIG v(vd_c0) VAL=0.4 FALL=2 TARG v(vd_c0) VAL=-0.4 FALL=2",
+    "dj_ui_c0": "(max(max(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0)-min(min(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0))/m_ui_ref",
+    "swing_c0": "vecmax(v(outp_c0)*v(winc))-vecmin(v(outp_c0)+10*(1-v(winc)))",
+    "vpp_c0": "vecmax(v(outp_c0)*v(win))-vecmin(v(outp_c0)+10*(1-v(win)))",
+    "vcm_c0": "(vecmax(v(outp_c0)*v(winc))+vecmin(v(outp_c0)+10*(1-v(winc)))+vecmax(v(outn_c0)*v(winc))+vecmin(v(outn_c0)+10*(1-v(winc))))/4",
+
+    "spa_c1": "TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 FALL=3",
+    "spb_c1": "TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 RISE=2",
+    "trise_c1": "TRIG v(vd_c1) VAL=-0.4 RISE=1 TARG v(vd_c1) VAL=0.4 RISE=1",
+    "tfall_c1": "TRIG v(vd_c1) VAL=0.4 FALL=2 TARG v(vd_c1) VAL=-0.4 FALL=2",
+    "dj_ui_c1": "(max(max(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0)-min(min(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0))/m_ui_ref",
+    "swing_c1": "vecmax(v(outp_c1)*v(winc))-vecmin(v(outp_c1)+10*(1-v(winc)))",
+    "vpp_c1": "vecmax(v(outp_c1)*v(win))-vecmin(v(outp_c1)+10*(1-v(win)))",
+    "vcm_c1": "(vecmax(v(outp_c1)*v(winc))+vecmin(v(outp_c1)+10*(1-v(winc)))+vecmax(v(outn_c1)*v(winc))+vecmin(v(outn_c1)+10*(1-v(winc))))/4",
+
+    "spa_mux": "TRIG v(muxref) VAL=0 FALL=1 TARG v(muxref) VAL=0 FALL=3",
+    "spb_mux": "TRIG v(muxref) VAL=0 FALL=1 TARG v(muxref) VAL=0 RISE=2",
+    "dj_ui_mux": "(max(max(m_spa_mux-m_spa_in,m_spb_mux-m_spb_in),0)-min(min(m_spa_mux-m_spa_in,m_spb_mux-m_spb_in),0))/m_ui_ref",
+    "dj_ui_drv_c1": "(max(max(m_spa_c1-m_spa_mux,m_spb_c1-m_spb_mux),0)-min(min(m_spa_c1-m_spa_mux,m_spb_c1-m_spb_mux),0))/m_ui_ref",
+
+    "spa_c2": "TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 FALL=3",
+    "spb_c2": "TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 RISE=2",
+    "trise_c2": "TRIG v(vd_c2) VAL=-0.4 RISE=1 TARG v(vd_c2) VAL=0.4 RISE=1",
+    "tfall_c2": "TRIG v(vd_c2) VAL=0.4 FALL=2 TARG v(vd_c2) VAL=-0.4 FALL=2",
+    "dj_ui_c2": "(max(max(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0)-min(min(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0))/m_ui_ref",
+    "swing_c2": "vecmax(v(outp_c2)*v(winc))-vecmin(v(outp_c2)+10*(1-v(winc)))",
+    "vpp_c2": "vecmax(v(outp_c2)*v(win))-vecmin(v(outp_c2)+10*(1-v(win)))",
+    "vcm_c2": "(vecmax(v(outp_c2)*v(winc))+vecmin(v(outp_c2)+10*(1-v(winc)))+vecmax(v(outn_c2)*v(winc))+vecmin(v(outn_c2)+10*(1-v(winc))))/4",
+
+    "spa_cmis": "TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 FALL=3",
+    "spb_cmis": "TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 RISE=2",
+    "dj_ui_cmis": "(max(max(m_spa_cmis-m_spa_in,m_spb_cmis-m_spb_in),0)-min(min(m_spa_cmis-m_spa_in,m_spb_cmis-m_spb_in),0))/m_ui_ref",
+    "swing_cmis": "vecmax(v(outp_cmis)*v(winc))-vecmin(v(outp_cmis)+10*(1-v(winc)))",
+
+    "swing_avcclo": "vecmax(v(outp_vlo)*v(winc))-vecmin(v(outp_vlo)+10*(1-v(winc)))",
+    "vcm_avcclo": "(vecmax(v(outp_vlo)*v(winc))+vecmin(v(outp_vlo)+10*(1-v(winc)))+vecmax(v(outn_vlo)*v(winc))+vecmin(v(outn_vlo)+10*(1-v(winc))))/4",
+    "swing_avcchi": "vecmax(v(outp_vhi)*v(winc))-vecmin(v(outp_vhi)+10*(1-v(winc)))",
+    "vcm_avcchi": "(vecmax(v(outp_vhi)*v(winc))+vecmin(v(outp_vhi)+10*(1-v(winc)))+vecmax(v(outn_vhi)*v(winc))+vecmin(v(outn_vhi)+10*(1-v(winc))))/4",
+
+    "vgs_sw_max": "vecmax((v(mn_vhi)-v(xvhi.tail))*v(win))",
+    "vgd_sw_max": "vecmax(abs(v(mn_vhi)-v(outp_vhi))*v(win))",
+    "vds_sw_max": "vecmax((v(outp_vhi)-v(xvhi.tail))*v(win))",
+    "vgs_tail_max": "vecmax(v(ib_vhi)*v(win))",
+    "vds_tail_max": "vecmax(v(xvhi.tail)*v(win))",
+
+    "vmux_dc": "vecmax(abs(v(vmuxz)))",
+    "swing_dc": "vecmax(v(outn_z))-vecmax(v(outp_z))",
+    "vcm_dc": "(vecmax(v(outn_z))+vecmax(v(outp_z)))/2",
+    "ioff_dc": "(vecmax(v(avcc))-vecmax(v(outn_z)))/50",
+    "itail_dc": "((vecmax(v(avcc))-vecmax(v(outp_z)))+(vecmax(v(avcc))-vecmax(v(outn_z))))/50",
+    "icell_dc": "vecmax(i(vsens_z))"
+  },
+  "checks": {
+    "swing_c0": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV, 0 pF pad -- same definition, window and comb as sim/cml-driver-eye's row of the same name, with the ideal input source replaced by the real DR-0003 multiplexer."
+    },
+    "swing_c1": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV, 1 pF pad, real mux input"
+    },
+    "swing_c2": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 single-ended swing 400-600 mV at DR-0005's full 2 pF pad-capacitance budget, real mux input"
+    },
+    "vcm_c0": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V, 0 pF pad, at the nominal 3.3 V receiver termination rail (avcc -10 %/+10 % sensitivity reported separately as vcm_avcclo/vcm_avcchi), real mux input"
+    },
+    "vcm_c1": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V, 1 pF pad, real mux input"
+    },
+    "vcm_c2": {
+      "min": 2.8,
+      "max": 3.3,
+      "description": "DR-0002 common mode 2.8-3.3 V at DR-0005's full 2 pF budget, real mux input"
+    },
+    "dj_ui_c0": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row, 0 pF pad. Referenced to the ideal half-rate CLOCK, so this is the MUX-PLUS-DRIVER deterministic jitter, not the driver's alone -- strictly harder than sim/cml-driver-eye's row of the same name, and the number that actually maps onto #2's allocation for this block. Random jitter is not a transient quantity and is not included."
+    },
+    "dj_ui_c1": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row, 1 pF pad, mux-plus-driver"
+    },
+    "dj_ui_c2": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row at DR-0005's full 2 pF budget, mux-plus-driver"
+    },
+    "dj_ui_cmis": {
+      "max": 0.15,
+      "description": "spec/tmds-tx.md #2 remaining-jitter row with a deliberate 1 pF leg-to-leg pad-capacitance mismatch (2 pF on OUTP, 1 pF on OUTN), mux-plus-driver"
+    },
+    "swing_cmis": {
+      "min": 0.4,
+      "max": 0.6,
+      "description": "DR-0002 swing under the same 1 pF leg-to-leg pad mismatch, real mux input"
+    },
+    "vgs_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device Vgs against the 3.3 V core devices' rated terminal voltage, adopting the identical 3.63 V ceiling and citation sim/cml-driver-eye's own row of this name uses. Measured on the avcc +10 % copy; the gate node is now the real mux output rather than an ideal source."
+    },
+    "vgd_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device |Vgd| against the same 3.63 V rated limit -- the binding stress row, since the off device's gate sits at the multiplexer's low level while its drain is pulled to the termination rail"
+    },
+    "vds_sw_max": {
+      "max": 3.63,
+      "description": "Switching-device Vds against the same 3.63 V rated limit"
+    },
+    "vgs_tail_max": {
+      "max": 3.63,
+      "description": "Tail/mirror-device Vgs (the shared bias node) against the same 3.63 V rated limit"
+    },
+    "vds_tail_max": {
+      "max": 3.63,
+      "description": "Tail-device Vds (the tail node) against the same 3.63 V rated limit"
+    },
+    "itail_dc": {
+      "min": 8e-3,
+      "max": 12e-3,
+      "description": "Tail current from the ideal 500 uA reference through the cell's 1:20 mirror, with the driver's inputs now at the real mux's DC levels. The 8-12 mA window is design/cml-driver-sizing.md's derived tail-current tolerance; a real mux that under-drives the switch pair shows up here as a tail current the termination cannot account for."
+    },
+    "ui_ref": {
+      "min_spread_pct": 50.0,
+      "description": "Harness-integrity check, not a design claim: the measured unit interval must differ by more than 50 % across the grid, which it can only do if rate_val actually reached the stimulus."
+    }
+  }
+}
