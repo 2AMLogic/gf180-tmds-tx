@@ -133,6 +133,14 @@ if ! python3 layout/scripts/gen_cml_driver_core_dut.py --check; then
   echo "  regenerate with: python3 layout/scripts/gen_cml_driver_core_dut.py"
   status=1
 fi
+# Same check for layout/sim/gf180_tmds_pad_ring_assembly_dut.spice (issue
+# #154 / Epic #542 Phase 3A), mechanically derived from the parasitics-
+# extracted netlist layout/gds/gf180_tmds_pad_ring_assembly.spice.
+if ! python3 layout/scripts/gen_pad_ring_assembly_dut.py --check; then
+  echo "FAIL: layout/sim/gf180_tmds_pad_ring_assembly_dut.spice is stale"
+  echo "  regenerate with: python3 layout/scripts/gen_pad_ring_assembly_dut.py"
+  status=1
+fi
 
 echo
 echo "== 5/7 evidence records (sim/*/records) =="
