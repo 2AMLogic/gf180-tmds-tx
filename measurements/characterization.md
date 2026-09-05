@@ -40,7 +40,7 @@ no simulation evidence at all yet.
 | Common mode 2.8–3.3 V at nominal AVCC = 3.3 V | **PASS** | same record | 3.041–3.054 V across the full PVT × rate × pad-cap grid at nominal supply. |
 | Common mode across the ±10 % supply-corner sweep | **PASS, against DR-0006's qualified reading** | same record | At AVCC = 2.97 V/3.63 V, common mode reaches 2.711 V / 3.384 V — outside DR-0002's original flat 2.8–3.3 V window taken literally, but DR-0006 (`spec/tmds-tx.md` §4) ratifies the window as a nominal-AVCC-3.3 V figure with this measured 1:1 supply-tracking as the explicit qualifier. Graded against DR-0006, every row in this record PASSes; graded against DR-0002's original unqualified text, the supply-corner rows do not. Both readings are stated here, per DR-0006's own correction of `design/cml-driver-sizing.md`'s earlier framing. |
 | `Vgs`/`Vgd`/`Vds` margin against the 3.3 V core devices' rated limit (deferred to driver design work by DR-0002) | **PASS** | same record | Worst measured stress 2.761 V (`vds_sw_max`, `ss_-40c_2.97v`) against the adopted 3.63 V rated ceiling — positive margin at every corner. |
-| Remaining (serializer+driver+board) jitter allocation, ≤ 0.15 UI p-p (spec/tmds-tx.md §2) | **PASS** | same record | Driver's own deterministic-jitter contribution measured ≤ 3.56×10⁻⁵ UI at 2 pF pad load (full PVT, both rates) — several thousand times inside the 0.15 UI budget. This measures the driver stage only, not the full serializer+driver+board chain the budget row nominally covers (the serializer/mux stage upstream of this driver has not itself been captured yet — see §3 below). |
+| Remaining (serializer+driver+board) jitter allocation, ≤ 0.15 UI p-p (spec/tmds-tx.md §2) | **PASS** | same record | Driver's own deterministic-jitter contribution measured ≤ 3.56×10⁻⁵ UI at 2 pF pad load (full PVT, both rates) — several thousand times inside the 0.15 UI budget. This measures the driver stage only. The DR-0003 final multiplexer's own contribution (mux-plus-driver, not driver-alone) is now also measured — see the new "DR-0002 — driver rows re-measured with the real DR-0003 mux" subsection below (issue #159): ≤ 4.60×10⁻⁵ UI at the nominal process corner, still several thousand times inside budget, though at only 1 of 5 process corners (see §3 below). |
 | Tail-current tolerance (this cell's own derived requirement, §2 of `design/cml-driver-sizing.md`, not a `spec/tmds-tx.md` row) | **PASS** (informative, not spec-bound) | same record | 9.822–10.327 mA across the full PVT matrix, inside the design's own derived 8–12 mA tolerance. |
 
 #### DR-0002, post-layout (extracted) corroboration
@@ -278,6 +278,63 @@ demonstrably fires; the PASS above is not vacuous.
   anywhere in this repository.
 - **Swing and common mode only** — no statistical claim is made about jitter,
   device stress, or tail current, and none is made about any other spec row.
+
+### DR-0003 — final multiplexer real-cell verification (issue #159)
+
+Every `sim/cml-driver-eye*` record above models the DR-0003 custom final 2:1
+multiplexer's output as an **ideal** differential source (stated explicitly
+in each testbench's own header). `design/tmds_final_mux.sch` (issue #159)
+draws that cell for the first time, sized per
+`design/tmds-final-mux-sizing.md`, and
+[`sim/tmds-final-mux-eye/records/20260905-220011-6434eba.md`](../sim/tmds-final-mux-eye/records/20260905-220011-6434eba.md)
+is the first measurement of what it actually delivers, driving a real
+`cml_driver` instance's gate load rather than the lumped capacitor or ideal
+source every prior record assumed.
+
+| Sub-claim | Verdict | Evidence record | Notes |
+|---|---|---|---|
+| `design/cml-driver-sizing.md` §4.1's input-swing assumption (levied on this cell): single-ended `vih = 0.85×VDD`, `vil = 0.55×VDD`, common mode `0.70×VDD` | **PASS, within a few % across the swept subset** | same record | `vih_m_frac` 0.841–0.858 (target 0.85), `vil_m_frac` 0.518–0.575 (target 0.55), `vcm_m_frac` 0.679–0.717 (target 0.70) — 18-point subset (see "coverage" below), both rates, clock-alternating stimulus. |
+| §4.2's derived ≥ 0.8 V differential full-commutation floor, clock-alternating (`vswing_m`) and word-alternating (`vswing_s`) stimulus | **PASS** | same record | `vswing_m` 0.842–1.173 V, `vswing_s` 0.844–1.187 V — both stay above the 0.8 V floor at every swept point, including the coldest/highest-swing corner (`tt_-40c_3.63v`) and the hottest/lowest-swing corner (`tt_125c_2.97v`). |
+| Device stress (`vgs_mu_max`, `vds_mu_max`, `vds_mt_max`) against the 3.63 V rated ceiling | **PASS** | same record | Worst measured 1.714 V (`vgs_mu_max`) — comfortable margin. |
+| **Coverage**: 18 of 90 PVT points (nominal `tt` process corner only, full −40/27/125 °C × ±10 % supply × both-rate matrix) | Subset, disclosed | same record's own **Corner matrix run** / **Justification** fields | The `ff`/`ss`/`fs`/`sf` process corners are deferred to a follow-up issue (this repository's sandboxed build environment has no OpenROAD/Docker access and shares its 8 CPU cores with other concurrent agent sessions; this bench's transient — three mux+driver copies plus reference/DC copies — takes several minutes of wall-clock per corner even at low job concurrency, and a full 90-point grid was not reachable in one session). Taken against a dirty working tree (same disclosed limitation `sim/esd-clamp-cv`'s and `sim/smoke-cml-pair`'s own records carry) — not citable as a clean-tree result on its own. |
+
+**What this does not cover**: schematic-level only (no post-layout run);
+`design/tmds-final-mux-sizing.md` §7's own non-goals (no isolated
+clock-pair commutation sweep, no dedicated bandwidth analysis — both
+folded into this end-to-end measurement instead); the reduction stage
+(`rtl/tmds_serializer.v`/DR-0014) upstream of this cell's `D0`/`D1` inputs
+is still modelled as an ideal source (`design/tmds-final-mux-sizing.md` §5),
+not the real reduction-stage output. See §3 below for the full accounting
+of what remains.
+
+### DR-0002 — driver rows re-measured with the real DR-0003 mux (issue #159)
+
+[`sim/cml-driver-eye-realmux/records/20260905-223322-6434eba.md`](../sim/cml-driver-eye-realmux/records/20260905-223322-6434eba.md)
+is the second half of the same measurement: `sim/cml-driver-eye`'s own
+graded DR-0002/§2 rows, re-run with the ideal differential source those
+records substitute for the DR-0003 final multiplexer replaced by the real
+`tmds_final_mux` cell driving the same `cml_driver` instance. Jitter here is
+still referenced to the ideal half-rate clock, so `dj_ui_c0`/`c1`/`c2` is
+the **mux-plus-driver** contribution, strictly harder than (and not
+comparable one-for-one with) `sim/cml-driver-eye`'s driver-only jitter row.
+
+| Sub-claim | Verdict | Evidence record | Notes |
+|---|---|---|---|
+| DR-0002 single-ended swing 400–600 mV, 0/1/2 pF pad, real mux input | **PASS** | same record | `swing_c0`/`c1`/`c2` 0.4894–0.5121 V across the 18-point subset — comfortably inside the window at every pad-cap point. |
+| DR-0002 common mode 2.8–3.3 V, 0/1/2 pF pad, real mux input | **PASS** | same record | `vcm_c0`/`c1`/`c2` 3.044–3.050 V. |
+| DR-0002 swing/common mode under a deliberate 1 pF leg-to-leg pad-capacitance mismatch, real mux input | **PASS** | same record | `swing_cmis` 0.4892–0.5107 V. |
+| spec/tmds-tx.md §2 remaining-jitter row, ≤ 0.15 UI p-p — **mux-plus-driver**, 0/1/2 pF pad | **PASS** | same record | `dj_ui_c0`/`c1`/`c2` max 4.60×10⁻⁵ UI (`tt_125c_2.97v_742p5mbps`, 2 pF) — ≈ 3260× inside budget. This is the figure that maps onto §2's allocation for this stage of the chain per this record's own framing (driver-only jitter, per `sim/cml-driver-eye`, is a looser, not-directly-comparable number). |
+| Same jitter row under the leg-mismatch copy | **PASS** | same record | `dj_ui_cmis` max 7.76×10⁻⁴ UI — the largest jitter figure in this record (as expected, the deliberately harder configuration), still ≈ 193× inside budget. |
+| Tail-current tolerance (design's own derived 8–12 mA window) | **PASS** | same record | `itail_dc` 9.981–10.188 mA with the real mux driving the switch pair (vs. an ideal source) — no measurable steering shortfall. |
+| Device stress (`vgs_sw_max`, `vgd_sw_max`, `vds_sw_max`, `vgs_tail_max`, `vds_tail_max`) against the 3.63 V rated ceiling | **PASS** | same record | Worst measured 2.543 V (`vds_sw_max`) — positive margin at every corner. |
+| **Coverage**: 18 of 90 PVT points (nominal `tt` process corner only) | Subset, disclosed | same record's own **Corner matrix run** / **Justification** fields | Same disclosed reduction and reason as the `tmds-final-mux-eye` record above; taken against the same dirty working tree. |
+
+Together with the `tmds-final-mux-eye` record above, this closes the gap
+`measurements/characterization.md`'s own DR-0002 jitter row previously
+named ("the serializer/mux stage upstream of this driver has not itself
+been captured yet") — for the nominal process corner, across the full
+temperature/supply/rate matrix; the remaining process corners are the
+named follow-up.
 
 ### DR-0013 row 6 — passing-eye criterion (combined swing+jitter eye mask)
 
@@ -578,6 +635,36 @@ following gaps are stated by name rather than left as silent omissions:
    above, covers swing/common mode only, not a combined eye construction).
    Row 11 (ESD HBM/CDM qualification) remains DR-0013's one other open gap,
    unaffected by this record, tracked as issue #145.
+6. **DR-0003 final multiplexer — real-cell evidence landed, at one process
+   corner.** Until issue #159, every `sim/cml-driver-eye*` record modelled
+   the DR-0003 custom final 2:1 multiplexer's output as an ideal source
+   (stated in each testbench's own header) — "the serializer/mux stage
+   upstream of this driver has not itself been captured yet" was §1's own
+   DR-0002 jitter-row caveat. That gap is now measured, not closed:
+   [`sim/tmds-final-mux-eye/records/20260905-220011-6434eba.md`](../sim/tmds-final-mux-eye/records/20260905-220011-6434eba.md)
+   (this cell's own output against `design/cml-driver-sizing.md` §4.1/§4.2's
+   targets) and
+   [`sim/cml-driver-eye-realmux/records/20260905-223322-6434eba.md`](../sim/cml-driver-eye-realmux/records/20260905-223322-6434eba.md)
+   (the driver's own DR-0002 rows, re-measured with the real mux) both
+   **PASS** — see §1's two new subsections above. **What is not yet
+   covered**: both records swept the full temperature (−40/27/125 °C) ×
+   supply (±10 %) × bit-rate matrix at the nominal (`tt`) process corner
+   only — 18 of the mandated 90 points each. The `ff`/`ss`/`fs`/`sf`
+   process corners were not reached in this session (this repository's
+   sandboxed build environment has no OpenROAD/Docker access and shares its
+   8 CPU cores with other concurrent agent sessions; each corner's
+   transient took several minutes of wall-clock even at low job
+   concurrency). Both records disclose this in their own **Corner matrix
+   run** field rather than silently reporting a full-grid claim; the
+   remaining 4 process corners for each bench are named as explicit
+   follow-up work, tracked by issue #163. Also still open, per
+   `design/tmds-final-mux-sizing.md` §7's own
+   non-goals: no post-layout run of this cell, no isolated clock-pair
+   commutation sweep in isolation from the end-to-end measurement, and the
+   10:1→2:1 reduction stage upstream of this cell's `D0`/`D1` inputs is
+   still modelled as an ideal source (the reduction stage's own real analog
+   output — synthesized at 480p per DR-0014, custom at 720p60 — has not
+   itself been captured).
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all. The encoder/serializer digital domain (DR-0003) is verified

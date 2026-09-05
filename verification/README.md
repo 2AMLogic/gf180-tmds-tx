@@ -24,7 +24,12 @@ Each `<bench-name>/` directory verifies exactly one RTL module (named after
 it) and is self-contained: it can be run on its own from a clean checkout
 without touching any other bench directory.
 
-Currently: `verification/tmds_encoder/` verifies `rtl/tmds_encoder.v`.
+Currently: `verification/tmds_encoder/` verifies `rtl/tmds_encoder.v`;
+`verification/tmds_serializer/` verifies `rtl/tmds_serializer.v` (the DR-0003/
+DR-0014 10:1→2:1 reduction stage plus DR-0012 Decision 1's internal
+divide-by-two), elaborated together with `rtl/tmds_encoder.v` via
+`tmds_tx_chain.v` so the reduction is checked against the encoder's own real
+output rather than hand-written stimulus.
 
 ## The three-leg verification plan
 

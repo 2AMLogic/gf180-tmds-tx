@@ -4,11 +4,13 @@ name: CI
 # jobs below are headless and PDK-free: they run on a bare ubuntu runner with
 # nothing but python3 (stdlib) and shellcheck, so a PR is never blocked on
 # downloading a ~1 GB PDK or on building xschem. The `tmds-encoder-verification`
-# job runs the RTL/cocotb bench and is unaffected by the sim-harness jobs.
+# and `tmds-serializer-verification` jobs run the RTL/cocotb benches and are
+# unaffected by the sim-harness jobs.
 #
 # | Self-check                                   | Needs        | Runs in        |
 # |----------------------------------------------|--------------|-----------------|
 # | RTL encoder + cocotb bench + negative control | iverilog/yosys/cocotb | `tmds-encoder-verification` |
+# | RTL serializer + cocotb bench (vs. real encoder) + negative control | iverilog/yosys/cocotb | `tmds-serializer-verification` |
 # | `.github/scripts/lint.sh`                     | python3      | `lint` (here)  |
 # | evidence-record format + append-only          | python3+git  | `lint` (here)  |
 # | LVS signoff verdicts + negative controls      | python3      | `lint` (here)  |
@@ -76,6 +78,47 @@ jobs:
         # the broken DUT (negative_control/tmds_encoder_broken.v) must FAIL
         # the same, unmodified test suite -- see verification/README.md.
         run: python3 verification/tmds_encoder/runner.py
+
+  tmds-serializer-verification:
+    name: TMDS serializer (RTL + cocotb bench vs. real encoder + negative control)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog and Yosys
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: a
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog yosys
+          iverilog -V
+          yosys -V
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install cocotb
+        run: pip install -r verification/tmds_serializer/requirements.txt
+
+      - name: Yosys elaboration smoke check (no vendor extensions)
+        # DR-0014: this stage is not synthesizable at 720p60 on this
+        # library (a register-to-register floor violation, not an
+        # elaboration problem), but the RTL must still elaborate cleanly --
+        # the same smoke check the encoder job runs, applied to both cells
+        # `tmds_tx_chain.v` wraps.
+        run: |
+          yosys -p "read_verilog rtl/tmds_encoder.v rtl/tmds_serializer.v verification/tmds_serializer/tmds_tx_chain.v; hierarchy -check -top tmds_tx_chain; check"
+
+      - name: Run verification bench (real DUT) and negative control (broken DUT)
+        # runner.py asserts BOTH legs against tmds_tx_chain.v (the real
+        # rtl/tmds_encoder.v wrapped with rtl/tmds_serializer.v, so the
+        # reduction is checked against the encoder's own real output): the
+        # real DUT must pass every test, and the broken DUT
+        # (negative_control/tmds_serializer_broken.v) must FAIL the same,
+        # unmodified test suite -- see verification/README.md.
+        run: python3 verification/tmds_serializer/runner.py
 
   lint:
     name: Lint (shellcheck + syntax + evidence records)

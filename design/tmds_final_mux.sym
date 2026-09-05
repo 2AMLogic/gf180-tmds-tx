@@ -1,0 +1,74 @@
+v {xschem version=3.4.7 file_version=1.2
+
+* Symbol for the DR-0003 custom final 2:1 (DDR) multiplexer, one lane
+* (issue #159).
+*
+* Ports, in .subckt order:
+*   OUTP OUTN   differential full-rate output. Drives the CML driver's
+*               INP/INN gates directly (no level shifter -- same 3.3 V
+*               domain, DR-0002/DR-0003). The levels this cell targets are
+*               design/cml-driver-sizing.md section 4.1's: vih = 0.85*VDD,
+*               vil = 0.55*VDD, common mode 0.70*VDD.
+*   D0P  D0N    differential data word bit 0 -- the bit emitted while CLKP
+*               is high.
+*   D1P  D1N    differential data word bit 1 -- the bit emitted while CLKP
+*               is low.
+*   CLKP CLKN   differential half-rate DDR clock (371.25 MHz at 720p60,
+*               135 MHz at 480p) -- DR-0012 Decision 1's internally-derived
+*               divide-by-two output. The divider itself is a follow-on
+*               cell; this cell only consumes its output.
+*   VDD         3.3 V core rail (DR-0002/DR-0003). Unlike the open-drain
+*               CML driver, this stage is resistively loaded and therefore
+*               does have a supply of its own.
+*   VSS         cell ground; also the bulk tie for every device and the
+*               body terminal of every poly resistor.
+*
+* There is deliberately no IBIAS port: the tail current is self-biased from
+* VDD through an in-cell reference resistor of the SAME type as the load
+* resistors, so the output levels are set by a resistor ratio and sheet-rho
+* process variation cancels. See design/tmds-final-mux-sizing.md section 3.
+}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"
+}
+V {}
+S {}
+E {}
+L 4 -100 -120 100 -120 {}
+L 4 100 -120 100 120 {}
+L 4 100 120 -100 120 {}
+L 4 -100 120 -100 -120 {}
+L 4 -100 -80 -95 -80 {}
+L 4 -100 -40 -95 -40 {}
+L 4 -100 0 -95 0 {}
+L 4 -100 40 -95 40 {}
+L 4 -100 80 -95 80 {}
+L 4 -100 110 -95 110 {}
+L 4 95 -80 100 -80 {}
+L 4 95 -40 100 -40 {}
+L 4 0 -125 0 -120 {}
+L 4 0 120 0 125 {}
+B 5 97.5 -82.5 102.5 -77.5 {name=OUTP dir=out}
+B 5 97.5 -42.5 102.5 -37.5 {name=OUTN dir=out}
+B 5 -102.5 -82.5 -97.5 -77.5 {name=D0P dir=in}
+B 5 -102.5 -42.5 -97.5 -37.5 {name=D0N dir=in}
+B 5 -102.5 -2.5 -97.5 2.5 {name=D1P dir=in}
+B 5 -102.5 37.5 -97.5 42.5 {name=D1N dir=in}
+B 5 -102.5 77.5 -97.5 82.5 {name=CLKP dir=in}
+B 5 -102.5 107.5 -97.5 112.5 {name=CLKN dir=in}
+B 5 -2.5 -127.5 2.5 -122.5 {name=VDD dir=inout}
+B 5 -2.5 122.5 2.5 127.5 {name=VSS dir=inout}
+T {@name} -100 -140 0 0 0.3 0.3 {}
+T {tmds_final_mux} -70 -8 0 0 0.4 0.4 {}
+T {OUTP} 90 -84 0 1 0.25 0.25 {}
+T {OUTN} 90 -44 0 1 0.25 0.25 {}
+T {D0P} -90 -84 0 0 0.25 0.25 {}
+T {D0N} -90 -44 0 0 0.25 0.25 {}
+T {D1P} -90 -4 0 0 0.25 0.25 {}
+T {D1N} -90 36 0 0 0.25 0.25 {}
+T {CLKP} -90 76 0 0 0.25 0.25 {}
+T {CLKN} -90 106 0 0 0.25 0.25 {}
+T {VDD} 5 -115 0 0 0.25 0.25 {}
+T {VSS} 5 100 0 0 0.25 0.25 {}

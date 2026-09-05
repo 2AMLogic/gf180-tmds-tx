@@ -6,10 +6,25 @@ driving [klayout-tools](https://github.com/2AMLogic/klayout-tools), xschem +
 ngspice on the analog side and Yosys/OpenROAD on the digital side.
 
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
-and now electrically post-layout-verified for its first process corner.**
+and now electrically post-layout-verified for its first process corner, and
+the serializer/final-mux stage joining the digital and analog partitions
+designed and analog-verified at that same corner.**
 The TMDS encoder RTL is
 verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
-timing-closed at 720p60 (`flow/`). The CML output driver's schematic is
+timing-closed at 720p60 (`flow/`). The 10:1→2:1 serializer/reduction stage
+(DR-0003, sized against timing by DR-0014) is written and verified against
+the encoder's own real output (`rtl/tmds_serializer.v`,
+`verification/tmds_serializer/`); DR-0014 found it cannot close timing in
+the synthesized domain at 720p60 on this standard-cell library, so it moves
+to the custom domain there and merges with the DR-0003 custom final 2:1
+multiplexer, which is now captured as a schematic and sized
+(`design/tmds_final_mux.sch`, `design/tmds-final-mux-sizing.md`) and
+analog-verified — its own real output (`sim/tmds-final-mux-eye/`) and the
+driver's own rows re-measured with it substituted for their prior
+ideal-source assumption (`sim/cml-driver-eye-realmux/`) both PASS at the
+nominal process corner across the full temperature/supply/rate matrix, with
+the remaining process corners named as follow-up work
+(`measurements/characterization.md`). The CML output driver's schematic is
 captured, sized, and PVT-swept against the ratified spec's electrical
 targets (`design/`, `sim/cml-driver-eye/`), and its core cell is laid out,
 DRC-clean, and LVS-matched against that schematic
@@ -94,13 +109,18 @@ electrically PVT-verified post-layout — with real interconnect parasitics
 and the real ESD clamp array in circuit — for its first process corner (18
 temperature/supply/rate points, `tt`, all PASS), reaching the "assembly
 PVT-verified" rung for that corner. The pad-capacitance budget (≤ 2 pF) is
-met with 95–96 % headroom. What remains open: the remaining four process
-corners (`ff`/`ss`/`fs`/`sf`) have no electrical/PVT evidence yet for the
-assembly (issue #161), ESD HBM/CDM qualification is not simulated (no PDK
-source characterizes the needed device parameters pre-silicon — see
-`measurements/characterization.md`), no post-layout eye-mask run exists yet
-against the extracted assembly (issue #160), and the 10:1→2:1 serializer
-joining the digital and analog partitions is not yet designed (issue #159).
+met with 95–96 % headroom. The 10:1→2:1 serializer/final-mux stage joining
+the digital and analog partitions is now designed too — RTL verified against
+the encoder's own output, and the custom final 2:1 multiplexer captured,
+sized, and analog-verified at that same `tt` corner across the full
+temperature/supply/rate matrix (DR-0014). What remains open: the remaining
+four process corners (`ff`/`ss`/`fs`/`sf`) have no electrical/PVT evidence
+yet for the assembly (issue #161) or for the serializer/final-mux benches
+(issue #163), the custom final-mux cell has no layout and therefore no
+post-layout run of its own yet, ESD HBM/CDM qualification is not simulated
+(no PDK source characterizes the needed device parameters pre-silicon — see
+`measurements/characterization.md`), and no post-layout eye-mask run exists
+yet against the extracted assembly (issue #160).
 The "shuttle seat" rung and later remain open for the actual block; see
 [`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
 for the current brief-conformant proposal.**

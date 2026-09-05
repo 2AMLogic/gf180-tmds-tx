@@ -187,7 +187,15 @@ steps: **DR-0008** (one boundary register, 3 of 5 corners) and **DR-0009**
 (four pipeline stages, **5 of 5 corners** at 74.25 MHz, worst-corner Fmax
 75.83 MHz). The **encoder** side of this record's open item is therefore
 closed; the 371.25 MHz intermediate rate this record flags belongs to the
-10:1→2:1 serializer, which is still unwritten and still unmeasured.
+10:1→2:1 serializer, which is now written and measured — see **DR-0014**
+(`spec/decisions/0014-serializer-rate-ceiling-and-microarchitecture.md`,
+issue #159), which finds the synthesized domain cannot close timing at
+371.25 MHz on this library (a floor violation, not a margin-limited result)
+and revises this record's synthesized/custom boundary at the **720p60**
+operating point only — the 10:1→2:1 reduction moves to the custom domain
+there, merging with the already-custom final 2:1 multiplexer. At **480p**
+(135 MHz) DR-0014 confirms this record's synthesized-domain assignment
+stands unmodified, with comfortable margin.
 
 ### DR-0004: PLL interface numerics and jitter budget
 
@@ -520,7 +528,10 @@ pipelining) decision record landed as **DR-0008**, closing 720p60 setup at
 closed by **DR-0009**'s four-stage pipeline, which brings 720p60 setup to
 5 of 5 corners. See DR-0009 for the full measured outcome, and note it is
 the encoder that closes — the 10:1→2:1 serializer this record's own
-371.25 MHz figure belongs to is still unwritten.
+371.25 MHz figure belongs to is now written and measured by **DR-0014**,
+which finds it cannot close timing in the synthesized domain at that rate
+either (see DR-0014 for why that is a different, floor-violation outcome
+from this record's own margin-limited one).
 
 ### DR-0008: `tmds_encoder` stage1→stage2 pipeline register — two-clock latency contract
 
@@ -841,7 +852,10 @@ synthesized-domain clock ceiling question (opened by DR-0003, resolved to
 DR-0008) is **closed for the encoder at 720p60**: the change DR-0007 called
 for has landed and the target closes at every 3.3 V corner. It is not closed
 for the block as a whole — the 10:1→2:1 serializer, which is where DR-0003's
-371.25 MHz intermediate rate actually lives, is still unwritten.
+371.25 MHz intermediate rate actually lives, is now written and measured by
+**DR-0014** (`spec/decisions/0014-serializer-rate-ceiling-and-microarchitecture.md`,
+issue #159): infeasible in the synthesized domain at 720p60 (moves to the
+custom domain there), confirmed feasible at 480p.
 
 ### Further decision records (index)
 
@@ -858,3 +872,4 @@ where new work landed, not backfilled onto history.
 - [`DR-0011: Pad and ESD strategy after #2 (successor to DR-0005)`](decisions/0011-pad-esd-strategy.md) — reaffirms the diode-based ESD clamp (verified via a real `klt` LVS run), rules on pad pitch/ring depth/continuity/substrate tap, carries the HBM/CDM/capacitance targets forward unrelaxed. Supersedes DR-0005.
 - [`DR-0012: Completing the PLL interface contract (successor to DR-0004)`](decisions/0012-pll-interface-completion.md) — adds the half-rate/synthesized-domain clock derivation, output signal type/swing/common-mode, duty-cycle tolerance, and loading rows §2 lacked. Extends DR-0004 (numbers unchanged).
 - [`DR-0013: Operating conditions and the verifiable spec rows`](decisions/0013-operating-conditions.md) — ratifies the PVT matrix (−40/27/125 °C, ±10 % supply, process corners) and the supply spec, and enumerates the spec's pass/fail rows (citing existing evidence where it exists, marking `Proposed` where it does not).
+- [`DR-0014: Serializer rate ceiling and micro-architecture`](decisions/0014-serializer-rate-ceiling-and-microarchitecture.md) — measures DR-0003's open 371.25 MHz synthesized-domain question for the 10:1→2:1 reduction stage (`rtl/tmds_serializer.v`): infeasible on this library at 720p60 (a register-to-register floor violation, not a margin-limited result), so the reduction moves to the custom domain there; confirmed feasible with comfortable margin at 480p, where DR-0003's synthesized-domain assignment stands. Also ratifies the loadable-shift-register micro-architecture.
