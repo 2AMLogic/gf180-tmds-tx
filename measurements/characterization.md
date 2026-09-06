@@ -378,9 +378,6 @@ is exactly DR-0013 row 6's test — no fixed sampling instant is assumed.
 
 **What this does not cover**, stated rather than left to be inferred:
 
-- **Schematic-level, not extracted.** Like `sim/cml-driver-eye`'s own
-  schematic record, this bench uses `sim/cml-driver-eye/testbench/
-  cml_driver_dut.spice` — no post-layout eye-mask run exists yet.
 - **`mos` corner set only** (tt/ff/ss/fs/sf), matching `sim/cml-driver-eye`'s
   own precedent — row 6's claim does not depend on resistor/BJT device-
   family parameters, so the resistor/BJT skew corners are not required for
@@ -394,6 +391,58 @@ is exactly DR-0013 row 6's test — no fixed sampling instant is assumed.
   above clears the 0.2 V floor by >= 4x, a finer grid is very unlikely to
   change the verdict; see the generator's own docstring for the full
   reasoning.
+
+#### DR-0013 row 6, post-layout (extracted) corroboration
+
+[`sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md`](../sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md)
+(issue #160) closes the gap the paragraph above left open: it re-runs **the
+same testbench deck, manifest, measurements and checks** as the schematic
+record above — same 90-point PVT × rate × pad-cap grid — against
+`layout/sim/gf180_tmds_pad_ring_assembly_dut.spice`, the same extracted
+driver+pad-ring+ESD assembly DUT issue #154's `cml-driver-eye` post-layout
+record uses. This extraction is a **full parasitic-RC extraction**
+(`klt extract --parasitics`), not merely a device-level LVS-clean netlist,
+and includes the real `diode_nd2ps_06v0` ESD clamp array and the real drawn
+bond pad in circuit with the driver. It is also this experiment's **first
+citable clean-tree record** — the schematic record above was taken against a
+dirty working tree and states so in its own **Netlist provenance** field.
+
+| Sub-claim | Schematic record | Extracted (assembly) record | Verdict |
+|---|---|---|---|
+| Eyemask margin, 0 pF pad | 0.962–1.033 V | 0.962–1.033 V | **PASS**, unchanged (< 0.03 % worst delta) |
+| Eyemask margin, 1 pF pad | 0.958–1.033 V | 0.955–1.033 V | **PASS**, unchanged (0.34 % worst delta) |
+| Eyemask margin, 2 pF pad | 0.871–1.033 V | 0.859–1.033 V | **PASS**, unchanged (1.47 % worst delta) |
+
+**The measured deltas, and why they are what they are.** The corner-by-corner
+comparison is computed, not transcribed —
+`python3 sim/compare_records.py cml-driver-eye-mask 20260825-040412-4b0c9f6 20260905-222646-a2b1051`
+reproduces the full 30-measurement table; **no corner changed verdict**. The
+worst-case eyemask margin across the whole grid moves from 0.871 V
+(schematic, `ss_125c_2.97v_742p5mbps` at 2 pF pad) to 0.859 V (extracted,
+same corner and pad point) — still **4.29× the 0.2 V floor**. The pattern
+matches `sim/cml-driver-eye`'s own device-level-vs-extracted delta (above):
+the heaviest-loaded, most process/temperature-stressed corner (`ss`, 125 °C,
+low supply) at the largest pad capacitance shows the largest movement,
+because that is exactly the corner/load combination where the extracted
+interconnect parasitics (not present in the schematic's ideal wires) add the
+most delay/loading relative to the signal's own settling budget. The
+unloaded (0 pF) points barely move (< 0.03 %) because there is little
+interconnect capacitance for the extraction to add on top of an already-tiny
+load.
+
+**What this adds beyond the schematic-level result above, and what it still
+does not cover:**
+
+- **Post-layout, full parasitic-RC, real ESD clamp and pad — now covered.**
+  The schematic-level gap flagged above is closed.
+- **Not modelled** (per the record's own **Claim** field, and
+  `layout/sim/gf180_tmds_pad_ring_assembly_dut.spice`'s own header):
+  package, board, or bond-wire parasitics (only the drawn on-die pad), and
+  any HBM/CDM ESD pulse event (the clamp diodes sit in the small-signal/
+  operating-point circuit only — issue #145, separate).
+- **Same `mos` corner set, no Monte Carlo eye-mask claim, same 8-phase-bin
+  resolution** as the schematic-level record — none of those scope limits
+  are narrowed or widened by this re-run.
 
 ### DR-0005 — pad cell and ESD strategy (clamp capacitance)
 
@@ -500,8 +549,14 @@ following gaps are stated by name rather than left as silent omissions:
    **Row 6 is likewise no longer a gap**: `sim/cml-driver-eye-mask/records/
    20260825-040412-4b0c9f6.md` (issue #144) grades it directly and
    **PASSes** across the full PVT matrix, both rates, 0/1/2 pF pad cap —
-   see §1's new DR-0013 row 6 subsection above and item 5 below. **Row 11
-   remains the one open gap** of the original two, tracked as issue #145.
+   see §1's new DR-0013 row 6 subsection above and item 5 below. **A
+   post-layout (full parasitic-RC extracted) re-run against the
+   driver+pad-ring+ESD assembly now exists too**:
+   `sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md` (issue
+   #160) — same PASS verdict, worst-case margin still >= 4x the 0.2 V
+   floor (see §1's new "post-layout (extracted) corroboration"
+   subsection). **Row 11 remains the one open gap** of the original two,
+   tracked as issue #145.
    They were previously listed here as tracked by Epic #17's own T1
    checklist item 5; #17 closed COMPLETED on 2026-08-21, so that pointer no
    longer resolves to anything open and has been replaced by the two live
@@ -640,11 +695,19 @@ following gaps are stated by name rather than left as silent omissions:
    fixed sampling instant assumed): **PASS**, full PVT matrix, both rates,
    0/1/2 pF pad cap, worst-case margin 0.871 V (>= 4x the 0.2 V floor).
    See §1's new "DR-0013 row 6" subsection above for the full table and
-   this record's own stated coverage limits. **What this does not cover**:
-   schematic-level only (no post-layout eye-mask run yet), and no Monte
-   Carlo/mismatch eye-mask claim (the driver's Monte Carlo evidence, item 3
-   above, covers swing/common mode only, not a combined eye construction).
-   Row 11 (ESD HBM/CDM qualification) remains DR-0013's one other open gap,
+   this record's own stated coverage limits. **A post-layout (full
+   parasitic-RC extracted) re-run against the driver+pad-ring+ESD assembly
+   now exists too** (issue #160):
+   `sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md` — same
+   PASS verdict, same 90-point PVT × rate × pad-cap grid, worst-case margin
+   0.859 V (still >= 4.29x the 0.2 V floor); see §1's new "post-layout
+   (extracted) corroboration" subsection for the full delta. **What this
+   does not cover**: no Monte Carlo/mismatch eye-mask claim (the driver's
+   Monte Carlo evidence, item 3 above, covers swing/common mode only, not a
+   combined eye construction), and the post-layout record does not model
+   package/board/bond-wire parasitics or an HBM/CDM ESD pulse event (same
+   scope limit as `sim/cml-driver-eye`'s own assembly record above). Row 11
+   (ESD HBM/CDM qualification) remains DR-0013's one other open gap,
    unaffected by this record, tracked as issue #145.
 6. **DR-0003 final multiplexer — real-cell evidence landed, at one process
    corner.** Until issue #159, every `sim/cml-driver-eye*` record modelled
