@@ -115,11 +115,13 @@ partitions is now designed too — RTL verified against the encoder's own
 output, and the custom final 2:1 multiplexer captured, sized, and
 analog-verified across the full 5-corner (`tt`/`ff`/`ss`/`fs`/`sf`)
 process grid and the full temperature/supply/rate matrix (DR-0014, issue
-#163). What remains open: that same PVT sweep discloses genuine, narrow
+#163). That same PVT sweep initially disclosed genuine, narrow
 `vswing_m`/`vswing_s` margin shortfalls at the `ss` and `sf` process
-corners' low-supply extremes (issues #169, #171) — not observable at the
-driver's own output, but an open design-margin question for the mux cell
-itself; the custom final-mux cell has no layout and therefore no
+corners' low-supply extremes (issues #169, #171); both are now fixed by
+widening the mux's load resistors `RLP`/`RLN` (5.66 µm → 5.90 µm, issue
+#169) and re-verified 90/90 PASS across the complete grid (issue #173) —
+neither was ever observable at the driver's own output. What remains
+open: the custom final-mux cell has no layout and therefore no
 post-layout run of its own yet; ESD HBM/CDM qualification is not simulated
 (no PDK source
 characterizes the needed device parameters pre-silicon — see
