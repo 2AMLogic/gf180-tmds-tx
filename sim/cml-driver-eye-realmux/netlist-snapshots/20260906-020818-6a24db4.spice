@@ -1,0 +1,284 @@
+* Frozen netlist snapshot for record 20260906-020818-6a24db4
+* source     : sim/cml-driver-eye-realmux/testbench/cml_driver_eye_realmux.spice
+* sha256     : a2da33ef57bfcf70cf040c17369340f1f9478394be85718b36cd16b8dbac3488
+* This is a verbatim copy taken at record time. Do not edit.
+* cml-driver-eye-realmux -- sim/cml-driver-eye's graded driver rows, re-measured
+* with the REAL DR-0003 final multiplexer substituted for its ideal source.
+*
+* Netlist FRAGMENT. The harness supplies the title, the .include of the
+* gf180mcu models, the corner .lib sections, .temp, the .include of the DUT
+* (sim/dut/tmds_output_stage.spice, named by tb.json's "dut" key), the
+* .control block (analyses + measurements) and .end. Parameters provided by
+* the harness (sim/harness/README.md): vdd_val/vdd_nom, temp_c and -- because
+* this testbench's manifest declares a `rates_mbps` axis -- rate_val.
+*
+* ---------------------------------------------------------------------------
+* WHAT THIS EXPERIMENT IS, AND WHAT IT IS NOT
+* ---------------------------------------------------------------------------
+* It is NOT a replacement for sim/cml-driver-eye. That experiment's records
+* stand exactly as recorded; nothing here edits or supersedes them (sim/
+* results are append-only evidence, CLAUDE.md). This is a SECOND, harder
+* experiment on the same cell: every driver copy below is the same
+* `cml_driver` instance driven by the same DR-0002 load and graded against the
+* same ratified rows, but its INP/INN now come from a real
+* `tmds_final_mux` instance (design/tmds_final_mux.sch) instead of the ideal
+* differential source cml_driver_eye.spice's own header documents.
+*
+* The ideal source assumed: 0.85/0.55*vdd_val levels, an 80 ps LINEAR edge at
+* both rates, zero source impedance, zero jitter. The real mux delivers what
+* sim/tmds-final-mux-eye measures -- a level pair that tracks but does not
+* exactly equal those fractions, a finite-impedance RC-shaped edge, a
+* same-data steering glitch, and a nonzero jitter contribution of its own. The
+* question this experiment answers is the one the ideal source could not: with
+* that real input, does the driver still meet DR-0002's swing and common-mode
+* rows and spec/tmds-tx.md #2's <= 0.15 UI jitter allocation?
+*
+* ---------------------------------------------------------------------------
+* JITTER IS MEASURED END-TO-END, WHICH IS STRICTLY HARDER
+* ---------------------------------------------------------------------------
+* sim/cml-driver-eye referenced its output crossings against its own ideal,
+* jitter-free input, so its `dj_ui_*` rows are the DRIVER's own contribution.
+* Here the reference is the ideal half-rate CLOCK (the only jitter-free signal
+* left in the chain), so `dj_ui_*` is the MUX-PLUS-DRIVER contribution. Graded
+* against the same 0.15 UI allocation, that is a strictly tighter test than
+* the existing record's, not a re-labelled equivalent one. `dj_ui_drv_c1` is
+* additionally reported referenced to the mux's own output, so the driver's
+* own share can still be compared like-for-like with the existing record.
+*
+* ---------------------------------------------------------------------------
+* POLARITY
+* ---------------------------------------------------------------------------
+* The mux inverts (a high gate on an upper pair pulls that pair's own load
+* resistor down), and so does the driver. The two are cross-connected below --
+* mux OUTN to driver INP, mux OUTP to driver INN -- so the chain as a whole is
+* non-inverting and a logical 1 is a POSITIVE differential output, exactly as
+* in sim/cml-driver-eye. Pad-side polarity is a wiring choice, not a design
+* constraint; wiring it this way is what makes the two experiments' numbers
+* directly comparable.
+*
+* ---------------------------------------------------------------------------
+* STIMULUS
+* ---------------------------------------------------------------------------
+* The same `mixed-run-length-16b` OUTPUT pattern sim/cml-driver-eye drives
+* (1 1 1 1 1 1 1 1 1 0 1 0 1 0 1 0, MSB first at t = 0), synthesised through
+* the half-rate DDR mux from a constant D0 word and a single-transition D1
+* word -- see sim/tmds-final-mux-eye/testbench/tmds_final_mux_eye.spice's
+* header for the derivation. Same measurement windows (bits 10..15), same
+* pad-capacitance sweep (0/1/2 pF in-deck), same leg-mismatch probe, same
+* termination-rail sensitivity copies.
+
+.param tbit_s   = '1e-6/rate_val'
+.param avcc_nom = 3.3
+.param rterm    = 50
+.param iref     = 500u
+.param vih_d    = '0.85*vdd_val'
+.param vil_d    = '0.55*vdd_val'
+.param vih_c    = '0.60*vdd_val'
+.param vil_c    = '0.30*vdd_val'
+.param tedge_d  = 200p
+.param tedge_c  = 150p
+
+.param tclk_s   = '2*tbit_s'
+.param tpw_c    = 'tbit_s-tedge_c'
+
+.param twin_a = '10.2*tbit_s'
+.param twin_b = '15.8*tbit_s'
+
+* ---- rails ---------------------------------------------------------------
+vvdd    vdd    0 dc {vdd_val}
+vavcc   avcc   0 dc {avcc_nom}
+vavcclo avcclo 0 dc '0.9*avcc_nom'
+vavcchi avcchi 0 dc '1.1*avcc_nom'
+
+* ---- half-rate DDR clock and the two data words --------------------------
+vclkp clkp 0 PULSE({vih_c} {vil_c} {tbit_s} {tedge_c} {tedge_c} {tpw_c} {tclk_s})
+vclkn clkn 0 PULSE({vil_c} {vih_c} {tbit_s} {tedge_c} {tedge_c} {tpw_c} {tclk_s})
+vd0p d0p 0 dc {vih_d}
+vd0n d0n 0 dc {vil_d}
+vd1p d1p 0 PWL(0 '{vih_d}' '{8*tbit_s}' '{vih_d}' '{8*tbit_s+tedge_d}' '{vil_d}' '{20*tbit_s}' '{vil_d}' r=0 td=0)
+vd1n d1n 0 PWL(0 '{vil_d}' '{8*tbit_s}' '{vil_d}' '{8*tbit_s+tedge_d}' '{vih_d}' '{20*tbit_s}' '{vih_d}' r=0 td=0)
+
+* Static inputs for the DC copy: permanently steered so the conducting driver
+* device is the one on OUTP.
+vd0pz d0pz 0 dc {vih_d}
+vd0nz d0nz 0 dc {vil_d}
+vclkpz clkpz 0 dc {vih_c}
+vclknz clknz 0 dc {vil_c}
+
+* Differential clock probe -- the only jitter-free signal in the chain, and
+* therefore the ideal-bit-grid reference every jitter row here is taken
+* against. A 1x VCVS onto a real node, because ngspice's two-terminal
+* v(a,b) probe does not parse inside a measurement TRIG/TARG expression
+* (the same workaround sim/cml-driver-eye's `einref` documents).
+eckref ckref 0 clkp clkn 1
+
+* Measurement-window gates (identical to sim/cml-driver-eye's).
+vwin win 0 PWL(0 0 '{twin_a}' 0 '{twin_a+1p}' 1 '{twin_b}' 1 '{twin_b+1p}' 0)
+vwinc winc 0 PWL(0 0
++ '{10.3*tbit_s}' 0 '{10.3*tbit_s+1p}' 1 '{10.7*tbit_s}' 1 '{10.7*tbit_s+1p}' 0
++ '{11.3*tbit_s}' 0 '{11.3*tbit_s+1p}' 1 '{11.7*tbit_s}' 1 '{11.7*tbit_s+1p}' 0
++ '{12.3*tbit_s}' 0 '{12.3*tbit_s+1p}' 1 '{12.7*tbit_s}' 1 '{12.7*tbit_s+1p}' 0
++ '{13.3*tbit_s}' 0 '{13.3*tbit_s+1p}' 1 '{13.7*tbit_s}' 1 '{13.7*tbit_s+1p}' 0
++ '{14.3*tbit_s}' 0 '{14.3*tbit_s+1p}' 1 '{14.7*tbit_s}' 1 '{14.7*tbit_s+1p}' 0
++ '{15.3*tbit_s}' 0 '{15.3*tbit_s+1p}' 1 '{15.7*tbit_s}' 1 '{15.7*tbit_s+1p}' 0)
+
+* ---------------------------------------------------------------------------
+* Pad-capacitance sweep. Every copy is one `tmds_final_mux` driving one
+* `cml_driver` -- the same two cells, from the same file, at the same PVT
+* point -- so a difference between two copies in one log is a difference
+* caused by that copy's load, not by the corner.
+* ---------------------------------------------------------------------------
+
+* ---- 0 pF pad ------------------------------------------------------------
+xmux_c0 mp_c0 mn_c0 d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xc0 outp_c0 outn_c0 mn_c0 mp_c0 ib_c0 0 cml_driver
+ib_c0src 0 ib_c0 dc {iref}
+rp_c0 avcc outp_c0 {rterm}
+rn_c0 avcc outn_c0 {rterm}
+ediff_c0 vd_c0 0 outn_c0 outp_c0 1
+
+* ---- 1 pF pad ------------------------------------------------------------
+xmux_c1 mp_c1 mn_c1 d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xc1 outp_c1 outn_c1 mn_c1 mp_c1 ib_c1 0 cml_driver
+ib_c1src 0 ib_c1 dc {iref}
+rp_c1 avcc outp_c1 {rterm}
+rn_c1 avcc outn_c1 {rterm}
+cp_c1 outp_c1 0 1p
+cn_c1 outn_c1 0 1p
+ediff_c1 vd_c1 0 outn_c1 outp_c1 1
+* The 1 pF copy's own mux output, so the DRIVER's own jitter share stays
+* measurable and directly comparable with sim/cml-driver-eye's dj_ui_c1.
+emuxref muxref 0 mn_c1 mp_c1 1
+
+* ---- 2 pF pad (DR-0005's full budget) ------------------------------------
+xmux_c2 mp_c2 mn_c2 d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xc2 outp_c2 outn_c2 mn_c2 mp_c2 ib_c2 0 cml_driver
+ib_c2src 0 ib_c2 dc {iref}
+rp_c2 avcc outp_c2 {rterm}
+rn_c2 avcc outn_c2 {rterm}
+cp_c2 outp_c2 0 2p
+cn_c2 outn_c2 0 2p
+ediff_c2 vd_c2 0 outn_c2 outp_c2 1
+
+* ---- leg-to-leg pad mismatch: 2 pF on OUTP, 1 pF on OUTN -----------------
+xmux_cmis mp_cm mn_cm d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xcmis outp_cmis outn_cmis mn_cm mp_cm ib_cmis 0 cml_driver
+ib_cmissrc 0 ib_cmis dc {iref}
+rp_cmis avcc outp_cmis {rterm}
+rn_cmis avcc outn_cmis {rterm}
+cp_cmis outp_cmis 0 2p
+cn_cmis outn_cmis 0 1p
+ediff_cmis vd_cmis 0 outn_cmis outp_cmis 1
+
+* ---- termination-rail sensitivity: avcc -10 %, 1 pF pad ------------------
+xmux_vlo mp_vlo mn_vlo d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xvlo outp_vlo outn_vlo mn_vlo mp_vlo ib_vlo 0 cml_driver
+ib_vlosrc 0 ib_vlo dc {iref}
+rp_vlo avcclo outp_vlo {rterm}
+rn_vlo avcclo outn_vlo {rterm}
+cp_vlo outp_vlo 0 1p
+cn_vlo outn_vlo 0 1p
+
+* ---- termination-rail sensitivity: avcc +10 %, 1 pF pad ------------------
+* Also the worst-case device-stress copy: the highest termination rail is the
+* highest drain voltage the switching devices ever see.
+xmux_vhi mp_vhi mn_vhi d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xvhi outp_vhi outn_vhi mn_vhi mp_vhi ib_vhi 0 cml_driver
+ib_vhisrc 0 ib_vhi dc {iref}
+rp_vhi avcchi outp_vhi {rterm}
+rn_vhi avcchi outn_vhi {rterm}
+cp_vhi outp_vhi 0 1p
+cn_vhi outn_vhi 0 1p
+
+* ---- static copy: DC swing, steering completeness, supply draw -----------
+* `vsens_z` is a 0 V source used as an ammeter in the driver's ground return,
+* so the whole-cell (= tail) current is a real branch current. The mux in this
+* copy is statically steered, so what this measures is the driver's DC
+* behaviour under the real mux's DC output levels -- which is exactly the
+* steering-completeness question design/cml-driver-sizing.md section 4.2 left
+* conditional on the mux's assumed swing.
+xmux_z mp_z mn_z d0pz d0nz d0nz d0pz clkpz clknz vdd 0 tmds_final_mux
+xz outp_z outn_z mn_z mp_z ib_z vss_z cml_driver
+ib_zsrc 0 ib_z dc {iref}
+vsens_z vss_z 0 dc 0
+rp_z avcc outp_z {rterm}
+rn_z avcc outn_z {rterm}
+emuxz vmuxz 0 mn_z mp_z 1
+
+* ---------------------------------------------------------------
+* DUT netlist included by this testbench (schematic)
+* source     : sim/dut/tmds_output_stage.spice
+* sha256     : 9986345e4358c565358a8d072f3beef2336731e4db39261c28497841a49f5f69
+* ---------------------------------------------------------------
+
+* tmds_output_stage.spice -- shared DUT fragment: the DR-0003 custom final
+* 2:1 multiplexer AND the CML output driver it feeds, as two callable
+* .subckt cells.
+*
+* Two experiments share this one file, so that the mux and the driver they
+* both instantiate are byte-identically the same cells:
+*   sim/tmds-final-mux-eye/       -- the mux's own output, into the real
+*                                    driver gate load
+*   sim/cml-driver-eye-realmux/   -- sim/cml-driver-eye's driver rows,
+*                                    re-measured with the real mux
+*                                    substituted for its ideal source
+*
+* Derived MECHANICALLY from the two xschem-generated netlists, by the same
+* recipe sim/cml-driver-eye/testbench/cml_driver_dut.spice documents:
+*   1. strip the machine-local `sch_path` comment and the trailing `.end`
+*      (the harness's DUT fragment rule, sim/harness/README.md: a DUT file
+*      may not carry .control/.endc/.end/.lib/.temp);
+*   2. un-comment the `**.subckt ... **.ends` markers xschem writes as
+*      documentation-only comments when it netlists a top-level sheet.
+*
+* Regenerate with:
+*   for c in tmds_final_mux cml_driver; do
+*     tail -n +2 design/netlist/$c.spice | grep -v '^\.end$' \
+*       | sed -E 's/^\*\*\.(subckt|ends)/.\1/'
+*   done > sim/dut/tmds_output_stage.spice
+* (then re-add this header).
+*
+.subckt tmds_final_mux OUTP OUTN D0P D0N D1P D1N CLKP CLKN VDD VSS
+*.opin OUTP
+*.opin OUTN
+*.ipin D0P
+*.ipin D0N
+*.ipin D1P
+*.ipin D1N
+*.ipin CLKP
+*.ipin CLKN
+*.iopin VDD
+*.iopin VSS
+XRC TOP VDD VSS ppolyf_u r_width=20u r_length=2.65u m=1
+XRLP OUTP TOP VSS ppolyf_u r_width=20u r_length=5.66u m=1
+XRLN OUTN TOP VSS ppolyf_u r_width=20u r_length=5.66u m=1
+XRREF IBIAS VDD VSS ppolyf_u r_width=2u r_length=24.8u m=1
+XMU0P OUTP D0P SA VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU0N OUTN D0N SA VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU1P OUTP D1P SB VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU1N OUTN D1N SB VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMCP SA CLKP TAIL VSS nfet_03v3 L=0.28u W=192u nf=96 ad=17.28p as=17.64p pd=209.28u ps=213.64u nrd=0.9375m nrs=0.9375m sa=0 sb=0
++ sd=0 m=1
+XMCN SB CLKN TAIL VSS nfet_03v3 L=0.28u W=192u nf=96 ad=17.28p as=17.64p pd=209.28u ps=213.64u nrd=0.9375m nrs=0.9375m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
+.subckt cml_driver OUTP OUTN INP INN IBIAS VSS
+*.ipin INP
+*.ipin INN
+*.opin OUTP
+*.opin OUTN
+*.iopin IBIAS
+*.iopin VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
