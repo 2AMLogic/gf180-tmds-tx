@@ -311,16 +311,21 @@ mandated 90-point grid. `ss` was the corner this cell's own design
 derivation had already flagged as the most plausible worst case for full
 current-steering commutation (`design/tmds-final-mux-sizing.md` §4.2); that
 flag was directionally correct but incomplete — **both `ss` and `sf`
-disclose genuine, narrow `vswing_m`/`vswing_s` FAILs**, while `tt`, `ff`,
-and `fs` are clean PASSes at all 18 points each. See below.
+disclosed genuine, narrow `vswing_m`/`vswing_s` FAILs**, while `tt`, `ff`,
+and `fs` were clean PASSes at all 18 points each. **Issue #169 has since
+fixed the `ss` FAIL** (`design/tmds_final_mux.sch`'s `RLP`/`RLN` widened
+5.66 µm → 5.90 µm, re-verified 18/18 PASS at the `ss` corner); **the `sf`
+FAIL (issue #171) remains open** and has not yet been re-checked against
+that fix (tracked by issue #173, alongside re-verifying `tt`/`ff`/`fs`
+against the same geometry change). See below.
 
 | Sub-claim | Verdict | Evidence record | Notes |
 |---|---|---|---|
 | `design/cml-driver-sizing.md` §4.1's input-swing assumption (levied on this cell): single-ended `vih = 0.85×VDD`, `vil = 0.55×VDD`, common mode `0.70×VDD` | **PASS, within a few % across the full 5-corner grid** | all five records above | `vih_m_frac` 0.8311–0.8678 (target 0.85), `vil_m_frac` 0.4949–0.6015 (target 0.55), `vcm_m_frac` 0.6631–0.7345 (target 0.70) — full `tt`/`ff`/`ss`/`fs`/`sf` grid, both rates, clock-alternating stimulus. No check in `tb.json` grades this row numerically (it is an assumption cited for context, not a pass/fail column); the two floor/ceiling rows below are the columns `tb.json` actually checks. |
-| §4.2's derived ≥ 0.8 V differential full-commutation floor, clock-alternating stimulus (`vswing_m`) | **FAIL at 4 of the full 90 points — `ss` and `sf` process corners, 2.97 V (−10 % supply), both rates, at their respective hot/cold extreme** | [`ss` record](../sim/tmds-final-mux-eye/records/20260906-011450-6a24db4.md), [`sf` record](../sim/tmds-final-mux-eye/records/20260906-052053-cef4040.md) | `vswing_m` = **0.799954 V** (`ss_-40c_2.97v_270mbps`, −46 µV), **0.798554 V** (`ss_125c_2.97v_270mbps`, −1.446 mV), **0.796899 V** (`sf_125c_2.97v_742p5mbps`, −3.1 mV), and **0.790067 V** (`sf_125c_2.97v_270mbps`, −9.9 mV, the worst of the four) — all at the lowest-swing (−10 % supply) corner. Every `tt`/`ff`/`fs` point PASSes (18/18 each); every other `ss`/`sf` point also PASSes (`vswing_m` up to 1.221 V across the full grid). **Not loosened to force a pass, per this repo's "agents do not relax the ratified spec to make results pass" rule** — filed as two decision-record-worthy findings, tracked as issue #169 (`ss`) and issue #171 (`sf`) (see §3 item 6 below). |
-| Same floor, word-alternating stimulus (`vswing_s`) | **FAIL at 1 of the full 90 points — `sf_125c_2.97v_270mbps` only** | same records | `vswing_s` 0.793148–1.23613 V across the full grid — the word-alternating copy stays above the floor everywhere `vswing_m` dips under it **except** at `sf`'s single worst point (0.793148 V, −6.85 mV under), where both stimuli now fail together (tracked as part of issue #171). At `ss`'s two failing points, `vswing_s` still narrowly PASSes (0.802474–0.802579 V), as previously reported. |
-| Device stress (`vgs_mu_max`, `vds_mu_max`, `vds_mt_max`) against the 3.63 V rated ceiling | **PASS** | all five records above | Worst measured 1.758 V (`vgs_mu_max`, `sf_125c_3.63v_742p5mbps`) — comfortable margin across the full grid. |
-| **Coverage**: 90 of 90 PVT points (full `tt`/`ff`/`ss`/`fs`/`sf` process-corner grid, full −40/27/125 °C × ±10 % supply × both-rate matrix each) | **Complete** — issue #163 closed | all five records' own **Corner matrix run** / **Justification** fields | The `ff`/`fs`/`sf` corners named as the remaining slice in the prior revision of this row are now landed; two of the five corners (`ss`, `sf`) disclose genuine, narrow `vswing_m`/`vswing_s` shortfalls at their low-supply extremes, tracked as design-margin findings (issues #169, #171) rather than hidden by loosening `tb.json`'s checks. All five records taken against a dirty working tree (same disclosed limitation `sim/esd-clamp-cv`'s and `sim/smoke-cml-pair`'s own records carry) — not citable as a clean-tree result on their own. |
+| §4.2's derived ≥ 0.8 V differential full-commutation floor, clock-alternating stimulus (`vswing_m`) | **`ss` FIXED by issue #169 (RL widened 5.66µm→5.90µm); `sf` still FAIL, tracked by issue #171** | [`ss` fix record](../sim/tmds-final-mux-eye/records/20260906-070531-94be115.md) (supersedes [the original `ss` FAIL](../sim/tmds-final-mux-eye/records/20260906-011450-6a24db4.md)), [`sf` record](../sim/tmds-final-mux-eye/records/20260906-052053-cef4040.md) (unchanged, still FAIL) | The original `ss`-corner record disclosed `vswing_m` = **0.799954 V** (`ss_-40c_2.97v_270mbps`, −46 µV) and **0.798554 V** (`ss_125c_2.97v_270mbps`, −1.446 mV) under the 0.8 V floor. Issue #169 root-caused this to `design/tmds-final-mux-sizing.md` §3's own disclosed residual (the resistor-ratio self-bias cancels the *resistor* sheet-rho corner axis but not the `nfet_03v3` device corner's `ss`-shift) and fixed it by widening the load resistors `RLP`/`RLN` (`r_length` 5.66 µm → 5.90 µm, +4.24 %, `design/tmds_final_mux.sch`) — since `swing = I_tail * RL` and `I_tail` does not depend on `RL`, this raises `vswing_m` by ≈ the same +4.24 % at every corner, independent of process. Re-verified against the **full `ss`-corner matrix (18/18 points)**: **PASS**, `vswing_m` now 0.830797–1.16330 V (previous low 0.798554 V) — both previously-failing points now clear the floor by +30.8 mV / +32.0 mV. The companion `sf` FAIL (`sf_125c_2.97v_742p5mbps`: 0.796899 V, −3.1 mV; `sf_125c_2.97v_270mbps`: 0.790067 V, −9.9 mV) was **not** re-run against the same fix and is not claimed as resolved — see issue #173. `tt`/`ff`/`fs` (18/18 PASS each, up to 1.221 V, pre-fix geometry) likewise have not been re-run against the widened `RL` — also tracked by issue #173, expected (not yet measured) to only gain margin per the same scaling argument. |
+| Same floor, word-alternating stimulus (`vswing_s`) | **`ss` FIXED by issue #169; `sf`'s single point FAIL (issue #171) still open** | [`ss` fix record](../sim/tmds-final-mux-eye/records/20260906-070531-94be115.md), [`sf` record](../sim/tmds-final-mux-eye/records/20260906-052053-cef4040.md) (unchanged) | Pre-fix, `vswing_s` 0.793148–1.23613 V across the full grid — the word-alternating copy stayed above the floor everywhere `vswing_m` dipped under it except at `sf`'s single worst point (0.793148 V, −6.85 mV under), where both stimuli failed together (issue #171, unaffected by #169's fix, not re-run). At `ss`'s two originally-failing points, `vswing_s` already narrowly PASSed pre-fix (0.802474–0.802579 V) and PASSes with more margin post-fix (0.834727–0.834766 V, per the `ss` fix record). |
+| Device stress (`vgs_mu_max`, `vds_mu_max`, `vds_mt_max`) against the 3.63 V rated ceiling | **PASS** | all five original records, plus the `ss` fix record | Worst measured 1.758 V (`vgs_mu_max`, `sf_125c_3.63v_742p5mbps`, pre-fix); worst in the post-fix `ss` re-run is 1.73329 V — comfortable margin (52 %+ of the 3.63 V ceiling) either way. |
+| **Coverage**: 90 of 90 PVT points (full `tt`/`ff`/`ss`/`fs`/`sf` process-corner grid, full −40/27/125 °C × ±10 % supply × both-rate matrix each) | **Complete for the pre-#169 geometry; `ss` re-verified post-fix, `tt`/`ff`/`fs`/`sf` not yet** | all five original records' own **Corner matrix run** / **Justification** fields, plus the `ss` fix record above | Issue #163 completed the mandated 90-point grid for the geometry that existed at the time; two of the five corners (`ss`, `sf`) disclosed genuine, narrow `vswing_m`/`vswing_s` shortfalls at their low-supply extremes (issues #169, #171) rather than being hidden by loosening `tb.json`'s checks. Issue #169 then widened `RLP`/`RLN` (5.66 µm → 5.90 µm) and re-verified the full `ss`-corner matrix (18/18 PASS) against the new geometry; `tt`/`ff`/`fs`/`sf` have **not** been re-run against it (issue #173) — those four corners' records above remain accurate evidence for the pre-#169 geometry only, not for the netlist currently committed. All records taken against a dirty working tree (same disclosed limitation `sim/esd-clamp-cv`'s and `sim/smoke-cml-pair`'s own records carry) — not citable as a clean-tree result on their own. |
 
 **What this does not cover**: schematic-level only (no post-layout run);
 `design/tmds-final-mux-sizing.md` §7's own non-goals (no isolated
@@ -353,7 +358,15 @@ DR-0003 subsection above and §3 item 6 below): the multiplexer's marginal
 output shortfall at those four points does not propagate into an
 observable DR-0002 spec-row violation at the driver's own output, at any
 process corner measured. This bench is now **90/90 PASS across the full
-mandated grid**.
+mandated grid**. Issue #169's `RLP`/`RLN` widening (5.66 µm → 5.90 µm) that
+fixed the companion `tmds-final-mux-eye` bench's `ss`-corner FAIL also
+changes this bench's upstream mux input; re-verified against the full
+`ss`-corner matrix,
+[`sim/cml-driver-eye-realmux/records/20260906-072026-94be115.md`](../sim/cml-driver-eye-realmux/records/20260906-072026-94be115.md)
+confirms **18/18 PASS unchanged** (`swing_c0`/`c1`/`c2` 0.4695–0.5070 V,
+still inside the DR-0002 window) — no regression from the mux-side sizing
+change. `tt`/`ff`/`fs`/`sf` have not been re-run against the new geometry
+here either (issue #173).
 
 | Sub-claim | Verdict | Evidence record | Notes |
 |---|---|---|---|
@@ -364,7 +377,7 @@ mandated grid**.
 | Same jitter row under the leg-mismatch copy | **PASS** | all five records above | `dj_ui_cmis` max 1.01×10⁻³ UI (`ss_125c_2.97v_742p5mbps`) — the largest jitter figure across the full grid (as expected, the deliberately harder configuration), still ≈ 148× inside budget. |
 | Tail-current tolerance (design's own derived 8–12 mA window) | **PASS** | all five records above | `itail_dc` 9.856–10.305 mA across the full grid — no measurable steering shortfall even at the process corners where the upstream mux itself shows a narrow shortfall. |
 | Device stress (`vgs_sw_max`, `vgd_sw_max`, `vds_sw_max`, `vgs_tail_max`, `vds_tail_max`) against the 3.63 V rated ceiling | **PASS** | all five records above | Worst measured 2.653 V (`vds_sw_max`, `ss_125c_2.97v_742p5mbps`) — positive margin (0.977 V) across the full grid. |
-| **Coverage**: 90 of 90 PVT points (full `tt`/`ff`/`ss`/`fs`/`sf` process-corner grid) | **Complete** — issue #163 closed | all five records' own **Corner matrix run** / **Justification** fields | Every point PASSes; this bench's own checks are unaffected by the two narrow `vswing_m`/`vswing_s` shortfalls the companion `tmds-final-mux-eye` bench discloses at `ss`/`sf` (issues #169, #171). All five records taken against the same dirty working tree. |
+| **Coverage**: 90 of 90 PVT points (full `tt`/`ff`/`ss`/`fs`/`sf` process-corner grid) | **Complete for the pre-#169 geometry; `ss` re-verified post-fix, `tt`/`ff`/`fs`/`sf` not yet (issue #173)** | all five original records' own **Corner matrix run** / **Justification** fields, plus the post-fix `ss` record above | Every point PASSes, both before and after issue #169's mux-side `RL` widening; this bench's own checks were unaffected by the two narrow `vswing_m`/`vswing_s` shortfalls the companion `tmds-final-mux-eye` bench discloses at `ss`/`sf` (issues #169, #171) before the fix, and remain unaffected by the fix itself. All records taken against the same dirty working tree. |
 
 Together with the `tmds-final-mux-eye` record above, this closes the gap
 `measurements/characterization.md`'s own DR-0002 jitter row previously
@@ -737,8 +750,9 @@ following gaps are stated by name rather than left as silent omissions:
    (ESD HBM/CDM qualification) remains DR-0013's one other open gap,
    unaffected by this record, tracked as issue #145.
 6. **DR-0003 final multiplexer — real-cell evidence now landed at all five
-   process corners; genuine, narrow `vswing_m`/`vswing_s` FAILs disclosed
-   at `ss` and `sf`.**
+   process corners; `ss` `vswing_m`/`vswing_s` FAIL fixed by issue #169,
+   `sf` FAIL (issue #171) still open, tt/ff/fs/sf not yet re-verified
+   against the fix (issue #173).**
    Until issue #159, every `sim/cml-driver-eye*` record modelled
    the DR-0003 custom final 2:1 multiplexer's output as an ideal source
    (stated in each testbench's own header) — "the serializer/mux stage
@@ -767,30 +781,59 @@ following gaps are stated by name rather than left as silent omissions:
 
    `ss` — the corner `design/tmds-final-mux-sizing.md` §4.2 and issue
    #163's own analysis had already flagged as the most plausible worst case
-   for full current-steering commutation — **discloses a genuine `vswing_m`
-   FAIL at 2 of its 18 points** (`ss_-40c_2.97v_270mbps`: 0.799954 V, 46 µV
-   under the 0.8 V floor; `ss_125c_2.97v_270mbps`: 0.798554 V, 1.446 mV
-   under); `vswing_s` PASSes at both. `ff` and `fs` are clean 18/18 PASSes.
-   `sf` **discloses a worse shortfall**: `vswing_m` FAILs at 2 points
-   (`sf_125c_2.97v_742p5mbps`: 0.796899 V, 3.1 mV under;
-   `sf_125c_2.97v_270mbps`: 0.790067 V, 9.9 mV under — the largest margin
-   violation of the four), and at the worst point `vswing_s` also FAILs
-   (0.793148 V, 6.85 mV under) — the first point where *both* stimulus
-   copies fail together. Neither check was loosened to force a pass, per
-   this repo's "agents do not relax the ratified spec to make results
-   pass" rule; each is filed as its own decision-record-worthy finding —
-   **issue #169** (`ss`) and **issue #171** (`sf`), the latter noting the
-   two findings likely share a root cause (`design/tmds-final-mux-sizing.md`
-   §3's self-biased reference not fully cancelling residual process-corner
-   mobility/Vt shift) but manifest at opposite temperature extremes (`ss`
-   cold, `sf` hot), so a sizing fix should be verified against both before
-   either is considered closed. The companion driver-side records at every
-   one of the four new corners are **18/18 PASS each** — the marginal
-   mux-output shortfall at these four points does not propagate into an
-   observable DR-0002 spec-row violation at the driver's own output, at any
-   process corner measured; `sim/cml-driver-eye-realmux` is now **90/90
-   PASS across the complete grid**. See §1's two updated subsections above
-   for the full numbers.
+   for full current-steering commutation — **originally disclosed a
+   genuine `vswing_m` FAIL at 2 of its 18 points**
+   (`ss_-40c_2.97v_270mbps`: 0.799954 V, 46 µV under the 0.8 V floor;
+   `ss_125c_2.97v_270mbps`: 0.798554 V, 1.446 mV under); `vswing_s` PASSed
+   at both. `ff` and `fs` were clean 18/18 PASSes. `sf` **disclosed a worse
+   shortfall**: `vswing_m` FAILs at 2 points (`sf_125c_2.97v_742p5mbps`:
+   0.796899 V, 3.1 mV under; `sf_125c_2.97v_270mbps`: 0.790067 V, 9.9 mV
+   under — the largest margin violation of the four), and at the worst
+   point `vswing_s` also FAILs (0.793148 V, 6.85 mV under) — the first
+   point where *both* stimulus copies fail together. Neither check was
+   loosened to force a pass, per this repo's "agents do not relax the
+   ratified spec to make results pass" rule; each was filed as its own
+   decision-record-worthy finding — **issue #169** (`ss`) and **issue
+   #171** (`sf`), the latter noting the two findings likely share a root
+   cause (`design/tmds-final-mux-sizing.md` §3's self-biased reference not
+   fully cancelling residual process-corner mobility/Vt shift) but manifest
+   at opposite temperature extremes (`ss` cold, `sf` hot).
+
+   **Issue #169 has since fixed the `ss` finding.** Root cause: exactly the
+   residual §3 names — the resistor-ratio self-bias cancels the *resistor*
+   sheet-rho process axis but not `nfet_03v3`'s own `ss`-corner
+   mobility/Vt shift, and the shortfall showed up at the lowest-swing
+   (2.97 V) supply extreme where there is the least headroom to begin
+   with. Fix: `design/tmds_final_mux.sch`'s load resistors `RLP`/`RLN`
+   widened `5.66 µm → 5.90 µm` (`r_length`, +4.24 %) — since `swing =
+   I_tail * RL` and `I_tail` is set entirely by the `RC`/`RREF` self-bias
+   loop (independent of `RL`), this raises `vswing_m` by very nearly the
+   same +4.24 % at every corner. Re-verified against the **full `ss`-corner
+   matrix**:
+   [`sim/tmds-final-mux-eye/records/20260906-070531-94be115.md`](../sim/tmds-final-mux-eye/records/20260906-070531-94be115.md)
+   is **18/18 PASS**, `vswing_m` now 0.830797–1.16330 V (previous low
+   0.798554 V) — both previously-failing points now clear the floor by
+   +30.8 mV / +32.0 mV. The companion driver-side bench was re-checked too:
+   [`sim/cml-driver-eye-realmux/records/20260906-072026-94be115.md`](../sim/cml-driver-eye-realmux/records/20260906-072026-94be115.md)
+   confirms **18/18 PASS unchanged** after the mux-side change. See
+   `design/tmds-final-mux-sizing.md`'s new "Issue #169" subsection for the
+   full root-cause/fix/verification writeup.
+
+   **`sf` (issue #171) was NOT re-run against this fix and remains an open
+   FAIL as recorded** — the `+4.24 %` scaling argument that fixed `ss`
+   plausibly also closes `sf`'s own, larger (`−9.9 mV`) gap, but that is a
+   prediction, not a measurement, until `sf` is actually re-run. `tt`/`ff`/
+   `fs` (previously clean 18/18 PASSes) were likewise not re-run against
+   the widened `RL` — expected to only gain margin, not yet confirmed.
+   Re-verifying all four is filed as **issue #173**, rather than silently
+   assumed. The companion driver-side records at the original four new
+   corners (pre-fix) remain **18/18 PASS each** — the marginal mux-output
+   shortfall at those points did not propagate into an observable DR-0002
+   spec-row violation at the driver's own output, at any process corner
+   measured; `sim/cml-driver-eye-realmux` was **90/90 PASS across the
+   complete grid** pre-fix and remains so post-fix at the one corner
+   (`ss`) re-checked. See §1's two updated subsections above for the full
+   numbers.
 
    **What is not yet covered**: no Monte Carlo/mismatch claim on this cell
    (out of scope for a corner-matrix bench); per
@@ -799,10 +842,11 @@ following gaps are stated by name rather than left as silent omissions:
    the end-to-end measurement, and the 10:1→2:1 reduction stage upstream of
    this cell's `D0`/`D1` inputs is still modelled as an ideal source (the
    reduction stage's own real analog output — synthesized at 480p per
-   DR-0014, custom at 720p60 — has not itself been captured). The two
-   disclosed `vswing_m`/`vswing_s` shortfalls (`ss`, `sf`) remain open design
-   questions tracked by issues #169 and #171, independent of issue #163
-   (now closed for the corner-completion slice of this work).
+   DR-0014, custom at 720p60 — has not itself been captured). The `sf`
+   shortfall (issue #171) remains an open design question, and re-verifying
+   `tt`/`ff`/`fs`/`sf` against issue #169's sizing fix is issue #173 —
+   both independent of issue #163 (closed for the corner-completion slice
+   of this work).
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all. The encoder/serializer digital domain (DR-0003) is verified

@@ -37,8 +37,8 @@
 *.iopin VDD
 *.iopin VSS
 XRC TOP VDD VSS ppolyf_u r_width=20u r_length=2.65u m=1
-XRLP OUTP TOP VSS ppolyf_u r_width=20u r_length=5.66u m=1
-XRLN OUTN TOP VSS ppolyf_u r_width=20u r_length=5.66u m=1
+XRLP OUTP TOP VSS ppolyf_u r_width=20u r_length=5.90u m=1
+XRLN OUTN TOP VSS ppolyf_u r_width=20u r_length=5.90u m=1
 XRREF IBIAS VDD VSS ppolyf_u r_width=2u r_length=24.8u m=1
 XMU0P OUTP D0P SA VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
 + sd=0 m=1
