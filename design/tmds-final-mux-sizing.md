@@ -187,14 +187,34 @@ confirms the companion driver-side bench remains **18/18 PASS** at the same
 `ss` corner after the change (`swing_c0`/`c1`/`c2` 0.4695–0.5070 V, still
 inside the 0.4–0.6 V DR-0002 window).
 
-**What this does not re-verify.** The `tt`/`ff`/`fs` corners (clean PASSes
-before this change) and the `sf` corner (a sibling, worse-margin `vswing_m`/
-`vswing_s` shortfall at its own hot/low-supply extreme, tracked separately
-as issue #171) have **not** been re-run against the widened `RL` — the
-monotonic-scaling argument above predicts they can only gain margin (or, for
-`sf`, likely close its own gap too), but that is a prediction, not a
-recorded measurement, until someone re-runs them. Filed as a follow-up,
-issue #173, rather than left undisclosed.
+**Issue #173: `tt`/`ff`/`fs`/`sf` re-verified against the same fix.** The
+`tt`/`ff`/`fs` corners (clean PASSes before this change) and the `sf`
+corner (a sibling, worse-margin `vswing_m`/`vswing_s` shortfall at its own
+hot/low-supply extreme, tracked separately as issue #171) were initially
+**not** re-run against the widened `RL` — the monotonic-scaling argument
+above predicted they could only gain margin (or, for `sf`, likely close its
+own gap too), but that was a prediction, not a recorded measurement. Issue
+#173 closed that gap:
+[`tt`](../sim/tmds-final-mux-eye/records/20260906-084639-fdb10c5.md),
+[`ff`](../sim/tmds-final-mux-eye/records/20260906-084713-fdb10c5.md),
+[`fs`](../sim/tmds-final-mux-eye/records/20260906-084753-fdb10c5.md), and
+[`sf`](../sim/tmds-final-mux-eye/records/20260906-084830-fdb10c5.md) each
+re-run the full temperature × supply × rate matrix (18/18 points) against
+the same widened `RL`, and their driver-side counterparts —
+[`tt`](../sim/cml-driver-eye-realmux/records/20260906-084909-fdb10c5.md),
+[`ff`](../sim/cml-driver-eye-realmux/records/20260906-085007-fdb10c5.md),
+[`fs`](../sim/cml-driver-eye-realmux/records/20260906-085134-fdb10c5.md),
+[`sf`](../sim/cml-driver-eye-realmux/records/20260906-085308-fdb10c5.md) —
+confirm no regression at the driver's own output. All eight are **18/18
+PASS**. At `sf`'s previously worst point (`sf_125c_2.97v_270mbps`), the
+predicted scaling held closely: `vswing_m` 0.790067 V → 0.821563 V is
++3.99 % (predicted +4.24 %), clearing the 0.8 V floor by +21.6 mV;
+`vswing_s` 0.793148 V → 0.824519 V clears by +24.5 mV. **Issue #171 (the
+`sf` finding) is therefore resolved by the same fix as issue #169** — both
+`sim/tmds-final-mux-eye` and `sim/cml-driver-eye-realmux` are now 90/90
+PASS across the full mandated 5-corner grid against the netlist currently
+committed. See `measurements/characterization.md`'s DR-0003/DR-0002
+subsections for the full combined-grid numbers.
 
 ## 3. Process invariance: a resistor RATIO, not a resistor VALUE
 

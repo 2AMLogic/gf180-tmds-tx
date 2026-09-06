@@ -1,0 +1,328 @@
+* Frozen netlist snapshot for record 20260906-084753-fdb10c5
+* source     : sim/tmds-final-mux-eye/testbench/tmds_final_mux_eye.spice
+* sha256     : 1e77eb555788a334f8a2c88e9ada976775eba79e182af04a3816577e39cf3988
+* This is a verbatim copy taken at record time. Do not edit.
+* tmds-final-mux-eye -- the DR-0003 custom final 2:1 multiplexer's own output,
+* measured against the interface design/cml-driver-sizing.md section 4.1 levies
+* on it, into the REAL CML driver gate load rather than a lumped capacitor.
+*
+* Netlist FRAGMENT. The harness supplies the title, the .include of the
+* gf180mcu models, the corner .lib sections, .temp, the .include of the DUT
+* (sim/dut/tmds_output_stage.spice, named by tb.json's "dut" key), the
+* .control block (analyses + measurements) and .end. Parameters provided by
+* the harness (sim/harness/README.md): vdd_val/vdd_nom, temp_c and -- because
+* this testbench's manifest declares a `rates_mbps` axis -- rate_val
+* (Mbps/lane for this grid point).
+*
+* ---------------------------------------------------------------------------
+* WHAT THIS EXPERIMENT IS FOR
+* ---------------------------------------------------------------------------
+* Every existing driver record (sim/cml-driver-eye, sim/cml-driver-eye-mask)
+* models this multiplexer as an IDEAL differential source: 0.85/0.55*vdd_val
+* single-ended levels, an 80 ps linear edge at both bit rates, zero source
+* impedance, zero jitter. design/cml-driver-sizing.md section 4.1 states that
+* as a REQUIREMENT levied on this cell, not as a measured fact -- and section
+* 4.2's switch-pair sizing (W=128u/nf=64) was derived assuming the resulting
+* ~0.891-0.99 V differential drive is actually delivered.
+*
+* This experiment measures what design/tmds_final_mux.sch really delivers,
+* across the full PVT x bit-rate grid. It is the first half of closing that
+* gap; sim/cml-driver-eye-realmux/ is the second half (the driver's own
+* ratified rows, re-measured with this cell substituted for the ideal source).
+*
+* ---------------------------------------------------------------------------
+* THE LOAD IS THE REAL DRIVER, NOT A LUMPED CAPACITOR
+* ---------------------------------------------------------------------------
+* Each mux copy below drives a real `cml_driver` instance's INP/INN gates
+* (same cell, same file, as sim/cml-driver-eye instantiates), terminated
+* exactly as DR-0002 specifies. A lumped-C stand-in would miss the driver
+* gate's own bias-dependent capacitance -- which is precisely the quantity
+* that sets this stage's achievable edge rate.
+*
+* ---------------------------------------------------------------------------
+* INPUT MODEL (assumptions this cell's results are, in turn, conditional on)
+* ---------------------------------------------------------------------------
+* This cell has two upstream neighbours, both follow-on cells:
+*
+*   D0/D1  -- the 10:1->2:1 reduction stage. Modelled here as an ideal
+*             differential source at THIS cell's own output levels
+*             (0.85/0.55*vdd_val, common mode 0.70*vdd_val), i.e. the mux is
+*             assumed to be driven by a stage identical to itself. That is not
+*             an arbitrary choice: it is what makes the level spec
+*             self-consistent (the reduction stage can be built from copies of
+*             this same cell), and it is stated as a requirement in
+*             design/tmds-final-mux-sizing.md section 5.
+*   CLKP/N -- DR-0012 Decision 1's internally-derived half-rate divide-by-two
+*             output. Modelled as an ideal differential clock at
+*             0.60/0.30*vdd_val (a 0.30*vdd_val differential swing, the same
+*             swing this cell's own data path uses) with a 150 ps edge and
+*             zero jitter, so every picosecond of jitter measured here is
+*             contributed by this cell.
+*
+* Both are stated, not hidden: an ideal upstream source is the same modelling
+* choice sim/cml-driver-eye made about THIS cell, one stage further back.
+*
+* ---------------------------------------------------------------------------
+* STIMULUS
+* ---------------------------------------------------------------------------
+* `mixed-run-length-16b` -- byte-for-byte the same 16-bit output pattern
+* sim/cml-driver-eye drives (1 1 1 1 1 1 1 1 1 0 1 0 1 0 1 0, MSB first at
+* t = 0), so the two experiments' numbers are directly comparable. Because
+* this is a half-rate DDR mux, that output pattern is produced by
+*
+*   D0 = bits 0,2,4,...,14 = 1 1 1 1 1 1 1 1   (constant)
+*   D1 = bits 1,3,5,...,15 = 1 1 1 1 0 0 0 0   (one transition, at bit 9)
+*
+* with D0 changing only on odd bit boundaries and D1 only on even ones -- the
+* standard half-rate retiming, so each word is stable throughout the half-UI
+* in which it is selected. In the measurement window (bits 10..15) both data
+* words are therefore static and every output transition is produced by the
+* CLOCK steering the tail current, which is the worst case for this cell: the
+* clock pair commutates at the full bit rate.
+*
+* The `_dsw` copy exists because that pattern leaves the DATA pairs unexercised
+* in the window. It is driven with word-alternating data (D0 and D1 both toggle
+* every word, producing a 0 0 1 1 0 0 1 1 output), so the data pairs commutate
+* at the half rate and the data-path contribution to the output levels/edges is
+* measured rather than assumed. It is a second stimulus on the same cell, not a
+* second design.
+*
+* Every transition ramps over its edge time starting at an exact multiple of
+* the bit period, so the differential zero crossings sit on a uniform grid
+* offset by half an edge -- the same convention sim/cml-driver-eye uses, and it
+* cancels in the spacing-difference jitter measurement below.
+
+.param tbit_s   = '1e-6/rate_val'
+.param avcc_nom = 3.3
+.param rterm    = 50
+.param iref     = 500u
+.param vih_d    = '0.85*vdd_val'
+.param vil_d    = '0.55*vdd_val'
+.param vih_c    = '0.60*vdd_val'
+.param vil_c    = '0.30*vdd_val'
+.param tedge_d  = 200p
+.param tedge_c  = 150p
+
+* Derived PULSE fields. Written as their own .param entries rather than
+* inline arithmetic because an ngspice PULSE field takes a single braced
+* parameter reference, not a nested-brace expression.
+.param tclk_s   = '2*tbit_s'
+.param tword_s  = '4*tbit_s'
+.param tpw_c    = 'tbit_s-tedge_c'
+.param tpw_d    = '2*tbit_s-tedge_d'
+.param t8bit_s  = '8*tbit_s'
+.param gnorm    = '1/(0.30*vdd_val)'
+
+* 10-90 % thresholds on the differential output, expressed against the level
+* pair this cell targets: the differential signal runs from -0.30*vdd_val to
+* +0.30*vdd_val, so its 10 % and 90 % points are at -/+0.8*0.30*vdd_val. Same
+* convention (80 % of the differential peak) sim/cml-driver-eye's own
+* +/-0.4 V thresholds use on its +/-0.5 V differential output.
+.param vth_1090 = '0.24*vdd_val'
+
+* Measurement windows over bits 10..15 -- the maximum-transition-density
+* section only, excluding the settled nine-bit run, exactly as
+* sim/cml-driver-eye does and for the same reason.
+.param twin_a = '10.2*tbit_s'
+.param twin_b = '15.8*tbit_s'
+
+* ---- rails ---------------------------------------------------------------
+vvdd   vdd   0 dc {vdd_val}
+vavcc  avcc  0 dc {avcc_nom}
+
+* ---- half-rate DDR clock (ideal, see header) ------------------------------
+* Rising edges on even bit boundaries, falling on odd ones: CLKP high selects
+* the D0 word, CLKP low selects D1.
+vclkp clkp 0 PULSE({vih_c} {vil_c} {tbit_s} {tedge_c} {tedge_c} {tpw_c} {tclk_s})
+vclkn clkn 0 PULSE({vil_c} {vih_c} {tbit_s} {tedge_c} {tedge_c} {tpw_c} {tclk_s})
+
+* ---- data words for the mixed-run-length-16b output pattern ---------------
+vd0p d0p 0 dc {vih_d}
+vd0n d0n 0 dc {vil_d}
+vd1p d1p 0 PWL(0 '{vih_d}' '{8*tbit_s}' '{vih_d}' '{8*tbit_s+tedge_d}' '{vil_d}' '{20*tbit_s}' '{vil_d}' r=0 td=0)
+vd1n d1n 0 PWL(0 '{vil_d}' '{8*tbit_s}' '{vil_d}' '{8*tbit_s+tedge_d}' '{vih_d}' '{20*tbit_s}' '{vih_d}' r=0 td=0)
+
+* ---- data words for the word-alternating (`_dsw`) copy --------------------
+vd0ps d0ps 0 PULSE({vil_d} {vih_d} {tbit_s} {tedge_d} {tedge_d} {tpw_d} {tword_s})
+vd0ns d0ns 0 PULSE({vih_d} {vil_d} {tbit_s} {tedge_d} {tedge_d} {tpw_d} {tword_s})
+vd1ps d1ps 0 PULSE({vil_d} {vih_d} {tclk_s} {tedge_d} {tedge_d} {tpw_d} {tword_s})
+vd1ns d1ns 0 PULSE({vih_d} {vil_d} {tclk_s} {tedge_d} {tedge_d} {tpw_d} {tword_s})
+
+* Differential clock probe -- the ideal, jitter-free grid every jitter
+* measurement here is taken against. ngspice's two-terminal v(a,b) probe does
+* not parse inside a `meas` TRIG/TARG expression, so a 1x VCVS onto a real
+* node is the documented workaround (same as sim/cml-driver-eye's `einref`).
+eckref ckref 0 clkp clkn 1
+
+* Measurement-window gates: 0 outside, 1 inside, so a windowed vecmax/vecmin
+* level measurement is expressible from inside the .control block, which has
+* no access to the rate-dependent .param bounds.
+vwin win 0 PWL(0 0 '{twin_a}' 0 '{twin_a+1p}' 1 '{twin_b}' 1 '{twin_b+1p}' 0)
+* `winr` gates the nine-bit static-data run (bits 2..8 inclusive, boundaries
+* included). Inside it the data words are constant while the clock keeps
+* toggling, so every clock edge hands the tail current from one data pair to
+* the other with no output change intended -- and the finite handover time
+* shows up as a momentary collapse of the differential output. That glitch is
+* a real property of this topology and `vglitch_m` measures its depth rather
+* than letting it hide.
+vwinr winr 0 PWL(0 0 '{1.9*tbit_s}' 0 '{1.9*tbit_s+1p}' 1 '{8.1*tbit_s}' 1 '{8.1*tbit_s+1p}' 0)
+vwinc winc 0 PWL(0 0
++ '{10.3*tbit_s}' 0 '{10.3*tbit_s+1p}' 1 '{10.7*tbit_s}' 1 '{10.7*tbit_s+1p}' 0
++ '{11.3*tbit_s}' 0 '{11.3*tbit_s+1p}' 1 '{11.7*tbit_s}' 1 '{11.7*tbit_s+1p}' 0
++ '{12.3*tbit_s}' 0 '{12.3*tbit_s+1p}' 1 '{12.7*tbit_s}' 1 '{12.7*tbit_s+1p}' 0
++ '{13.3*tbit_s}' 0 '{13.3*tbit_s+1p}' 1 '{13.7*tbit_s}' 1 '{13.7*tbit_s+1p}' 0
++ '{14.3*tbit_s}' 0 '{14.3*tbit_s+1p}' 1 '{14.7*tbit_s}' 1 '{14.7*tbit_s+1p}' 0
++ '{15.3*tbit_s}' 0 '{15.3*tbit_s+1p}' 1 '{15.7*tbit_s}' 1 '{15.7*tbit_s+1p}' 0)
+
+* ---------------------------------------------------------------------------
+* Copy `_m`: the nominal configuration -- one mux driving one real CML driver
+* into the DR-0002 load, at DR-0005's mid pad-capacitance point (1 pF).
+* ---------------------------------------------------------------------------
+xmux_m outp_m outn_m d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+xdrv_m dop_m don_m outp_m outn_m ib_m 0 cml_driver
+ib_msrc 0 ib_m dc {iref}
+rp_m avcc dop_m {rterm}
+rn_m avcc don_m {rterm}
+cp_m dop_m 0 1p
+cn_m don_m 0 1p
+emux_m vd_m 0 outn_m outp_m 1
+* `vd_*` is (OUTN - OUTP), the same polarity convention sim/cml-driver-eye's
+* own `ediff_*` sources use: it makes a logical 1 a POSITIVE differential
+* value, so the mux output's edge indices line up one-for-one with the
+* reference clock's and the spacing-difference jitter measurement below is a
+* like-for-like comparison rather than an inverted one.
+*
+* Normalised differential copy: 1.0 = this cell's TARGET differential swing
+* (0.30*vdd_val), so the edge thresholds in tb.json are plain literals at
+* every supply corner rather than the supply-dependent number an ngspice
+* measurement VAL= field cannot carry.
+envd_m vdn_m 0 vd_m 0 {gnorm}
+* Window-gated copy: zero outside the measurement window. The nine-bit run
+* ahead of the window carries STATIC data under a TOGGLING clock, so every
+* clock edge there produces a small steering glitch on the output -- real,
+* and reported by the ungated jitter rows, but it adds threshold crossings
+* whose count varies with corner, which would make a fixed RISE=n/FALL=n edge
+* index unreliable. Gating removes them: inside the window every clock edge
+* is a genuine full transition, so the crossing indices are fixed by
+* construction.
+bvdg_m vdg_m 0 v = v(vdn_m)*v(win)
+
+* ---------------------------------------------------------------------------
+* Copy `_dsw`: same cell, word-alternating data (see header) -- measures the
+* DATA pairs' own commutation, which the main pattern leaves static.
+* ---------------------------------------------------------------------------
+xmux_s outp_s outn_s d0ps d0ns d1ps d1ns clkp clkn vdd 0 tmds_final_mux
+xdrv_s dop_s don_s outp_s outn_s ib_s 0 cml_driver
+ib_ssrc 0 ib_s dc {iref}
+rp_s avcc dop_s {rterm}
+rn_s avcc don_s {rterm}
+cp_s dop_s 0 1p
+cn_s don_s 0 1p
+emux_s vd_s 0 outn_s outp_s 1
+envd_s vdn_s 0 vd_s 0 {gnorm}
+bvdg_s vdg_s 0 v = v(vdn_s)*v(win)
+
+* ---------------------------------------------------------------------------
+* Copy `_nl`: the SAME mux with no driver attached (open outputs). The
+* difference between `_m` and `_nl` is the driver gate load's own cost in
+* swing and edge rate, measured at the identical PVT point in one invocation
+* rather than inferred.
+* ---------------------------------------------------------------------------
+xmux_n outp_n outn_n d0p d0n d1p d1n clkp clkn vdd 0 tmds_final_mux
+emux_n vd_n 0 outn_n outp_n 1
+envd_n vdn_n 0 vd_n 0 {gnorm}
+bvdg_n vdg_n 0 v = v(vdn_n)*v(win)
+
+* ---------------------------------------------------------------------------
+* Copy `_z`: statically steered to the D0 side, for the DC level pair and the
+* whole-cell supply draw. `vsens_z` is a 0 V source used as an ammeter in the
+* cell's VDD feed, so the cell current is a real branch current.
+* ---------------------------------------------------------------------------
+vd0pz d0pz 0 dc {vih_d}
+vd0nz d0nz 0 dc {vil_d}
+vclkpz clkpz 0 dc {vih_c}
+vclknz clknz 0 dc {vil_c}
+vsens_z vdd_z 0 dc {vdd_val}
+xmux_z outp_z outn_z d0pz d0nz d0nz d0pz clkpz clknz vdd_z 0 tmds_final_mux
+xdrv_z dop_z don_z outp_z outn_z ib_z 0 cml_driver
+ib_zsrc 0 ib_z dc {iref}
+rp_z avcc dop_z {rterm}
+rn_z avcc don_z {rterm}
+
+* ---------------------------------------------------------------
+* DUT netlist included by this testbench (schematic)
+* source     : sim/dut/tmds_output_stage.spice
+* sha256     : afa79028fa54dbb05b4bf37178752e7b58ccddab40413bd1ae2b3226b94ba301
+* ---------------------------------------------------------------
+
+* tmds_output_stage.spice -- shared DUT fragment: the DR-0003 custom final
+* 2:1 multiplexer AND the CML output driver it feeds, as two callable
+* .subckt cells.
+*
+* Two experiments share this one file, so that the mux and the driver they
+* both instantiate are byte-identically the same cells:
+*   sim/tmds-final-mux-eye/       -- the mux's own output, into the real
+*                                    driver gate load
+*   sim/cml-driver-eye-realmux/   -- sim/cml-driver-eye's driver rows,
+*                                    re-measured with the real mux
+*                                    substituted for its ideal source
+*
+* Derived MECHANICALLY from the two xschem-generated netlists, by the same
+* recipe sim/cml-driver-eye/testbench/cml_driver_dut.spice documents:
+*   1. strip the machine-local `sch_path` comment and the trailing `.end`
+*      (the harness's DUT fragment rule, sim/harness/README.md: a DUT file
+*      may not carry .control/.endc/.end/.lib/.temp);
+*   2. un-comment the `**.subckt ... **.ends` markers xschem writes as
+*      documentation-only comments when it netlists a top-level sheet.
+*
+* Regenerate with:
+*   for c in tmds_final_mux cml_driver; do
+*     tail -n +2 design/netlist/$c.spice | grep -v '^\.end$' \
+*       | sed -E 's/^\*\*\.(subckt|ends)/.\1/'
+*   done > sim/dut/tmds_output_stage.spice
+* (then re-add this header).
+*
+.subckt tmds_final_mux OUTP OUTN D0P D0N D1P D1N CLKP CLKN VDD VSS
+*.opin OUTP
+*.opin OUTN
+*.ipin D0P
+*.ipin D0N
+*.ipin D1P
+*.ipin D1N
+*.ipin CLKP
+*.ipin CLKN
+*.iopin VDD
+*.iopin VSS
+XRC TOP VDD VSS ppolyf_u r_width=20u r_length=2.65u m=1
+XRLP OUTP TOP VSS ppolyf_u r_width=20u r_length=5.90u m=1
+XRLN OUTN TOP VSS ppolyf_u r_width=20u r_length=5.90u m=1
+XRREF IBIAS VDD VSS ppolyf_u r_width=2u r_length=24.8u m=1
+XMU0P OUTP D0P SA VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU0N OUTN D0N SA VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU1P OUTP D1P SB VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMU1N OUTN D1N SB VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMCP SA CLKP TAIL VSS nfet_03v3 L=0.28u W=192u nf=96 ad=17.28p as=17.64p pd=209.28u ps=213.64u nrd=0.9375m nrs=0.9375m sa=0 sb=0
++ sd=0 m=1
+XMCN SB CLKN TAIL VSS nfet_03v3 L=0.28u W=192u nf=96 ad=17.28p as=17.64p pd=209.28u ps=213.64u nrd=0.9375m nrs=0.9375m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
+.subckt cml_driver OUTP OUTN INP INN IBIAS VSS
+*.ipin INP
+*.ipin INN
+*.opin OUTP
+*.opin OUTN
+*.iopin IBIAS
+*.iopin VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+.ends
