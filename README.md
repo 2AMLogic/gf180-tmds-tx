@@ -113,11 +113,15 @@ matrix. The pad-capacitance budget (≤ 2 pF) is met with 95–96 % headroom.
 The 10:1→2:1 serializer/final-mux stage joining the digital and analog
 partitions is now designed too — RTL verified against the encoder's own
 output, and the custom final 2:1 multiplexer captured, sized, and
-analog-verified at the `tt` corner across the full temperature/supply/rate
-matrix (DR-0014). What remains open: the serializer/final-mux benches have
-no electrical/PVT evidence yet beyond the `tt` corner (issue #163), the
-custom final-mux cell has no layout and therefore no post-layout run of its
-own yet, ESD HBM/CDM qualification is not simulated (no PDK source
+analog-verified across the full 5-corner (`tt`/`ff`/`ss`/`fs`/`sf`)
+process grid and the full temperature/supply/rate matrix (DR-0014, issue
+#163). What remains open: that same PVT sweep discloses genuine, narrow
+`vswing_m`/`vswing_s` margin shortfalls at the `ss` and `sf` process
+corners' low-supply extremes (issues #169, #171) — not observable at the
+driver's own output, but an open design-margin question for the mux cell
+itself; the custom final-mux cell has no layout and therefore no
+post-layout run of its own yet; ESD HBM/CDM qualification is not simulated
+(no PDK source
 characterizes the needed device parameters pre-silicon — see
 `measurements/characterization.md`), and no post-layout eye-mask run exists
 yet against the extracted assembly (issue #160).
