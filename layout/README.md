@@ -720,9 +720,9 @@ operating-point circuit only — issue #145's separate, pre-silicon-only gap).
 
 **Record**: see `measurements/characterization.md`'s DR-0002 "block-level
 (assembly, extracted-with-parasitics) corroboration" subsection for the
-result (18-point `tt`-corner × rate grid, 18/18 PASS) and its own stated
-coverage limits, including the disclosed `tt`-only scope (issue #161 tracks
-extending to `ff`/`ss`/`fs`/`sf`).
+result — the full 5-corner `mos` set (`tt`/`ff`/`ss`/`fs`/`sf`), each an
+18-point × rate grid, 90/90 PASS (issue #154 landed `tt`; issue #161 landed
+the remaining four corners) — and its own stated coverage limits.
 
 ### The block-level LVS signoff regression (issue #143 finding), historical record — resolved (issue #149)
 

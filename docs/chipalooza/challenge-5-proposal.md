@@ -238,18 +238,18 @@ table summarizes rather than duplicates independently.
 | Parameter | Spec target (DR) | Measured (3.3 V, full PVT unless noted) | Verdict | Source (dated) |
 |---|---|---|---|---|
 | Rate per lane | 742.5 Mbps target, 270 Mbps fallback | Both rates swept at every PVT point below | — | `spec/tmds-tx.md` §1 |
-| Single-ended swing | 400–600 mV (DR-0002) | Schematic 481.2–518.9 mV; core-extracted 481.2–519.0 mV; **assembly-extracted 493.6–511.7 mV (§6, `tt` corner)** | **MET** | `sim/cml-driver-eye/records/20260810-041436-a2c358b.md`, `.../20260815-072956-34e5253.md`, `.../20260905-193624-231b75c.md` |
-| Common mode at nominal AVCC | 2.8–3.3 V (DR-0002, nominal-supply reading per DR-0006) | 3.041–3.054 V (schematic and core-extracted, unchanged); **3.0434–3.0506 V (assembly-extracted, `tt` corner)** | **MET** | Same records |
-| Common mode across ±10 % AVCC | Tracks AVCC ~1:1 (DR-0006's qualified reading) | 2.711 V / 3.384 V (schematic/core); **2.714–2.721 V / 3.373–3.380 V (assembly-extracted, `tt` corner)** at AVCC = 2.97 V / 3.63 V | **MET against DR-0006**, not against DR-0002's original unqualified window | Same records |
-| Device stress (`vds`/`vgs`/`vgd`) vs. 3.3 V core-device ceiling | Positive margin to the adopted 3.63 V ceiling (DR-0002, deferred to driver design) | Worst 2.761 V (`vds_sw_max`, schematic); 2.757 V (core-extracted); **2.632 V (assembly-extracted, `tt` corner, `tt_-40c_2.97v_742p5mbps`)** | **MET** | Same records |
-| Deterministic jitter (this stage's contribution to the ≤ 0.15 UI allocation) | ≤ 0.15 UI p-p (spec/tmds-tx.md §2, DR-0004) | ≤ 5.79×10⁻⁵ UI (core-extracted, worst corner); **≤ 9.58×10⁻⁵ UI (assembly-extracted, `tt` corner)** — several thousand times inside budget either way | **MET** | Same records |
+| Single-ended swing | 400–600 mV (DR-0002) | Schematic 481.2–518.9 mV; core-extracted 481.2–519.0 mV; **assembly-extracted 480.5–517.8 mV (§6, full 5-corner `mos` set)** | **MET** | `sim/cml-driver-eye/records/20260810-041436-a2c358b.md`, `.../20260815-072956-34e5253.md`, `.../20260905-193624-231b75c.md` (`tt`), `.../20260905-213837-a2b1051.md` (`ff`), `.../20260905-222410-a2b1051.md` (`ss`), `.../20260905-225202-a2b1051.md` (`fs`), `.../20260905-232931-a2b1051.md` (`sf`) |
+| Common mode at nominal AVCC | 2.8–3.3 V (DR-0002, nominal-supply reading per DR-0006) | 3.041–3.054 V (schematic and core-extracted, unchanged); **3.0403–3.0543 V (assembly-extracted, full 5-corner `mos` set)** | **MET** | Same records |
+| Common mode across ±10 % AVCC | Tracks AVCC ~1:1 (DR-0006's qualified reading) | 2.711 V / 3.384 V (schematic/core); **2.7108–2.7245 V / 3.3704–3.3840 V (assembly-extracted, full 5-corner `mos` set)** at AVCC = 2.97 V / 3.63 V | **MET against DR-0006**, not against DR-0002's original unqualified window | Same records |
+| Device stress (`vds`/`vgs`/`vgd`) vs. 3.3 V core-device ceiling | Positive margin to the adopted 3.63 V ceiling (DR-0002, deferred to driver design) | Worst 2.761 V (`vds_sw_max`, schematic); 2.757 V (core-extracted); **2.75438 V (assembly-extracted, full 5-corner `mos` set, `ss_-40c_2.97v_742p5mbps`)** | **MET** | Same records |
+| Deterministic jitter (this stage's contribution to the ≤ 0.15 UI allocation) | ≤ 0.15 UI p-p (spec/tmds-tx.md §2, DR-0004) | ≤ 5.79×10⁻⁵ UI (core-extracted, worst corner); **≤ 1.0395×10⁻⁴ UI (assembly-extracted, full 5-corner `mos` set, `ff` corner)** — several thousand times inside budget either way | **MET** | Same records |
 | Combined swing+jitter eye mask (DR-0013 row 6) | Height ≥ 200 mV AND width ≥ 0.75 UI, simultaneously, no fixed sampling instant | Worst 0.871–1.033 V margin, ≥ 4× the floor, full PVT × both rates × 0/1/2 pF pad cap | **MET** (schematic-level; no post-layout eye-mask run yet) | `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md` |
 | Pad capacitance budget | ≤ 2 pF/pad, ESD diodes + pad parasitic combined (DR-0005/DR-0011) | **0.094 pF (`OUTP`) / 0.075 pF (`OUTN`)**, 95–96 % headroom, at the landed block assembly, 20-finger clamp | **MET** — closed, not relaxed; corrects an earlier self-reported ~4× "over budget" figure that was a units-label bug (§9 of `design/esd-capacitance-budget.md`), not a redesign | `design/esd-capacitance-budget.md` §10.5, backed by `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json` |
 | ESD HBM ≥ 2 kV / CDM ≥ 500 V | JEDEC JS-001/JS-002 | No PDK source characterizes ESD failure current density or breakdown/snapback behavior for any gf180mcu device family; sizing is literature-estimated, not PDK-sourced | **Not evidenced — structurally unaddressable pre-silicon**, not a design gap this repo can close by simulation alone | `design/esd-capacitance-budget.md` §2; open decision, issue #145 |
 | DRC (assembly) | 0 violations (`spec/tmds-tx.md` §1 "Signoff") | 0 violations, re-confirmed 2026-09-05 for this proposal | **MET** | `klt drc --deck gf180mcu layout/gds/gf180_tmds_pad_ring_assembly.gds`, this proposal's re-run |
 | LVS (assembly) | `status: match`, negative control correctly `mismatch` | `status: match` (2 warning-only findings), `_shorted` negative control `status: mismatch` (5 error-severity findings), re-confirmed 2026-09-05 | **MET** | Same re-run; `layout/scripts/check_lvs_signoff.py` enforces the pair |
 | Post-layout PVT, driver core only | Device-level extraction, full PVT × rate | Matches schematic to < 5 % on every DC/timing row (§ above) | **MET**, core-cell scope only | `sim/cml-driver-eye/records/20260815-072956-34e5253.md` |
-| **Post-layout PVT, full driver+pad-ring+ESD assembly** | **Electrical/PVT simulation of the assembled block — previously an open gap this proposal exists to close** | **See §6 — first record of its kind (18-point `tt`-corner grid: full temperature/supply/rate sweep, one process corner)** | **MET for the `tt` corner; `ff`/`ss`/`fs`/`sf` not yet run (tracked, issue #161)** — a disclosed subset, not a narrowed claim | `sim/cml-driver-eye/records/20260905-193624-231b75c.md` |
+| **Post-layout PVT, full driver+pad-ring+ESD assembly** | **Electrical/PVT simulation of the assembled block — previously an open gap this proposal exists to close** | **See §6 — full 5-corner `mos` set now landed (90-point grid: full temperature/supply/rate/process sweep), all PASS** | **MET across the full mandated `mos` corner-set** (issue #161 closed the `ff`/`ss`/`fs`/`sf` gap) | `sim/cml-driver-eye/records/20260905-193624-231b75c.md` (`tt`), `.../20260905-213837-a2b1051.md` (`ff`), `.../20260905-222410-a2b1051.md` (`ss`), `.../20260905-225202-a2b1051.md` (`fs`), `.../20260905-232931-a2b1051.md` (`sf`) |
 | Digital: RTL functional verification | Exhaustive golden-model equivalence + negative control | Real DUT passes, negative-control DUT correctly fails | **MET** | `verification/tmds_encoder/`, `verification/README.md` |
 | Digital: synthesis, P&R, DRC, LVS | Gate-level netlist, routed GDS, clean signoff | 266 cells, 0 unmapped; `status: clean` DRC; `status: match` LVS with a correctly-failing negative control | **MET** | `flow/tmds_encoder/records/20260816-*.md` |
 | Digital: setup timing, 720p60 (74.25 MHz) | Met at all corners | Worst-corner Fmax 75.83 MHz (`ss_125C_3v00`); margin +0.2799 ns, 2.1 % of the period — **closed, not comfortable** | **MET, narrow margin** | `flow/tmds_encoder/records/20260817-110611-37e197a.md` |
@@ -313,26 +313,39 @@ against the LVS reference by `sim/tests/test_pad_ring_assembly_dut.py`
 agreement with `layout/lvs/gf180_tmds_pad_ring_assembly.ref.spice`, no
 transposed leg, correct substrate handling).
 
-**Record**: [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../../sim/cml-driver-eye/records/20260905-193624-231b75c.md)
+**Records**: [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../../sim/cml-driver-eye/records/20260905-193624-231b75c.md) (`tt`),
+[`.../20260905-213837-a2b1051.md`](../../sim/cml-driver-eye/records/20260905-213837-a2b1051.md) (`ff`),
+[`.../20260905-222410-a2b1051.md`](../../sim/cml-driver-eye/records/20260905-222410-a2b1051.md) (`ss`),
+[`.../20260905-225202-a2b1051.md`](../../sim/cml-driver-eye/records/20260905-225202-a2b1051.md) (`fs`), and
+[`.../20260905-232931-a2b1051.md`](../../sim/cml-driver-eye/records/20260905-232931-a2b1051.md) (`sf`)
 — the same testbench, manifest, measurements and checks as the two existing
-driver-core records, run instead against this assembly DUT: **18 points**
-(3 temperatures × 3 supply points × both rates) at the `tt` (typical)
-process corner, **18/18 PASS**. Every row that record reports is summarized
-into §5 above. As with the core-only extraction, `klt extract --parasitics`
-does not model skin effect, distributed transmission-line behavior,
-package, board, or bond wire — the drawn on-die pad and its real
-interconnect R/C are what is captured; anything beyond the die edge is not
-(the record's own **Claim** field states this explicitly).
+driver-core records, run instead against this assembly DUT, once per process
+corner: **18 points each** (3 temperatures × 3 supply points × both rates),
+**90/90 PASS** across all five `mos`-set corners (`tt`/`ff`/`ss`/`fs`/`sf`).
+Every row these records report is summarized into §5 above. As with the
+core-only extraction, `klt extract --parasitics` does not model skin
+effect, distributed transmission-line behavior, package, board, or bond
+wire — the drawn on-die pad and its real interconnect R/C are what is
+captured; anything beyond the die edge is not (each record's own **Claim**
+field states this explicitly).
 
-**Scope, disclosed rather than glossed over**: this record covers the `tt`
-process corner only, not the full 5-corner (`tt`/`ff`/`ss`/`fs`/`sf`)
-`mos` set this repository's own PVT-matrix convention (DR-0013) mandates
-for a complete claim — the record's own **Corner matrix run** field states
-this explicitly with a written justification (the run was minted on
-contended shared hardware; a full 5-corner invocation risked an unbounded
-multi-hour run). Extending to the remaining four corners is tracked as a
-follow-up (issue #161) and needs no new tooling — the DUT and testbench
-already exist. This is stated here, in §5's table, and in
+**Scope, disclosed rather than glossed over**: the `tt` record landed first
+(issue #154) and, on its own, covered the `tt` process corner only — not
+the full 5-corner (`tt`/`ff`/`ss`/`fs`/`sf`) `mos` set this repository's
+own PVT-matrix convention (DR-0013) mandates for a complete claim. Its own
+**Corner matrix run** field stated this explicitly with a written
+justification (the run was minted on contended shared hardware; a full
+5-corner invocation risked an unbounded multi-hour run). The remaining four
+corners have since landed as four additional appended records (issue #161,
+this proposal's own tracked follow-up), each minted the same way — one
+corner per invocation, needing no new tooling since the DUT and testbench
+already existed — after an initial combined `-j8`/300 s attempt across
+`ff`/`ss`/`fs`/`sf` mostly timed out under host contention; the successful
+per-corner runs used `-j 2` and a 900 s per-point timeout. Every one of the
+five records still individually discloses its own single-corner scope per
+`sim/README.md`'s subset-reason convention — the full-matrix, all-PASS
+claim above is the union of all five, not any one record's own stated
+scope. This is stated here, in §5's table, and in
 `measurements/characterization.md`'s own coverage-honesty section, so no
 reader has to infer the scope from silence.
 
@@ -381,12 +394,10 @@ repository, per `CLAUDE.md`'s explicit scope discipline. See
 4. **No post-layout eye-mask (DR-0013 row 6) run exists yet against the
    extracted assembly** — only the schematic-level PRBS7 record does
    (tracked as issue #160).
-5. **The assembly's post-layout PVT record (§6) covers the `tt` process
-   corner only** — 18 of the mandated 90-point `mos` corner-set × rate
-   grid. `ff`/`ss`/`fs`/`sf` have no electrical/PVT evidence yet for the
-   assembled block (tracked as issue #161); the DUT and testbench already
-   exist, so closing this needs no new tooling, only additional
-   `sim/run_corners.py` invocations on uncontended hardware.
+5. ~~The assembly's post-layout PVT record (§6) covers the `tt` process
+   corner only~~ — **closed by issue #161**: the full 5-corner `mos` set
+   (`tt`/`ff`/`ss`/`fs`/`sf`) now has electrical/PVT evidence for the
+   assembled block, 90/90 points PASS across five appended records (§6).
 6. **Digital setup-timing margin at 720p60 is narrow** (2.1 % of the
    period at the worst corner, §5) — closed, not comfortable; a process
    shift or a design change elsewhere in the clock path could re-open it.

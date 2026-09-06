@@ -41,13 +41,13 @@ LVS-matched, and its pad-capacitance budget (≤ 2 pF) **is met**: 0.094 pF
 (`OUTP`) / 0.075 pF (`OUTN`), 95–96 % headroom (an earlier self-reported
 ~4× "over budget" figure was a units-label bug, corrected and re-measured
 against the real drawn geometry, not a relaxed target). **The assembled
-block now also has its first electrical/PVT simulation** — an 18-point
-full temperature/supply/rate sweep at the `tt` (typical) process corner,
-18/18 PASS, layout-extracted with real interconnect parasitic R/C and the
-real diode-clamp ESD array in circuit with the driver — closing the "no
-electrical/PVT simulation of its own yet" gap for that corner; the
-remaining four process corners (`ff`/`ss`/`fs`/`sf`) are tracked as a
-follow-up (issue #161), not yet run. See `measurements/characterization.md`
+block now also has its first electrical/PVT simulation** — a full 5-corner
+`mos` process-corner sweep (`tt`/`ff`/`ss`/`fs`/`sf`), each an 18-point full
+temperature/supply/rate grid, 90/90 PASS, layout-extracted with real
+interconnect parasitic R/C and the real diode-clamp ESD array in circuit
+with the driver — closing the "no electrical/PVT simulation of its own
+yet" gap across the full mandated corner-set (issues #154/#161). See
+`measurements/characterization.md`
 for the full, per-row accounting, and
 [`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
 for the brief-conformant proposal document.
@@ -106,19 +106,19 @@ driver schematic and its core-cell layout both simulated across the full
 PVT matrix, and the driver+pad-ring/ESD assembly
 (`gf180_tmds_pad_ring_assembly`) DRC-clean, LVS-matched, and now
 electrically PVT-verified post-layout — with real interconnect parasitics
-and the real ESD clamp array in circuit — for its first process corner (18
-temperature/supply/rate points, `tt`, all PASS), reaching the "assembly
-PVT-verified" rung for that corner. The pad-capacitance budget (≤ 2 pF) is
-met with 95–96 % headroom. The 10:1→2:1 serializer/final-mux stage joining
-the digital and analog partitions is now designed too — RTL verified against
-the encoder's own output, and the custom final 2:1 multiplexer captured,
-sized, and analog-verified at that same `tt` corner across the full
-temperature/supply/rate matrix (DR-0014). What remains open: the remaining
-four process corners (`ff`/`ss`/`fs`/`sf`) have no electrical/PVT evidence
-yet for the assembly (issue #161) or for the serializer/final-mux benches
-(issue #163), the custom final-mux cell has no layout and therefore no
-post-layout run of its own yet, ESD HBM/CDM qualification is not simulated
-(no PDK source characterizes the needed device parameters pre-silicon — see
+and the real ESD clamp array in circuit — across the full mandated 5-corner
+`mos` process-corner set (18 temperature/supply/rate points per corner,
+90/90 PASS), reaching the "assembly PVT-verified" rung across the full
+matrix. The pad-capacitance budget (≤ 2 pF) is met with 95–96 % headroom.
+The 10:1→2:1 serializer/final-mux stage joining the digital and analog
+partitions is now designed too — RTL verified against the encoder's own
+output, and the custom final 2:1 multiplexer captured, sized, and
+analog-verified at the `tt` corner across the full temperature/supply/rate
+matrix (DR-0014). What remains open: the serializer/final-mux benches have
+no electrical/PVT evidence yet beyond the `tt` corner (issue #163), the
+custom final-mux cell has no layout and therefore no post-layout run of its
+own yet, ESD HBM/CDM qualification is not simulated (no PDK source
+characterizes the needed device parameters pre-silicon — see
 `measurements/characterization.md`), and no post-layout eye-mask run exists
 yet against the extracted assembly (issue #160).
 The "shuttle seat" rung and later remain open for the actual block; see
