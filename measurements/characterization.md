@@ -161,32 +161,42 @@ issue #86/#149), extracted **with interconnect parasitic R/C**
 by `layout/scripts/gen_pad_ring_assembly_dut.py` →
 `layout/sim/gf180_tmds_pad_ring_assembly_dut.spice`. This is the first
 electrical/PVT record of the assembled block — until this record, only its
-structural DRC/LVS signoff existed (§3 item 2's stated gap, now closed for
-the `tt` corner; see the scope caveat below for what remains).
+structural DRC/LVS signoff existed (§3 item 2's stated gap). The full
+5-corner `mos` corner-set is now landed for this DUT/testbench pair, across
+four additional appended records (issue #161) that each run the identical
+deck, manifest, measurements and checks against one more process corner:
+
+- `tt` — [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../sim/cml-driver-eye/records/20260905-193624-231b75c.md) (issue #154, PASS)
+- `ff` — [`sim/cml-driver-eye/records/20260905-213837-a2b1051.md`](../sim/cml-driver-eye/records/20260905-213837-a2b1051.md) (issue #161, PASS)
+- `ss` — [`sim/cml-driver-eye/records/20260905-222410-a2b1051.md`](../sim/cml-driver-eye/records/20260905-222410-a2b1051.md) (issue #161, PASS)
+- `fs` — [`sim/cml-driver-eye/records/20260905-225202-a2b1051.md`](../sim/cml-driver-eye/records/20260905-225202-a2b1051.md) (issue #161, PASS)
+- `sf` — [`sim/cml-driver-eye/records/20260905-232931-a2b1051.md`](../sim/cml-driver-eye/records/20260905-232931-a2b1051.md) (issue #161, PASS)
+
+All five corners report **Overall: PASS** in their own **Result** field — 90
+of 90 mandated `mos` corner-set × rate points now have electrical/PVT
+evidence for the assembled block. Each record's own **Corner matrix run**
+field still discloses that it individually covers one process corner (per
+`sim/README.md`'s subset-reason convention) — the full-matrix claim below is
+the union of all five, not any single record's own scope.
 
 | Sub-claim | Verdict | Notes |
 |---|---|---|
-| Single-ended swing 400–600 mV | **PASS** | 493.6–511.7 mV across the `tt`-corner grid below (0/1/2 pF pad cap, both rates) |
-| Common mode 2.8–3.3 V at nominal AVCC | **PASS** | 3.0434–3.0506 V |
-| Common mode across the ±10 % supply-corner sweep | **PASS, against DR-0006's qualified reading** | 2.7139–2.7208 V / 3.3735–3.3804 V at AVCC = 2.97 V/3.63 V — same DR-0006 supply-tracking qualification as the core-cell records above |
-| Worst device stress vs. the 3.63 V rated ceiling | **PASS** | Worst measured 2.6322 V (`vds_sw_max`, `tt_-40c_2.97v_742p5mbps`) — positive margin, consistent with the core-extracted record's own 2.757 V worst case |
-| Driver's own deterministic jitter, ≤ 0.15 UI p-p | **PASS** | ≤ 9.578×10⁻⁵ UI worst case (2 pF pad) — three orders of magnitude inside budget |
-| Tail-current tolerance (8–12 mA, informative) | **PASS** | 9.970–10.200 mA |
+| Single-ended swing 400–600 mV | **PASS** | 480.5–517.8 mV across all five corners' grids below (0/1/2 pF pad cap, both rates) — worst-case low at `ss_125c_2.97v_742p5mbps`, worst-case high at `ff_-40c_3.63v_742p5mbps` |
+| Common mode 2.8–3.3 V at nominal AVCC | **PASS** | 3.0403–3.0543 V across all five corners |
+| Common mode across the ±10 % supply-corner sweep | **PASS, against DR-0006's qualified reading** | 2.7108–2.7245 V / 3.3704–3.3840 V at AVCC = 2.97 V/3.63 V across all five corners — same DR-0006 supply-tracking qualification as the core-cell records above |
+| Worst device stress vs. the 3.63 V rated ceiling | **PASS** | Worst measured 2.75438 V (`vds_sw_max`, `ss_-40c_2.97v_742p5mbps`) — 0.876 V of margin to the 3.63 V ceiling, consistent with the core-extracted record's own 2.757 V worst case |
+| Driver's own deterministic jitter, ≤ 0.15 UI p-p | **PASS** | ≤ 1.0395×10⁻⁴ UI worst case (2 pF pad, `ff` corner) — three orders of magnitude inside budget |
+| Tail-current tolerance (8–12 mA, informative) | **PASS** | 9.823–10.329 mA across all five corners |
 
-**Scope caveat, stated per this document's own coverage-honesty
-requirement: this record covers the `tt` (typical) process corner only —
-18 of the mandated 90-point `mos` corner-set × rate grid** (temperature
-and supply are fully swept: −40/27/125 °C × 2.97/3.30/3.63 V × both rates).
-The record's own **Corner matrix run** field states this explicitly with a
-written justification (`sim/README.md`'s subset-reason convention, used for
-the first time in this repository): the run was minted on a machine
-observed at load average 50+ from unrelated concurrent jobs during this
-session, and completing the full 5-corner matrix in one invocation risked
-an unbounded multi-hour run on contended hardware. **This is not a claim
-that `ff`/`ss`/`fs`/`sf` pass** — it is a disclosed, honest subset, not a
-narrowed target; landing the remaining four corners as additional appended
-records (this experiment's own append-only convention) is tracked as a
-follow-up (issue #161).
+**Full matrix landed, subset caveat dropped.** The `tt`-only record's
+original disclosure (minted under load average 50+ from unrelated
+concurrent jobs, per `sim/README.md`'s subset-reason convention) is
+unchanged and still stands as evidence for the `tt` corner on its own — the
+four follow-up records (issue #161) close the remaining `ff`/`ss`/`fs`/`sf`
+gap it named, each landed one corner at a time (`-j` reduced and per-point
+timeout raised after an initial `-j8`/300 s attempt mostly timed out under
+host contention) for the same reason the original record gave for not
+attempting the full matrix in one invocation.
 
 **What this newly models, relative to the core-only post-layout record
 above** (stated per the coverage-honesty requirement, same as that
@@ -522,21 +532,22 @@ following gaps are stated by name rather than left as silent omissions:
    itself DRC-clean (0 violations) and LVS-matched (`status: match`, 2
    warning-only findings) — so "no pad/ESD post-layout evidence because the
    cell doesn't exist yet" is no longer the gap. **Electrical/PVT
-   simulation of the assembled cell has now landed (issue #154)** —
-   [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../sim/cml-driver-eye/records/20260905-193624-231b75c.md)
+   simulation of the assembled cell has now landed for the full mandated
+   `mos` corner-set (issues #154 and #161)** —
+   [`sim/cml-driver-eye/records/20260905-193624-231b75c.md`](../sim/cml-driver-eye/records/20260905-193624-231b75c.md) (`tt`),
+   [`sim/cml-driver-eye/records/20260905-213837-a2b1051.md`](../sim/cml-driver-eye/records/20260905-213837-a2b1051.md) (`ff`),
+   [`sim/cml-driver-eye/records/20260905-222410-a2b1051.md`](../sim/cml-driver-eye/records/20260905-222410-a2b1051.md) (`ss`),
+   [`sim/cml-driver-eye/records/20260905-225202-a2b1051.md`](../sim/cml-driver-eye/records/20260905-225202-a2b1051.md) (`fs`), and
+   [`sim/cml-driver-eye/records/20260905-232931-a2b1051.md`](../sim/cml-driver-eye/records/20260905-232931-a2b1051.md) (`sf`)
    (§1's new "block-level (assembly, extracted-with-parasitics)
    corroboration" subsection above), extracted **with** interconnect
    parasitic R/C (`klt extract --parasitics`), closing both this item's
-   "no electrical/PVT simulation" gap and the parasitic-RC gap in one
-   record, for the assembled block. **What remains outstanding**: that
-   record covers the `tt` process corner only (18 of the mandated 90-point
-   `mos` corner-set × rate grid, a disclosed subset per `sim/README.md`'s
-   subset-reason convention) — `ff`/`ss`/`fs`/`sf` still have no
-   electrical/PVT evidence for the assembly, tracked as issue #161. A
-   parasitic-RC re-run of the *bare* driver core cell in isolation (as
-   opposed to the assembly) remains separately unaddressed, though the
-   assembly record now covers a strict superset of that cell's own
-   circuitry.
+   "no electrical/PVT simulation" gap and the parasitic-RC gap, for the
+   assembled block, across all 5 `mos` corners × both rates — 90 of 90
+   points, all PASS. **What remains outstanding**: a parasitic-RC re-run of
+   the *bare* driver core cell in isolation (as opposed to the assembly)
+   remains separately unaddressed, though the assembly record set now
+   covers a strict superset of that cell's own circuitry.
 3. **Monte Carlo evidence — landed for the driver's swing/common mode;
    nothing else carries a distribution claim.** This item previously stated
    that *"no record in `sim/` today carries a **Statistical convention**
