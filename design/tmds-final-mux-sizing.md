@@ -82,37 +82,119 @@ Committed netlist values (`ppolyf_u`, `rsh = 350 ohm/sq` at the nominal
 | Resistor | `r_width` | `r_length` | `R = rsh * length/width` (typical) |
 |---|---|---|---|
 | `RC` | 20 µm | 2.65 µm | 46.375 Ω |
-| `RLP`/`RLN` | 20 µm | 5.66 µm | 99.05 Ω |
+| `RLP`/`RLN` | 20 µm | 5.90 µm | 103.25 Ω |
 | `RREF` | 2 µm | 24.8 µm | 4340 Ω |
 
-`RL` matches its 99.0 Ω target to within 0.05 %. `RC` (46.375 Ω) sits about
-6.3 % below its 49.5 Ω target — expected, not an error: `RC`'s actual
-operating current is set by the self-biased reference (§3), not assumed
-exactly 10 mA a priori the way this section's target arithmetic does; the
-real operating point is verified directly below rather than forced to match
-the hand estimate.
+`RC` (46.375 Ω) sits about 6.3 % below its 49.5 Ω target — expected, not an
+error: `RC`'s actual operating current is set by the self-biased reference
+(§3), not assumed exactly 10 mA a priori the way this section's target
+arithmetic does; the real operating point is verified directly below rather
+than forced to match the hand estimate.
 
-**Verified DC operating point** (`ngspice -b`, `.op` on the committed
-`tmds_final_mux` subcircuit in isolation, `typical`/27 °C, `D0` side
-statically selected, reproducible from `sim/dut/tmds_output_stage.spice`
-plus a static-input testbench matching `sim/tmds-final-mux-eye/testbench/
-tmds_final_mux_eye.spice`'s own `_z` DC copy):
+`RLP`/`RLN`'s `r_length` was originally `5.66 µm` (matching its 99.0 Ω
+target to within 0.05 %) and was widened to `5.90 µm` (+4.24 %, 103.25 Ω)
+by **issue #169**, which found that the original value left `vswing_m`
+under the driver's 0.8 V full-commutation floor by a narrow margin
+(−46 µV to −1.446 mV) at the `ss` process corner's low-supply extreme
+(2.97 V, both bit rates) — see "Issue #169" below for the full rationale.
+The target arithmetic above is retained as the *first-order* derivation;
+the committed value now deliberately overshoots it by design margin rather
+than matching it exactly.
+
+**Verified DC operating point** (`ngspice -b` on the committed
+`tmds_final_mux` subcircuit, `typical`/27 °C, `D0` side statically selected
+via `tmds_final_mux_eye.spice`'s own `_z` DC copy, reproducible with
+`python3 sim/run_corners.py tmds-final-mux-eye --corners tt --temps 27
+--rates 270 --supply-tol 0 --no-write`):
 
 | Quantity | Value | vs. §1 target |
 |---|---|---|
-| `I_tail` (measured, `-i(vdd)`) | 9.904 mA | target 10 mA, −0.96 % |
-| `VIH` (`v(outn)`, inactive leg) | 2.8055 V | target 2.805 V (0.85×VDD), **+0.02 %** |
-| `VIL` (`v(outp)`, active leg) | 1.8137 V | target 1.815 V (0.55×VDD), −0.07 % |
-| Swing | 0.9918 V | target 0.99 V (0.30×VDD), +0.18 % |
-| Common mode | 2.3096 V | target 2.31 V (0.70×VDD), **+0.02 %** |
+| `I_tail` (measured, `icell_dc`) | 9.9039 mA | target 10 mA, −0.96 % |
+| `VIH` (inactive leg, derived from `vswing_dc`/`vcm_dc_frac`) | 2.8055 V | target 2.805 V (0.85×VDD), **+0.02 %** |
+| `VIL` (active leg) | 1.7741 V | target 1.815 V (0.55×VDD), −2.26 % |
+| Swing (`vswing_dc`) | 1.0315 V | target 0.99 V (0.30×VDD), +4.19 % |
+| Common mode (`vcm_dc_frac` × VDD) | 2.2898 V | target 2.31 V (0.70×VDD), −0.87 % |
 
-The self-biased design lands within a few tenths of a percent of every §1
-target at the nominal corner — closer than the simple hand estimate above,
-because the actual loop (reference current through `RREF` and the 1:20
-mirror) sets `I_tail` to whatever value makes `RC`'s own drop land at the
-target, rather than the other way around. §6 (`sim/tmds-final-mux-eye/`)
-is where this is checked across the full PVT matrix, not just this one
-static corner.
+`I_tail` and `VIH` are essentially unchanged from the pre-#169 values above
+(the self-bias loop that sets them runs through `RC`/`RREF`, not `RL`, so
+widening `RL` does not feed back into it). `VIL` moves down and swing moves
+up by almost exactly the `RL` widening's own +4.24 % (`swing = I_tail *
+RL`, §2's own derivation) — the intended effect, trading a small amount of
+`VIL`/common-mode target-matching for headroom against the `ss`-corner
+floor violation. §6 (`sim/tmds-final-mux-eye/`) is where this is checked
+across the full PVT matrix, not just this one static corner.
+
+### Issue #169: `ss`-corner `vswing_m` floor violation and its fix
+
+[`sim/tmds-final-mux-eye/records/20260906-011450-6a24db4.md`](../sim/tmds-final-mux-eye/records/20260906-011450-6a24db4.md)
+(the full 5-corner PVT grid landed by issue #163) found `vswing_m` FAILing
+the 0.8 V floor at exactly two points, both at the `ss` process corner's
+2.97 V (−10 %) supply extreme: `ss_-40c_2.97v_270mbps` (0.799954 V, −46 µV)
+and `ss_125c_2.97v_270mbps` (0.798554 V, −1.446 mV). Every other point in
+that record (including the `742.5 Mbps/lane` rate at the same temperature/
+supply corner) PASSed, and the companion `sim/cml-driver-eye-realmux`
+bench PASSed cleanly at the same corner (the shortfall did not propagate
+into an observable driver-side spec violation).
+
+**Root cause.** §3 above states plainly that the resistor-ratio
+cancellation this cell's self-bias relies on covers only the *resistor*
+(`rsh`) axis of process variation — it explicitly does not cancel the
+diode-connected reference's own `Vgs` (and therefore `I_ref`/`I_tail`)
+moving with `nfet_03v3`'s own `ss`-corner mobility/threshold shift. The
+`ss` corner is exactly the FET corner named there as not fully cancelled,
+and it manifests at the lowest-swing operating point (2.97 V supply, which
+leaves the least `RC`/`RL` headroom to begin with) — consistent with a
+residual few-percent `I_tail` shortfall at that one process/device corner,
+not a modelling error or a harness defect (16 of 18 `ss`-corner points, and
+all `tt`/`ff`/`fs` points, PASSed comfortably).
+
+**Fix chosen and why.** Of the three candidate directions issue #169 named
+(widening `MCP`/`MCN`, re-examining the self-biased reference's residual
+corner sensitivity, or reconsidering the 0.8 V floor itself), none of the
+first two was adopted: `MCP`/`MCN` already carries a 1.5× margin over the
+data pairs (§4.2) and is not the binding constraint here — the FAIL is a
+*swing amplitude* shortfall, not a commutation-completeness shortfall
+(`vgs_mu_max`/`vds_mu_max`/`vds_mt_max` all sit far under their 3.63 V
+ceilings at the failing points, so the switch pairs are not starved for
+gate drive); and re-deriving the self-biased reference to actively cancel
+the `nfet_03v3` device-corner shift (e.g. a bandgap-like compensation)
+would be a substantially larger redesign for a sub-2-mV gap. The 0.8 V
+floor itself is not a free variable — it is `design/cml-driver-sizing.md`
+§4.2's own measured full-commutation point for the *driver's* switch pair,
+not an assumption of this cell's.
+
+Instead, `RLP`/`RLN` were widened directly: since `swing = I_tail * RL`
+(§2) and `I_tail` is untouched by an `RL` change (`RL` does not appear in
+the `RREF`/`MB`/`MT` bias loop, §0), enlarging `RL` raises `vswing_m` by
+very nearly its own fractional increase, independent of process corner —
+a `+4.24 %` `RL` widening (`5.66 µm → 5.90 µm`) predicts a `+4.24 %` swing
+increase at every corner, comfortably covering the worst observed shortfall
+(`−1.446 mV` on `≈0.8 V`, i.e. **0.18 %**) with roughly 23× headroom, while
+leaving the device-stress ceilings (§2's table; margins of 55–65 % of the
+3.63 V rated ceiling even at the tightened corner) untouched by such a
+small load-resistor change.
+
+**Verification.** [`sim/tmds-final-mux-eye/records/20260906-070531-94be115.md`](../sim/tmds-final-mux-eye/records/20260906-070531-94be115.md)
+re-runs the full `ss`-corner temperature × supply × rate matrix (18/18
+points) against the widened `RL`: **18/18 PASS**, `vswing_m` now
+0.830797–1.16330 V (previous low: 0.798554 V) — both previously-failing
+points clear the floor by margin (`ss_-40c_2.97v_270mbps`: 0.83203 V,
++32.03 mV; `ss_125c_2.97v_270mbps`: 0.830797 V, +30.8 mV), and the
+predicted +4.24 % scaling reproduces closely (e.g. `ss_-40c_2.97v_270mbps`:
+0.799954 V → 0.83203 V is +4.01 %). [`sim/cml-driver-eye-realmux/records/
+20260906-072026-94be115.md`](../sim/cml-driver-eye-realmux/records/20260906-072026-94be115.md)
+confirms the companion driver-side bench remains **18/18 PASS** at the same
+`ss` corner after the change (`swing_c0`/`c1`/`c2` 0.4695–0.5070 V, still
+inside the 0.4–0.6 V DR-0002 window).
+
+**What this does not re-verify.** The `tt`/`ff`/`fs` corners (clean PASSes
+before this change) and the `sf` corner (a sibling, worse-margin `vswing_m`/
+`vswing_s` shortfall at its own hot/low-supply extreme, tracked separately
+as issue #171) have **not** been re-run against the widened `RL` — the
+monotonic-scaling argument above predicts they can only gain margin (or, for
+`sf`, likely close its own gap too), but that is a prediction, not a
+recorded measurement, until someone re-runs them. Filed as a follow-up,
+issue #173, rather than left undisclosed.
 
 ## 3. Process invariance: a resistor RATIO, not a resistor VALUE
 
