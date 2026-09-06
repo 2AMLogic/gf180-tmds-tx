@@ -243,7 +243,7 @@ table summarizes rather than duplicates independently.
 | Common mode across ±10 % AVCC | Tracks AVCC ~1:1 (DR-0006's qualified reading) | 2.711 V / 3.384 V (schematic/core); **2.7108–2.7245 V / 3.3704–3.3840 V (assembly-extracted, full 5-corner `mos` set)** at AVCC = 2.97 V / 3.63 V | **MET against DR-0006**, not against DR-0002's original unqualified window | Same records |
 | Device stress (`vds`/`vgs`/`vgd`) vs. 3.3 V core-device ceiling | Positive margin to the adopted 3.63 V ceiling (DR-0002, deferred to driver design) | Worst 2.761 V (`vds_sw_max`, schematic); 2.757 V (core-extracted); **2.75438 V (assembly-extracted, full 5-corner `mos` set, `ss_-40c_2.97v_742p5mbps`)** | **MET** | Same records |
 | Deterministic jitter (this stage's contribution to the ≤ 0.15 UI allocation) | ≤ 0.15 UI p-p (spec/tmds-tx.md §2, DR-0004) | ≤ 5.79×10⁻⁵ UI (core-extracted, worst corner); **≤ 1.0395×10⁻⁴ UI (assembly-extracted, full 5-corner `mos` set, `ff` corner)** — several thousand times inside budget either way | **MET** | Same records |
-| Combined swing+jitter eye mask (DR-0013 row 6) | Height ≥ 200 mV AND width ≥ 0.75 UI, simultaneously, no fixed sampling instant | Worst 0.871–1.033 V margin, ≥ 4× the floor, full PVT × both rates × 0/1/2 pF pad cap | **MET** (schematic-level; no post-layout eye-mask run yet) | `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md` |
+| Combined swing+jitter eye mask (DR-0013 row 6) | Height ≥ 200 mV AND width ≥ 0.75 UI, simultaneously, no fixed sampling instant | Schematic: worst 0.871–1.033 V margin, ≥ 4× the floor; **post-layout (extracted assembly): worst 0.859–1.033 V margin, ≥ 4.29× the floor** — both full PVT × both rates × 0/1/2 pF pad cap | **MET, at both schematic and post-layout (extracted)** | `sim/cml-driver-eye-mask/records/20260825-040412-4b0c9f6.md`, `.../20260905-222646-a2b1051.md` |
 | Pad capacitance budget | ≤ 2 pF/pad, ESD diodes + pad parasitic combined (DR-0005/DR-0011) | **0.094 pF (`OUTP`) / 0.075 pF (`OUTN`)**, 95–96 % headroom, at the landed block assembly, 20-finger clamp | **MET** — closed, not relaxed; corrects an earlier self-reported ~4× "over budget" figure that was a units-label bug (§9 of `design/esd-capacitance-budget.md`), not a redesign | `design/esd-capacitance-budget.md` §10.5, backed by `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json` |
 | ESD HBM ≥ 2 kV / CDM ≥ 500 V | JEDEC JS-001/JS-002 | No PDK source characterizes ESD failure current density or breakdown/snapback behavior for any gf180mcu device family; sizing is literature-estimated, not PDK-sourced | **Not evidenced — structurally unaddressable pre-silicon**, not a design gap this repo can close by simulation alone | `design/esd-capacitance-budget.md` §2; open decision, issue #145 |
 | DRC (assembly) | 0 violations (`spec/tmds-tx.md` §1 "Signoff") | 0 violations, re-confirmed 2026-09-05 for this proposal | **MET** | `klt drc --deck gf180mcu layout/gds/gf180_tmds_pad_ring_assembly.gds`, this proposal's re-run |
@@ -391,9 +391,12 @@ repository, per `CLAUDE.md`'s explicit scope discipline. See
    `design/esd-capacitance-budget.md` §2, cannot be evidenced from PDK data
    alone pre-silicon — tracked as an open decision at issue #145 (is this
    schedulable work, or a permanent pre-silicon limitation).
-4. **No post-layout eye-mask (DR-0013 row 6) run exists yet against the
-   extracted assembly** — only the schematic-level PRBS7 record does
-   (tracked as issue #160).
+4. ~~No post-layout eye-mask (DR-0013 row 6) run exists yet against the
+   extracted assembly~~ — **closed by issue #160**: the PRBS7 eye-mask
+   testbench has now been run against the extracted driver+pad-ring+ESD
+   assembly DUT over the full 90-point PVT × rate × pad-cap grid, 90/90
+   PASS, worst-case margin 0.859 V (§5)
+   (`sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md`).
 5. ~~The assembly's post-layout PVT record (§6) covers the `tt` process
    corner only~~ — **closed by issue #161**: the full 5-corner `mos` set
    (`tt`/`ff`/`ss`/`fs`/`sf`) now has electrical/PVT evidence for the
