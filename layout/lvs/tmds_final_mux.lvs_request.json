@@ -1,0 +1,5 @@
+{
+  "layout": {"file": "../gds/tmds_final_mux.gds", "deck": "gf180mcu", "top": "tmds_final_mux"},
+  "reference": {"netlist": "tmds_final_mux.ref.spice", "top": "tmds_final_mux"},
+  "options": {"combine_devices": true}
+}

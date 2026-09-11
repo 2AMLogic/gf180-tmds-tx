@@ -369,4 +369,12 @@ if any).
   720p60 operating point's own reduction stage is custom-domain per
   DR-0014 and does not exist as a drawn circuit yet).
 - **Layout, DRC, LVS** for this cell are not addressed here — schematic
-  and simulation only, per this issue's own scope.
+  and simulation only, per this issue's own scope. **Update (issue #177):**
+  layout now exists (`layout/scripts/gen_tmds_final_mux.py`,
+  `layout/gds/tmds_final_mux.gds`) and is DRC-clean / LVS-`match`-signed-off
+  against this sizing (`layout/README.md`'s `## tmds_final_mux` section has
+  the full signoff record). **Still open**: post-layout re-simulation —
+  re-running `sim/tmds-final-mux-eye`/`sim/cml-driver-eye-realmux` against
+  the extracted layout netlist rather than this schematic — has not been
+  done; the numbers this document and `measurements/characterization.md`
+  §3 record are still schematic-level.

@@ -1,0 +1,6 @@
+file: gds/tmds_final_mux.gds
+deck: gf180mcu
+dbu_um: 0.0005
+status: clean
+violations: 0
+unchecked layers in stream: 6

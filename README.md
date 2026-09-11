@@ -8,7 +8,8 @@ ngspice on the analog side and Yosys/OpenROAD on the digital side.
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
 and now electrically post-layout-verified for its first process corner, and
 the serializer/final-mux stage joining the digital and analog partitions
-designed and analog-verified at that same corner.**
+designed, analog-verified at that same corner, and now also laid out and
+DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is
 verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
 timing-closed at 720p60 (`flow/`). The 10:1→2:1 serializer/reduction stage
@@ -120,9 +121,12 @@ process grid and the full temperature/supply/rate matrix (DR-0014, issue
 corners' low-supply extremes (issues #169, #171); both are now fixed by
 widening the mux's load resistors `RLP`/`RLN` (5.66 µm → 5.90 µm, issue
 #169) and re-verified 90/90 PASS across the complete grid (issue #173) —
-neither was ever observable at the driver's own output. What remains
-open: the custom final-mux cell has no layout and therefore no
-post-layout run of its own yet; ESD HBM/CDM qualification is not simulated
+neither was ever observable at the driver's own output. The custom
+final-mux cell is now also laid out and DRC-clean/LVS-matched against that
+sized schematic (`layout/gds/tmds_final_mux.gds`, issue #177), mirroring
+the `cml_driver_core` generator pattern. What remains open: a post-layout
+(extracted-netlist) re-simulation of this cell has not yet been run;
+ESD HBM/CDM qualification is not simulated
 (no PDK source
 characterizes the needed device parameters pre-silicon — see
 `measurements/characterization.md`), and no post-layout eye-mask run exists
