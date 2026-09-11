@@ -863,18 +863,30 @@ following gaps are stated by name rather than left as silent omissions:
    before or after the fix. See §1's two updated subsections above for the
    full numbers.
 
+   **Layout now exists and is DRC/LVS-signed-off (issue #177).**
+   `layout/scripts/gen_tmds_final_mux.py` draws this cell against the sized
+   schematic above (`mos_array`/`res_array` composition, mirroring
+   `cml_driver_core`'s issue #22 generator pattern); `klt drc --deck
+   gf180mcu` reports `status: clean` and `klt lvs` reports `status: match`
+   against a hand-written reference netlist (`status: mismatch` for the
+   required `_shorted` negative control) — see `layout/README.md`'s
+   `## tmds_final_mux` section for the full signoff record.
+
    **What is not yet covered**: no Monte Carlo/mismatch claim on this cell
-   (out of scope for a corner-matrix bench); per
-   `design/tmds-final-mux-sizing.md` §7's own non-goals, no post-layout run
-   of this cell, no isolated clock-pair commutation sweep in isolation from
-   the end-to-end measurement, and the 10:1→2:1 reduction stage upstream of
-   this cell's `D0`/`D1` inputs is still modelled as an ideal source (the
-   reduction stage's own real analog output — synthesized at 480p per
-   DR-0014, custom at 720p60 — has not itself been captured). Both the
-   `ss` (#169) and `sf` (#171) design-margin findings are now closed by
-   the same `RLP`/`RLN` widening, independent of issue #163 (closed for
-   the corner-completion slice of this work) and issue #173 (closed for
-   the re-verification slice).
+   (out of scope for a corner-matrix bench); **the post-layout
+   re-simulation itself remains open** — re-running `sim/tmds-final-mux-eye`
+   / `sim/cml-driver-eye-realmux` against the newly-extracted layout
+   netlist (rather than this schematic) has not been done, so every number
+   in this section is still schematic-level, not post-layout; no isolated
+   clock-pair commutation sweep in isolation from the end-to-end
+   measurement; and the 10:1→2:1 reduction stage upstream of this cell's
+   `D0`/`D1` inputs is still modelled as an ideal source (the reduction
+   stage's own real analog output — synthesized at 480p per DR-0014, custom
+   at 720p60 — has not itself been captured). Both the `ss` (#169) and `sf`
+   (#171) design-margin findings are now closed by the same `RLP`/`RLN`
+   widening, independent of issue #163 (closed for the corner-completion
+   slice of this work) and issue #173 (closed for the re-verification
+   slice).
 
 No other spec row beyond those listed in §1 has any recorded `sim/`
 evidence at all. The encoder/serializer digital domain (DR-0003) is verified

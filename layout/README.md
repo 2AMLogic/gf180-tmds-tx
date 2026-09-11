@@ -481,6 +481,108 @@ Until this repo's `klt` moves past that tag, the generator here rewrites the
 `sim/tests/test_extracted_dut.py` asserts every simulated device carries
 non-zero junction area and perimeter so the gap cannot silently reappear.
 
+## `tmds_final_mux` — DR-0003 custom final 2:1 (DDR) multiplexer (issue #177)
+
+The DR-0003 custom final 2:1 (DDR) multiplexer from the sized schematic
+(`design/tmds_final_mux.sch` / `design/netlist/tmds_final_mux.spice`, issue
+#159, with issue #169's `RLP`/`RLN` `r_length=5.90u` widening already in the
+committed netlist), laid out via the same `klt gen` + `klt gen-compose`
+pattern `cml_driver_core` above established — one `mos_array` unit per
+schematic NMOS (`gate_contact=True`, folded `nf`/`m` into a single strapped
+device) — extended here with `res_array` for this cell's four `ppolyf_u`
+poly resistors, the first use of that generator family in this repo
+(`gf180-rcosc`'s `layout/build_cells.py` is the sibling-repo precedent for
+`res_array` on gf180mcu; see `scripts/gen_tmds_final_mux.py`'s own module
+docstring for the full device mapping, the `MT` m=20 tiling-choice
+rationale, and why this cell needs two `klt gen-compose` passes merged by
+hand — its net graph is provably non-planar, filed generically as
+[klayout-tools#1655](https://github.com/2AMLogic/klayout-tools/issues/1655)
+and
+[klayout-tools#1656](https://github.com/2AMLogic/klayout-tools/issues/1656)).
+
+```
+scripts/gen_tmds_final_mux.py           generator (klt gen + klt gen-compose, subprocess-driven, two-pass merge)
+gds/tmds_final_mux.gds                  the composed cell
+gds/tmds_final_mux_shorted.gds          LVS negative control (OUTP shorted to VSS via a Metal2 jumper)
+gds/tmds_final_mux.spice                klt extract's schematic-equivalent netlist
+gds/tmds_final_mux_shorted.spice        klt extract's schematic-equivalent netlist (shorted variant)
+drc_reports/tmds_final_mux*.{drc,extract}.{json,txt}  klt drc / klt extract reports, both cells
+lvs_reports/tmds_final_mux*.lvs.{json,txt}            klt lvs reports, both cells
+lvs/tmds_final_mux.ref.spice            hand-written reference netlist for LVS (see that file's own header)
+lvs/tmds_final_mux.lvs_request*.json    klt lvs request documents
+tests/test_gen_tmds_final_mux.py        port list + device/resistor inventory vs. design/netlist/tmds_final_mux.spice
+```
+
+Regenerate and re-run signoff:
+
+```bash
+cd layout
+python3 scripts/gen_tmds_final_mux.py -o gds/tmds_final_mux.gds
+python3 scripts/gen_tmds_final_mux.py -o gds/tmds_final_mux_shorted.gds --shorted
+klt drc gds/tmds_final_mux.gds --deck gf180mcu --format json > drc_reports/tmds_final_mux.drc.json
+klt drc gds/tmds_final_mux.gds --deck gf180mcu --format text > drc_reports/tmds_final_mux.drc.txt
+klt drc gds/tmds_final_mux_shorted.gds --deck gf180mcu --format json > drc_reports/tmds_final_mux_shorted.drc.json
+klt drc gds/tmds_final_mux_shorted.gds --deck gf180mcu --format text > drc_reports/tmds_final_mux_shorted.drc.txt
+klt extract gds/tmds_final_mux.gds --deck gf180mcu --top tmds_final_mux \
+  -o gds/tmds_final_mux.spice --format json > drc_reports/tmds_final_mux.extract.json
+klt extract gds/tmds_final_mux_shorted.gds --deck gf180mcu --top tmds_final_mux_shorted \
+  -o gds/tmds_final_mux_shorted.spice --format json > drc_reports/tmds_final_mux_shorted.extract.json
+klt lvs lvs/tmds_final_mux.lvs_request.json --format json > lvs_reports/tmds_final_mux.lvs.json
+klt lvs lvs/tmds_final_mux.lvs_request.json --format text > lvs_reports/tmds_final_mux.lvs.txt
+klt lvs lvs/tmds_final_mux.lvs_request_shorted.json --format json > lvs_reports/tmds_final_mux_shorted.lvs.json   # expect status: mismatch
+klt lvs lvs/tmds_final_mux.lvs_request_shorted.json --format text > lvs_reports/tmds_final_mux_shorted.lvs.txt    # expect status: mismatch
+python3 scripts/check_lvs_signoff.py --list
+```
+
+**Toolchain**: regenerated and signed off against `klt 0.4.0+g916a843903ff`
+(a build from a current `klayout-tools` checkout, on `$PATH` at
+`~/.local/bin/klt` — already at or beyond the "Which `klt` build" note
+above's requirement, so no rebuild was needed for this cell), deck
+`gf180mcu` `content_hash sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0`,
+KLayout engine `0.30.12`, `--pdk gf180mcuD` per DR-0010.
+
+**Current signoff status**: **DRC-clean** (0 violations, both cells) and
+**LVS `status: match`** for the intact cell (nets 16/16, devices 12/12,
+pins 16/16 matched — the device count is 8 folded MOS +
+4 `ppolyf_u` resistors after `options.combine_devices`, confirming the
+resistors were recognized as real devices rather than the extraction
+silently collapsing into a coincidental-count short) against
+`design/netlist/tmds_final_mux.spice`, checked via a hand-written
+schematic-equivalent reference netlist (`lvs/tmds_final_mux.ref.spice` —
+see that file's own header for the three required, documented
+translations: folded `nf`/`m` into a single per-device `W`, `ppolyf_u`
+resistors as plain `R`-elements carrying the deck's own `rsh`-derived
+ohms value rather than `r_width`/`r_length`, and bulk = `vsubs` not `VSS`
+— the same convention `lvs/cml_driver_core.ref.spice` established). 3
+`severity: warning` findings only (identical shape to `cml_driver_core`'s
+own three: one `device.body_unverified` — the deck-synthesized-substrate-
+net finding, since gf180mcu has no distinct substrate-tap layer — and two
+unused-device-class `topology` notes). The `_shorted` negative control
+(the `MB`-`VSS`-to-`RLP`-`OUTP` Metal2 jumper the generator draws for
+`--shorted`, per its module docstring's routing-corridor rationale)
+correctly reports `status: mismatch` (a `net.merged` finding plus three
+`device.unmatched` findings — the mux devices whose terminals the short
+collapses out of correspondence), confirming the LVS check actually
+distinguishes connected from disconnected for this cell too. Both cells
+are enrolled in `check_lvs_signoff.py --list`'s consistency check (step
+6/6 of `.github/scripts/lint.sh`).
+
+**Friction filed (CLAUDE.md's friction protocol)**: this cell's net graph
+(`OUTP`/`OUTN`/`TAIL` on one side, `SA`/`SB`/`TOP` on the other, joined
+pairwise through the switch/commutation devices plus the `IBIAS` reference
+path) is a K3,3 subdivision — non-planar by Kuratowski's theorem — so no
+single-layer `gen-compose` call can route it without a crossing. Filed
+generically (no design-specific detail, per CLAUDE.md) as
+[klayout-tools#1655](https://github.com/2AMLogic/klayout-tools/issues/1655)
+(`gen-compose`'s `routing.layer_role` is one value per whole composition,
+with no per-net/per-leg override, so a non-planar graph needs N separate
+`gen-compose` calls over the same blocks plus a caller-side GDS merge) and
+[klayout-tools#1656](https://github.com/2AMLogic/klayout-tools/issues/1656)
+(the obstacle-overlap check that motivates routing the second pass on a
+different metal layer is itself layer-agnostic — it rejects a route for
+crossing a block's bounding box even when that block draws nothing at all
+on the route's own layer and cannot physically short to it).
+
 ## `gf180_tmds_pad_ring_assembly` — block-level layout with pad-ring/ESD integration (issue #86)
 
 The analog partition's first block-level assembly: `cml_driver_core.gds`

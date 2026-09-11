@@ -1,0 +1,77 @@
+* Reference (schematic-equivalent) netlist for tmds_final_mux (issue #177),
+* checked against design/netlist/tmds_final_mux.spice (issue #159's sized
+* schematic, carrying issue #169's RLP/RLN r_length=5.90u widening). Plain-
+* element form per klt lvs's schematic-equivalent contract (docs/cli/lvs.md
+* "Netlist form"): M-cards naming the klt-curated device class "nfet" and
+* R-cards naming the class "ppolyf_u" directly, not the nfet_03v3/ppolyf_u
+* PDK subcircuit calls the sized netlist uses.
+*
+* Three deliberate translations from design/netlist/tmds_final_mux.spice, all
+* required by klt's own documented contract/deck limitations, none of them a
+* design change:
+*
+*  1. Folded W/L, no nf/m. docs/cli/lvs.md's reference.form=subckt-call
+*     conversion path explicitly REJECTS nf/m > 1 ("flatten it -- one device
+*     per drawn gate -- in the schematic netlist first"). Each M-card below
+*     instead states the device's TOTAL folded width directly (nf*2u per
+*     finger, m folded into nf for MT) -- exactly what klt extract's
+*     per-finger devices reduce to once options.combine_devices folds them
+*     (layout/lvs/tmds_final_mux.lvs_request.json). This is the same
+*     translation lvs/cml_driver_core.ref.spice (issue #22) documents, against
+*     the same 2 um/finger unit cell (design/cml-driver-sizing.md section 1.3,
+*     reused by design/tmds-final-mux-sizing.md section 0):
+*       MU0P/MU0N/MU1P/MU1N  nf=64         -> W=128u L=0.28u
+*       MCP/MCN              nf=96         -> W=192u L=0.28u
+*       MT                   nf=10 m=20    -> 200 fingers -> W=400u L=0.5u
+*       MB                   nf=10 m=1     -> 10 fingers  -> W=20u  L=0.5u
+*
+*  2. Resistors as plain R-elements carrying a RESISTANCE, not r_width/
+*     r_length. klt's reference-netlist normalizer only converts MOS (l/w-
+*     bearing) X cards, not resistor (r_width/r_length) ones, and klt's
+*     gf180mcu extraction deck reports every drawn ppolyf_u body as an ohms
+*     value derived from its own sheet_rho_ohm_sq=350 (klayout_tools/decks/
+*     gf180mcu.py, sourced from the PDK's res_extraction.lvs). The three
+*     values below are therefore the deck's own rsh * r_length / r_width, and
+*     they are not this file's arithmetic: `klt extract --deck gf180mcu`
+*     reports r_ohm exactly 46.375 / 103.25 / 4340.0 for the three generated
+*     bodies, which is also design/tmds-final-mux-sizing.md section 2's own
+*     typical-corner table, entry for entry:
+*       RC       r_width=20u r_length=2.65u ->   46.375 ohm
+*       RLP/RLN  r_width=20u r_length=5.90u ->  103.25  ohm
+*       RREF     r_width=2u  r_length=24.8u -> 4340     ohm
+*     (The same plain-element resistor form the sibling gf180-rcosc repo's
+*     layout/lvs_ref/*.spice uses against this same deck.)
+*
+*  3. Bulk = vsubs, not VSS. gf180mcu has no distinct substrate/tap layer
+*     (docs/cli/extract.md "Coverage"); klt's gf180mcu extraction deck ties
+*     every NMOS body AND every resistor bulk terminal to one deck-synthesized
+*     global net ("vsubs") via connect_global, regardless of drawn geometry --
+*     the same limitation lvs/cml_driver_core.ref.spice and
+*     lvs/gf180_tmds_pad_min.ref.spice already document and work around the
+*     same way. The sized schematic's own B=VSS (design/tmds-final-mux-
+*     sizing.md section 0: "cell ground, and the body terminal of every device
+*     and every poly resistor -- no isolated well") is the physically-intended
+*     tie; VSS is separately wired here as a real routed net (MT's and MB's
+*     source terminals) matching the layout, and the body-vs-VSS gap surfaces
+*     as klt lvs's own documented device.body_unverified warning (severity:
+*     warning, never changes status) rather than a real defect.
+*
+* Pin list: the ten ports of design/tmds_final_mux.sym, plus vsubs. The drawn
+* cell additionally promotes its labelled internal nets (TOP/SA/SB/TAIL/IBIAS)
+* to pins, because klt gen-compose labels every routed connectivity[] net --
+* the same thing cml_driver_core's own TAIL does. klt lvs compares topology,
+* not pin counts, and reports layout=16 / reference=11 / matched=16.
+.SUBCKT tmds_final_mux OUTP OUTN D0P D0N D1P D1N CLKP CLKN VDD VSS vsubs
+RC   TOP   VDD  vsubs   46.375 ppolyf_u
+RLP  OUTP  TOP  vsubs  103.25  ppolyf_u
+RLN  OUTN  TOP  vsubs  103.25  ppolyf_u
+RREF IBIAS VDD  vsubs 4340     ppolyf_u
+MU0P OUTP  D0P  SA   vsubs nfet L=0.28U W=128U
+MU0N OUTN  D0N  SA   vsubs nfet L=0.28U W=128U
+MU1P OUTP  D1P  SB   vsubs nfet L=0.28U W=128U
+MU1N OUTN  D1N  SB   vsubs nfet L=0.28U W=128U
+MCP  SA    CLKP TAIL vsubs nfet L=0.28U W=192U
+MCN  SB    CLKN TAIL vsubs nfet L=0.28U W=192U
+MT   TAIL  IBIAS VSS vsubs nfet L=0.5U  W=400U
+MB   IBIAS IBIAS VSS vsubs nfet L=0.5U  W=20U
+.ENDS tmds_final_mux

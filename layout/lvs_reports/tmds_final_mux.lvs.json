@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "../gds/tmds_final_mux.gds",
+  "reference": "tmds_final_mux.ref.spice",
+  "top": "tmds_final_mux",
+  "reference_top": "TMDS_FINAL_MUX",
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": true,
+    "combine_devices_per_circuit": null,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null
+  },
+  "status": "match",
+  "mismatch_count": 3,
+  "error_count": 0,
+  "category_counts": {
+    "device.body_unverified": 1,
+    "topology": 2
+  },
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 16,
+      "reference": 16,
+      "matched": 16
+    },
+    "devices": {
+      "layout": 12,
+      "reference": 12,
+      "matched": 12
+    },
+    "pins": {
+      "layout": 16,
+      "reference": 11,
+      "matched": 16
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.12",
+    "layout_sha256": "829181061300af920005617d961c7a36dbf74acab2c976a0fdfcd987ea71c139",
+    "reference_sha256": "493f88defe72843bdf3635b16c85f732efadb6c3f467465dbbd31e1471e4797b",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.4.0",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
+      "released": true
+    },
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "device.body_unverified",
+      "severity": "warning",
+      "description": "8 NMOS device body terminal(s) were compared against the 'vsubs' deck-synthesized substrate net, not a real schematic net -- no drawn substrate-tap geometry resolved these device(s)' body terminal to a real net (see docs/cli/extract.md, \"Coverage\")",
+      "side": "layout",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "nfet"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "topology",
+      "severity": "warning",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "CLKN",
+      "reference": "CLKN",
+      "pin": true
+    },
+    {
+      "layout": "CLKP",
+      "reference": "CLKP",
+      "pin": true
+    },
+    {
+      "layout": "D0N",
+      "reference": "D0N",
+      "pin": true
+    },
+    {
+      "layout": "D0P",
+      "reference": "D0P",
+      "pin": true
+    },
+    {
+      "layout": "D1N",
+      "reference": "D1N",
+      "pin": true
+    },
+    {
+      "layout": "D1P",
+      "reference": "D1P",
+      "pin": true
+    },
+    {
+      "layout": "IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
+    {
+      "layout": "OUTN",
+      "reference": "OUTN",
+      "pin": true
+    },
+    {
+      "layout": "OUTP",
+      "reference": "OUTP",
+      "pin": true
+    },
+    {
+      "layout": "SA",
+      "reference": "SA",
+      "pin": true
+    },
+    {
+      "layout": "SB",
+      "reference": "SB",
+      "pin": true
+    },
+    {
+      "layout": "TAIL",
+      "reference": "TAIL",
+      "pin": true
+    },
+    {
+      "layout": "TOP",
+      "reference": "TOP",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    },
+    {
+      "layout": "vsubs",
+      "reference": "VSUBS",
+      "pin": true
+    }
+  ]
+}
