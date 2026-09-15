@@ -161,10 +161,8 @@ PDK.
   snapback/holding-voltage parameters — all of which a real GGNMOS ESD
   sizing exercise needs and which this PDK does not provide.
 - **The PDK source is silent on ESD device failure behavior.** This
-  matches `spec/pad-ring-esd-survey.md` §8's own finding ("diode SPICE
-  parameters (breakdown voltage, avalanche/TLP behavior)" as something the
-  survey did not establish) and extends it explicitly to the GGNMOS clamp
-  actually in use, per this issue's plan.
+  extends explicitly to the GGNMOS clamp actually in use, per this issue's
+  plan.
 
 ### 2b. HBM sizing (quantitative, current-density-based)
 
@@ -563,9 +561,7 @@ travel with it, not be left to the reader:
   behavior for any device family** (§2a) — every number in §2 is either a
   PDK-geometry citation or an explicitly external, not-PDK-sourced
   literature assumption. No new `2AMLogic/klayout-tools` issue is filed
-  for this: it is a PDK/model-content gap, not a `klt` tool gap, and
-  `spec/pad-ring-esd-survey.md` §8 already documents it as a PDK-content
-  finding rather than something upstream tooling work would fix.
+  for this: it is a PDK/model-content gap, not a `klt` tool gap (§2a).
 
 ## 7. Links
 
