@@ -45,17 +45,16 @@ supplies it. Consequences, already honestly stated before this record:
 That last point is the one this record turns into a disposition: the gap is
 not a missing simulation this repository could still run, and not a
 missing PDK dataset a future `klt` deck update could plausibly supply
-(`spec/pad-ring-esd-survey.md` §8 and `design/esd-capacitance-budget.md`
-§2a both independently confirm the open gf180mcu PDK carries no
-electrical ESD-device data at all, only DRC geometry) — it is a structural
-absence that only two things can close: **real silicon** (a fabricated
-part and a physical HBM/CDM tester), or **a PDK-sourced ESD electrical
-dataset** that does not exist today. Per the operator's 2026-09-15 comment
-on issue #145 (citing the standing ratification-via-PR mechanism,
-2AMLogic/2am#357 and its #372 mechanism), a tracker-treatment question that
-presents options like this is not itself an operator-authority call — it
-is resolved by drafting the decision and letting the existing two-key
-review mechanism evaluate it, which is what this record does.
+(`design/esd-capacitance-budget.md` §2a confirms the open gf180mcu PDK
+carries no electrical ESD-device data at all, only DRC geometry) — it is a
+structural absence that only two things can close: **real silicon** (a
+fabricated part and a physical HBM/CDM tester), or **a PDK-sourced ESD
+electrical dataset** that does not exist today. Per the operator's
+2026-09-15 comment on issue #145 (citing the standing ratification-via-PR
+mechanism, 2AMLogic/2am#357 and its #372 mechanism), a tracker-treatment
+question that presents options like this is not itself an operator-authority
+call — it is resolved by drafting the decision and letting the existing
+two-key review mechanism evaluate it, which is what this record does.
 
 ## Decision
 
