@@ -1,0 +1,36 @@
+{
+  "block": "gf180-tmds-tx",
+  "kind": "mixed-signal",
+  "evidence": {
+    "3.analog": {
+      "file": "layout/drc_reports/gf180_tmds_pad_ring_assembly.drc.json",
+      "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983"
+    },
+    "3.digital": {
+      "file": "layout/drc_reports/tmds_encoder.drc.json",
+      "content_hash": "sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d"
+    },
+    "4.analog": {
+      "file": "layout/lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json",
+      "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983"
+    },
+    "4.digital": {
+      "file": "layout/lvs_reports/tmds_encoder.lvs.json",
+      "content_hash": "sha256:8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa"
+    },
+    "8": {
+      "file": "signoff/characterization-envelope.json",
+      "content_hash": "sha256:2fbf5fd513020ab6747840be6d8919ff5ee559f428adc996a74b6375ec1c815e"
+    },
+    "11.digital": [
+      {
+        "file": "layout/erc_reports/tmds_encoder.erc.json",
+        "content_hash": "sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d"
+      },
+      {
+        "file": "layout/lvs_reports/tmds_encoder.lvs.json",
+        "content_hash": "sha256:8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa"
+      }
+    ]
+  }
+}

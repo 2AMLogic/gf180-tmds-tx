@@ -9,6 +9,8 @@ errors: 0
   nets: layout=7  reference=7  matched=7
   devices: layout=6  reference=6  matched=6
   pins: layout=7  reference=6  matched=7
+power_connectivity: unchecked
+  (reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply)
 
 category_counts:
   topology: 2

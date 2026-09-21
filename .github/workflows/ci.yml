@@ -15,6 +15,7 @@ name: CI
 # | evidence-record format + append-only          | python3+git  | `lint` (here)  |
 # | LVS signoff verdicts + negative controls      | python3      | `lint` (here)  |
 # | characterization report cites every record    | python3+git  | `lint` (here)  |
+# | T1 block-manifest re-grade vs committed record | klt (pinned git ref, see `signoff/README.md`) | `signoff` (here) |
 # | testbench manifests load (`--list`)           | python3      | `test` (here)  |
 # | LVS signoff-guard unit tests (layout/tests)   | python3      | `test` (here)  |
 #
@@ -140,6 +141,68 @@ jobs:
         # resolving, fail loudly instead of passing on a skipped check.
         # Same script `npm run lint` runs locally.
         run: .github/scripts/lint.sh --require-shellcheck --require-append-only
+
+  signoff:
+    name: T1 signoff manifest (klt re-grade vs committed record)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install the pinned klt grading build
+        # The grading surface is `klt signoff --manifest`, which needs no
+        # KLayout engine, no PDK and no GDS in this job -- it reads the
+        # committed envelopes. The one deliberate departure from the other
+        # jobs' dependency-free philosophy: the grader is installed from a
+        # pinned klayout-tools commit, because the eleven-item T1 checklist
+        # (item 11, klayout-tools#2025) postdates the PyPI 0.5.0 release.
+        # The pin, the rationale and the bump procedure live in
+        # signoff/README.md, which this job must never disagree with.
+        run: pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@e8ca621a6961879cec1af60cc932c3b3d58ddcaa"
+
+      - name: Characterization envelope freshness (generic-citation input re-hash)
+        # klt signoff never re-hashes a generic envelope's input (its
+        # provenance field names are the author's choice -- see klayout-tools
+        # docs/cli/signoff.md "Generic evidence"), so item 8's
+        # characterization.md -> envelope link is enforced here instead, by
+        # the same --check convention lint step 4 uses for generated DUTs.
+        run: python3 signoff/gen_characterization_envelope.py --check
+
+      - name: Re-grade the block manifest and compare with the committed record
+        # `klt signoff --manifest` exits 3 when the report rendered but the
+        # block is not at T1 yet (that is the documented signal, not an
+        # error: signoff/README.md). Exit 0 = T1. Any other exit (1 =
+        # malformed input or grading error) fails here. The byte-compare is
+        # the anti-rotting gate: a changed cited artifact, a changed
+        # manifest, or a changed grader/checklist under the pin flips the
+        # freshly-graded row verdicts (stale_evidence and friends) and the
+        # build breaks until evidence + record are regenerated and committed
+        # together.
+        run: |
+          set +e
+          klt signoff --manifest signoff/manifest.json --format json > /tmp/signoff-fresh.json
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then
+            echo "::error::klt signoff exited $rc (grading error or malformed manifest/evidence -- fix the inputs; do not commit an error envelope)"
+            exit 1
+          fi
+          if [ "$rc" -eq 3 ]; then
+            echo "klt signoff exit 3: report rendered, block not at T1 (documented in signoff/README.md)."
+          fi
+          if cmp --silent /tmp/signoff-fresh.json signoff/signoff.json; then
+            echo "signoff record fresh: the committed grade reproduces byte-for-byte."
+          else
+            echo "::error::the fresh klt signoff grade does not match the committed record signoff/signoff.json."
+            echo "A cited artifact, the manifest, or the grader/checklist under the pin has drifted."
+            echo "Regenerate and commit evidence + record together, per signoff/README.md:"
+            echo "  klt signoff --manifest signoff/manifest.json --format json > signoff/signoff.json"
+            diff -u signoff/signoff.json /tmp/signoff-fresh.json | head -80 || true
+            exit 1
+          fi
 
   test:
     name: Harness self-test (no PDK)

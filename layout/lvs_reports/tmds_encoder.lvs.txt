@@ -8,3 +8,5 @@ errors: 0
   nets: layout=384  reference=384  matched=612
   devices: layout=0  reference=0  matched=0
   pins: layout=25  reference=25  matched=253
+power_connectivity: unchecked
+  (reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply)

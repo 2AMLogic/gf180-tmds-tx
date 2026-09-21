@@ -8,12 +8,43 @@
   "parameter_tolerance": null,
   "options": {
     "combine_devices": true,
+    "combine_devices_per_circuit": null,
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
-    "parameter_tolerance": null
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ]
   },
+  "hints_applied": null,
   "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "verified",
+    "reason": null,
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
   "mismatch_count": 2,
   "error_count": 0,
   "category_counts": {
@@ -48,21 +79,25 @@
   ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.11",
+    "engine_version": "0.30.12",
     "layout_sha256": "e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983",
     "reference_sha256": "f48740f53bda71c70a173613bd2c0b7e97ceef9eddf9b867b77719204b2b9095",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.3.0",
-    "klayout_version": "0.30.11",
+    "klt_version": "0.5.0+ge8ca621a6961",
+    "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
-      "released": true
+      "content_hash": "sha256:95c2eb9148b29ded02182aeca4222287ff57f813691d5e2f9f8d7a675f6cb637",
+      "released": false
     },
-    "input": null
+    "input": {
+      "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983",
+      "role": "layout"
+    },
+    "klayout_version_mismatch": true
   },
   "mismatches": [
     {
