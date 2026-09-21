@@ -33,6 +33,45 @@ As of this commit the grade is **6/22 T1 items met** (per-partition rows,
 | #1, #2, #9, #10 | `no_evidence` by design — `klt signoff` cannot check topical relevance for the no-verb items, and citing an unrelated passing envelope to make a row go green is exactly the dishonesty this mechanism exists to prevent |
 | #5, #6, #7 | `no_evidence` — the analog corner/Monte-Carlo/post-layout evidence in `sim/` and `flow/` is committed as this repo's own Markdown evidence records, which are not `klt sim`/`klt yield`/`klt pex` JSON envelopes and are rejected by the grader regardless of how sound they are. The grading gap (not the engineering gap) is real and named: see "Why some genuinely-passed work grades unmet" below |
 
+## Partition boundary (the `kind: "mixed-signal"` declaration)
+
+Per `design-evidence-tiers.md`'s "Block kind" subsection, a mixed-signal
+claim must state explicitly which silicon each partition's evidence covers:
+
+- **analog partition** — the full-custom CML line driver and the pad ring:
+  the driver core (xschem `design/cml_driver.sch` →
+  `layout/gds/cml_driver_core.gds`) assembled with the production pad cells
+  and `diode_nd2ps_06v0` ESD clamps into
+  `layout/gds/gf180_tmds_pad_ring_assembly.gds` — the artifact the
+  `*.analog` citations grade. Per-cell signoffs (DRC/LVS/extract report
+  pairs with negative controls) and the analog measurement records
+  (`sim/cml-driver-*`, `sim/esd-*`) live under `layout/` and `sim/` as
+  before.
+- **digital partition (RTL flow)** — the synthesized `tmds_encoder`:
+  `rtl/tmds_encoder.v` → Yosys → OpenROAD P&R →
+  `layout/gds/tmds_encoder.gds`, verified by `verification/tmds_encoder/`
+  and `flow/tmds_encoder/` — the artifact the `*.digital` citations grade.
+  The `rtl/tmds_serializer.v` reduction stage is RTL in the same flow, with
+  its own cocotb bench (`verification/tmds_serializer/`).
+- **full-custom digital sub-case** — `tmds_final_mux` (DR-0003's custom
+  final 2:1 DDR multiplexer) is *not* synthesized RTL: it is captured as a
+  schematic and hand-composed GDS (`design/tmds_final_mux.sch` →
+  `layout/gds/tmds_final_mux.gds`), exactly the "Full-custom digital
+  sub-case" `design-evidence-tiers.md` defines — its artifacts satisfy the
+  analog *column*'s shapes (schematic + GDS + DRC/LVS pairs with negative
+  controls) while its silicon belongs to the digital side of the signal
+  chain. The manifest's per-partition citations name each partition's
+  top-level artifact (the assembled analog signal path, the routed
+  encoder); the final mux's own committed signoff pair remains under
+  `layout/` and — like every drawn cell's — is machine-checked by the lint
+  job's `check_lvs_signoff.py` step on every push.
+
+The partition boundary in the signal chain is the serializer → final-mux →
+CML-driver handoff into the pad ring's OUTP/OUTN pair;
+`spec/tmds-tx.md`'s decision records (DR-0009, DR-0003, DR-0002) are the
+authoritative signal-path description. This manifest's job is narrower:
+to state which committed evidence covers which silicon.
+
 ## Files
 
 | file | what it is |
