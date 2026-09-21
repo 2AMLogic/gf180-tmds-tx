@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "file": "layout/gds/tmds_encoder.gds",
+  "spec": "layout/erc-tie-spec.known-gap.json",
+  "pdk": null,
+  "gate_role": "poly2",
+  "gate_count": 1,
+  "gates": [
+    {
+      "gate_id": "gate0",
+      "net": "A1,A2,A3,A4,B,B1,B2,C,CLK,D,I,I0,I1,Q,S,VDD,VSS,Z,ZN",
+      "gate_area_um2": 2521.751,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 4611.96995,
+          "cumulative_area_um2": 4611.96995,
+          "antenna_ratio": 1.828876,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 9175.209325,
+          "cumulative_area_um2": 13787.179275,
+          "antenna_ratio": 5.467304,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 2869.91372,
+          "cumulative_area_um2": 16657.092995,
+          "antenna_ratio": 6.605368,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 1869.147568,
+          "cumulative_area_um2": 18526.240563,
+          "antenna_ratio": 7.346578,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 6553.39496,
+          "cumulative_area_um2": 25079.635523,
+          "antenna_ratio": 9.945326,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal5",
+          "step_area_um2": 3341.7216,
+          "cumulative_area_um2": 28421.357123,
+          "antenna_ratio": 11.270485,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    }
+  ],
+  "erc_findings": [
+    {
+      "rule": "erc.supply_short",
+      "description": "declared nets 'VDD' and 'VSS' are electrically the same net (shorted together)",
+      "net": "VDD",
+      "other_net": "VSS",
+      "gate_id": null,
+      "layer": null,
+      "bbox": null
+    }
+  ],
+  "erc_finding_count": 1,
+  "status": "violations",
+  "provenance": {
+    "klt_version": "0.5.0",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d"
+    },
+    "spec": {
+      "content_hash": "sha256:14b9ee32c19e76f8d234fa475eda4056d1c1f30354771403e438d5a07f8bc662"
+    }
+  }
+}

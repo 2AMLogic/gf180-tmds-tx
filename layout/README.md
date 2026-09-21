@@ -1103,6 +1103,13 @@ drc_reports/tmds_encoder.drc.{json,txt}       klt drc reports
 lvs_reports/tmds_encoder.lvs.{json,txt}       klt lvs reports
 lvs_reports/tmds_encoder_negctl.lvs.{json,txt}   reference-side negative-control reports
 lvs_reports/tmds_encoder_shorted.lvs.{json,txt}  layout-side negative-control reports
+erc-supply-spec.json                          klt erc supply spec -- the T1 item 11 (structural power
+                                              delivery) declared-supply read (issue #188, see below)
+erc-tie-spec.known-gap.json                   klt erc spec reproducing klayout-tools#2169 (NOT a signoff spec)
+erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and VSS each resolve to
+                                              exactly one electrical island
+erc_reports/tmds_encoder_tie_known_gap.erc.json   the #2169 reproduction -- evidence of the tool gap,
+                                              not evidence about this design
 ```
 
 Regenerate (requires OpenROAD on `PATH`, run via the pinned `openroad/orfs`
@@ -1143,6 +1150,16 @@ klt extract --deck gf180mcu layout/gds/tmds_encoder_shorted.gds --top tmds_encod
   --abstract-cells 'gf180mcu_fd_sc_mcu9t5v0__*' -o layout/gds/tmds_encoder_shorted.lvs_extracted.spice
 klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format json > layout/lvs_reports/tmds_encoder_shorted.lvs.json
 klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format text > layout/lvs_reports/tmds_encoder_shorted.lvs.txt
+
+# T1 item 11 (structural power delivery) supply read -- see the ERC section
+# at the end of this tmds_encoder writeup. NOTE: the committed reports were
+# produced by a klt build carrying klayout-tools #1968/#2036 (the report
+# `provenance` + spec content-hash fields, not yet in PyPI's 0.5.0); a
+# klt from source at or after v0.5.0-101-gfe6fe526 reproduces them.
+klt erc layout/gds/tmds_encoder.gds layout/erc-supply-spec.json \
+  --format json > layout/erc_reports/tmds_encoder.erc.json
+klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.known-gap.json \
+  --format json > layout/erc_reports/tmds_encoder_tie_known_gap.erc.json
 ```
 
 > **`klt` 0.3.0 needed the `klayout-tools#1366` fix (upstream PR #1374,
@@ -1323,3 +1340,86 @@ environment) — not needed for this confirmation, since that step reads
 ORFS's own bundled, PDK-variant-agnostic tech file plus the (Metal5-free,
 byte-identical) standard-cell GDS library, and the DEF it would consume is
 itself confirmed unchanged.
+
+### T1 item 11 (structural power delivery): the `klt erc` supply read (issue #188)
+
+The T1 checklist grew an eleventh item on 2026-09-17 (approved as
+[klayout-tools#2025](https://github.com/2AMLogic/klayout-tools/issues/2025)
+and now written into that repo's
+[docs/design-evidence-tiers.md](https://github.com/2AMLogic/klayout-tools/blob/main/docs/design-evidence-tiers.md)):
+*Power delivery (structural)* — is the supply actually connected to what it
+powers? The evidence is a `klt erc` supply-spec run over the routed GDS,
+which this repo previously did not have. `erc-supply-spec.json` is that
+spec, and `erc_reports/tmds_encoder.erc.json` is its committed report
+against `layout/gds/tmds_encoder.gds` (its `provenance.input.content_hash`
+matches the committed GDS byte-for-byte).
+
+**Reading the verdict.** The spec declares `VDD` and `VSS` as
+`"kind": "supply"` `nets[]` entries over a Metal1-Metal5 stackup -- every
+layer this block's PDN actually routes on, per `flow/tmds_encoder/pnr/pdn.tcl`
+(Metal1 follow-pin rails, Metal4/Metal5 straps, `-pins {Metal5}`), so every
+strap layer is covered as item 11's digital column requires. Zero findings
+*is* the verdict, not an absence of one: `erc.unconnected_net` fires when a
+declared net matches **zero** islands (nothing carries that label) **or
+more than one** (the rail is split into pieces that never touch), and
+`erc.supply_short` fires when two declared supplies resolve to the same
+island. The committed report has `erc_finding_count: 0` over 1019 gate
+nets — exactly one electrical island per supply, and the two are distinct.
+The split-rail case is the no-PDN signature `klayout-tools#2025`'s fleet
+survey actually found in 2 of 7 committed digital layouts; this block
+does not have it (the survey itself already recorded `VDD 1 / VSS 1` here).
+
+**What is NOT verified here: `erc.missing_tie`** (upstream
+[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169),
+reproduced four ways in `gf180-drone-fc`'s FRICTION F-034). `klt erc`'s
+`ties[]` collapses a real routed standard-cell design into one electrical
+island and reports a **false** `erc.supply_short`, so
+`erc-supply-spec.json` deliberately declares no `ties[]` — which means
+`erc.missing_tie` is *not computed* by the committed report
+(docs/cli/erc.md is explicit that omitting `ties[]` means the rule is
+never computed). Its zero count is an absence of evidence, not evidence
+of absence, and must not be cited as a well-tie verdict.
+`erc-tie-spec.known-gap.json` +
+`erc_reports/tmds_encoder_tie_known_gap.erc.json` are the committed
+reproduction on this block: with `ties[]` declared, `gates[]` drops from
+1019 to 1 and one `erc.supply_short` (VDD/VSS) appears — evidence *of the
+tool gap*, not evidence *about this design*.
+
+The standing-in well-tie evidence, named per issue #188, is:
+
+1. **The taps were actually placed.** `flow/pnr_tmds_encoder.py` runs
+   `tapcell -distance 100 -tapcell_master gf180mcu_fd_sc_mcu9t5v0__filltie
+   -endcap_master gf180mcu_fd_sc_mcu9t5v0__endcap`, and the merged GDS
+   contains both `gf180mcu_fd_sc_mcu9t5v0__filltie` and
+   `gf180mcu_fd_sc_mcu9t5v0__endcap` cells.
+2. **The tap instances' own well-tap pins are in the merged GDS**: 1292
+   `VNW` texts on Nwell pin (21/10) and 1292 `VPW` texts on LVPWELL pin
+   (204/10) — the filltie instances' well-tap pins, the same evidence shape
+   `gf180-drone-fc`'s item-11 claim cites.
+3. **The rails took part in the LVS compare**:
+   `lvs_reports/tmds_encoder.lvs.json` reports `status: "match"` with
+   `VDD`→`VDD` and `VSS`→`VSS` pairs in `net_correspondence` — its SPICE
+   reference carries the supply nets, so the rails' connectivity was part
+   of that compare rather than absent from it.
+
+**Item 11's digital column is therefore still partial, and this PR does not
+claim otherwise.** The item's own text additionally requires the LVS
+report's `power_connectivity.status` to read `"match"` — a per-instance
+PG-pin-to-net verdict (`klt lvs` #1964, graded on `gate-level-verilog`
+compares) that this block's committed LVS report does not carry (the field
+postdates the `klt` 0.2.0-era run that produced it, and this block LVSes
+against a SPICE reference, where the verdict is inapplicable rather than
+`"unchecked"`). That sub-criterion is the same class of gap as the digital
+LVS note item 4 already tracks; it is filed as its own issue rather than
+being tuned away here. The committed ERC report's antenna verdicts are all
+`unchecked` (`--pdk` intentionally omitted — gf180 is not in `klt erc`'s
+built-in antenna-limit table), which per the item's own text does not
+block item 11.
+
+**Tool-version note.** The two committed reports carry
+`provenance.klt_version: "0.5.0"` from a klayout-tools source build at
+`v0.5.0-101-gfe6fe526` — the first build with the report `provenance` +
+spec content-hash fields (#1968/#2036), which PyPI's published `0.5.0`
+does not yet have; a klt from source at or after that commit reproduces
+both reports verbatim. `gate_count` and every verdict were confirmed
+identical under both the installed 0.5.0 binary and the source build.
