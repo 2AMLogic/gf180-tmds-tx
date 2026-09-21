@@ -1095,14 +1095,20 @@ layout/lvs/tmds_encoder_negctl.ref.spice      the same reference with one delibe
 layout/lvs/tmds_encoder.lvs_request.json      klt lvs request document
 layout/lvs/tmds_encoder.lvs_request_negctl.json  reference-side negative-control request document
 layout/lvs/tmds_encoder.lvs_request_shorted.json layout-side negative-control request document
+layout/lvs/tmds_encoder.pnr_signal_only.v   signal-only view of the committed post-P&R netlist --
+                                         the gate-level-verilog compare's reference (issue #190)
+layout/lvs/tmds_encoder.lvs_request_gate.json  gate-level-verilog LVS request document (issue #190)
 layout/scripts/gen_tmds_encoder_ref.py  reference-netlist generator (+ --negative-control)
 layout/scripts/gen_tmds_encoder_shorted.py  layout-side negative-control GDS generator (issue #146)
-layout/scripts/filter_pnr_utility_cells.py    optional utility-cell filter (not used in the
-                                         primary flow below -- see its own docstring)
+layout/scripts/filter_pnr_utility_cells.py    utility-cell filter -- the `--form verilog` half
+                                         feeds the gate-level recipe below (issue #190); the
+                                         SPICE half stays the optional tool it always was
 drc_reports/tmds_encoder.drc.{json,txt}       klt drc reports
 lvs_reports/tmds_encoder.lvs.{json,txt}       klt lvs reports
 lvs_reports/tmds_encoder_negctl.lvs.{json,txt}   reference-side negative-control reports
 lvs_reports/tmds_encoder_shorted.lvs.{json,txt}  layout-side negative-control reports
+lvs_reports/tmds_encoder_gate.lvs.{json,txt}  gate-level-verilog LVS reports -- the T1 item 11
+                                              digital-column power verdict (issue #190)
 erc-supply-spec.json                          klt erc supply spec -- the T1 item 11 (structural power
                                               delivery) declared-supply read (issue #188, see below)
 erc-tie-spec.known-gap.json                   klt erc spec reproducing klayout-tools#2169 (NOT a signoff spec)
@@ -1160,6 +1166,17 @@ klt erc layout/gds/tmds_encoder.gds layout/erc-supply-spec.json \
   --format json > layout/erc_reports/tmds_encoder.erc.json
 klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.known-gap.json \
   --format json > layout/erc_reports/tmds_encoder_tie_known_gap.erc.json
+
+# T1 item 11 digital column (issue #190): the gate-level-verilog LVS read --
+# see the "gate-level-verilog LVS read" section at the end of this
+# tmds_encoder writeup for what each verdict means and for the tool-build
+# note (a klt from source at or after e8ca621a; PyPI's 0.5.0 predates the
+# power_connectivity check entirely).
+python3 layout/scripts/filter_pnr_utility_cells.py --form verilog \
+  flow/tmds_encoder/netlist/tmds_encoder.pnr.v \
+  -o layout/lvs/tmds_encoder.pnr_signal_only.v
+klt lvs layout/lvs/tmds_encoder.lvs_request_gate.json --format json > layout/lvs_reports/tmds_encoder_gate.lvs.json
+klt lvs layout/lvs/tmds_encoder.lvs_request_gate.json --format text > layout/lvs_reports/tmds_encoder_gate.lvs.txt
 ```
 
 > **`klt` 0.3.0 needed the `klayout-tools#1366` fix (upstream PR #1374,
@@ -1402,16 +1419,18 @@ The standing-in well-tie evidence, named per issue #188, is:
    reference carries the supply nets, so the rails' connectivity was part
    of that compare rather than absent from it.
 
-**Item 11's digital column is therefore still partial, and this PR does not
-claim otherwise.** The item's own text additionally requires the LVS
-report's `power_connectivity.status` to read `"match"` — a per-instance
-PG-pin-to-net verdict (`klt lvs` #1964, graded on `gate-level-verilog`
-compares) that this block's committed LVS report does not carry (the field
-postdates the `klt` 0.2.0-era run that produced it, and this block LVSes
-against a SPICE reference, where the verdict is inapplicable rather than
-`"unchecked"`). That sub-criterion is the same class of gap as the digital
-LVS note item 4 already tracks; it is filed as its own issue rather than
-being tuned away here. The committed ERC report's antenna verdicts are all
+**Item 11's digital column was still partial when this ERC section landed
+(issue #191), and that pass did not claim otherwise.** The item's own text
+additionally requires the LVS report's `power_connectivity.status` to read
+`"match"` — a per-instance PG-pin-to-net verdict (`klt lvs` #1964, graded
+on `gate-level-verilog` compares) that this block's committed LVS report
+does not carry (the field postdates the `klt` 0.2.0-era run that produced
+it, and this block LVSes against a SPICE reference, where the verdict is
+inapplicable rather than `"unchecked"`). That sub-criterion was the same
+class of gap as the digital LVS note item 4 already tracks; it was filed as
+its own issue (#190) rather than being tuned away — and it is now landed:
+the gate-level-verilog LVS read that supplies the verdict is documented in
+the next subsection. The committed ERC report's antenna verdicts are all
 `unchecked` (`--pdk` intentionally omitted — gf180 is not in `klt erc`'s
 built-in antenna-limit table), which per the item's own text does not
 block item 11.
@@ -1423,3 +1442,133 @@ spec content-hash fields (#1968/#2036), which PyPI's published `0.5.0`
 does not yet have; a klt from source at or after that commit reproduces
 both reports verbatim. `gate_count` and every verdict were confirmed
 identical under both the installed 0.5.0 binary and the source build.
+
+### T1 item 11 digital column: the gate-level-verilog `klt lvs` read (issue #190)
+
+The ERC supply read above settles item 11's first digital sub-criterion
+(production with a power grid — `flow/pnr_tmds_encoder.py`'s `tapcell` +
+`pdngen`, evidenced by the `klt erc` islands read). This read settles the
+second: the **per-instance PG-pin-to-net verdict** the item's digital column
+requires, which `klt lvs` reports as `power_connectivity` and grades only on
+`reference.form: "gate-level-verilog"` compares (`klt lvs` #1964/#2003, see
+`docs/cli/lvs.md` → "Power/ground connectivity"). Per the upstream contract
+a digital power-delivery claim gates on **both** `status` (the
+signal-connectivity compare) **and** `power_connectivity.status`, and the
+two are reported independently — a `match` on one proves nothing about the
+other.
+
+**The committed verdict**
+(`lvs_reports/tmds_encoder_gate.lvs.{json,txt}`, request
+`layout/lvs/tmds_encoder.lvs_request_gate.json`):
+
+- `status: "match"`, 0 errors. The single `severity: "warning"` finding is
+  the disclosed, in-report `topology.power_only_pruned` entry naming the 9
+  fill/tap/endcap master types the compare removed from the layout side (see
+  below) — an auditable marker, not an error.
+- `power_connectivity.status: "match"` — zero findings — across **all 1339
+  instances** (every webbed `klt extract --abstract-cells` instance in the
+  committed extraction, fill/tap cells included: `klt lvs` runs the check
+  *before* the power-only prune, by design), `power_pins: ["VDD", "VSS"]`,
+  `unchecked_expected_pins: []`.
+
+The check is declared in the **absolute** form the upstream docs recommend
+for signoff — `options.power_connectivity.expected_nets: {VDD: "VDD", VSS:
+"VSS"}` — which upgrades the default cross-instance *consistency* rule (every
+same-named supply pin agrees on its net) to a per-instance *absolute* one
+(each named pin must reach the named net). This is strictly stronger than
+the `power_connectivity: true` form the gf180-drone-fc precedent committed:
+a design uniformly miswired the same way satisfies the consistency rule
+while violating `expected_nets`, and `unchecked_expected_pins: []`
+additionally proves both declared expectations were exercised (a declared
+pin no instance actually carried reads identically to "checked and found
+correct" without that field).
+
+**The reference side, and why it is a filtered view of the committed
+post-P&R netlist.** The compare's reference is
+`layout/lvs/tmds_encoder.pnr_signal_only.v` — the committed
+`flow/tmds_encoder/netlist/tmds_encoder.pnr.v` minus exactly its 970
+power-only *instance* lines (72 `endcap`, 19 `filltie`, 879 `fill_*`),
+produced by `layout/scripts/filter_pnr_utility_cells.py --form verilog`
+(its own docstring records the guard: any utility-master line that is not
+verbatim an empty-connection instantiation aborts the filter rather than
+being dropped — a fill/tap cell carrying a real connection is
+signal-bearing content). Each dropped line connects nothing, so the
+retained instance set (1339 − 970) plus every wire/port declaration is
+byte-identical to the source netlist's — the artifact differs from
+`gen_pnr_netlist.py`'s own output by zero signal content.
+
+Why the filter exists: OpenROAD's `write_verilog`, as run against a routed
+DEF, *emits* the physical-only fillers (each as an empty
+`<master> <inst> ();` line), unlike `klt place-and-route`'s own
+`verilog_path` writer, which skips them. `klt lvs`'s #1622 handling prunes
+the *layout-side* power-only circuits before a signal-only compare (that is
+the disclosure warning above) but has no symmetric handling for a reference
+that itself instantiates the pruned masters — each of the 970 reference
+instances then reports "circuit could not be matched to a counterpart" and
+the signal verdict flips to `mismatch` on a design whose two sides are
+equivalent. Filed upstream as
+[klayout-tools#2244](https://github.com/2AMLogic/klayout-tools/issues/2244);
+the filter is the documented interim shape until the symmetric prune lands
+(upstream's own suggested workaround, filed generically there).
+
+**The layout side is the existing committed extraction** —
+`layout/gds/tmds_encoder.lvs_extracted.spice`, the same netlist the
+SPICE-reference pair compares. `klt lvs` reads it directly (no re-extract,
+the request's `layout.netlist` pre-extracted shape), so this read inherits
+that pair's trust in the extraction rather than re-establishing it — and
+`check_lvs_signoff.py` picks the new report pair up under its existing
+rules intact (`tmds_encoder_gate` is an intact cell: `match` + the .txt
+twin must agree; negative controls stay their own entries).
+
+**The check is live, not vacuous.** Serving the same
+role a `_shorted` twin serves for the signal compare, the
+`power_connectivity` verdict was probed once with a deliberately wrong
+expectation (swap the two expected_nets in a throwaway copy of the request,
+run, discard): the power half flips to
+`power_connectivity.status: "mismatch"` with two `power.unexpected_pin_net`
+findings — one per pin — each confirming the pin reaches its actual (and
+deliberately-not-expected) net **on all 1339 instances**, while the signal
+half stays `"match"` exactly as upstream's independent-verdicts contract
+prescribes. The committed report is the clean run of the same request
+document — the only parameter that differs from the probe run is the
+expected_nets values — which ties the two results together: the `match`
+comes from having checked 1339 instances against declared expectations,
+not from a check that compared nothing.
+
+**Re-verification.** `klt lvs --check` (cheap mode) on the committed gate
+report passes and reproduces both content hashes (the request's paths
+resolve from `layout/lvs/`, the directory the committed reports' own
+`../gds` / `../lvs` echoes are relative to — same convention as the
+existing SPICE reports). `--check --rerun` is **documented-unsupported**
+for non-default `reference.form` values (the report does not echo the form,
+so full mode reconstructs the default SPICE read and fails loudly on the
+`.v` path — `docs/cli/lvs.md`, "`--check`" known limitations: use cheap
+mode); the report's own `options.power_connectivity` echo preserves the
+declared expectations for any future reconstruction that does carry the
+form.
+
+**What this read does not prove.** Exactly what upstream scopes out:
+`power_connectivity` is per-instance *pin-to-net*, not rail/grid
+*continuity* — a broken rail segment enters the verdict only through the
+per-instance pin resolution (`klt power`'s IR-drop/EM analysis and
+`klt ring-check` are the tools for the grid questions, and stay outside
+item 11 by its own text). The analog side of item 11 (the `ties[]`
+well-tie column) is unchanged by this read: it remains blocked on
+[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)
+exactly as the ERC subsection above documents, and nothing here touches
+that known-gap reproduction. The SPICE-reference signoff pair
+(`tmds_encoder.lvs.json` + its `_negctl`/`_shorted` controls) is also
+untouched: this read adds a report, it does not regenerate theirs (their
+reference derives from *unfiltered* `tmds_encoder.pnr.v`, unchanged in
+this pass).
+
+**Tool-version note.** The committed reports record
+`provenance.klt_version: "0.5.0+ge8ca621a6961"` — a klayout-tools source
+build at `e8ca621a` (`v0.5.0-224`, current `origin/main` when this section
+was written). That is the first mainline tag-descendant that carries the
+whole `power_connectivity` contract cited here (#1952/#1964, the #2009
+first-tester follow-ups, and the pre-#2105/#2140 supply-semantic side
+fixes); PyPI's published `0.5.0` does not carry the check at all. A klt
+from source at or after `e8ca621a` reproduces both committed reports;
+`reference.pdk: "gf180mcuD"` in the request pins the same PDK variant every
+other flow in this repo resolves (`sim/harness/pdk.py`'s convention).

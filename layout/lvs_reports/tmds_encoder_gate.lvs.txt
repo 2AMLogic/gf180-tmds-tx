@@ -1,0 +1,16 @@
+layout: ../gds/tmds_encoder.lvs_extracted.spice
+reference: ../lvs/tmds_encoder.pnr_signal_only.v
+top: TMDS_ENCODER
+engine: klayout
+status: match
+mismatches: 1
+errors: 0
+  nets: layout=384  reference=375  matched=587
+  devices: layout=0  reference=0  matched=0
+  pins: layout=25  reference=23  matched=235
+power_connectivity: match
+
+category_counts:
+  topology.power_only_pruned: 1
+
+[warning] topology.power_only_pruned  (layout)  removed layout-side circuit(s) whose every declared pin is a power/ground pin of the reference library (a pin the library declares but the gate-level-Verilog reference never carries), and every instance of them, before comparing -- 9 circuit(s): GF180MCU_FD_SC_MCU9T5V0__ENDCAP, GF180MCU_FD_SC_MCU9T5V0__FILLTIE, GF180MCU_FD_SC_MCU9T5V0__FILL_1, GF180MCU_FD_SC_MCU9T5V0__FILL_16, GF180MCU_FD_SC_MCU9T5V0__FILL_2, GF180MCU_FD_SC_MCU9T5V0__FILL_32, GF180MCU_FD_SC_MCU9T5V0__FILL_4, GF180MCU_FD_SC_MCU9T5V0__FILL_64, GF180MCU_FD_SC_MCU9T5V0__FILL_8 (see docs/cli/lvs.md, "topology.power_only_pruned")

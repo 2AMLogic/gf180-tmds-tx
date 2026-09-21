@@ -1,0 +1,14 @@
+{
+  "layout": {"netlist": "../gds/tmds_encoder.lvs_extracted.spice", "top": "tmds_encoder"},
+  "reference": {
+    "netlist": "../lvs/tmds_encoder.pnr_signal_only.v",
+    "top": "tmds_encoder",
+    "form": "gate-level-verilog",
+    "library": "gf180mcu_fd_sc_mcu9t5v0",
+    "pdk": "gf180mcuD"
+  },
+  "options": {
+    "combine_devices": false,
+    "power_connectivity": {"expected_nets": {"VDD": "VDD", "VSS": "VSS"}}
+  }
+}
