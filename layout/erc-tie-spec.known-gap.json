@@ -1,0 +1,68 @@
+{
+  "_comment": [
+    "NOT A SIGNOFF SPEC. This file exists only to reproduce klayout-tools",
+    "upstream issue #2169 -- `klt erc`'s `ties[]` (`erc.missing_tie`)",
+    "collapsing a real routed standard-cell layout's connectivity and",
+    "reporting a FALSE `erc.supply_short`. Its committed report",
+    "(`erc_reports/tmds_encoder_tie_known_gap.erc.json`) is evidence OF the",
+    "tool gap, not evidence ABOUT this design. Do not cite its zero",
+    "erc.missing_tie count as a well-tie verdict: that zero is produced by",
+    "the same collapse that produces the false short (every tap trivially",
+    "reaches the declared net once the whole design is one island).",
+    "",
+    "    klt erc layout/gds/tmds_encoder.gds \\",
+    "      layout/erc-tie-spec.known-gap.json --format json",
+    "",
+    "Identical to `erc-supply-spec.json` except for the `ties[]` section",
+    "below. gf180mcu draws both wells for this cell library, so both tie",
+    "checks are individually well-posed: Nwell 21/0 is the n-well, LVPWELL",
+    "204/0 is the low-voltage p-well (named in the PDK's own",
+    "libs.tech/klayout/tech/gf180mcu.lyp, gf180mcuD), and Contact 33/0 is",
+    "the tap contact that ties each well up to its own supply rail on",
+    "Metal1 -- which exists at all because flow/pnr_tmds_encoder.py runs",
+    "tapcell -distance 100 -tapcell_master gf180mcu_fd_sc_mcu9t5v0__filltie",
+    "(filltie instances draw exactly the two taps these entries expect).",
+    "",
+    "`tap_layer` is Contact rather than a diffusion or implant layer because",
+    "the tap gf180mcu actually draws is a boolean (`Comp n Nplus` inside",
+    "Nwell, `Comp n Pplus` inside LVPWELL) that this spec grammar cannot",
+    "express -- see klayout-tools#2169 and gf180-drone-fc's FRICTION",
+    "F-034, where Comp 22/0, Nplus 32/0 and Contact 33/0 were each measured",
+    "separately and all three collapse the design identically."
+  ],
+  "stackup": [
+    { "name": "poly2", "layer": "30/0", "role": "gate", "active_layer": "22/0" },
+    { "name": "Metal1", "layer": "34/0", "label_layer": "34/10" },
+    { "name": "Metal2", "layer": "36/0" },
+    { "name": "Metal3", "layer": "42/0" },
+    { "name": "Metal4", "layer": "46/0" },
+    { "name": "Metal5", "layer": "81/0", "label_layer": "81/10" }
+  ],
+  "vias": [
+    { "name": "Contact", "layer": "33/0", "between": ["poly2", "Metal1"] },
+    { "name": "Via1", "layer": "35/0", "between": ["Metal1", "Metal2"] },
+    { "name": "Via2", "layer": "38/0", "between": ["Metal2", "Metal3"] },
+    { "name": "Via3", "layer": "40/0", "between": ["Metal3", "Metal4"] },
+    { "name": "Via4", "layer": "41/0", "between": ["Metal4", "Metal5"] }
+  ],
+  "nets": [
+    { "name": "VDD", "kind": "supply" },
+    { "name": "VSS", "kind": "supply" }
+  ],
+  "ties": [
+    {
+      "name": "nwell_tap",
+      "well_layer": "21/0",
+      "tap_layer": "33/0",
+      "connect_to": "Metal1",
+      "net": "VDD"
+    },
+    {
+      "name": "lvpwell_tap",
+      "well_layer": "204/0",
+      "tap_layer": "33/0",
+      "connect_to": "Metal1",
+      "net": "VSS"
+    }
+  ]
+}
