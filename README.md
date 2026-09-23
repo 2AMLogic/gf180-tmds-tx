@@ -5,6 +5,8 @@ open PDK — serializer plus current-mode line driver — designed by AI agents
 driving [klayout-tools](https://github.com/2AMLogic/klayout-tools), xschem +
 ngspice on the analog side and Yosys/OpenROAD on the digital side.
 
+![fleet burndown](https://raw.githubusercontent.com/2AMLogic/2am/main/fleet-metrics/charts/gf180-tmds-tx.svg)
+
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
 and now electrically post-layout-verified for its first process corner, and
 the serializer/final-mux stage joining the digital and analog partitions
