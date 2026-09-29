@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-09-29
+
+- **Issue #199** (closed): Guard telemetry: worktree-write-confinement catastrophic denies on routine /tmp scratch writes during SPICE/klt sanity checks
+- **Issue #198** (closed): Guard telemetry: 'git clean -fd' ASK pattern fires on search strings and issue text, not actual clean invocations
+
 ### 2026-09-23
 
 - **Issue #196** (closed): README: embed the fleet burndown chart (one line)
