@@ -13,11 +13,11 @@ Judge-approved PRs stuck under a `loom:operator` merge-risk hold — implementat
 
 _None._
 
-## Urgent
+## Operator Priority
 
-Issues flagged as highest priority (`loom:urgent`).
+Issues the operator starred (`loom:operator-priority`); land these first.
 
-- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
+_None._
 
 ## Ready
 
@@ -29,8 +29,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA)
-- **#88**: Fold the digital partition into the block-level characterization report (T1 item 8)
+_None._
 
 ## PRs Awaiting Review
 
@@ -48,28 +47,27 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#100**: Digital: close timing on tmds_encoder at the 720p60 pixel clock (setup fails at 4/5 corners per #83's STA) *(curated)*
-- **#88**: Fold the digital partition into the block-level characterization report (T1 item 8) *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
-- **#9**: Spec defects: an ambiguous PDK variant, DR-0005 still provisional after #2 closed, and an incomplete PLL contract *(architect)*
+_None._
 
 ## Epics
 
-- **#17**: Track the gap to T1 sim-validated / bronze (klayout-tools design-evidence tiers)
+_None._
 
 ## Backlog Balance
 
 | Tier | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Urgent | 1 |
+| Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
-| Architect / Hermit proposals | 1 |
-| Active epics | 1 |
+| Curated | 0 |
+| Architect / Hermit proposals | 0 |
+| Active epics | 0 |
 <!-- guide:plan-body:end -->
