@@ -1,6 +1,6 @@
 # DR-0012: Completing the PLL interface contract (successor to DR-0004)
 
-**Status: Accepted.** Extends, does not replace, `spec/tmds-tx.md` §2 and
+**Status: Accepted.** *DR-0017 (Proposed) re-derives Decisions 1–3 for a 135 MHz half-rate PLL clock (no internal ÷2; 720p60 deferred); they stand as written for the deferred 720p60 premise only, pending its ratification.* Extends, does not replace, `spec/tmds-tx.md` §2 and
 DR-0004 — DR-0004's Status line is updated to point here; its own numeric
 derivations (reference frequency choice, 0.25/0.10/0.15 UI jitter split) are
 **unchanged**.

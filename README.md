@@ -82,10 +82,15 @@ why this block exists.
 ## Scope
 
 - **Target**: 720p60 (742.5 Mbps/lane). 480p is the guaranteed fallback.
+  **Clock-path status (DR-0017, Proposed)**: only 480p has a clock path —
+  a 135 MHz half-rate clock from `gf180-pll`. 720p60 is **deferred, with no
+  clock path** until a successor record names one.
 - **Stretch, not promised**: 1080p60 (1.485 Gbps/lane).
 - **In scope**: TMDS encoder, 10:1 serializer, current-mode driver, and the
   custom pad cell with its ESD structure.
-- **Not in scope**: the PLL. It comes from a sibling canary; specify the
+- **Not in scope**: the PLL. It comes from the sibling canary
+  [`gf180-pll`](https://github.com/2AMLogic/gf180-pll) (DR-0017; pinned in
+  `reuse.lock.json`); specify the
   interface to it, including the jitter budget, and stop.
 
 The gf180mcu I/O library ships a general-purpose 5 V wide-range GPIO library

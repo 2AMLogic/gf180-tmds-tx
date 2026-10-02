@@ -1,6 +1,6 @@
 # DR-0014: Serializer rate ceiling and micro-architecture
 
-**Status: Accepted.** Revises DR-0003's synthesized/custom boundary at the
+**Status: Accepted.** *DR-0017 (Proposed) makes the 480p / 135 MHz case below the only live operating point; the 720p60 finding is dormant (deferred, no clock path).* Revises DR-0003's synthesized/custom boundary at the
 720p60 operating point only; DR-0003 stands unmodified at 480p. Does not
 touch DR-0012 (the clock derivation this stage consumes) or the PLL
 interface it fixes.

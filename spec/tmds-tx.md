@@ -28,26 +28,34 @@ should be described as an HDMI block.
 1080p60 is a stretch goal only. Per DR-0001, it does not drive architecture
 before 720p60 closes.
 
-## 2. PLL interface (levied on a sibling canary — out of scope here)
+## 2. PLL interface (levied on the sibling canary `gf180-pll` — out of scope here)
 
-**Scope note**: this block does not design the PLL. The PLL is a sibling
-canary block. This section is the numeric interface contract this block
+**Amended by DR-0017 (Proposed — effective on two-key ratification).** The
+sibling is [`2AMLogic/gf180-pll`](https://github.com/2AMLogic/gf180-pll)
+(pinned in `reuse.lock.json`). Its ratified v1 serves a 10–200 MHz band, a
+1–25 MHz reference and integer N only, so this block takes a **135 MHz
+half-rate clock (480p first)** and **720p60 is deferred with no clock path**.
+The table below is the DR-0017 interface; the superseded 742.5/270 MHz,
+27 MHz-reference and pixel-rate-output rows are not live and are recorded in
+DR-0004 and DR-0017 only.
+
+**Scope note**: this block does not design the PLL. The PLL is the sibling
+canary block `gf180-pll`. This section is the numeric interface contract this block
 requires of it; the PLL's internal architecture (loop filter, VCO topology,
 charge pump, etc.) is entirely out of scope for this repository.
 
 | Requirement | Value |
 |---|---|
-| Reference input | 27.000 MHz, single-ended CMOS, ±100 ppm |
-| Bit-rate clock output (720p60 target) | 742.5 MHz (= 27.000 MHz × 110/4) |
-| Bit-rate clock output (480p fallback) | 270 MHz (= 27.000 MHz × 10) |
-| Pixel-rate clock output (720p60 target) | 74.25 MHz (= bit-rate clock ÷ 10) |
-| Pixel-rate clock output (480p fallback) | 27.000 MHz (= bit-rate clock ÷ 10) |
-| Clock relationship | Bit-rate and pixel-rate outputs must be a fixed, edge-aligned 10:1 pair with no cycle slips — either pixel clock derived from bit clock by an internal ÷10, or both delivered already phase-locked with defined edge alignment |
-| Total TMDS output jitter budget (informative, DVI-class target) | ≤ 0.25 UI peak-to-peak at the pad (≈ 337 ps @ 742.5 Mbps, ≈ 926 ps @ 270 Mbps) |
-| **PLL-attributable jitter budget (this block's requirement of the PLL)** | **≤ 0.10 UI peak-to-peak on the bit-rate clock output (≈ 135 ps @ 742.5 Mbps, ≈ 370 ps @ 270 Mbps)** |
-| Remaining budget (serializer + driver + board, this block's own responsibility) | ≤ 0.15 UI peak-to-peak (≈ 202 ps @ 742.5 Mbps, ≈ 556 ps @ 270 Mbps) — closed out empirically with PVT-corner sim results in the driver design work, not asserted here |
+| Reference input | 13.5 MHz (= this block's 27.000 MHz system clock ÷ 2, 50 % duty), single-ended CMOS, ±100 ppm — inside `gf180-pll` row 2 (1–25 MHz) |
+| Clock output (480p, the only operating point with a clock path) | **135 MHz = 13.5 MHz × N = 10** (integer N, inside `gf180-pll` row 1's 10–200 MHz band and row 3's N = 4–64) — a **half-rate** clock: the DDR final stage samples both edges to give 270 Mbps. Single-ended rail-to-rail CMOS, 45–55 % duty (`gf180-pll` rows 13/14) |
+| Clock output (720p60) | **Deferred — no clock path.** (Was 742.5 MHz; `gf180-pll` v1 cannot produce 742.5 or 371.25 MHz.) A successor decision record must name a source |
+| Pixel-rate clock (480p) | 27.000 MHz = 135 MHz ÷ 5, derived **inside this block** — not a PLL output |
+| Clock relationship | One PLL output; the pixel clock is derived from it by construction, so the 10:1 relationship is edge-aligned with no cycle slips |
+| Total TMDS output jitter budget (informative, DVI-class target) | ≤ 0.25 UI peak-to-peak at the pad (≈ 926 ps @ 270 Mbps, the live 480p point; 720p60 deferred, was ≈ 337 ps @ 742.5 Mbps) |
+| **PLL-attributable jitter budget (this block's requirement of the PLL)** | **≤ 0.10 UI peak-to-peak (UI = 1/270 Mbps) on the 135 MHz clock output, per edge (≈ 370 ps @ 270 Mbps; 720p60 deferred, was ≈ 135 ps @ 742.5 Mbps).** Not shown met by `gf180-pll`'s ratified period-jitter row — see DR-0017 |
+| Remaining budget (serializer + driver + board, this block's own responsibility) | ≤ 0.15 UI peak-to-peak (≈ 556 ps @ 270 Mbps; 720p60 deferred, was ≈ 202 ps @ 742.5 Mbps) — carries a new duty-cycle term, DR-0017 Decision 6 — closed out empirically with PVT-corner sim results in the driver design work, not asserted here |
 
-720p60's UI is 1/742.5 MHz ≈ 1.347 ns; 480p's UI is 1/270 MHz ≈ 3.704 ns. The
+The deferred 720p60 UI is 1/742.5 MHz ≈ 1.347 ns; 480p's UI is 1/270 MHz ≈ 3.704 ns. The
 0.10 UI PLL allocation is derived, not measured — see DR-0004 for the
 derivation and its informative RMS approximation.
 
@@ -89,7 +97,7 @@ pad/ESD budget (DR-0005) are all specified against 742.5 Mbps as the primary
 number, with 270 Mbps as a fallback operating point. Revisiting 1080p60 is a
 future decision record, not an assumption baked into this one.
 
-**Status**: Accepted.
+**Status**: Accepted. DR-0017 (Proposed) defers 720p60 for want of a clock path from `gf180-pll`; the ladder's rate definitions are unchanged.
 
 ### DR-0002: Driver topology and supply — DC-coupled current-mode, 3.3 V core devices
 
@@ -195,16 +203,19 @@ and revises this record's synthesized/custom boundary at the **720p60**
 operating point only — the 10:1→2:1 reduction moves to the custom domain
 there, merging with the already-custom final 2:1 multiplexer. At **480p**
 (135 MHz) DR-0014 confirms this record's synthesized-domain assignment
-stands unmodified, with comfortable margin.
+stands unmodified, with comfortable margin. **DR-0017 (Proposed)** supersedes the "PLL's full-rate (742.5 MHz / 270 MHz) and half-rate phases" clock premise: the clock is `gf180-pll`'s 135 MHz output, directly the half-rate clock, at 480p; 742.5 MHz / 371.25 MHz references here are 720p60 premises, deferred with no clock path.
 
 ### DR-0004: PLL interface numerics and jitter budget
 
 **Context**: The PLL is out of scope for this repository (DR-0001/CLAUDE.md
-scope discipline), but this block must hand its sibling a numeric interface
+scope discipline), but this block must hand its sibling PLL canary (named
+by DR-0017 as `gf180-pll`) a numeric interface
 contract — reference frequency, output frequencies, and a jitter budget —
 since TMDS eye closure is the primary way a bad PLL breaks this block.
 
-**Decision**: See §2's table. Key derivation:
+**Decision**: See §2's table (as amended by DR-0017; the 742.5 MHz and
+27.000 MHz-reference figures below are the original derivation, retained as
+history — 742.5 MHz is deferred with no clock path). Key derivation:
 
 - **Reference**: 27.000 MHz is chosen because it lets the 480p fallback's
   pixel clock come directly from the reference (×1, ÷10 for the bit clock)
@@ -229,7 +240,7 @@ since TMDS eye closure is the primary way a bad PLL breaks this block.
   model at a 1e-12 BER target (Q ≈ 7.03, so peak-to-peak ≈ 14.1 × RMS for a
   Gaussian random-jitter-dominated budget), the 0.10 UI PLL allocation
   corresponds to roughly 9.6 ps RMS @ 742.5 Mbps. This is informative only —
-  the actual deterministic/random jitter split is the sibling PLL block's
+  the actual deterministic/random jitter split is the sibling PLL block's (`gf180-pll`'s)
   own spec's responsibility, not fixed here.
 
 **Alternatives considered**: A flat percentage-of-UI budget with no
@@ -240,7 +251,7 @@ requirement in §2 cannot be verified as satisfiable, since arbitrary
 reference/ratio choices can make an exact 74.25/27.000 MHz relationship
 unreachable with a realistic PLL architecture.
 
-**Consequences**: If the sibling PLL canary's own ratified spec cannot meet
+**Consequences**: If the sibling PLL canary's (`gf180-pll`'s) own ratified spec cannot meet
 0.10 UI peak-to-peak at 742.5 MHz, this decision record must be revisited —
 either by relaxing this block's own internal budget below 0.15 UI (tightening
 serializer/driver design margin) or by re-deriving the total 0.25 UI figure
@@ -250,7 +261,10 @@ verification exists.
 **Status**: Superseded by DR-0012 (`spec/decisions/0012-pll-interface-completion.md`)
 as the authoritative document for §2's PLL interface contract, pending
 confirmation against the sibling PLL canary's own ratified spec once it
-exists. This is a completion, not a reversal: DR-0012 adds the clocks,
+exists. **That confirmation has now been attempted: DR-0017 (Proposed) finds
+`gf180-pll` v1 cannot serve 742.5 / 270 MHz or a 27 MHz reference, and amends
+§2 to a 135 MHz half-rate clock (480p first, 720p60 deferred); the 0.25/0.10/
+0.15 UI split is carried unchanged.** This is a completion, not a reversal: DR-0012 adds the clocks,
 signal types, and duty-cycle/loading rows DR-0003 required but this record
 never supplied — this record's own derivations (reference-frequency choice,
 0.25/0.10/0.15 UI jitter split) are carried forward **unchanged** by
@@ -874,3 +888,4 @@ where new work landed, not backfilled onto history.
 - [`DR-0013: Operating conditions and the verifiable spec rows`](decisions/0013-operating-conditions.md) — ratifies the PVT matrix (−40/27/125 °C, ±10 % supply, process corners) and the supply spec, and enumerates the spec's pass/fail rows (citing existing evidence where it exists, marking `Proposed` where it does not).
 - [`DR-0014: Serializer rate ceiling and micro-architecture`](decisions/0014-serializer-rate-ceiling-and-microarchitecture.md) — measures DR-0003's open 371.25 MHz synthesized-domain question for the 10:1→2:1 reduction stage (`rtl/tmds_serializer.v`): infeasible on this library at 720p60 (a register-to-register floor violation, not a margin-limited result), so the reduction moves to the custom domain there; confirmed feasible with comfortable margin at 480p, where DR-0003's synthesized-domain assignment stands. Also ratifies the loadable-shift-register micro-architecture.
 - [`DR-0015: HBM/CDM ESD qualification (DR-0013 row 11) is a permanent pre-silicon limitation, not schedulable work`](decisions/0015-esd-hbm-cdm-qualification-tracking.md) — records DR-0013 row 11 as an accepted, non-closing, pre-silicon limitation rather than open engineering work or a blocked dependency; the HBM/CDM requirement itself stays ratified and unrelaxed, and the row no longer blocks this block's T1/bronze tier. Re-opens on real silicon/ESD-tester data or a PDK-sourced ESD electrical dataset.
+- [`DR-0017: PLL sourcing — the sibling is gf180-pll; 135 MHz half-rate retarget (480p first), 720p60 deferred with no clock path`](decisions/0017-pll-sourcing-and-135mhz-half-rate-retarget.md) — **Proposed**; ratified only via `2am` `scripts/ratify-key.sh` (two-key rule, 2am#1056). Names `gf180-pll`, amends §2, re-derives DR-0012/DR-0014's clock premises for 135 MHz, pins the consumed interface in `reuse.lock.json`.
