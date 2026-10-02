@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "imports": [
+    {
+      "from": "2AMLogic/gf180-pll",
+      "commit": "db7a0455bdfcf546f0501ee1e0606eca36d1e7fb",
+      "mode": "fetched",
+      "files": [
+        {
+          "upstream": "spec/pll.md",
+          "sha256": "8b79033cffda4713488c3e020d2377d8579660f513dd9df1b2d1bf8a4f2b8608"
+        }
+      ],
+      "consumed": {
+        "decision": "spec/decisions/0017-pll-sourcing-and-135mhz-half-rate-retarget.md",
+        "interface": "pll_top CLK output, single-ended CMOS on vdd_vco (spec/pll.md rows 1, 3, 13, 14)",
+        "band": "10-200 MHz ratified output band (row 1); N = 4-64 integer (row 3)",
+        "output_frequency_mhz": 135,
+        "reference_frequency_mhz": 13.5,
+        "multiplication_ratio_n": 10,
+        "note": "Informative, non-schema annotation. The pinned stamp is of the sibling's ratified spec, which is the contract this block consumes; no silicon/layout bytes are imported."
+      }
+    }
+  ],
+  "in_tree": []
+}
