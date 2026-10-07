@@ -17,7 +17,7 @@ _None._
 
 Issues the operator starred (`loom:operator-priority`); land these first.
 
-_None._
+- **#186**: Define the block-level top's external 10-bit character input (DR-0016 Option A enabler)
 
 ## Ready
 
@@ -62,7 +62,7 @@ _None._
 | Tier | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Operator priority | 0 |
+| Operator priority | 1 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |

@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-02
+
+- **Issue #194** (closed): 2am: reuse rule 9 — the PLL this block takes its 270/742.5 MHz bit clock from is unnamed, and gf180-pll is ratified to 200 MHz
+- **PR #202**: spec: DR-0017 PLL sourcing — name gf180-pll, 135 MHz half-rate retarget, 720p60 deferred (#194)
+
 ### 2026-09-29
 
 - **Issue #199** (closed): Guard telemetry: worktree-write-confinement catastrophic denies on routine /tmp scratch writes during SPICE/klt sanity checks
