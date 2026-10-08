@@ -20,7 +20,7 @@ klt signoff --manifest signoff/manifest.json --format json
 as emitted by the graded build pinned below. Exit code `3` is the tool's
 documented "rendered but not T1" signal, not an error: `tier` is `null`
 until every T1 item is met, which is the honest state for this block today.
-As of this commit the grade is **6/22 T1 items met** (per-partition rows,
+As of this commit the grade is **7/22 T1 items met** (per-partition rows,
 11 checklist items × `kind: mixed-signal`'s two partitions):
 
 | met | why (the record's own reason, where unmet) |
@@ -29,7 +29,7 @@ As of this commit the grade is **6/22 T1 items met** (per-partition rows,
 | #4 LVS clean — analog + digital | `klt lvs` `status: match` (regenerated 2026-09-21 under the pinned build; identical 0-error verdicts), layout-hash pinned, `input_verified: true` |
 | #8 characterization report — analog + digital | the hand-rolled `kind: "generic"` wrapper over `measurements/characterization.md`, its `content_hash` pinned in both the manifest and the envelope |
 | #11 power delivery — analog | `no_evidence`: the analog partition has no `klt erc` supply spec or report yet (open work, unfiled) |
-| #11 power delivery — digital | `supply_spec_incomplete`: the committed `layout/erc-supply-spec.json` deliberately omits `ties[]` (klayout-tools#2169 — declaring one collapses the design into one island and reports a false `erc.supply_short`), so `erc.missing_tie` is uncomputed; and the digital column's `power_connectivity` verdict is `unchecked` (see #190) |
+| #11 power delivery — digital | **`met`** (issue #206). `klt erc` on `layout/erc-supply-spec.json` now declares both well ties: `erc_finding_count 0`, `erc.missing_tie` for `nwell_vdd_tap` and `lvpwell_vss_tap` both checked and none skipped, pinned to the committed GDS hash. Branch that graded it: **no place-and-route citation, so the PDN branch is not selected** (`power_delivery.pdn: false`; this block's P&R is `flow/pnr_tmds_encoder.py` driving OpenROAD directly and has no `klt place-and-route` response to cite, and none is fabricated). The grader instead takes the ERC + LVS pair: the cited LVS report is the SPICE-reference `layout/lvs_reports/tmds_encoder.lvs.json` (`power_connectivity: unchecked`, but its reference carries `VDD`/`VSS`, `supply_nets` `["VDD","VSS"]`), which suffices on that branch. The gate-level `tmds_encoder_gate.lvs.json` (`match`) is not the cited report |
 | #1, #2, #9, #10 | `no_evidence` by design — `klt signoff` cannot check topical relevance for the no-verb items, and citing an unrelated passing envelope to make a row go green is exactly the dishonesty this mechanism exists to prevent |
 | #5, #6, #7 | `no_evidence` — the analog corner/Monte-Carlo/post-layout evidence in `sim/` and `flow/` is committed as this repo's own Markdown evidence records, which are not `klt sim`/`klt yield`/`klt pex` JSON envelopes and are rejected by the grader regardless of how sound they are. The grading gap (not the engineering gap) is real and named: see "Why some genuinely-passed work grades unmet" below |
 

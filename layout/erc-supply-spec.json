@@ -51,47 +51,128 @@
     "  item 11 exists to detect (klayout-tools#2025's fleet survey found 2",
     "  of 7 committed digital layouts with exactly that hole).",
     "",
-    "- There is deliberately NO ties[] section here, and that is a recorded",
-    "  gap rather than an oversight: klt erc's ties[] collapses a real",
-    "  routed standard-cell design into one electrical island and reports a",
-    "  FALSE erc.supply_short (upstream klayout-tools#2169, reproduced four",
-    "  ways in gf180-drone-fc's FRICTION F-034). Because ties[] is omitted,",
-    "  erc.missing_tie is NOT COMPUTED by this run (docs/cli/erc.md:",
-    "  'Omitted entirely -> erc.missing_tie is never computed') -- any zero",
-    "  count for it in the committed report is an absence of evidence, not",
-    "  evidence of absence. Standing-in well-tie evidence, named per issue",
-    "  #188:",
-    "  - tapcell insertion in the flow that built this GDS:",
-    "    flow/pnr_tmds_encoder.py runs",
-    "    tapcell -distance 100 -tapcell_master gf180mcu_fd_sc_mcu9t5v0__filltie",
-    "    -endcap_master gf180mcu_fd_sc_mcu9t5v0__endcap;",
-    "  - the standard cells' own PG pin labels are present in the merged",
-    "    GDS (1385 VDD + 1385 VSS texts on 34/10, per above), and",
-    "    layout/lvs_reports/tmds_encoder.lvs.json reports status: \"match\"",
-    "    with VDD->VDD and VSS->VSS pairs in net_correspondence -- its SPICE",
-    "    reference carries the supply nets, so the rails' connectivity was",
-    "    part of that compare rather than absent from it.",
-    "  Full verification of well ties stays open until klayout-tools#2169",
-    "  is fixed and a ties[] section can be declared without manufacturing",
-    "  a false supply_short."
+    "- ties[] IS declared (issue #206). The blocker that kept it out",
+    "  (klayout-tools#2169: a declared tie collapsed the routed design into",
+    "  one island and reported a FALSE erc.supply_short) was fixed by",
+    "  klayout-tools#2186, merge commit 62fb705c, an ancestor of the pinned",
+    "  grading build e8ca621a6961. Re-running the unchanged historical",
+    "  reproduction (erc-tie-spec.known-gap.json) under that pin no longer",
+    "  reports erc.supply_short (see layout/README.md). Both ties use the",
+    "  boolean a real tap is, via tap_requires, because a bare Contact/Comp",
+    "  tap is graded skipped/degenerate_tap_declaration, not checked:",
+    "  - nwell_vdd_tap: well Nwell 21/0, tap = Comp 22/0 AND Nplus 32/0,",
+    "    connect_to Metal1, net VDD. Measured in this GDS: 91 merged",
+    "    Comp&Nplus&Nwell tap regions, 201 Contact shapes landing on them.",
+    "  - lvpwell_vss_tap: well LVPWELL 204/0, tap = Comp 22/0 AND Pplus",
+    "    31/0, connect_to Metal1, net VSS. Measured: 91 merged",
+    "    Comp&Pplus&LVPWELL tap regions, 201 Contact shapes on them.",
+    "  Wrong-polarity overlaps (Nplus Comp in LVPWELL, Pplus Comp in Nwell:",
+    "  553 each) are source/drain diffusion and are correctly excluded by the",
+    "  well intersection. The negative control (a tie pointed at an absent",
+    "  net fires erc.missing_tie) is recorded in layout/README.md."
   ],
   "stackup": [
-    { "name": "poly2", "layer": "30/0", "role": "gate", "active_layer": "22/0" },
-    { "name": "Metal1", "layer": "34/0", "label_layer": "34/10" },
-    { "name": "Metal2", "layer": "36/0" },
-    { "name": "Metal3", "layer": "42/0" },
-    { "name": "Metal4", "layer": "46/0" },
-    { "name": "Metal5", "layer": "81/0", "label_layer": "81/10" }
+    {
+      "name": "poly2",
+      "layer": "30/0",
+      "role": "gate",
+      "active_layer": "22/0"
+    },
+    {
+      "name": "Metal1",
+      "layer": "34/0",
+      "label_layer": "34/10"
+    },
+    {
+      "name": "Metal2",
+      "layer": "36/0"
+    },
+    {
+      "name": "Metal3",
+      "layer": "42/0"
+    },
+    {
+      "name": "Metal4",
+      "layer": "46/0"
+    },
+    {
+      "name": "Metal5",
+      "layer": "81/0",
+      "label_layer": "81/10"
+    }
   ],
   "vias": [
-    { "name": "Contact", "layer": "33/0", "between": ["poly2", "Metal1"] },
-    { "name": "Via1", "layer": "35/0", "between": ["Metal1", "Metal2"] },
-    { "name": "Via2", "layer": "38/0", "between": ["Metal2", "Metal3"] },
-    { "name": "Via3", "layer": "40/0", "between": ["Metal3", "Metal4"] },
-    { "name": "Via4", "layer": "41/0", "between": ["Metal4", "Metal5"] }
+    {
+      "name": "Contact",
+      "layer": "33/0",
+      "between": [
+        "poly2",
+        "Metal1"
+      ]
+    },
+    {
+      "name": "Via1",
+      "layer": "35/0",
+      "between": [
+        "Metal1",
+        "Metal2"
+      ]
+    },
+    {
+      "name": "Via2",
+      "layer": "38/0",
+      "between": [
+        "Metal2",
+        "Metal3"
+      ]
+    },
+    {
+      "name": "Via3",
+      "layer": "40/0",
+      "between": [
+        "Metal3",
+        "Metal4"
+      ]
+    },
+    {
+      "name": "Via4",
+      "layer": "41/0",
+      "between": [
+        "Metal4",
+        "Metal5"
+      ]
+    }
   ],
   "nets": [
-    { "name": "VDD", "kind": "supply" },
-    { "name": "VSS", "kind": "supply" }
+    {
+      "name": "VDD",
+      "kind": "supply"
+    },
+    {
+      "name": "VSS",
+      "kind": "supply"
+    }
+  ],
+  "ties": [
+    {
+      "name": "nwell_vdd_tap",
+      "well_layer": "21/0",
+      "tap_layer": "22/0",
+      "tap_requires": [
+        "32/0"
+      ],
+      "connect_to": "Metal1",
+      "net": "VDD"
+    },
+    {
+      "name": "lvpwell_vss_tap",
+      "well_layer": "204/0",
+      "tap_layer": "22/0",
+      "tap_requires": [
+        "31/0"
+      ],
+      "connect_to": "Metal1",
+      "net": "VSS"
+    }
   ]
 }
