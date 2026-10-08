@@ -43,6 +43,7 @@ the reason DR-0014 exists.
 
 from __future__ import annotations
 
+import os
 import random
 import sys
 from pathlib import Path
@@ -101,12 +102,19 @@ class ClockPair:
         self._pix.stop()
 
 
+#: rtl/tmds_tx_lane.v SEL_MODE this elaboration was built with (DR-0018);
+#: set by runner.py. 2 = runtime select, 0 = encoder only, 1 = external only.
+SEL_MODE = int(os.environ.get("TMDS_SEL_MODE", "2"))
+
+
 async def reset_dut(dut) -> None:
     """Assert reset, hold it across both domains, release on a bit-clock edge."""
     dut.rst.value = 1
     dut.data.value = 0
     dut.ctrl.value = 0
     dut.de.value = 0
+    dut.ext_tmds.value = 0
+    dut.ext_sel.value = 0
     for _ in range(3):
         await RisingEdge(dut.clk_pix)
     await RisingEdge(dut.clk_bit)
@@ -261,6 +269,10 @@ async def _collect_ser_words(dut, n: int) -> list[tuple[int, int]]:
 
 async def _drive_symbols(dut, n: int, rng: random.Random) -> None:
     for _ in range(n):
+        # The external port carries unrelated random words so that, in the
+        # external-only configuration, this legacy reduction check is not
+        # trivially satisfied. ext_sel stays 0 (encoder) in runtime mode.
+        dut.ext_tmds.value = rng.randrange(1024)
         if rng.random() < 0.2:
             dut.de.value = 0
             dut.ctrl.value = rng.randrange(4)
@@ -383,3 +395,186 @@ async def test_ser_word_pairs_are_lsb_first(dut):
             )
     finally:
         clocks.stop()
+
+
+# ---------------------------------------------------------------------------
+# DR-0018: per-cycle source selection against an independent scoreboard
+# ---------------------------------------------------------------------------
+
+#: Words the external port must carry exactly: all-zero, all-one, alternating.
+SPECIAL_WORDS = (0x000, 0x3FF, 0x2AA, 0x155, 0x001, 0x200)
+
+
+def _expected_char(sample: dict) -> int:
+    """Independent model of the lane's character mux, from sampled inputs.
+
+    Written from the DR-0018 contract, not from the RTL: at each clk_pix edge
+    the character presented to the serializer on the NEXT cycle is 0 if rst
+    was high, else the whole external word or the whole encoder word per the
+    configured select.
+    """
+    if sample["rst"]:
+        return 0
+    if SEL_MODE == 0:
+        use_ext = 0
+    elif SEL_MODE == 1:
+        use_ext = 1
+    else:
+        use_ext = sample["sel"]
+    return sample["ext"] if use_ext else sample["enc"]
+
+
+async def _monitor(dut, samples: list[dict], chars: list[int], n: int) -> None:
+    """Per clk_pix edge: sample inputs pre-edge, then read the output post-edge."""
+    for _ in range(n):
+        await RisingEdge(dut.clk_pix)
+        sample = {
+            "rst": int(dut.rst.value),
+            "sel": int(dut.ext_sel.value),
+            "ext": int(dut.ext_tmds.value),
+            "enc": int(dut.tmds_enc.value),
+        }
+        await Timer(READ_DELAY_PS, unit="ps")
+        samples.append(sample)
+        chars.append(int(dut.tmds.value))
+
+
+async def _drive_selection(dut, n: int, rng: random.Random) -> None:
+    """Arbitrary words, special words, consecutive characters, select toggling."""
+    for k in range(n):
+        dut.de.value = int(rng.random() < 0.8)
+        dut.data.value = rng.randrange(256)
+        dut.ctrl.value = rng.randrange(4)
+        phase = (k // 8) % 4
+        if rng.random() < 0.15:
+            dut.ext_tmds.value = rng.choice(SPECIAL_WORDS)
+        else:
+            dut.ext_tmds.value = rng.randrange(1024)
+        if phase == 0:  # select flips every cycle: adjacent-boundary changes
+            dut.ext_sel.value = k & 1
+        elif phase == 1:  # long run of external characters
+            dut.ext_sel.value = 1
+        elif phase == 2:  # random
+            dut.ext_sel.value = rng.randrange(2)
+        else:  # long run of encoder characters
+            dut.ext_sel.value = 0
+        await RisingEdge(dut.clk_pix)
+
+
+@cocotb.test()
+async def test_source_select_scoreboard(dut):
+    """Every character is wholly the selected source's, and reaches `ser`.
+
+    Per-cycle scoreboard on the 10-bit word presented to the serializer, then
+    the same words are checked on `ser` through the independent model (a
+    mixed-source or mistimed character would corrupt the stream). Includes a
+    mid-stream reset; the post-reset segment is checked end to end.
+    """
+    for label, t_bit, t_pix in OPERATING_POINTS:
+        rng = random.Random(0xC0DE ^ t_bit)
+        clocks = ClockPair(dut, t_bit, t_pix)
+        clocks.start()
+        try:
+            await reset_dut(dut)
+            n_pre, n_post = 90, 64
+            samples: list[dict] = []
+            chars: list[int] = []
+            total = n_pre + 4 + n_post
+            mon = cocotb.start_soon(_monitor(dut, samples, chars, total))
+            await _drive_selection(dut, n_pre, rng)
+
+            # Mid-stream reset while the external source is selected.
+            dut.ext_sel.value = 1 if SEL_MODE == 2 else 0
+            dut.rst.value = 1
+            for _ in range(4):
+                await RisingEdge(dut.clk_pix)
+            dut.rst.value = 0
+            await RisingEdge(dut.clk_pix)
+            start_post = len(chars)
+            pairs_task = cocotb.start_soon(_collect_ser_words(dut, 5 * (n_post + 4)))
+            await _drive_selection(dut, n_post, rng)
+            await mon
+            pairs = await pairs_task
+
+            expected = [_expected_char(sm) for sm in samples]
+            assert len(chars) == len(expected)
+            # chars[i] is observed after edge i, so it is a function of sample i.
+            for i, (got, want) in enumerate(zip(chars, expected)):
+                assert got == want, (
+                    f"{label} SEL_MODE={SEL_MODE}: cycle {i}: serializer input "
+                    f"0x{got:03x}, expected 0x{want:03x} from sample {samples[i]} "
+                    "-- character not wholly from the selected source"
+                )
+            assert any(sm["rst"] for sm in samples) and chars[n_pre + 1] == 0
+
+            used_ext = {sm["ext"] for sm in samples if not sm["rst"]}
+            used_enc = {sm["enc"] for sm in samples if not sm["rst"]}
+            if SEL_MODE == 2:
+                srcs = [sm["sel"] for sm in samples if not sm["rst"]]
+                assert 0 in srcs and 1 in srcs
+                assert any(a != b for a, b in zip(srcs, srcs[1:])), "select never changed"
+            assert {0x000, 0x3FF, 0x2AA} <= used_ext or len(used_ext) > 40
+            assert len(used_enc) > 4
+
+            # Serial stream of the post-reset segment, from the scoreboard words.
+            post = expected[start_post : start_post + n_post]
+            want_bits = model.chars_to_bitstream(post[2:])
+            got_bits = model.ser_words_to_bitstream(pairs)
+            offset = model.find_alignment(got_bits, want_bits)
+            assert offset >= 0, f"{label} SEL_MODE={SEL_MODE}: post-reset words not on ser"
+            end = offset + len(want_bits)
+            assert end <= len(got_bits)
+            assert got_bits[offset:end] == want_bits, (
+                f"{label} SEL_MODE={SEL_MODE}: ser stream mismatch after reset"
+            )
+            dut._log.info("%s SEL_MODE=%d: scoreboard OK over %d cycles", label, SEL_MODE, total)
+        finally:
+            clocks.stop()
+            await Timer(READ_DELAY_PS, unit="ps")
+
+
+@cocotb.test()
+async def test_external_path_is_identical_to_encoder_path(dut):
+    """The same character stream gives the same `ser` stream from either source.
+
+    Runtime mode: first run with the encoder selected; record the encoder's
+    own characters; replay exactly those words through `ext_tmds` (one cycle
+    per word, same cadence) with `ext_sel` = 1 and compare the two `ser`
+    streams bit for bit. Static modes cover the single source they elaborate.
+    """
+    if SEL_MODE != 2:
+        return
+    label, t_bit, t_pix = OPERATING_POINTS[1]
+    rng = random.Random(0x1D)
+    clocks = ClockPair(dut, t_bit, t_pix)
+    clocks.start()
+    try:
+        await reset_dut(dut)
+        n = 40
+        driver = cocotb.start_soon(_drive_symbols(dut, n + 10, rng))
+        chars_task = cocotb.start_soon(_collect_characters(dut, n))
+        ser_task = cocotb.start_soon(_collect_ser_words(dut, 5 * (n + 4)))
+        chars = await chars_task
+        pairs = await ser_task
+        await driver
+        internal_bits = model.ser_words_to_bitstream(pairs)
+
+        await reset_dut(dut)
+        dut.ext_sel.value = 1
+        ser_task = cocotb.start_soon(_collect_ser_words(dut, 5 * (n + 4)))
+        for word in chars:
+            dut.ext_tmds.value = word
+            await RisingEdge(dut.clk_pix)
+        dut.ext_tmds.value = 0
+        pairs2 = await ser_task
+        external_bits = model.ser_words_to_bitstream(pairs2)
+
+        want = model.chars_to_bitstream(chars[2:])
+        o_int = model.find_alignment(internal_bits, want)
+        o_ext = model.find_alignment(external_bits, want)
+        assert o_int >= 0 and o_ext >= 0, f"{label}: replayed words not found on ser"
+        assert internal_bits[o_int : o_int + len(want)] == external_bits[o_ext : o_ext + len(want)]
+        assert o_int % 2 == 0 and o_ext % 2 == 0
+    finally:
+        clocks.stop()
+        await Timer(READ_DELAY_PS, unit="ps")
