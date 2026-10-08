@@ -1111,9 +1111,10 @@ lvs_reports/tmds_encoder_gate.lvs.{json,txt}  gate-level-verilog LVS reports -- 
                                               digital-column power verdict (issue #190)
 erc-supply-spec.json                          klt erc supply spec -- the T1 item 11 (structural power
                                               delivery) declared-supply read (issue #188, see below)
-erc-tie-spec.known-gap.json                   klt erc spec reproducing klayout-tools#2169 (NOT a signoff spec)
-erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and VSS each resolve to
-                                              exactly one electrical island
+erc-tie-spec.known-gap.json                   HISTORICAL: klt erc spec that reproduced klayout-tools#2169 (NOT a signoff spec)
+erc-tie-spec.negctl.json                      negative control: the production spec with nwell_vdd_tap pointed at VSS
+erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and VSS each one island,
+                                              both ties checked, zero findings (issue #206)
 erc_reports/tmds_encoder_tie_known_gap.erc.json   the #2169 reproduction -- evidence of the tool gap,
                                               not evidence about this design
 ```
@@ -1386,23 +1387,59 @@ The split-rail case is the no-PDN signature `klayout-tools#2025`'s fleet
 survey actually found in 2 of 7 committed digital layouts; this block
 does not have it (the survey itself already recorded `VDD 1 / VSS 1` here).
 
-**What is NOT verified here: `erc.missing_tie`** (upstream
-[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169),
-reproduced four ways in `gf180-drone-fc`'s FRICTION F-034). `klt erc`'s
-`ties[]` collapses a real routed standard-cell design into one electrical
-island and reports a **false** `erc.supply_short`, so
-`erc-supply-spec.json` deliberately declares no `ties[]` — which means
-`erc.missing_tie` is *not computed* by the committed report
-(docs/cli/erc.md is explicit that omitting `ties[]` means the rule is
-never computed). Its zero count is an absence of evidence, not evidence
-of absence, and must not be cited as a well-tie verdict.
-`erc-tie-spec.known-gap.json` +
-`erc_reports/tmds_encoder_tie_known_gap.erc.json` are the committed
-reproduction on this block: with `ties[]` declared, `gates[]` drops from
-1019 to 1 and one `erc.supply_short` (VDD/VSS) appears — evidence *of the
-tool gap*, not evidence *about this design*.
+**Well ties (`erc.missing_tie`), closed by issue #206.**
+`erc-supply-spec.json` now declares both ties. The earlier omission was
+forced by [klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)
+(a declared tie collapsed the routed design into one island and reported a
+false `erc.supply_short`); the fix, klayout-tools#2186 (merge `62fb705c`),
+is an ancestor of the pinned grading build `e8ca621a6961` (`klt
+0.5.0+ge8ca621a6961`, KLayout 0.30.12), so no pin move was needed. All runs
+below use that build and the committed GDS,
+`sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d`
+(independently re-hashed with `sha256sum`; matches each report's
+`provenance.input.content_hash` and the manifest citation).
 
-The standing-in well-tie evidence, named per issue #188, is:
+1. *Historical reproduction re-run, unchanged* (`klt erc layout/gds/tmds_encoder.gds
+   layout/erc-tie-spec.known-gap.json --format json`): exit 4, **gate_count
+   1019** (was 1), **0 findings, no `erc.supply_short`**. The bug is gone. That
+   spec's Contact-only taps are now graded `skipped /
+   degenerate_tap_declaration` (both ties), so it is still not a usable
+   signoff spec. `erc-tie-spec.known-gap.json` and
+   `erc_reports/tmds_encoder_tie_known_gap.erc.json` are retained
+   **unchanged as historical, append-only evidence** of the tool gap as
+   produced by the earlier build (report spec hash `sha256:14b9ee32...`);
+   they say nothing about the current build.
+2. *Tap derivation, measured in the committed GDS* (KLayout region
+   booleans over the flattened top cell): Comp 22/0 AND Nplus 32/0 inside
+   Nwell 21/0 gives 91 merged n-tap regions, with 201 Contact 33/0 shapes
+   on them; Comp AND Pplus 31/0 inside LVPWELL 204/0 gives 91 merged p-tap
+   regions, again with 201 Contacts. Wrong-polarity overlaps (Nplus Comp in
+   LVPWELL, Pplus Comp in Nwell; 553 each) are source/drain diffusion and
+   are excluded by the well intersection. Hence `tap_layer: 22/0` with
+   `tap_requires: [32/0]` (to VDD) and `[31/0]` (to VSS), both
+   `connect_to: Metal1`. The flat text inventory on 21/10 / 204/10 measured
+   1248 `VNW` / 1248 `VPW` texts in this pass (the 1292 quoted below is the
+   earlier #188-era count); neither number feeds the graded check, which
+   reads the tie geometry.
+3. *Same-build no-ties vs production-ties* (`klt erc ... --format json`,
+   both exit 4, i.e. antenna not checked, no PDK antenna rules): identical
+   `gates[]` (1019) and identical `coverage`; **ties add nothing but the two
+   `erc.missing_tie` coverage entries**. Committed report
+   `erc_reports/tmds_encoder.erc.json`: `erc_finding_count 0` (zero
+   `erc.unconnected_net`, `erc.supply_short`, `erc.missing_tie`),
+   `erc_status: clean`, `erc.missing_tie:["nwell_vdd_tap"]` and
+   `["lvpwell_vss_tap"]` both in `erc_coverage.checked`, `skipped: []`.
+4. *Negative control* -- `erc-tie-spec.negctl.json` is the production spec
+   with `nwell_vdd_tap.net` changed to `VSS`:
+   `klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.negctl.json
+   --format json` exits 3 with **18 `erc.missing_tie`** findings ("well/tub
+   tap is not connected to declared net 'VSS'", layer `nwell_vdd_tap`). A
+   tie pointed at an absent net (`VDD_ABSENT`) likewise gave 18. The tie
+   check can fail. (Control reports are not committed, 2.7 MB each; the
+   spec is, and the command reproduces them.)
+
+The earlier standing-in evidence (kept for context, no longer load-bearing
+for ties) was:
 
 1. **The taps were actually placed.** `flow/pnr_tmds_encoder.py` runs
    `tapcell -distance 100 -tapcell_master gf180mcu_fd_sc_mcu9t5v0__filltie
@@ -1552,11 +1589,9 @@ form.
 *continuity* — a broken rail segment enters the verdict only through the
 per-instance pin resolution (`klt power`'s IR-drop/EM analysis and
 `klt ring-check` are the tools for the grid questions, and stay outside
-item 11 by its own text). The analog side of item 11 (the `ties[]`
-well-tie column) is unchanged by this read: it remains blocked on
-[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)
-exactly as the ERC subsection above documents, and nothing here touches
-that known-gap reproduction. The SPICE-reference signoff pair
+item 11 by its own text). The ERC well-tie half is now closed (issue #206, see the ERC
+subsection above); the known-gap reproduction is retained as historical
+evidence. The SPICE-reference signoff pair
 (`tmds_encoder.lvs.json` + its `_negctl`/`_shorted` controls) is also
 untouched: this read adds a report, it does not regenerate theirs (their
 reference derives from *unfiltered* `tmds_encoder.pnr.v`, unchanged in
