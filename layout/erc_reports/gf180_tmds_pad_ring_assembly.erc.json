@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "file": "layout/gds/gf180_tmds_pad_ring_assembly.gds",
+  "spec": "layout/erc-supply-spec.pad-ring.json",
+  "pdk": null,
+  "findings_only": false,
+  "gate_role": "poly2",
+  "gate_count": 3,
+  "gates": [
+    {
+      "gate_id": "gate0",
+      "net": "IBIAS",
+      "gate_area_um2": 210.0,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 418.8912,
+          "cumulative_area_um2": 418.8912,
+          "antenna_ratio": 1.99472,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 36.9078,
+          "cumulative_area_um2": 455.799,
+          "antenna_ratio": 2.170471,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 455.799,
+          "antenna_ratio": 2.170471,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 455.799,
+          "antenna_ratio": 2.170471,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 455.799,
+          "antenna_ratio": 2.170471,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal5",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 455.799,
+          "antenna_ratio": 2.170471,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    },
+    {
+      "gate_id": "gate1",
+      "net": "INP",
+      "gate_area_um2": 35.84,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 76.342,
+          "cumulative_area_um2": 76.342,
+          "antenna_ratio": 2.130078,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 0.1764,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal5",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    },
+    {
+      "gate_id": "gate2",
+      "net": "INN",
+      "gate_area_um2": 35.84,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 76.342,
+          "cumulative_area_um2": 76.342,
+          "antenna_ratio": 2.130078,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 0.1764,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal5",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 76.5184,
+          "antenna_ratio": 2.135,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "name": "VDD",
+      "matched_islands": 0,
+      "expected_islands": 1,
+      "roles": [],
+      "unlabelled_islands": null,
+      "unlabelled_area_um2": null,
+      "unlabelled_bbox": null,
+      "unlabelled_allowed_islands": null
+    },
+    {
+      "name": "VSS",
+      "matched_islands": 1,
+      "expected_islands": 1,
+      "roles": [],
+      "unlabelled_islands": null,
+      "unlabelled_area_um2": null,
+      "unlabelled_bbox": null,
+      "unlabelled_allowed_islands": null
+    }
+  ],
+  "erc_findings": [
+    {
+      "rule": "erc.unconnected_net",
+      "description": "declared net 'VDD' matches no labelled geometry in this layout",
+      "net": "VDD",
+      "other_net": null,
+      "gate_id": null,
+      "layer": null,
+      "bbox": null,
+      "islands": null
+    }
+  ],
+  "erc_finding_count": 1,
+  "erc_status": "violations",
+  "status": "violations",
+  "coverage": {
+    "scope": "antenna",
+    "schema_version": 1,
+    "known": true,
+    "checked": [],
+    "skipped": [
+      {
+        "id": "antenna:[\"gate0\",\"Metal1\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate0\",\"Metal2\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate0\",\"Metal3\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate0\",\"Metal4\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate0\",\"Metal5\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"Metal1\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"Metal2\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"Metal3\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"Metal4\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"Metal5\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"Metal1\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"Metal2\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"Metal3\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"Metal4\"]",
+        "reason": "missing_antenna_pdk"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"Metal5\"]",
+        "reason": "missing_antenna_pdk"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "antenna:[\"gate0\",\"poly2\"]",
+        "reason": "gate_reference_level"
+      },
+      {
+        "id": "antenna:[\"gate1\",\"poly2\"]",
+        "reason": "gate_reference_level"
+      },
+      {
+        "id": "antenna:[\"gate2\",\"poly2\"]",
+        "reason": "gate_reference_level"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": true,
+    "nothing_checked_reasons": [
+      "gate_reference_level",
+      "missing_antenna_pdk"
+    ]
+  },
+  "erc_coverage": {
+    "scope": "connectivity",
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "erc.floating_gate:[\"gate0\"]",
+      "erc.floating_gate:[\"gate1\"]",
+      "erc.floating_gate:[\"gate2\"]",
+      "erc.missing_tie:[\"substrate_vss_tap\"]",
+      "erc.net_connectivity:[\"VDD\"]",
+      "erc.net_connectivity:[\"VSS\"]"
+    ],
+    "skipped": [],
+    "inapplicable": [],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": [],
+    "checked_by_assertion": [],
+    "checked_by_well_assertion": [
+      "erc.missing_tie:[\"substrate_vss_tap\"]"
+    ],
+    "layers_in_stream_without_declaration": [
+      "32/0",
+      "37/0",
+      "55/0",
+      "115/5"
+    ]
+  },
+  "ties_disclosure": null,
+  "provenance": {
+    "klt_version": "0.6.0+g1eb3e4bfd0f5",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983",
+      "role": "layout"
+    },
+    "spec": {
+      "content_hash": "sha256:73c584c7929ae7097f1bb2ecb920602a6a6f0c3457da13f9ab9d4d918e2d455c"
+    },
+    "devices": [],
+    "net_exclusions": []
+  }
+}

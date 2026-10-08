@@ -31,6 +31,16 @@
         "file": "layout/lvs_reports/tmds_encoder.lvs.json",
         "content_hash": "sha256:8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa"
       }
+    ],
+    "11.analog": [
+      {
+        "file": "layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json",
+        "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983"
+      },
+      {
+        "file": "layout/lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json",
+        "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983"
+      }
     ]
   }
 }
