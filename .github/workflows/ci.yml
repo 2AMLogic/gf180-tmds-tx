@@ -110,7 +110,7 @@ jobs:
         # the same smoke check the encoder job runs, applied to both cells
         # `tmds_tx_chain.v` wraps.
         run: |
-          yosys -p "read_verilog rtl/tmds_encoder.v rtl/tmds_serializer.v verification/tmds_serializer/tmds_tx_chain.v; hierarchy -check -top tmds_tx_chain; check"
+          yosys -p "read_verilog rtl/tmds_encoder.v rtl/tmds_serializer.v rtl/tmds_tx_lane.v verification/tmds_serializer/tmds_tx_chain.v; hierarchy -check -top tmds_tx_chain; check"
 
       - name: Run verification bench (real DUT) and negative control (broken DUT)
         # runner.py asserts BOTH legs against tmds_tx_chain.v (the real

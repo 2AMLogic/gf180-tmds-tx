@@ -7,7 +7,8 @@ API, and enforces the same three-leg verification plan
 verification/README.md):
 
   - Leg 1 + Leg 2 (`--good-only` or default): `rtl/tmds_serializer.v`, wrapped
-    with the real `rtl/tmds_encoder.v` by `tmds_tx_chain.v`, must pass every
+    with the real `rtl/tmds_encoder.v` by `rtl/tmds_tx_lane.v` (via
+    `tmds_tx_chain.v`), in every SEL_MODE (DR-0018), must pass every
     test in test_tmds_serializer.py with zero failures.
   - Leg 3 (`--broken-only` or default): the *same* test module, run against
     negative_control/tmds_serializer_broken.v, must FAIL -- a bench that has
@@ -42,6 +43,7 @@ from cocotb_tools.runner import get_results, get_runner
 HERE = Path(__file__).resolve().parent
 RTL_DIR = HERE.parent.parent / "rtl"
 ENCODER = RTL_DIR / "tmds_encoder.v"
+LANE = RTL_DIR / "tmds_tx_lane.v"
 CHAIN = HERE / "tmds_tx_chain.v"
 GOOD_DUT = RTL_DIR / "tmds_serializer.v"
 BROKEN_DUT = HERE / "negative_control" / "tmds_serializer_broken.v"
@@ -49,12 +51,20 @@ TEST_MODULE = "test_tmds_serializer"
 TOPLEVEL = "tmds_tx_chain"
 
 
-def run_leg(serializer_source: Path, build_subdir: str) -> tuple[int, int]:
+#: Static configurations of rtl/tmds_tx_lane.v (SEL_MODE), see DR-0018:
+#: 2 = runtime select, 0 = encoder only, 1 = external only. All three are
+#: elaborated and run against the real serializer; the negative control runs
+#: in the runtime-select configuration (the one that exercises every path).
+SEL_MODES = (2, 0, 1)
+
+
+def run_leg(serializer_source: Path, build_subdir: str, sel_mode: int = 2) -> tuple[int, int]:
     """Build + run the bench with `serializer_source` as the serializer."""
     build_dir = HERE / "sim_build" / build_subdir
     runner = get_runner("icarus")
     runner.build(
-        verilog_sources=[ENCODER, serializer_source, CHAIN],
+        verilog_sources=[ENCODER, serializer_source, LANE, CHAIN],
+        parameters={"SEL_MODE": sel_mode},
         hdl_toplevel=TOPLEVEL,
         build_dir=build_dir,
         always=True,
@@ -66,6 +76,7 @@ def run_leg(serializer_source: Path, build_subdir: str) -> tuple[int, int]:
         hdl_toplevel=TOPLEVEL,
         build_dir=build_dir,
         test_dir=HERE,
+        extra_env={"TMDS_SEL_MODE": str(sel_mode)},
     )
     return get_results(results_xml)
 
@@ -93,13 +104,15 @@ def main() -> int:
 
     if run_good:
         print(f"=== Leg 1+2: {TEST_MODULE} vs. {GOOD_DUT.relative_to(repo_root)} ===")
-        n, f = run_leg(GOOD_DUT, "good")
-        print(f"real DUT: {n} test(s), {f} failed")
-        if f != 0:
-            print("FAIL: the real DUT must pass every test in the bench.")
-            ok = False
-        else:
-            print("PASS: real DUT passed the full bench.")
+        for mode in SEL_MODES:
+            sub = "good" if mode == 2 else f"good_sel{mode}"
+            n, f = run_leg(GOOD_DUT, sub, mode)
+            print(f"real DUT (SEL_MODE={mode}): {n} test(s), {f} failed")
+            if f != 0:
+                print(f"FAIL: the real DUT must pass every test (SEL_MODE={mode}).")
+                ok = False
+            else:
+                print(f"PASS: real DUT passed the full bench (SEL_MODE={mode}).")
 
     if run_broken:
         print(

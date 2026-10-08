@@ -17,14 +17,31 @@ DVI-mode TMDS transmitter component, not an HDMI part -- see `CLAUDE.md`,
   control-character citation, the four stages' cut points, and the full
   interface/behavior description, are in the file's own header.
 
+- `tmds_serializer.v` -- the 10:1->2:1 half-rate reduction (DR-0012, DR-0014);
+  verified by `verification/tmds_serializer/`.
+- `tmds_tx_lane.v` -- one TMDS lane (DR-0018): `tmds_encoder`, a registered
+  2:1 character-source select, and `tmds_serializer`. Per lane it admits an
+  external 10-bit character `ext_tmds` and a select `ext_sel` (parameter
+  `SEL_MODE`: 2 runtime select, default; 0 encoder only; 1 external only).
+  The external port's contract is the encoder's own: one registered character
+  per `clk_pix`, bit 0 first. Every character comes wholly from one source;
+  `ext_sel` may change at any `clk_pix` boundary; the mux register adds one
+  `clk_pix` of latency to both paths (encoder to serializer input: 5 cycles).
+  Three-lane use: instantiate it three times sharing `clk_bit`, `clk_pix`,
+  `rst`. **Boundary**: this is the digital per-lane module only. It contains
+  no HDMI-defined content (no TERC4, guard bands, preambles or packets -- that
+  is the consumer's layer, DR-0016) and no claim of HDMI compliance.
+  Physical/custom-domain integration and 720p60 timing closure are separate
+  work under DR-0014; simulation here shows function, not timing closure.
+
 Verified by `verification/tmds_encoder/` -- see `verification/README.md`
 for the verification conventions this repo follows (three-leg plan,
 cold-start invocation, pinned toolchain, negative-control rule).
 
 ## What's not here yet
 
-- **The 10:1->2:1 serializer.** Deliberate follow-on (issue #10's stated
-  scope boundary): this directory currently holds the encoder only.
+- **A ratified full block-level top** (pad ring, custom domain, 720p60
+  integration). `tmds_tx_lane.v` is the digital per-lane piece only.
 - **Synthesis recipes.** Those live in `flow/` (Yosys/OpenROAD, via `klt`),
   which is currently empty pending this directory having something to
   synthesize.

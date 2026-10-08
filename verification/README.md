@@ -27,7 +27,8 @@ without touching any other bench directory.
 Currently: `verification/tmds_encoder/` verifies `rtl/tmds_encoder.v`;
 `verification/tmds_serializer/` verifies `rtl/tmds_serializer.v` (the DR-0003/
 DR-0014 10:1→2:1 reduction stage plus DR-0012 Decision 1's internal
-divide-by-two), elaborated together with `rtl/tmds_encoder.v` via
+divide-by-two), elaborated together with `rtl/tmds_encoder.v` through
+`rtl/tmds_tx_lane.v` (DR-0018; all three `SEL_MODE` values) via
 `tmds_tx_chain.v` so the reduction is checked against the encoder's own real
 output rather than hand-written stimulus.
 

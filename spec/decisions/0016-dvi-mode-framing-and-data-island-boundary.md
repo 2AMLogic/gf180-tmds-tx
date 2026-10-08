@@ -1,6 +1,6 @@
 # DR-0016: The DVI-mode framing stands; HDMI data islands sit outside this block's boundary
 
-**Status: Proposed.** Records a scope/framing answer only. No parameter in
+**Status: Accepted** (Option A, as written; ratified 2026-10-08 -- see "Status"). Records a scope/framing answer only. No parameter in
 `spec/tmds-tx.md` §1 changes, no RTL or analog work is authorized or
 required by this record, and `CLAUDE.md` is not amended by it.
 
@@ -287,9 +287,15 @@ performed by issue #185.
 
 ## Status
 
-**Proposed.** Awaiting the same human/Champion ratification every other
-decision record in this repository goes through; no part of it takes effect
-until then.
+**Accepted** (Option A, ratified as written). Ratified by the attended-session
+decision of @turian (repository member) recorded on issue
+[#186](https://github.com/2AMLogic/gf180-tmds-tx/issues/186), 2026-10-08
+06:40 UTC: "Ratify DR-0016 as written (Option A): flip Status to Accepted and
+add its index entry under spec/tmds-tx.md 'Further decision records'". Only the
+Status line and the index entry changed on ratification; the Option-A boundary,
+the ratified parameters, `CLAUDE.md` and `README.md` are untouched. The
+character-cut interface requirement (question 3) is implemented by
+[DR-0018](0018-tx-lane-external-character-interface.md).
 
 **Cross-references**:
 [`2AMLogic/product#16`](https://github.com/2AMLogic/product/issues/16) (the
