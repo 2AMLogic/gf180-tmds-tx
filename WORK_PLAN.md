@@ -47,7 +47,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#207**: T1 item 11 (analog): add a klt erc supply spec and report for the pad-ring assembly and cite it *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -67,7 +67,7 @@ _None._
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 1 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
