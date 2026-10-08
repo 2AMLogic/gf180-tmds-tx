@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-08
+
+- **PR #204**: feat: per-lane external 10-bit character input + select (DR-0018); ratify DR-0016
+- **Issue #186** (closed): Define the block-level top's external 10-bit character input (DR-0016 Option A enabler)
+
 ### 2026-10-02
 
 - **Issue #194** (closed): 2am: reuse rule 9 — the PLL this block takes its 270/742.5 MHz bit clock from is unnamed, and gf180-pll is ratified to 200 MHz
