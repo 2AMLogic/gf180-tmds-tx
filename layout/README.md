@@ -1115,6 +1115,12 @@ erc-tie-spec.known-gap.json                   HISTORICAL: klt erc spec that repr
 erc-tie-spec.negctl.json                      negative control: the production spec with nwell_vdd_tap pointed at VSS
 erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and VSS each one island,
                                               both ties checked, zero findings (issue #206)
+erc-supply-spec.pad-ring.json                 klt erc supply spec for the analog pad-ring assembly (issue #207)
+erc-supply-spec.pad-ring.negctl-tie.json      negative control spec: substrate tie pointed at signal net OUTP
+erc-supply-spec.pad-ring.negctl-short.json    negative control spec: OUTP/OUTN declared as signal nets (for the shorted GDS)
+erc_reports/gf180_tmds_pad_ring_assembly.erc.json   positive pad-ring report (cited as 11.analog)
+erc_reports/gf180_tmds_pad_ring_assembly.negctl_tie.erc.json   control: erc.missing_tie
+erc_reports/gf180_tmds_pad_ring_assembly_shorted.negctl_short.erc.json   control: erc.multiply_driven_net
 erc_reports/tmds_encoder_tie_known_gap.erc.json   the #2169 reproduction -- evidence of the tool gap,
                                               not evidence about this design
 ```
@@ -1607,3 +1613,67 @@ fixes); PyPI's published `0.5.0` does not carry the check at all. A klt
 from source at or after `e8ca621a` reproduces both committed reports;
 `reference.pdk: "gf180mcuD"` in the request pins the same PDK variant every
 other flow in this repo resolves (`sim/harness/pdk.py`'s convention).
+
+### T1 item 11 (analog): `klt erc` supply read of the pad-ring assembly (issue #207)
+
+Producing build: `klt 0.6.0+g1eb3e4bfd0f5` (klayout-tools commit `1eb3e4bf`,
+KLayout 0.30.12) -- the pinned grading build `e8ca621a6961` cannot *produce*
+this report because it rejects `ties[].well_layer: null` (`must be
+'<layer>/<datatype>'`; the undrawn-substrate form, klayout-tools#2255, is in
+0.6.0 and newer). It *can read* the committed report: the pin is **not**
+moved, and re-grading with it changes exactly one row (below). Reproduce:
+
+```
+klt erc layout/gds/gf180_tmds_pad_ring_assembly.gds layout/erc-supply-spec.pad-ring.json \
+  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json   # exit 3 (finding)
+klt erc layout/gds/gf180_tmds_pad_ring_assembly.gds layout/erc-supply-spec.pad-ring.negctl-tie.json \
+  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.negctl_tie.erc.json
+klt erc layout/gds/gf180_tmds_pad_ring_assembly_shorted.gds layout/erc-supply-spec.pad-ring.negctl-short.json \
+  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly_shorted.negctl_short.erc.json
+```
+
+Note: 0.6.0+ rejects unknown spec keys, so the pad-ring specs carry no
+`_comment` (the digital `erc-supply-spec.json` does and is read by the pinned
+build only; filed upstream as klayout-tools#2822). Rationale lives here.
+
+**Inventory (measured from the GDS, flat single cell).** Routing layers
+Poly2 30/0, Metal1-Metal5 (34, 36, 42, 46, 81 /0) and Contact/Via1-Via4
+(33, 35, 38, 40, 41 /0) -- the stackup/vias in the spec. Labels: Metal1 34/10
+`VSS`x2 `OUTP`x2 `OUTN`x2 `TAIL`x2 `IBIAS`x2 `INP` `INN`; Metal5 81/10 `OUTP`,
+`OUTN`. **There is no `VDD` text anywhere.** Straps: DVSS at y 2-6 um and DVDD
+at y 12-16 um, each x 0-700 um on Metal3/4/5. Taps: one Comp&Pplus substrate
+tap (349.5,2)-(350.5,3) wired to the DVSS strap; no Nwell, no Nplus tap (the
+generator draws neither). No resistors/caps on conductor layers
+(`provenance.devices: []`). Intentionally ungraded: Nplus 32/0, Dualgate 55/0,
+37/0, 115/5 (reported under `layers_in_stream_without_declaration`).
+
+**Result: 1 finding.** `erc.unconnected_net`: "declared net 'VDD' matches no
+labelled geometry". `VSS` resolves to one island, no `erc.supply_short`, and
+`erc.missing_tie:["substrate_vss_tap"]` is in `erc_coverage.checked` (under
+`checked_by_well_assertion`), `skipped: []`. `provenance.input.content_hash`
+is `sha256:e65b3579...`, the committed GDS. The tie's `well_boxes`
+(230,-31)-(470,5) um is a caller assertion covering the driver devices and
+the tap; a box spanning the whole die is graded degenerate by the tool, so the
+substrate cannot honestly be asserted die-wide. That is the coverage boundary:
+the tie proves the tap reaches `VSS` inside that region, not that the whole
+die substrate is biased.
+
+**Grade.** `klt signoff` (pinned build): `11.analog` is `unmet` /
+`supply_not_continuous`; the only changed `signoff.json` row is that reason
+(was `no_evidence`); digital 11 stays `met`, `t1_met_count` unchanged. Even
+if VDD were labelled, the item-4 LVS report pairs only `VSS` in
+`net_correspondence` (the reference has no VDD), so it would then read
+`lvs_supply_unproven`. Neither is worked around: `VDD` is not omitted and no
+LVS correspondence is invented. The DVDD-strap question is filed as a design
+issue (#210).
+
+**Negative controls (separate envelopes, each carries the same baseline `VDD`
+finding).** (1) `negctl-tie`: tie net set to declared signal net `OUTP` on the
+real GDS -> `erc.missing_tie` ("tap is not connected to declared net 'OUTP'"),
+2 findings total. (2) `negctl-short`: the shorted assembly GDS (OUTP wired to
+VSS) with `OUTP`/`OUTN` declared as signal nets -> `erc.multiply_driven_net`
+("'OUTP' and 'VSS' are electrically the same net"), 2 findings. The shorted
+GDS is **not** an `erc.supply_short` control (OUTP is not a supply), and under
+the *production* spec it raises nothing beyond VDD (the short joins a
+undeclared signal to VSS), so the production spec alone does not detect that
+short; LVS does.
