@@ -6,6 +6,9 @@ phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
 ### 2026-10-08
+- **PR #208**: feat(erc): declare well ties in digital supply spec; item 11 digital met (#206)
+- **Issue #206** (closed): T1 item 11 (digital): declare well and substrate ties[] in layout/erc-supply-spec.json and re-run klt erc
+
 
 - **PR #204**: feat: per-lane external 10-bit character input + select (DR-0018); ratify DR-0016
 - **Issue #186** (closed): Define the block-level top's external 10-bit character input (DR-0016 Option A enabler)
