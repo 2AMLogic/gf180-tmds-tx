@@ -15,6 +15,12 @@ DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is
 verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
 timing-closed at 720p60 (`flow/`). The 10:1→2:1 serializer/reduction stage
+is fed through `rtl/tmds_tx_lane.v`, which selects registered characters
+from the encoder or an external 10-bit input at character boundaries.
+DR-0016 is accepted with the block remaining DVI-mode only; DR-0018
+(Proposed) records the lane interface and source-selection rules. This
+lane integration is functionally verified; its timing closure remains open.
+The serializer/reduction stage
 (DR-0003, sized against timing by DR-0014) is written and verified against
 the encoder's own real output (`rtl/tmds_serializer.v`,
 `verification/tmds_serializer/`); DR-0014 found it cannot close timing in
