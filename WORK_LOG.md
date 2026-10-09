@@ -6,6 +6,8 @@ phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
 ### 2026-10-08
+- **PR #211**: T1 item 11 (analog): klt erc supply spec + report for pad-ring assembly (#207)
+- **Issue #207** (closed): T1 item 11 (analog): add a klt erc supply spec and report for the pad-ring assembly and cite it
 - **PR #208**: feat(erc): declare well ties in digital supply spec; item 11 digital met (#206)
 - **Issue #206** (closed): T1 item 11 (digital): declare well and substrate ties[] in layout/erc-supply-spec.json and re-run klt erc
 
