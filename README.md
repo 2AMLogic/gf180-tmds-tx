@@ -8,9 +8,9 @@ ngspice on the analog side and Yosys/OpenROAD on the digital side.
 ![fleet burndown](https://raw.githubusercontent.com/2AMLogic/2am/main/fleet-metrics/charts/gf180-tmds-tx.svg)
 
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
-and now electrically post-layout-verified for its first process corner, and
+and electrically post-layout-verified across all five process corners, and
 the serializer/final-mux stage joining the digital and analog partitions
-designed, analog-verified at that same corner, and now also laid out and
+designed, analog-verified across all five process corners, and laid out and
 DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is
 verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
@@ -30,10 +30,10 @@ multiplexer, which is now captured as a schematic and sized
 (`design/tmds_final_mux.sch`, `design/tmds-final-mux-sizing.md`) and
 analog-verified — its own real output (`sim/tmds-final-mux-eye/`) and the
 driver's own rows re-measured with it substituted for their prior
-ideal-source assumption (`sim/cml-driver-eye-realmux/`) both PASS at the
-nominal process corner across the full temperature/supply/rate matrix, with
-the remaining process corners named as follow-up work
-(`measurements/characterization.md`). The CML output driver's schematic is
+ideal-source assumption (`sim/cml-driver-eye-realmux/`) both PASS across the
+full five-process-corner temperature/supply/rate matrix after the load-resistor
+sizing correction (issues #169/#173; schematic-level evidence only,
+`measurements/characterization.md`). The CML output driver's schematic is
 captured, sized, and PVT-swept against the ratified spec's electrical
 targets (`design/`, `sim/cml-driver-eye/`), and its core cell is laid out,
 DRC-clean, and LVS-matched against that schematic
@@ -55,7 +55,13 @@ block now also has its first electrical/PVT simulation** — a full 5-corner
 temperature/supply/rate grid, 90/90 PASS, layout-extracted with real
 interconnect parasitic R/C and the real diode-clamp ESD array in circuit
 with the driver — closing the "no electrical/PVT simulation of its own
-yet" gap across the full mandated corner-set (issues #154/#161). See
+yet" gap across the full mandated corner-set (issues #154/#161).
+**Supply signoff remains incomplete:** the assembly's declared VDD matches
+no labelled geometry, so T1 item 11 analog remains `unmet / supply_not_continuous`.
+The DVDD integration scope awaits an owner decision in
+[issue #210](https://github.com/2AMLogic/gf180-tmds-tx/issues/210); see the
+[committed ERC report](layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json).
+See
 `measurements/characterization.md`
 for the full, per-row accounting, and
 [`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
@@ -142,8 +148,14 @@ the `cml_driver_core` generator pattern. What remains open: a post-layout
 ESD HBM/CDM qualification is not simulated
 (no PDK source
 characterizes the needed device parameters pre-silicon — see
-`measurements/characterization.md`), and no post-layout eye-mask run exists
-yet against the extracted assembly (issue #160).
+`measurements/characterization.md`). The post-layout eye-mask run against
+the extracted assembly has passed the same 90-point PVT/rate/pad-capacitance
+grid as its schematic counterpart (issue #160), with a worst-case margin
+of 0.859 V against the 0.2 V floor; see the
+[record](sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md).
+This covers on-die parasitic R/C, the drawn pad and the ESD clamp in its
+operating-point circuit; it excludes package/board/bond-wire parasitics,
+HBM/CDM pulses and Monte Carlo eye-mask analysis.
 The "shuttle seat" rung and later remain open for the actual block; see
 [`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
 for the current brief-conformant proposal.**
