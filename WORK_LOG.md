@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-13
+
+- **PR #216**: chore(loom): drop onIdle [auditor] — follow the fleet idle-role setting
+
 ### 2026-10-08
 - **PR #211**: T1 item 11 (analog): klt erc supply spec + report for pad-ring assembly (#207)
 - **Issue #207** (closed): T1 item 11 (analog): add a klt erc supply spec and report for the pad-ring assembly and cite it
