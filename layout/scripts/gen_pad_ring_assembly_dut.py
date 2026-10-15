@@ -118,7 +118,18 @@ WRAPPER_PINS = ("OUTP", "OUTN", "INP", "INN", "IBIAS", "VSS")
 #: (which still names the klt extraction-deck's bare 'nfet' class). Anything
 #: else is an error: silently passing an unrecognized class through would
 #: produce a deck that either fails to parse or simulates the wrong device.
-KNOWN_X_MODELS = ("nfet_03v3", "diode_nd2ps_06v0")
+KNOWN_X_MODELS = ("nfet_03v3", "diode_nd2ps_06v0", "diode_pd2nw_06v0")
+
+#: ESD clamp diode models the D-cards may name: the VSS-side n+/p-sub leg and
+#: DR-0011's symmetric VDD-side p+/Nwell leg (issue #210).
+KNOWN_D_MODELS = ("diode_nd2ps_06v0", "diode_pd2nw_06v0")
+
+#: The assembly's DVDD ring net. The CML driver has no VDD pin, so the
+#: wrapper (which keeps the schematic cell's six-pin boundary) holds it at the
+#: testbench's own core rail -- `vdd_val`, which the harness hands every PVT
+#: point -- through an ideal source, instead of leaving the VDD-side clamps'
+#: cathodes floating.
+VDD_NET = "VDD"
 
 _SUBCKT_RE = re.compile(r"^\.SUBCKT\s+(?P<name>\S+)\s+(?P<pins>.*)$", re.IGNORECASE)
 _ENDS_RE = re.compile(r"^\.ENDS\b", re.IGNORECASE)
@@ -204,10 +215,10 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
         d_match = _D_RE.match(stripped)
         if d_match:
             model = d_match.group("model")
-            if model != "diode_nd2ps_06v0":
+            if model not in KNOWN_D_MODELS:
                 raise TranslationError(
                     f"unknown D-card model {model!r} on card {stripped!r}; "
-                    "this script only recognizes 'diode_nd2ps_06v0' -- if a new "
+                    f"this script only recognizes {KNOWN_D_MODELS!r} -- if a new "
                     "clamp topology was added to the assembly, extend this "
                     "deliberately rather than silently passing it through"
                 )
@@ -252,6 +263,11 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
             f"extracted cell is missing pin(s) {missing} needed by "
             f".subckt {WRAPPER_SUBCKT}; got {core_pins}"
         )
+    if VDD_NET not in core_pins:
+        raise TranslationError(
+            f"extracted cell has no {VDD_NET!r} pin; the VDD-side clamp leg "
+            "(issue #210) is expected to carry the DVDD ring net out as a pin"
+        )
     if "vsubs" in core_pins:
         raise TranslationError(
             "extracted cell unexpectedly exposes a 'vsubs' pin -- this script "
@@ -276,7 +292,7 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
         f"* source        : {source_label}",
         f"* source sha256 : {source_sha256}",
         f"* devices       : {x_devices} extracted X-card devices "
-        f"(nfet_03v3 + diode_nd2ps_06v0 ESD clamp), already PDK-bound",
+        f"(nfet_03v3 + diode_nd2ps_06v0 / diode_pd2nw_06v0 ESD clamps), already PDK-bound",
         "*",
         "* Unlike gen_cml_driver_core_dut.py's input (the bare core cell), this",
         "* extraction is already bound to real PDK subcircuits and already carries",
@@ -288,6 +304,10 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
         f"({WRAPPER_SUBCKT} {' '.join(WRAPPER_PINS)}),",
         "*   so sim/cml-driver-eye's testbench runs unchanged against this DUT too.",
         "*",
+        f"* The assembly's {VDD_NET} ring net (VDD-side clamp cathodes and Nwell tap,",
+        "* issue #210) is held at the testbench core rail vdd_val by an ideal source",
+        "* inside the wrapper, since the six-pin schematic boundary has no VDD pin.",
+        "*",
         "* NOT modelled here (state this in any record taken against this netlist):",
         "*   - no package, no board, no bond wire -- only the drawn on-die pad;",
         "*   - no HBM/CDM ESD pulse event -- the clamp diodes are in the",
@@ -297,6 +317,7 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
         f"* {CORE_SUBCKT} pin order is the extraction's own (alphabetical, plus the",
         f"* promoted internal node{'s' if len(internal) != 1 else ''} "
         f"{', '.join(internal) if internal else '(none)'}).",
+        f"vvdd_rail {VDD_NET} 0 dc {{vdd_val}}",
         f"xcore {' '.join(connections)} {CORE_SUBCKT}",
         ".ends",
         "",

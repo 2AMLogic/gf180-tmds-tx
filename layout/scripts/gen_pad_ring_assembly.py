@@ -38,16 +38,17 @@ guarantee it finishes in one PR"):
 - Two pads only (this driver's own OUTP/OUTN), not a full multi-lane TMDS
   ring (3 data lanes + clock, each needing its own differential pair) --
   that is a follow-up increment once this pattern is proven.
-- Clamp topology is `diode_nd2ps_06v0` only (pad-to-substrate/VSS), reusing
-  `gen_pad_v2.py`'s own DRC/LVS-clean multi-finger array geometry (issue
-  #87/#143), translated and relabelled per pad. DR-0011's symmetric
-  `diode_pd2nw_06v0` VDD-side leg (needing its own Nwell + well tap) is not
-  drawn here -- deferred, since this cell's driver has no VDD pin to begin
-  with (`cml_driver_core` is an NMOS-only differential pair + tail source,
-  per `design/netlist/cml_driver.spice`); the DVDD strap is still drawn
-  (ring continuity is a ring-wide requirement, independent of whether *this*
-  driver instance sinks current from it) but carries no clamp leg in this
-  increment.
+- Clamp topology is DR-0011's dual-diode pair per output: `diode_nd2ps_06v0`
+  (pad-to-substrate/VSS, `gen_pad_v2.py`'s own DRC/LVS-clean multi-finger
+  array geometry, issue #87/#143, translated and relabelled per pad) and the
+  symmetric `diode_pd2nw_06v0` VDD-side leg (issue #210): the same folded
+  finger array drawn as Pplus/Dualgate/diode_mk Comp inside its own Nwell
+  above the first array, anode on the pad net, plus an Nplus Nwell tap that
+  carries the Nwell (the cathode) to the DVDD strap through Metal1/Metal2/
+  via2. The strap is labelled `VDD` at those taps. The driver itself still
+  has no VDD pin (`cml_driver_core` is an NMOS-only differential pair + tail
+  source, per `design/netlist/cml_driver.spice`), so VDD is carried by the
+  ring clamps and the Nwell tap only.
 - INP/INN/IBIAS (driver inputs, off-chip from a digital/bias source) are not
   routed to pads here -- out of scope for the *output* pad-ring integration
   this issue targets.
@@ -86,6 +87,7 @@ except ModuleNotFoundError:  # pragma: no cover
 COMP = (22, 0)
 PPLUS = (31, 0)
 NPLUS = (32, 0)
+NWELL = (21, 0)
 DUALGATE = (55, 0)  # 5V/6V thick-oxide marker -- required by diode_nd2ps_06v0
 DIODE_MK = (115, 5)  # junction-diode device-recognition mark
 CONTACT = (33, 0)
@@ -105,7 +107,8 @@ PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only
 DBU = 0.001  # 1 nm, matches every other GDS in this repo
 
 CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
-VIA_SIZE = 0.30  # comfortably clears via*.width.1's 0.26um floor (all levels)
+VIA_SIZE = 0.26  # via*.width.1 is a fixed 0.26 x 0.26um square at every level (klt >= 0.7)
+VIA_HALF = VIA_SIZE / 2
 
 # ---------------------------------------------------------------------------
 # DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
@@ -158,6 +161,18 @@ N_FINGERS = 20
 # module's pre-#149 value, put the plate straight through the DVDD strap
 # band once the plate grew from the placeholder's 6.6um to 25um).
 PAD_STRUCT_OY_UM = 30.0
+
+# VDD-side clamp (`diode_pd2nw_06v0`, DR-0011's symmetric P-clamp-toward-VDD
+# leg): the second finger array of each pad sits this far above the first
+# array's top edge. Wide enough that the Nwell (NWELL_MARGIN_UM past the
+# Pplus fingers) clears the VSS-side N+ diode's Nplus/Dualgate/diode_mk
+# halos with room to spare.
+VDD_CLAMP_GAP_UM = 7.0
+NWELL_MARGIN_UM = 0.7  # Nwell overlap of the Pplus fingers (clears NW enclosure)
+# x of the Nwell tap's Comp, left of the VDD clamp array. Far enough that the
+# tap's Nplus clears the array's Pplus/diode_mk, near enough to stay in the
+# same Nwell island.
+NWELL_TAP_X_UM = -3.4
 
 
 def _box(layout, x0, y0, x1, y1):
@@ -273,7 +288,7 @@ def _draw_production_pad(
     stack_cy = array_y1 / 2
     for metal_spec in (METAL2, METAL3, METAL4):
         rect(metal_spec, via_cx - 0.60, stack_cy - 0.60, via_cx + 0.60, stack_cy + 0.60)
-    via_half = 0.15
+    via_half = VIA_HALF
     for via_spec in (VIA1, VIA2, VIA3, VIA4):
         rect(via_spec, via_cx - via_half, stack_cy - via_half, via_cx + via_half, stack_cy + via_half)
 
@@ -336,10 +351,108 @@ def _draw_substrate_tap(top, L, ox: float, oy: float, net_name: str) -> None:
     sy0, sy1 = m1_y1 - 0.10, m1_y1 + 0.60
     rect(METAL1, sx0, sy0, sx1, sy1)
     rect(METAL2, sx0, sy0, sx1, sy1)
-    via_half = 0.15
+    via_half = VIA_HALF
     vcx, vcy = cx, (sy0 + sy1) / 2
     rect(VIA1, vcx - via_half, vcy - via_half, vcx + via_half, vcy + via_half)
     rect(VIA2, vcx - via_half, vcy - via_half, vcx + via_half, vcy + via_half)
+
+
+def _draw_vdd_clamp(
+    top,
+    L,
+    ox: float,
+    oy: float,
+    net_name: str,
+    n_fingers: int = N_FINGERS,
+    bus_width: float = DEFAULT_BUS_WIDTH_UM,
+) -> dict[str, float]:
+    """Draw one pad's VDD-side clamp: a folded `diode_pd2nw_06v0` finger
+    array (Pplus/Dualgate/diode_mk Comp inside an Nwell -- anode = the pad
+    net, cathode = the Nwell), plus an Nplus Comp Nwell tap that carries the
+    Nwell (the diode cathode) to VDD. Same finger geometry and row fold as
+    the VSS-side `_draw_production_pad` array so both legs present the same
+    area/periphery (`A=40P P=120U` at 20 fingers) to `klt extract`.
+
+    (ox, oy) is the array's own origin; the anode's Metal1 gather bus runs
+    out to x = via_cx (this pad's cathode-spine column, `_draw_production_pad`
+    at the same ox) so the caller can tie it to the pad net with a vertical
+    Metal1 spine. Returns the absolute (x, y) of the Nwell tap's Metal2
+    landing, for the caller to route down to the DVDD strap.
+    """
+
+    def rect(spec, x0, y0, x1, y1):
+        top.shapes(L(spec)).insert(_box(top.layout(), ox + x0, oy + y0, ox + x1, oy + y1))
+
+    def label(spec, text, x, y):
+        top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
+
+    rows = clamp_rows(n_fingers)
+    array_x1 = _row_span(max(rows))
+    row_pitch = _row_pitch(bus_width)
+    array_y1 = (len(rows) - 1) * row_pitch + max(FINGER_DEPTH, bus_width)
+
+    contact_y_off = 0.39
+    bus_cy = contact_y_off + CONTACT_SIZE / 2
+    bus_dy0 = bus_cy - bus_width / 2
+    bus_dy1 = bus_cy + bus_width / 2
+    via_cx = array_x1 + PAD_VIA_GAP_UM
+
+    for r, count in enumerate(rows):
+        row_y0 = r * row_pitch
+        for i in range(count):
+            fx0 = i * FINGER_PITCH
+            rect(COMP, fx0, row_y0, fx0 + FINGER_L, row_y0 + FINGER_DEPTH)
+            cx = fx0 + FINGER_L / 2
+            rect(
+                CONTACT,
+                cx - CONTACT_SIZE / 2,
+                row_y0 + contact_y_off,
+                cx + CONTACT_SIZE / 2,
+                row_y0 + contact_y_off + CONTACT_SIZE,
+            )
+        rect(METAL1, -0.10, row_y0 + bus_dy0, via_cx + 0.60, row_y0 + bus_dy1)
+
+    margin = 0.16
+    rect(PPLUS, -margin, -margin, array_x1 + margin, array_y1 + margin)
+    dg = 0.30
+    rect(DUALGATE, -dg, -dg, array_x1 + dg, array_y1 + dg)
+    mk = 0.40
+    rect(DIODE_MK, -mk, -mk, array_x1 + mk, array_y1 + mk)
+
+    # Vertical Metal1 spine joining the rows' anode buses (also the column the
+    # caller's pad-net spine arrives on).
+    spine_half = max(0.60, bus_width / 2)
+    rect(METAL1, via_cx - spine_half, bus_dy0, via_cx + spine_half, (len(rows) - 1) * row_pitch + bus_dy1)
+
+    # Nwell tap: Nplus-covered 1x1 um Comp left of the array, inside the same
+    # Nwell. No Dualgate / diode_mk -- a plain well tie, not a diode terminal.
+    tap_x0 = NWELL_TAP_X_UM
+    tap_x1 = tap_x0 + 1.0
+    tap_y0, tap_y1 = 0.0, 1.0
+    rect(COMP, tap_x0, tap_y0, tap_x1, tap_y1)
+    rect(NPLUS, tap_x0 - margin, tap_y0 - margin, tap_x1 + margin, tap_y1 + margin)
+    tcx = (tap_x0 + tap_x1) / 2
+    tcy = (tap_y0 + tap_y1) / 2
+    rect(CONTACT, tcx - CONTACT_SIZE / 2, tcy - CONTACT_SIZE / 2, tcx + CONTACT_SIZE / 2, tcy + CONTACT_SIZE / 2)
+    m1_half = 0.35
+    rect(METAL1, tcx - m1_half, tcy - m1_half, tcx + m1_half, tcy + m1_half)
+    label(METAL1_LABEL, net_name, tcx, tcy)
+
+    # One Nwell over the tap and every Pplus finger.
+    rect(
+        NWELL,
+        tap_x0 - NWELL_MARGIN_UM,
+        -NWELL_MARGIN_UM,
+        array_x1 + NWELL_MARGIN_UM,
+        array_y1 + NWELL_MARGIN_UM,
+    )
+
+    # Via1 + Metal2 landing on the tap's Metal1 pad; the caller runs Metal2
+    # from here down to the DVDD strap.
+    via_half = VIA_HALF
+    rect(VIA1, tcx - via_half, tcy - via_half, tcx + via_half, tcy + via_half)
+    rect(METAL2, tcx - m1_half, tcy - m1_half, tcx + m1_half, tcy + m1_half)
+    return {"x": ox + tcx, "y": oy + tcy, "spine_x": ox + via_cx, "bus_y": oy + bus_cy}
 
 
 def _draw_ring_strap(top, L, x0: float, x1: float, y0: float, y1: float) -> None:
@@ -354,7 +467,7 @@ def _draw_ring_strap(top, L, x0: float, x1: float, y0: float, y1: float) -> None
     for metal_spec in (METAL3, METAL4, METAL5):
         rect(metal_spec, x0, y0, x1, y1)
     cy = (y0 + y1) / 2
-    via_half = 0.15
+    via_half = VIA_HALF
     x = x0 + STRAP_STITCH_PITCH_UM / 2
     while x < x1:
         rect(VIA3, x - via_half, cy - via_half, x + via_half, cy + via_half)
@@ -402,7 +515,7 @@ def _land_via_stack(top, L, x: float, y: float, size: float = 0.4) -> None:
     half = size / 2
     rect(METAL1, x - half, y - half, x + half, y + half)
     rect(METAL2, x - half, y - half, x + half, y + half)
-    via_half = 0.15
+    via_half = VIA_HALF
     rect(VIA1, x - via_half, y - via_half, x + via_half, y + via_half)
 
 
@@ -503,6 +616,36 @@ def build(
     pad0 = _draw_production_pad(top, L, pad0_cx - struct_width / 2, PAD_STRUCT_OY_UM, "OUTP", n_fingers, bus_width)
     pad1 = _draw_production_pad(top, L, pad1_cx - struct_width / 2, PAD_STRUCT_OY_UM, "OUTN", n_fingers, bus_width)
 
+    # -- VDD-side clamp per pad: pd2nw array + Nwell tap -> DVDD strap ------
+    # (DR-0011's symmetric P-clamp-toward-VDD leg, issue #210.) Each array
+    # sits above its pad's VSS-side array; a Metal1 spine ties its anode bus
+    # to the pad net, and the Nwell tap's Metal2 runs down onto the DVDD
+    # strap's Metal3 through one via2.
+    rows = clamp_rows(n_fingers)
+    array_top = (len(rows) - 1) * _row_pitch(bus_width) + max(FINGER_DEPTH, bus_width)
+    vdd_oy = PAD_STRUCT_OY_UM + array_top + VDD_CLAMP_GAP_UM
+    strap_cy = (DVDD_BAND[0] + DVDD_BAND[1]) / 2
+    for slot_cx, net in ((pad0_cx, "OUTP"), (pad1_cx, "OUTN")):
+        ox = slot_cx - struct_width / 2
+        clamp = _draw_vdd_clamp(top, L, ox, vdd_oy, "VDD", n_fingers, bus_width)
+        # anode bus -> pad net: Metal1 spine from the pad's own bus up to this
+        # array's bus, on the column both arrays' buses already reach.
+        spine_half = max(0.60, bus_width / 2)
+        top.shapes(L(METAL1)).insert(
+            _box(
+                top.layout(),
+                clamp["spine_x"] - spine_half,
+                PAD_STRUCT_OY_UM,
+                clamp["spine_x"] + spine_half,
+                clamp["bus_y"] + bus_width / 2,
+            )
+        )
+        # Nwell tap -> DVDD strap: Metal2 straight down, via2 into Metal3.
+        _route(top, L, [(clamp["x"], clamp["y"]), (clamp["x"], strap_cy)], 0.7, METAL2)
+        top.shapes(L(VIA2)).insert(
+            _box(top.layout(), clamp["x"] - VIA_HALF, strap_cy - VIA_HALF, clamp["x"] + VIA_HALF, strap_cy + VIA_HALF)
+        )
+
     # -- Route driver outputs up to their pads, on Metal2 -------------------
     # Landing point is each pad's row-0 Metal1 bus centre (scope item 5).
     _land_via_stack(top, L, outp_x, outp_y)
@@ -526,7 +669,10 @@ def build(
     )
 
     # -- Route driver VSS into the substrate tap / DVSS strap ---------------
-    tap_land_x, tap_land_y = tap_x + 0.5, tap_y + 1.5
+    # Coincide exactly with the tap's own via1 (`_draw_substrate_tap`'s vcy =
+    # 1.75) -- two 0.26um vias 0.25um apart would merge into one 0.26 x 0.51um
+    # via, which via1.width.1's fixed square size rejects.
+    tap_land_x, tap_land_y = tap_x + 0.5, tap_y + 1.75
     _land_via_stack(top, L, vss_x, vss_y)
     _land_via_stack(top, L, tap_land_x, tap_land_y)
     _route(

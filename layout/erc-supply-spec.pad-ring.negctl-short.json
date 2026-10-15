@@ -107,6 +107,16 @@
       ],
       "connect_to": "Metal1",
       "net": "VSS"
+    },
+    {
+      "name": "nwell_vdd_tap",
+      "well_layer": "21/0",
+      "tap_layer": "22/0",
+      "tap_requires": [
+        "32/0"
+      ],
+      "connect_to": "Metal1",
+      "net": "VDD"
     }
   ]
 }

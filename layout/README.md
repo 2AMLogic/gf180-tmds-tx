@@ -330,7 +330,8 @@ the machine re-verification this repo relies on.
 size with a real DR-0011-ratified clamp; it does not draw pad-ring
 continuity straps (DVDD/DVSS at DR-0011's 350/75 µm pitch) or a second
 (P-toward-VDD) clamp leg — both are block-level pad-ring assembly concerns
-(issue #86's scope, coordinated with, not duplicated, here).
+(issue #86's scope, coordinated with, not duplicated, here; the straps and the
+VDD-side leg are drawn in `gf180_tmds_pad_ring_assembly`, issues #86/#210).
 
 ## `cml_driver_core` — CML output driver core cell (issue #22)
 
@@ -605,6 +606,14 @@ Structure, per DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`):
   landed here via `pad_pitch_fit_study.py`'s already-validated block-level
   reference implementation (issue #143/#149), translated and relabelled per
   pad rather than re-derived.
+- **A VDD-side clamp per pad (issue #210)**: DR-0011's symmetric
+  `diode_pd2nw_06v0` leg — a 20-finger Pplus/Dualgate/`diode_mk` Comp array in
+  its own Nwell above each pad's `diode_nd2ps_06v0` array, anode on the pad net
+  (Metal1 spine) and the Nwell (cathode) tied by an Nplus Nwell tap through
+  Metal1/Metal2/via2 onto the DVDD strap, which is labelled `VDD` at those
+  taps. The reference netlist gains the `VDD` port and two `diode_pd2nw_06v0`
+  cards; the supply spec keeps its `VDD` assertion and adds an `nwell_vdd_tap`
+  tie.
 - **DVDD/DVSS ring continuity**: Metal3/Metal4/Metal5 supply straps drawn
   continuously across the full two-pad span (not stopping at either pad's
   own footprint) and via-stitched every 50 um so the three metal levels
@@ -623,12 +632,10 @@ Structure, per DR-0011 (`spec/decisions/0011-pad-esd-strategy.md`):
 own module docstring for the full reasoning): two pads only (this driver's
 own outputs), not a full multi-lane TMDS ring — three data lanes plus clock,
 each needing its own differential pair, is a follow-up increment once this
-pattern is proven. Clamp topology is `diode_nd2ps_06v0` (pad-to-VSS) only;
-DR-0011's symmetric `diode_pd2nw_06v0` VDD-side leg is not drawn (this
-driver has no VDD pin to begin with — the DVDD strap is still drawn for
-ring-continuity's own sake, but carries no clamp leg or other connection in
-this increment, and `klt extract` correctly reports it as disconnected
-"dead metal", not a missing connection: see the Signoff section below).
+pattern is proven. Clamp topology is DR-0011's dual-diode pair per output:
+`diode_nd2ps_06v0` (pad-to-VSS) and, since issue #210, the symmetric
+`diode_pd2nw_06v0` VDD-side leg (the driver itself still has no VDD pin; VDD
+is carried by the ring clamps and the Nwell tap only).
 `INP`/`INN`/`IBIAS` (driver inputs) are not routed to pads — out of scope
 for the *output* pad-ring integration this issue targets. Clamp size is
 `N_FINGERS` (20 fingers, `gf180_tmds_pad_v2`'s own as-drawn array) — a
@@ -685,17 +692,17 @@ assembly and its `_shorted` negative control) and **LVS `status: match`** (2
 class" informational notes every other cell's own clean LVS run already
 carries) against a hand-written schematic-equivalent reference
 (`lvs/gf180_tmds_pad_ring_assembly.ref.spice`, `design/netlist/cml_driver.spice`
-plus two `diode_nd2ps_06v0` `D` cards). The `_shorted` negative control
+plus two `diode_nd2ps_06v0` and two `diode_pd2nw_06v0` `D` cards, `VDD` a
+port). The `_shorted` negative control
 (OUTP bridged directly to VSS) correctly reports `status: mismatch`
 (`net.merged`/`net.split` findings, plus cascading device mismatches) against
 the same reference, confirming the LVS check actually distinguishes
-connected from disconnected. `klt extract`'s own report additionally flags
-the DVDD strap's three 700x4um (~2800 um² each) Metal3/Metal4/Metal5
-rectangles (plus its via3/via4 stitches) as
-disclosed, expected "dead metal" — connected to no device or labelled net in
-this single-driver-instance increment, exactly as the Scope note above
-states. `klt extract`'s `device_counts` reports `diode_nd2ps_06v0: 40` (20
-fingers per pad × 2 pads, up from the pre-#149 placeholder's `2`) and
+connected from disconnected. `klt extract`'s `dead_metal` list is now empty:
+the DVDD strap is tied to the VDD-side clamps and the Nwell taps (issue #210;
+before it, the strap's three 700x4um Metal3/Metal4/Metal5 rectangles were
+disclosed "dead metal"). `klt extract`'s `device_counts` reports
+`diode_nd2ps_06v0: 40` and `diode_pd2nw_06v0: 40` (20 fingers per pad × 2 pads
+each) and
 `nfet: 338`, unchanged from `cml_driver_core`'s own device count.
 
 **Pad-node capacitance vs. DR-0005's ≤ 2 pF budget (issue #149)**: `klt
@@ -1117,9 +1124,11 @@ erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and V
                                               both ties checked, zero findings (issue #206)
 erc-supply-spec.pad-ring.json                 klt erc supply spec for the analog pad-ring assembly (issue #207)
 erc-supply-spec.pad-ring.negctl-tie.json      negative control spec: substrate tie pointed at signal net OUTP
+erc-supply-spec.pad-ring.negctl-vdd-tie.json  negative control spec: Nwell (VDD) tie pointed at signal net OUTP (issue #210)
 erc-supply-spec.pad-ring.negctl-short.json    negative control spec: OUTP/OUTN declared as signal nets (for the shorted GDS)
 erc_reports/gf180_tmds_pad_ring_assembly.erc.json   positive pad-ring report (cited as 11.analog)
 erc_reports/gf180_tmds_pad_ring_assembly.negctl_tie.erc.json   control: erc.missing_tie
+erc_reports/gf180_tmds_pad_ring_assembly.negctl_vdd_tie.erc.json   control: erc.missing_tie (Nwell tap)
 erc_reports/gf180_tmds_pad_ring_assembly_shorted.negctl_short.erc.json   control: erc.multiply_driven_net
 erc_reports/tmds_encoder_tie_known_gap.erc.json   the #2169 reproduction -- evidence of the tool gap,
                                               not evidence about this design
@@ -1614,66 +1623,86 @@ from source at or after `e8ca621a` reproduces both committed reports;
 `reference.pdk: "gf180mcuD"` in the request pins the same PDK variant every
 other flow in this repo resolves (`sim/harness/pdk.py`'s convention).
 
-### T1 item 11 (analog): `klt erc` supply read of the pad-ring assembly (issue #207)
+### T1 item 11 (analog): `klt erc` supply read of the pad-ring assembly (issues #207, #210)
 
-Producing build: `klt 0.6.0+g1eb3e4bfd0f5` (klayout-tools commit `1eb3e4bf`,
-KLayout 0.30.12) -- the pinned grading build `e8ca621a6961` cannot *produce*
-this report because it rejects `ties[].well_layer: null` (`must be
+Producing build: `klt 0.7.1.dev524+g2dd587bd4185` (KLayout 0.30.12) for the
+ERC reports -- the pinned grading build `e8ca621a6961` cannot *produce* them
+because it rejects `ties[].well_layer: null` (`must be
 '<layer>/<datatype>'`; the undrawn-substrate form, klayout-tools#2255, is in
-0.6.0 and newer). It *can read* the committed report: the pin is **not**
-moved, and re-grading with it changes exactly one row (below). Reproduce:
+0.6.0 and newer). It *can read* the committed reports: the pin is **not**
+moved. The DRC/extract/LVS reports and the parasitic netlist were regenerated
+with the pinned build (`0.5.0+ge8ca621a6961`). Reproduce (from the repo root,
+so the report's `file`/`spec` paths resolve for `klt signoff`):
 
 ```
 klt erc layout/gds/gf180_tmds_pad_ring_assembly.gds layout/erc-supply-spec.pad-ring.json \
-  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json   # exit 3 (finding)
+  --top gf180_tmds_pad_ring_assembly --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json   # exit 4 (no findings; antenna not checked)
 klt erc layout/gds/gf180_tmds_pad_ring_assembly.gds layout/erc-supply-spec.pad-ring.negctl-tie.json \
-  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.negctl_tie.erc.json
+  --top gf180_tmds_pad_ring_assembly --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.negctl_tie.erc.json
+klt erc layout/gds/gf180_tmds_pad_ring_assembly.gds layout/erc-supply-spec.pad-ring.negctl-vdd-tie.json \
+  --top gf180_tmds_pad_ring_assembly --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly.negctl_vdd_tie.erc.json
 klt erc layout/gds/gf180_tmds_pad_ring_assembly_shorted.gds layout/erc-supply-spec.pad-ring.negctl-short.json \
-  --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly_shorted.negctl_short.erc.json
+  --top gf180_tmds_pad_ring_assembly_shorted --format json > layout/erc_reports/gf180_tmds_pad_ring_assembly_shorted.negctl_short.erc.json
 ```
 
 Note: 0.6.0+ rejects unknown spec keys, so the pad-ring specs carry no
 `_comment` (the digital `erc-supply-spec.json` does and is read by the pinned
 build only; filed upstream as klayout-tools#2822). Rationale lives here.
 
+**History.** Issue #207 produced the first read of the assembly: one finding,
+`erc.unconnected_net` on `VDD` (the DVDD strap carried no label and touched no
+device), and `11.analog` rendered `unmet` / `supply_not_continuous`. Issue #210
+(owner ruling: complete DVDD integration per DR-0011, no exemption, no weakened
+assertion) drew the VDD-side clamp and Nwell taps; the numbers below are the
+re-read against the new GDS. The #207 report is superseded in this tree, not
+edited by hand; it remains in git history.
+
 **Inventory (measured from the GDS, flat single cell).** Routing layers
 Poly2 30/0, Metal1-Metal5 (34, 36, 42, 46, 81 /0) and Contact/Via1-Via4
 (33, 35, 38, 40, 41 /0) -- the stackup/vias in the spec. Labels: Metal1 34/10
-`VSS`x2 `OUTP`x2 `OUTN`x2 `TAIL`x2 `IBIAS`x2 `INP` `INN`; Metal5 81/10 `OUTP`,
-`OUTN`. **There is no `VDD` text anywhere.** Straps: DVSS at y 2-6 um and DVDD
-at y 12-16 um, each x 0-700 um on Metal3/4/5. Taps: one Comp&Pplus substrate
-tap (349.5,2)-(350.5,3) wired to the DVSS strap; no Nwell, no Nplus tap (the
-generator draws neither). No resistors/caps on conductor layers
-(`provenance.devices: []`). Intentionally ungraded: Nplus 32/0, Dualgate 55/0,
-37/0, 115/5 (reported under `layers_in_stream_without_declaration`).
+`VSS`x2 `VDD`x2 `OUTP`x2 `OUTN`x2 `TAIL`x2 `IBIAS`x2 `INP` `INN`; Metal5 81/10
+`OUTP`, `OUTN`. Straps: DVSS at y 2-6 um and DVDD at y 12-16 um, each x 0-700 um
+on Metal3/4/5. Taps: one Comp&Pplus substrate tap (349.5,2)-(350.5,3) wired to
+the DVSS strap, and one Comp&Nplus Nwell tap per pad, each inside that pad's
+own Nwell and wired by Metal1/Metal2/via2 to the DVDD strap. No resistors/caps
+on conductor layers (`provenance.devices: []`). Intentionally ungraded: Nplus
+32/0 is now a tie layer; Nwell 21/0 is the `nwell_vdd_tap` well layer; Dualgate
+55/0, 37/0, 115/5 are reported under `layers_in_stream_without_declaration`.
 
-**Result: 1 finding.** `erc.unconnected_net`: "declared net 'VDD' matches no
-labelled geometry". `VSS` resolves to one island, no `erc.supply_short`, and
-`erc.missing_tie:["substrate_vss_tap"]` is in `erc_coverage.checked` (under
-`checked_by_well_assertion`), `skipped: []`. `provenance.input.content_hash`
-is `sha256:e65b3579...`, the committed GDS. The tie's `well_boxes`
-(230,-31)-(470,5) um is a caller assertion covering the driver devices and
-the tap; a box spanning the whole die is graded degenerate by the tool, so the
-substrate cannot honestly be asserted die-wide. That is the coverage boundary:
-the tie proves the tap reaches `VSS` inside that region, not that the whole
-die substrate is biased.
+**Result: 0 findings.** `VDD` and `VSS` each resolve to exactly one island, no
+`erc.supply_short`, and both `erc.missing_tie:["nwell_vdd_tap"]` and
+`erc.missing_tie:["substrate_vss_tap"]` are in `erc_coverage.checked`
+(`skipped: []`). `provenance.input.content_hash` is `sha256:136ec1a3...`, the
+committed GDS. The substrate tie's `well_boxes` (230,-31)-(470,5) um is a
+caller assertion covering the driver devices and the tap; a box spanning the
+whole die is graded degenerate by the tool, so the substrate cannot honestly be
+asserted die-wide. That is the coverage boundary: the tie proves the tap
+reaches `VSS` inside that region, not that the whole die substrate is biased.
+The `VDD` assertion is unchanged from #207 (still a declared supply); only the
+`nwell_vdd_tap` tie was added.
 
-**Grade.** `klt signoff` (pinned build): `11.analog` is `unmet` /
-`supply_not_continuous`; the only changed `signoff.json` row is that reason
-(was `no_evidence`); digital 11 stays `met`, `t1_met_count` unchanged. Even
-if VDD were labelled, the item-4 LVS report pairs only `VSS` in
-`net_correspondence` (the reference has no VDD), so it would then read
-`lvs_supply_unproven`. Neither is worked around: `VDD` is not omitted and no
-LVS correspondence is invented. The DVDD-strap question is filed as a design
-issue (#210).
+**LVS pairing.** The item-4 LVS report (`status: match`) now carries `VDD`
+paired to the reference's `VDD` in `net_correspondence`, so the supply is part
+of the compare (not `lvs_supply_unproven`).
 
-**Negative controls (separate envelopes, each carries the same baseline `VDD`
-finding).** (1) `negctl-tie`: tie net set to declared signal net `OUTP` on the
-real GDS -> `erc.missing_tie` ("tap is not connected to declared net 'OUTP'"),
-2 findings total. (2) `negctl-short`: the shorted assembly GDS (OUTP wired to
-VSS) with `OUTP`/`OUTN` declared as signal nets -> `erc.multiply_driven_net`
-("'OUTP' and 'VSS' are electrically the same net"), 2 findings. The shorted
-GDS is **not** an `erc.supply_short` control (OUTP is not a supply), and under
-the *production* spec it raises nothing beyond VDD (the short joins a
-undeclared signal to VSS), so the production spec alone does not detect that
-short; LVS does.
+**Grade.** `klt signoff` (pinned build): `11.analog` is `met`, regenerated
+from the cited evidence (`signoff/signoff.json`, not edited by hand);
+`t1_met_count` 7 -> 8. The record also now lists `nwell.space.1` and
+`nwell.enclosing.comp.1` among the DRC rules actually checked on the analog
+layout (they were skipped while the layout had no Nwell).
+
+**Negative controls (separate envelopes, each otherwise as clean as the
+positive).** (1) `negctl-tie`: substrate tie net set to declared signal net
+`OUTP` on the real GDS -> `erc.missing_tie` ("tap is not connected to declared
+net 'OUTP'"), 1 finding. (2) `negctl-vdd-tie` (issue #210): the same for the
+Nwell tie -> `erc.missing_tie` on `OUTP`, one per pad's Nwell tap (2
+findings); proves the new VDD tie assertion can fail. (3) `negctl-short`: the
+shorted assembly GDS (OUTP wired to VSS) with `OUTP`/`OUTN` declared as signal
+nets -> `erc.multiply_driven_net` ("'OUTP' and 'VSS' are electrically the same
+net"), 1 finding. The shorted GDS is **not** an `erc.supply_short` control
+(OUTP is not a supply), and under the *production* spec it raises nothing (the
+short joins an undeclared signal to VSS), so the production spec alone does not
+detect that short; LVS does. A VDD-to-VSS short control on the layout side was
+not drawn: the `negctl-vdd-tie` spec control stands in for "VDD tap removed or
+mis-tied", and the `_shorted` LVS control keeps proving LVS distinguishes
+connected from disconnected on this reference.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "file": "layout/gds/gf180_tmds_pad_ring_assembly.gds",
-  "spec": "/tmp/negA.json",
+  "spec": "layout/erc-supply-spec.pad-ring.negctl-tie.json",
   "pdk": null,
   "findings_only": false,
   "gate_role": "poly2",
@@ -215,7 +215,7 @@
   "nets": [
     {
       "name": "VDD",
-      "matched_islands": 0,
+      "matched_islands": 1,
       "expected_islands": 1,
       "roles": [],
       "unlabelled_islands": null,
@@ -259,19 +259,9 @@
         "top": 5000
       },
       "islands": null
-    },
-    {
-      "rule": "erc.unconnected_net",
-      "description": "declared net 'VDD' matches no labelled geometry in this layout",
-      "net": "VDD",
-      "other_net": null,
-      "gate_id": null,
-      "layer": null,
-      "bbox": null,
-      "islands": null
     }
   ],
-  "erc_finding_count": 2,
+  "erc_finding_count": 1,
   "erc_status": "violations",
   "status": "violations",
   "coverage": {
@@ -370,6 +360,7 @@
       "erc.floating_gate:[\"gate0\"]",
       "erc.floating_gate:[\"gate1\"]",
       "erc.floating_gate:[\"gate2\"]",
+      "erc.missing_tie:[\"nwell_vdd_tap\"]",
       "erc.missing_tie:[\"substrate_vss_tap\"]",
       "erc.net_connectivity:[\"OUTP\"]",
       "erc.net_connectivity:[\"VDD\"]",
@@ -385,26 +376,47 @@
       "erc.missing_tie:[\"substrate_vss_tap\"]"
     ],
     "layers_in_stream_without_declaration": [
-      "32/0",
       "37/0",
       "55/0",
       "115/5"
+    ],
+    "well_assertion_coverage": [
+      {
+        "id": "erc.missing_tie:[\"substrate_vss_tap\"]",
+        "tap_layer": "22/0",
+        "drawn_tap_area_um2": 731.96,
+        "uncovered_tap_area_um2": 162.0,
+        "uncovered_tap_fraction": 0.221324,
+        "extent_uncovered_fraction": 0.835616
+      }
     ]
   },
   "ties_disclosure": null,
   "provenance": {
-    "klt_version": "0.6.0+g1eb3e4bfd0f5",
+    "klt_version": "0.7.1.dev524+g2dd587bd4185",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": null,
     "input": {
-      "content_hash": "sha256:e65b357967cf91c4246921508662f1bfef0137a8188cb97953993b97ebc86983",
+      "content_hash": "sha256:136ec1a3db4af9b039fde47595eedc71d60079bdf65b517a6c64b2cec15f3fb2",
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:8318f26a519a65f4a8e12d4c32870c3939fbf839a63098a4f8fbd72ded6f09bc"
+      "content_hash": "sha256:59f088c6135aae37eeabc9e65bc6ae1ff8f73e897ca9ff6fa1ec1823e8436ea5"
     },
     "devices": [],
-    "net_exclusions": []
+    "net_exclusions": [],
+    "label_layers": [
+      {
+        "name": "Metal1",
+        "label_layer": "34/10",
+        "label_text_count": 14
+      },
+      {
+        "name": "Metal5",
+        "label_layer": "81/10",
+        "label_text_count": 2
+      }
+    ]
   }
 }

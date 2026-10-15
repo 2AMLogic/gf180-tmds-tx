@@ -56,11 +56,13 @@ temperature/supply/rate grid, 90/90 PASS, layout-extracted with real
 interconnect parasitic R/C and the real diode-clamp ESD array in circuit
 with the driver — closing the "no electrical/PVT simulation of its own
 yet" gap across the full mandated corner-set (issues #154/#161).
-**Supply signoff remains incomplete:** the assembly's declared VDD matches
-no labelled geometry, so T1 item 11 analog remains `unmet / supply_not_continuous`.
-The DVDD integration scope awaits an owner decision in
-[issue #210](https://github.com/2AMLogic/gf180-tmds-tx/issues/210); see the
-[committed ERC report](layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json).
+**Supply signoff (issue #210):** the DVDD ring strap is now labelled `VDD` and
+tied to a `diode_pd2nw_06v0` VDD-side clamp per output pad plus an Nwell tap,
+the LVS reference carries `VDD`, and T1 item 11 analog grades `met` from the
+regenerated [ERC report](layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json)
+(zero findings, `VDD` one island, both ties checked). The post-layout eye
+records below were taken on the earlier, VDD-less revision of the assembly and
+have not been re-run on this one.
 See
 `measurements/characterization.md`
 for the full, per-row accounting, and

@@ -29,6 +29,8 @@ version (issue #143).
 
 from __future__ import annotations
 
+import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -40,6 +42,21 @@ import gen_pad_ring_assembly as gen  # noqa: E402
 import pad_pitch_fit_study as study  # noqa: E402
 
 HBM_WINDOW_FINGERS = (111, 222, 334)
+
+LAYOUT = REPO_ROOT / "layout"
+CELL = "gf180_tmds_pad_ring_assembly"
+
+
+def _d_cards(path: Path) -> dict[str, tuple[str, str, str, dict[str, str]]]:
+    """name -> (anode, cathode, model, params) for each D card in a
+    reference netlist."""
+    cards = {}
+    for line in path.read_text().splitlines():
+        if not re.match(r"^D\S*\s", line):
+            continue
+        name, anode, cathode, model, *params = line.split()
+        cards[name] = (anode, cathode, model, dict(p.split("=") for p in params))
+    return cards
 
 
 class DR0011ConstantsTest(unittest.TestCase):
@@ -161,6 +178,85 @@ class HardErrorGuardTest(unittest.TestCase):
         gen.MAX_FINGERS_PER_ROW = 1000
         width = gen._struct_width_um(500)
         self.assertGreater(width, gen.PAD_PITCH_UM)
+
+
+class VddClampGeometryTest(unittest.TestCase):
+    """Issue #210: the VDD-side `diode_pd2nw_06v0` leg. The drawn geometry is
+    judged by `klt drc`/`klt lvs`/`klt erc`; what those cannot see is a
+    constant edited to a value that merely stops mattering to them."""
+
+    def test_nwell_stays_clear_of_the_vss_side_array_halos(self):
+        # The VSS-side array's Nplus/Dualgate/diode_mk halos reach 0.4 um past
+        # its top edge; the VDD array's Nwell starts NWELL_MARGIN_UM below
+        # its own first row. The gap must leave real room between them.
+        self.assertGreater(gen.VDD_CLAMP_GAP_UM - gen.NWELL_MARGIN_UM, 0.4 + 1.0)
+
+    def test_nwell_tap_sits_left_of_the_array_inside_the_nwell(self):
+        self.assertLess(gen.NWELL_TAP_X_UM, 0.0)
+        self.assertGreater(gen.NWELL_MARGIN_UM, 0.12)  # nwell.enclosing.comp.1
+
+    def test_vdd_clamp_array_stays_under_the_pad_plate_column(self):
+        top = gen.PAD_STRUCT_OY_UM + gen.VDD_CLAMP_GAP_UM + 1.0 + gen.NWELL_MARGIN_UM
+        self.assertLess(top, gen.PAD_STRUCT_OY_UM + gen.PAD_SIDE)
+
+    def test_via_cuts_are_the_fixed_026um_square(self):
+        # via*.width.1 is a fixed 0.26 x 0.26 um square at every level.
+        self.assertAlmostEqual(gen.VIA_SIZE, 0.26)
+        self.assertAlmostEqual(2 * gen.VIA_HALF, 0.26)
+
+
+class VddReferenceAndSpecTest(unittest.TestCase):
+    """The reference netlists and ERC specs carry VDD for real, and the VDD
+    assertion was neither dropped nor weakened (the owner's ruling on #210)."""
+
+    def test_reference_has_a_vdd_port_and_pd2nw_cards(self):
+        for suffix in ("", "_shorted"):
+            ref = LAYOUT / "lvs" / f"{CELL}{suffix}.ref.spice"
+            subckt = next(
+                line for line in ref.read_text().splitlines() if line.startswith(".SUBCKT")
+            )
+            self.assertIn(" VDD", subckt, ref.name)
+            cards = _d_cards(ref)
+            pd = {n: c for n, c in cards.items() if c[2] == "diode_pd2nw_06v0"}
+            self.assertEqual(
+                sorted((c[0], c[1]) for c in pd.values()),
+                [("OUTN", "VDD"), ("OUTP", "VDD")],
+                f"{ref.name}: anode = protected output, cathode = VDD",
+            )
+
+    def test_vdd_leg_matches_the_vss_leg_area_and_perimeter(self):
+        cards = _d_cards(LAYOUT / "lvs" / f"{CELL}.ref.spice")
+        params = {c[2]: c[3] for c in cards.values()}
+        self.assertEqual(params["diode_pd2nw_06v0"], params["diode_nd2ps_06v0"])
+
+    def test_supply_spec_keeps_vdd_and_ties_the_nwell_to_it(self):
+        for name in ("", ".negctl-short", ".negctl-tie"):
+            spec = json.loads((LAYOUT / f"erc-supply-spec.pad-ring{name}.json").read_text())
+            self.assertIn({"name": "VDD", "kind": "supply"}, spec["nets"], name)
+            ties = {t["name"]: t for t in spec["ties"]}
+            self.assertEqual(ties["nwell_vdd_tap"]["net"], "VDD", name)
+            self.assertEqual(ties["nwell_vdd_tap"]["well_layer"], "21/0", name)
+
+    def test_vdd_negative_control_points_the_nwell_tie_at_a_signal_net(self):
+        spec = json.loads(
+            (LAYOUT / "erc-supply-spec.pad-ring.negctl-vdd-tie.json").read_text()
+        )
+        ties = {t["name"]: t for t in spec["ties"]}
+        self.assertEqual(ties["nwell_vdd_tap"]["net"], "OUTP")
+        self.assertEqual(ties["substrate_vss_tap"]["net"], "VSS")
+
+    def test_committed_erc_reports(self):
+        reports = LAYOUT / "erc_reports"
+        pos = json.loads((reports / f"{CELL}.erc.json").read_text())
+        self.assertEqual(pos["erc_finding_count"], 0)
+        nets = {n["name"]: n for n in pos["nets"]}
+        self.assertEqual(nets["VDD"]["matched_islands"], 1)
+        self.assertEqual(nets["VDD"]["expected_islands"], 1)
+        self.assertEqual(pos["erc_coverage"]["skipped"], [])
+        self.assertIn('erc.missing_tie:["nwell_vdd_tap"]', pos["erc_coverage"]["checked"])
+        neg = json.loads((reports / f"{CELL}.negctl_vdd_tie.erc.json").read_text())
+        self.assertTrue(neg["erc_findings"])
+        self.assertTrue(all(f["rule"] == "erc.missing_tie" for f in neg["erc_findings"]))
 
 
 if __name__ == "__main__":  # pragma: no cover

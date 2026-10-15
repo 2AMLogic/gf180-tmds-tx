@@ -226,3 +226,18 @@ the capacitance budget regardless).
 ## Status
 
 **Accepted.**
+
+## Implementation note (2026-10-15, issue #210)
+
+This note records scope completed under the ratified decision; it does not
+amend it. The owner ruled on issue #210 (2026-10-15) to complete DVDD
+integration per this record, with no exemption and no weakened supply
+assertion. `gf180_tmds_pad_ring_assembly` now draws the symmetric
+`diode_pd2nw_06v0` VDD-side clamp (one per output pad, anode on the pad net,
+cathode = a dedicated Nwell) and an Nplus Nwell tap per pad tied into the DVDD
+ring strap, labelled `VDD`. The LVS reference carries `VDD` and the supply
+ERC keeps its `VDD` assertion, adding an `nwell_vdd_tap` tie. Evidence:
+`layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json` (zero findings),
+`layout/lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json` (`match`, `VDD`
+paired). Clamp finger count (20) remains a representative size, not the final
+HBM-qualified one; the driver still has no VDD pin.

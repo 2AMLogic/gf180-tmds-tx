@@ -120,7 +120,7 @@ class RegenerationTests(unittest.TestCase):
         # the same string first (str.replace(..., 1) takes the first
         # occurrence in the file, which is that comment).
         text = EXTRACTED.read_text().replace(
-            " diode_nd2ps_06v0 A=2P", " diode_pd2nw_06v0 A=2P", 1
+            " diode_nd2ps_06v0 A=2P", " diode_nw2ps_06v0 A=2P", 1
         )
         with self.assertRaises(gen.TranslationError):
             gen.translate(text, "synthetic", "0" * 64)
@@ -138,8 +138,8 @@ class RegenerationTests(unittest.TestCase):
         # redraw removes the real substrate tap), the generator must refuse
         # rather than silently wrap a floating body net.
         text = EXTRACTED.read_text().replace(
-            ".SUBCKT gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP TAIL VSS",
-            ".SUBCKT gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP TAIL VSS vsubs",
+            ".SUBCKT gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP TAIL VDD VSS",
+            ".SUBCKT gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP TAIL VDD VSS vsubs",
             1,
         )
         with self.assertRaises(gen.TranslationError):
@@ -161,7 +161,7 @@ class ModelBindingTests(unittest.TestCase):
         self.assertEqual(len(self.translated_x), len(self.extracted_x) + 1)
 
     def test_diode_device_count_is_preserved(self):
-        self.assertEqual(len(self.extracted_d), 40)  # 20 fingers x 2 pads
+        self.assertEqual(len(self.extracted_d), 80)  # 20 fingers x 2 legs x 2 pads
         self.assertEqual(len(self.translated_d), len(self.extracted_d))
 
     def test_no_bare_deck_class_survives(self):
@@ -191,7 +191,7 @@ class ModelBindingTests(unittest.TestCase):
     def test_every_diode_binds_to_the_pdk_subcircuit(self):
         self.assertTrue(self.translated_d)
         for match in self.translated_d:
-            self.assertEqual(match.group("model"), "diode_nd2ps_06v0")
+            self.assertIn(match.group("model"), ("diode_nd2ps_06v0", "diode_pd2nw_06v0"))
 
     def test_diode_parameters_are_renamed_area_pj_not_a_p(self):
         # klt's extraction-deck writes A/P; nfet_03v3's own model recognizes
@@ -397,15 +397,23 @@ class TopologyFoldTests(unittest.TestCase):
         for match in self.nfets:
             self.assertEqual(_hub(match.group("b")), "VSS", match.group(0))
 
-    def _diode_net(self, match: re.Match) -> str:
-        terminals = {_hub(match.group("a")), _hub(match.group("c"))}
-        terminals.discard("VSS")
-        self.assertEqual(
-            len(terminals), 1, f"expected exactly one non-VSS terminal: {match.group(0)}"
-        )
-        return next(iter(terminals))
+    def _diode_net(self, match: re.Match) -> tuple[str, str]:
+        """(protected output net, clamp model). The VSS-side leg is anode VSS
+        / cathode output; the VDD-side leg is anode output / cathode VDD --
+        asserted here so a transposed leg fails rather than passes."""
+        a, c = _hub(match.group("a")), _hub(match.group("c"))
+        model = match.group("model")
+        if model == "diode_nd2ps_06v0":
+            self.assertEqual(a, "VSS", match.group(0))
+            net = c
+        else:
+            self.assertEqual(model, "diode_pd2nw_06v0", match.group(0))
+            self.assertEqual(c, "VDD", match.group(0))
+            net = a
+        self.assertIn(net, {"OUTP", "OUTN"}, match.group(0))
+        return net, model
 
-    def _folded_diode_geometry(self) -> dict[str, tuple]:
+    def _folded_diode_geometry(self) -> dict[tuple[str, str], tuple]:
         """Sum area/perimeter over fingers, keyed by the protected output
         net (the terminal that is not VSS)."""
         totals: dict[str, list[float]] = defaultdict(lambda: [0.0, 0.0])
@@ -423,26 +431,48 @@ class TopologyFoldTests(unittest.TestCase):
         )
         reference = {}
         for match in _cards(LVS_REF, d_re):
-            terminals = {match.group("a"), match.group("c")}
-            terminals.discard("VSS")
-            self.assertEqual(len(terminals), 1)
-            net = next(iter(terminals))
+            model = match.group("model")
+            a, c = match.group("a"), match.group("c")
+            if model == "diode_nd2ps_06v0":
+                self.assertEqual(a, "VSS")
+                net = c
+            else:
+                self.assertEqual((model, c), ("diode_pd2nw_06v0", "VDD"))
+                net = a
             params = _params(match.group("params"))
-            reference[net] = (_value(params["a"]), _value(params["p"]))
+            reference[(net, model)] = (_value(params["a"]), _value(params["p"]))
 
-        self.assertEqual(set(reference), {"OUTP", "OUTN"})
+        expected = {
+            (net, model)
+            for net in ("OUTP", "OUTN")
+            for model in ("diode_nd2ps_06v0", "diode_pd2nw_06v0")
+        }
+        self.assertEqual(set(reference), expected)
         folded = self._folded_diode_geometry()
-        self.assertEqual(set(folded), {"OUTP", "OUTN"})
-        for net, (area, perim) in reference.items():
-            with self.subTest(net=net):
-                self.assertAlmostEqual(folded[net][0], area, places=18)
-                self.assertAlmostEqual(folded[net][1], perim, places=15)
+        self.assertEqual(set(folded), expected)
+        for key, (area, perim) in reference.items():
+            with self.subTest(leg=key):
+                self.assertAlmostEqual(folded[key][0], area, places=18)
+                self.assertAlmostEqual(folded[key][1], perim, places=15)
 
     def test_diode_finger_count_is_20_per_pad(self):
-        folded_counts: dict[str, int] = defaultdict(int)
+        folded_counts: dict[tuple[str, str], int] = defaultdict(int)
         for match in self.diodes:
             folded_counts[self._diode_net(match)] += 1
-        self.assertEqual(folded_counts, {"OUTP": 20, "OUTN": 20})
+        self.assertEqual(
+            folded_counts,
+            {
+                (net, model): 20
+                for net in ("OUTP", "OUTN")
+                for model in ("diode_nd2ps_06v0", "diode_pd2nw_06v0")
+            },
+        )
+
+    def test_vdd_ring_is_held_at_the_testbench_core_rail(self):
+        # The six-pin schematic boundary has no VDD pin, so the wrapper holds
+        # the VDD-side clamps' cathode net at the harness-supplied vdd_val
+        # rather than leaving it floating.
+        self.assertRegex(DUT.read_text(), r"(?mi)^vvdd_rail\s+VDD\s+0\s+dc\s+\{vdd_val\}\s*$")
 
 
 if __name__ == "__main__":  # pragma: no cover
