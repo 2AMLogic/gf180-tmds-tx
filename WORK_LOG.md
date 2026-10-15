@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-15
+
+- **PR #218**: Bump Repo Skills 0.19.5 -> 0.24.1
+
 ### 2026-10-13
 
 - **PR #216**: chore(loom): drop onIdle [auditor] — follow the fleet idle-role setting
