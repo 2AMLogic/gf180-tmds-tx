@@ -1082,6 +1082,32 @@ pad-only at 668 µm) well inside the budget.
 
 Artifacts: `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json`.
 
+### 10.5a. Issue #210: the VDD-side clamp leg's effect on the pad node
+
+Issue #210 added DR-0011's symmetric `diode_pd2nw_06v0` clamp (20 fingers, same
+geometry as the VSS-side leg) to each output pad, plus the Metal1 spine joining
+its anode bus to the pad net. `klt extract --parasitics --pdk gf180mcuD`
+(`0.5.0+ge8ca621a6961`) against the regenerated assembly measures the output
+nets' own interconnect capacitance:
+
+| Net | §10.5 (before) | §10.5a (after) | Added interconnect |
+|---|---|---|---|
+| `OUTP` | 48.733 fF | 54.548 fF | +5.815 fF |
+| `OUTN` | 30.453 fF | 36.268 fF | +5.815 fF |
+
+That is the metal only. The new leg's *junction* capacitance is **not
+measured**: `sim/esd-diode-clamp-cv` has only been run for
+`diode_nd2ps_06v0`, and no `diode_pd2nw_06v0` PVT record exists yet. It is
+bounded, not asserted: the nd2ps leg's 45.03 fF (§9.4, `ss_125c_2.97v`) plus the
+metal above leaves `2000 - (54.548 + 45.03) = 1900 fF` of the 2 pF budget for
+the new junction on `OUTP` (1918 fF on `OUTN`), more than 40x the nd2ps leg's own
+junction. If the pd2nw junction equalled the nd2ps one, the totals would be about
+144.6 fF (`OUTP`) / 126.3 fF (`OUTN`), roughly 93 % headroom. The budget is not
+exceeded under any plausible junction value, but the figure itself is an
+open measurement.
+
+Artifacts: `layout/drc_reports/gf180_tmds_pad_ring_assembly.parasitics.json`.
+
 ### 10.6. Links (issues #143, #149)
 
 - Fit-study generator: `layout/scripts/pad_pitch_fit_study.py`.

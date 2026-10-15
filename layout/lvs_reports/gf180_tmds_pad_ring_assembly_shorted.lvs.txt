@@ -4,18 +4,21 @@ top: gf180_tmds_pad_ring_assembly_shorted
 reference top: GF180_TMDS_PAD_RING_ASSEMBLY_SHORTED
 engine: klayout
 status: mismatch
-mismatches: 7
-errors: 5
-  nets: layout=6  reference=7  matched=3
-  devices: layout=6  reference=6  matched=4
-  pins: layout=6  reference=6  matched=8
+mismatches: 8
+errors: 6
+  nets: layout=7  reference=8  matched=4
+  devices: layout=8  reference=8  matched=5
+  pins: layout=7  reference=7  matched=9
+power_connectivity: unchecked
+  (reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply)
 
 category_counts:
-  device.unmatched: 2
+  device.unmatched: 3
   net.merged: 2
   net.split: 1
   topology: 2
 
+[error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] device.unmatched  (reference)  device has no counterpart on the other side
 [error] net.merged  (reference)  multiple reference nets were collapsed into one layout net

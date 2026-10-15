@@ -1,7 +1,8 @@
 * Reference (schematic-equivalent) netlist for gf180_tmds_pad_ring_assembly
 * (issue #86, T1 item 2 analog block-level assembly), checked against
 * design/netlist/cml_driver.spice (issue #11's sized schematic) plus the
-* two diode_nd2ps_06v0 ESD clamps this assembly adds (DR-0011).
+* two diode_nd2ps_06v0 ESD clamps and two diode_pd2nw_06v0 VDD-side clamps
+* this assembly adds (DR-0011; the VDD-side leg and the VDD port: issue #210).
 *
 * Same two translations cml_driver_core.ref.spice's own header documents
 * (folded W/L per klt lvs's schematic-equivalent contract; bulk stated
@@ -36,18 +37,28 @@
 *   A_total = 20 * 2.0 um^2  = 40 um^2  -> A=40P
 *   P_total = 20 * 6.0 um    = 120 um   -> P=120U
 *
-* Not modelled here (see gen_pad_ring_assembly.py's own module docstring
-* for the full scope note): the DVDD ring strap (drawn for ring continuity,
-* but this driver has no VDD pin and nothing else in this increment
-* connects to it -- `klt extract` correctly reports it as disconnected
-* "dead metal", not a missing connection); INP/INN/IBIAS are not routed to
-* pads (out of scope -- this issue targets the *output* pad-ring
-* integration, not driver inputs).
-.SUBCKT gf180_tmds_pad_ring_assembly OUTP OUTN INP INN IBIAS VSS
+* The two VDD-side ESD clamps (issue #210, DR-0011's symmetric P-clamp-toward-
+* VDD leg): diode_pd2nw_06v0, anode = the protected output (OUTP / OUTN),
+* cathode = VDD (the Nwell, tied to the DVDD ring strap by an Nplus Nwell tap
+* and labelled "VDD"). Same 20-finger geometry as the VSS-side leg, so the
+* same aggregate card parameters (one combined D-card per pad, as above):
+*   A_total = 20 * 2.0 um^2  = 40 um^2  -> A=40P
+*   P_total = 20 * 6.0 um    = 120 um   -> P=120U
+* VDD is now a real port: the DVDD strap is connected to those clamps and the
+* Nwell tap, so `klt extract` no longer reports it as dead metal.
+*
+* Not modelled here (see gen_pad_ring_assembly.py's own module docstring for
+* the full scope note): the CML driver itself has no VDD pin (VDD is carried
+* by the ring clamps and the Nwell tap only); INP/INN/IBIAS are not routed to
+* pads (out of scope -- this issue targets the *output* pad-ring integration,
+* not driver inputs).
+.SUBCKT gf180_tmds_pad_ring_assembly OUTP OUTN INP INN IBIAS VSS VDD
 M1 OUTP INP TAIL VSS nfet L=0.28U W=128U
 M2 OUTN INN TAIL VSS nfet L=0.28U W=128U
 MT TAIL IBIAS VSS VSS nfet L=0.5U W=400U
 MB IBIAS IBIAS VSS VSS nfet L=0.5U W=20U
 D1 VSS OUTP diode_nd2ps_06v0 A=40P P=120U
 D2 VSS OUTN diode_nd2ps_06v0 A=40P P=120U
+D3 OUTP VDD diode_pd2nw_06v0 A=40P P=120U
+D4 OUTN VDD diode_pd2nw_06v0 A=40P P=120U
 .ENDS gf180_tmds_pad_ring_assembly

@@ -8,40 +8,71 @@
   "parameter_tolerance": null,
   "options": {
     "combine_devices": true,
+    "combine_devices_per_circuit": null,
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
-    "parameter_tolerance": null
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ]
   },
+  "hints_applied": null,
   "status": "mismatch",
-  "mismatch_count": 7,
-  "error_count": 5,
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "verified",
+    "reason": null,
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "mismatch_count": 8,
+  "error_count": 6,
   "category_counts": {
-    "device.unmatched": 2,
+    "device.unmatched": 3,
     "net.merged": 2,
     "net.split": 1,
     "topology": 2
   },
   "category_error_counts": {
-    "device.unmatched": 2,
+    "device.unmatched": 3,
     "net.merged": 2,
     "net.split": 1
   },
   "counts": {
     "nets": {
-      "layout": 6,
-      "reference": 7,
-      "matched": 3
-    },
-    "devices": {
-      "layout": 6,
-      "reference": 6,
+      "layout": 7,
+      "reference": 8,
       "matched": 4
     },
+    "devices": {
+      "layout": 8,
+      "reference": 8,
+      "matched": 5
+    },
     "pins": {
-      "layout": 6,
-      "reference": 6,
-      "matched": 8
+      "layout": 7,
+      "reference": 7,
+      "matched": 9
     }
   },
   "device_classes": [
@@ -55,21 +86,25 @@
   ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.11",
-    "layout_sha256": "2b3483e2e070a851a8d2dfdda6bbd52685525909f2e31967dcd302b4cf018bd2",
-    "reference_sha256": "9f90303156f635138a74aaa94fdcbea0cf3a7724221577f90aaf173f22f57422",
+    "engine_version": "0.30.12",
+    "layout_sha256": "a15ffbfbdafc8f7161757a9b9504d8712d5bf9b919b39621019307322edd383f",
+    "reference_sha256": "e2a4cb92ee421a9b751890624e8932e68084da0632ee6fcbe14e93117c571374",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.3.0",
-    "klayout_version": "0.30.11",
+    "klt_version": "0.5.0+ge8ca621a6961.dirty",
+    "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
-      "released": true
+      "content_hash": "sha256:95c2eb9148b29ded02182aeca4222287ff57f813691d5e2f9f8d7a675f6cb637",
+      "released": false
     },
-    "input": null
+    "input": {
+      "content_hash": "sha256:a15ffbfbdafc8f7161757a9b9504d8712d5bf9b919b39621019307322edd383f",
+      "role": "layout"
+    },
+    "klayout_version_mismatch": true
   },
   "mismatches": [
     {
@@ -99,6 +134,23 @@
         "layout": "\\$5",
         "reference": "1",
         "class": "diode_nd2ps_06v0"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$7",
+        "reference": "3",
+        "class": "diode_pd2nw_06v0"
       },
       "property": null,
       "details": null,
@@ -195,6 +247,11 @@
     {
       "layout": "OUTN",
       "reference": "OUTN",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
       "pin": true
     }
   ]

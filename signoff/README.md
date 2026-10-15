@@ -20,7 +20,7 @@ klt signoff --manifest signoff/manifest.json --format json
 as emitted by the graded build pinned below. Exit code `3` is the tool's
 documented "rendered but not T1" signal, not an error: `tier` is `null`
 until every T1 item is met, which is the honest state for this block today.
-As of this commit the grade is **7/22 T1 items met** (per-partition rows,
+As of this commit the grade is **8/22 T1 items met** (per-partition rows,
 11 checklist items × `kind: mixed-signal`'s two partitions):
 
 | met | why (the record's own reason, where unmet) |
@@ -28,7 +28,7 @@ As of this commit the grade is **7/22 T1 items met** (per-partition rows,
 | #3 DRC clean — analog + digital | `klt drc` `status: clean`, layout hash pinned, on both partitions |
 | #4 LVS clean — analog + digital | `klt lvs` `status: match` (regenerated 2026-09-21 under the pinned build; identical 0-error verdicts), layout-hash pinned, `input_verified: true` |
 | #8 characterization report — analog + digital | the hand-rolled `kind: "generic"` wrapper over `measurements/characterization.md`, its `content_hash` pinned in both the manifest and the envelope |
-| #11 power delivery — analog | **`unmet`, `supply_not_continuous`** (issue #207). The evidence is now cited (`11.analog` = `layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json` + the item-4 LVS report, both pinned to the assembly GDS hash) and graded rather than absent. The ERC report has exactly one finding: `erc.unconnected_net` for the declared supply `VDD` -- the drawn DVDD ring strap (Metal3/4/5, y 12-16 um) carries no label and touches no device, and the reference netlist deliberately excludes it as dead metal (the driver has no VDD pin). `VSS` is one island; the substrate tie `substrate_vss_tap` is checked (via `checked_by_well_assertion`), none skipped. `VDD` is left declared, not omitted and not paired in LVS by invention; the finding is visible and filed as a design issue rather than tuned away. See `../layout/README.md`, "T1 item 11 (analog)" |
+| #11 power delivery — analog | **`met`** (issue #210, after #207's `unmet` / `supply_not_continuous`). `11.analog` = `layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json` + the item-4 LVS report, both pinned to the assembly GDS hash. The DVDD ring strap now carries a `VDD` label at two Nwell taps and is tied to real devices (a `diode_pd2nw_06v0` VDD-side clamp per output pad); the ERC report has zero findings, `VDD` and `VSS` each one island, and both `nwell_vdd_tap` and `substrate_vss_tap` checked (none skipped); the LVS reference carries `VDD` and the report pairs it in `net_correspondence`. `VDD` stayed declared throughout — it was neither omitted nor relabelled to turn the row green; the row moved because the geometry and the reference now carry the supply. The ERC reports were produced by a newer `klt` than the pin (the pin cannot produce `well_layer: null` specs) and read by the pinned build; see `../layout/README.md`, "T1 item 11 (analog)" |
 | #11 power delivery — digital | **`met`** (issue #206). `klt erc` on `layout/erc-supply-spec.json` now declares both well ties: `erc_finding_count 0`, `erc.missing_tie` for `nwell_vdd_tap` and `lvpwell_vss_tap` both checked and none skipped, pinned to the committed GDS hash. Branch that graded it: **no place-and-route citation, so the PDN branch is not selected** (`power_delivery.pdn: false`; this block's P&R is `flow/pnr_tmds_encoder.py` driving OpenROAD directly and has no `klt place-and-route` response to cite, and none is fabricated). The grader instead takes the ERC + LVS pair: the cited LVS report is the SPICE-reference `layout/lvs_reports/tmds_encoder.lvs.json` (`power_connectivity: unchecked`, but its reference carries `VDD`/`VSS`, `supply_nets` `["VDD","VSS"]`), which suffices on that branch. The gate-level `tmds_encoder_gate.lvs.json` (`match`) is not the cited report |
 | #1, #2, #9, #10 | `no_evidence` by design — `klt signoff` cannot check topical relevance for the no-verb items, and citing an unrelated passing envelope to make a row go green is exactly the dishonesty this mechanism exists to prevent |
 | #5, #6, #7 | `no_evidence` — the analog corner/Monte-Carlo/post-layout evidence in `sim/` and `flow/` is committed as this repo's own Markdown evidence records, which are not `klt sim`/`klt yield`/`klt pex` JSON envelopes and are rejected by the grader regardless of how sound they are. The grading gap (not the engineering gap) is real and named: see "Why some genuinely-passed work grades unmet" below |
@@ -41,7 +41,7 @@ claim must state explicitly which silicon each partition's evidence covers:
 - **analog partition** — the full-custom CML line driver and the pad ring:
   the driver core (xschem `design/cml_driver.sch` →
   `layout/gds/cml_driver_core.gds`) assembled with the production pad cells
-  and `diode_nd2ps_06v0` ESD clamps into
+  and `diode_nd2ps_06v0` / `diode_pd2nw_06v0` ESD clamps into
   `layout/gds/gf180_tmds_pad_ring_assembly.gds` — the artifact the
   `*.analog` citations grade. Per-cell signoffs (DRC/LVS/extract report
   pairs with negative controls) and the analog measurement records
