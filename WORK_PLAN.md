@@ -23,7 +23,7 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-_None._
+- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
 
 ## Ready
 
@@ -69,7 +69,7 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 0 |
+| Important | 1 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
