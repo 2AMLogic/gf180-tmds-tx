@@ -53,7 +53,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -74,7 +74,7 @@ _None._
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 1 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
