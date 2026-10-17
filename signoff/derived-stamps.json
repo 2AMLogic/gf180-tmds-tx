@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "rows": [
+    {
+      "id": "analog.cml_driver",
+      "basis": "klt netlist --check (xschem 3.4.4, gf180mcuD symbols via design/xschemrc) matched when stamped",
+      "check_argv": [
+        "klt",
+        "netlist",
+        "design/cml_driver.sch",
+        "-o",
+        "design/netlist/cml_driver.spice",
+        "--rcfile",
+        "design/xschemrc",
+        "--check"
+      ],
+      "sources": {
+        "design/cml_driver.sch": "sha256:9b65bf3c06a01124c3989ac51bf9e045aa2a471e8a5237929494d4142de4d6f3",
+        "design/cml_driver.sym": "sha256:1f4742cf847bf3133d0247116329579bcd218d5da9494f642ee6b2fbce322b55",
+        "design/xschemrc": "sha256:825230a9d65ca71f2216feca922697e087f5a603ac884c499529a30e1c66ee0f"
+      },
+      "derived": {
+        "design/netlist/cml_driver.spice": "sha256:30a3e6d1c2b79b07af785e7ee9638a181092d41109efdd3452d8a4470fbf90f9"
+      }
+    },
+    {
+      "id": "analog.tmds_final_mux",
+      "basis": "klt netlist --check (xschem 3.4.4, gf180mcuD symbols via design/xschemrc) matched when stamped",
+      "check_argv": [
+        "klt",
+        "netlist",
+        "design/tmds_final_mux.sch",
+        "-o",
+        "design/netlist/tmds_final_mux.spice",
+        "--rcfile",
+        "design/xschemrc",
+        "--check"
+      ],
+      "sources": {
+        "design/tmds_final_mux.sch": "sha256:70a0dcdc3d0a65a17dce103102bf6480e277f7b1856a712931ed22d472b43a14",
+        "design/tmds_final_mux.sym": "sha256:0bcde2838a5983d881901cc943492f170a7ec1ba2383611da17667fd0571c726",
+        "design/xschemrc": "sha256:825230a9d65ca71f2216feca922697e087f5a603ac884c499529a30e1c66ee0f"
+      },
+      "derived": {
+        "design/netlist/tmds_final_mux.spice": "sha256:e0798f923bc6c4bc5fdc190b72f083ad4d00630991b9cb0a49b53fe611391ee7"
+      }
+    },
+    {
+      "id": "digital.tmds_encoder.synth",
+      "basis": "NOT re-run: the gf180mcu_fd_sc_mcu9t5v0 std-cell library is absent on the stamping host, so Yosys cannot resynthesize. The pin rests on flow record 20260817-110611-37e197a, which cites this netlist's sha256",
+      "check_argv": null,
+      "sources": {
+        "rtl/tmds_encoder.v": "sha256:ff658e3dbadbd865f2a2c1cd45b0445835ba6306596d2efffb4d453ab144bff7",
+        "flow/synth_tmds_encoder.py": "sha256:45c71bf8c95c98b15b7777c454e32b531bd71854e8dfb6c26bb6613c27c37a4c"
+      },
+      "derived": {
+        "flow/tmds_encoder/netlist/tmds_encoder.synth.v": "sha256:dea60b1b9d296a9467c60f9174737167b0ec160332e9b2f7745252ef09a719a6"
+      }
+    },
+    {
+      "id": "digital.tmds_encoder.pnr",
+      "basis": "NOT re-run: OpenROAD needs the same absent std-cell techlef. The routed DEF is the committed source of both this netlist and layout/gds/tmds_encoder.gds (flow/gen_pnr_netlist.py docstring); the DEF's sha256 is cited by flow record 20260817-110611-37e197a",
+      "check_argv": null,
+      "sources": {
+        "flow/tmds_encoder/pnr/tmds_encoder.def": "sha256:5a887d9a2bdcc15699340192b7568f41dcc01909b4f707e6110ecfbec502c890",
+        "flow/gen_pnr_netlist.py": "sha256:ffe47054d0c897e18c4251a7ec3a0c483e1bef77da03c941bbfd4e7b68cd301c"
+      },
+      "derived": {
+        "flow/tmds_encoder/netlist/tmds_encoder.pnr.v": "sha256:2ecd8ee09a6a403fe3fcb83fb5b4aad841e79be7dbb4e50364b5900795359c4f"
+      }
+    }
+  ]
+}
