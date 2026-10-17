@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 10,
+  "summary": "T1 item 10 (Repo hygiene): 7/7 attestation checks passed (klt signoff --attest)",
+  "source": "signoff/attest/item10.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 7,
+    "passed_count": 7,
+    "checks": [
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": ".github/workflows/ci.yml",
+        "passed": true,
+        "content_hash": "sha256:402a62afd87d09f79c2f409a8ce6dfa744c4e74591b1f0a5792e4c059859dfee"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "LICENSE",
+        "passed": true,
+        "content_hash": "sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "README.md",
+        "passed": true,
+        "content_hash": "sha256:a7c364ed1bc83be9db64d95a6628d648011817dc5bc790d8e3a55378842810b7"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "spec/tmds-tx.md",
+        "passed": true,
+        "content_hash": "sha256:2e5230f04ad859ba1a329379fe7bc18e54135323129e04499aba34e0c9feebf8"
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "lint",
+        "argv": [
+          "bash",
+          ".github/scripts/lint.sh",
+          "--require-shellcheck",
+          "--require-append-only"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "harness-unit-tests",
+        "argv": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "sim/tests"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "lvs-guard-unit-tests",
+        "argv": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "layout/tests"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "signoff/attest/item10.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:d8b561fec023f7e2a1176dbe4e79af4ceef1717f2635ed93fb5c52bf074185ef"
+    }
+  }
+}

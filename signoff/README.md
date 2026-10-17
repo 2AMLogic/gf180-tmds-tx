@@ -20,7 +20,7 @@ klt signoff --manifest signoff/manifest.json --format json
 as emitted by the graded build pinned below. Exit code `3` is the tool's
 documented "rendered but not T1" signal, not an error: `tier` is `null`
 until every T1 item is met, which is the honest state for this block today.
-As of this commit the grade is **8/22 T1 items met** (per-partition rows,
+As of this commit the grade is **16/22 T1 items met** (per-partition rows,
 11 checklist items × `kind: mixed-signal`'s two partitions):
 
 | met | why (the record's own reason, where unmet) |
@@ -30,7 +30,10 @@ As of this commit the grade is **8/22 T1 items met** (per-partition rows,
 | #8 characterization report — analog + digital | the hand-rolled `kind: "generic"` wrapper over `measurements/characterization.md`, its `content_hash` pinned in both the manifest and the envelope |
 | #11 power delivery — analog | **`met`** (issue #210, after #207's `unmet` / `supply_not_continuous`). `11.analog` = `layout/erc_reports/gf180_tmds_pad_ring_assembly.erc.json` + the item-4 LVS report, both pinned to the assembly GDS hash. The DVDD ring strap now carries a `VDD` label at two Nwell taps and is tied to real devices (a `diode_pd2nw_06v0` VDD-side clamp per output pad); the ERC report has zero findings, `VDD` and `VSS` each one island, and both `nwell_vdd_tap` and `substrate_vss_tap` checked (none skipped); the LVS reference carries `VDD` and the report pairs it in `net_correspondence`. `VDD` stayed declared throughout — it was neither omitted nor relabelled to turn the row green; the row moved because the geometry and the reference now carry the supply. The ERC reports were produced by a newer `klt` than the pin (the pin cannot produce `well_layer: null` specs) and read by the pinned build; see `../layout/README.md`, "T1 item 11 (analog)" |
 | #11 power delivery — digital | **`met`** (issue #206). `klt erc` on `layout/erc-supply-spec.json` now declares both well ties: `erc_finding_count 0`, `erc.missing_tie` for `nwell_vdd_tap` and `lvpwell_vss_tap` both checked and none skipped, pinned to the committed GDS hash. Branch that graded it: **no place-and-route citation, so the PDN branch is not selected** (`power_delivery.pdn: false`; this block's P&R is `flow/pnr_tmds_encoder.py` driving OpenROAD directly and has no `klt place-and-route` response to cite, and none is fabricated). The grader instead takes the ERC + LVS pair: the cited LVS report is the SPICE-reference `layout/lvs_reports/tmds_encoder.lvs.json` (`power_connectivity: unchecked`, but its reference carries `VDD`/`VSS`, `supply_nets` `["VDD","VSS"]`), which suffices on that branch. The gate-level `tmds_encoder_gate.lvs.json` (`match`) is not the cited report |
-| #1, #2, #9, #10 | `no_evidence` by design — `klt signoff` cannot check topical relevance for the no-verb items, and citing an unrelated passing envelope to make a row go green is exactly the dishonesty this mechanism exists to prevent |
+| #1 design sources — analog + digital | **`met`** via `klt signoff --attest 1` envelopes (`envelopes/item1-{analog,digital}.json`) pinning versioned inventories (`attest/item1-*.json`): each source is present and each derived netlist passes its freshness check. Analog: the xschem schematics/symbols and `design/netlist/*.spice`, stamped after `klt netlist --check` (xschem 3.4.4) matched. **Digital is weaker, and says so:** the encoder RTL and its `.synth.v`/`.pnr.v` netlists are hash-stamped, but Yosys/OpenROAD were *not* re-run (std-cell library absent on the stamping host); the pins rest on flow record `20260817-110611-37e197a`. `rtl/tmds_serializer.v`/`tmds_tx_lane.v` are listed sources with no synthesized netlist (DR-0014). See "Item 1 freshness" below |
+| #2 layout — analog + digital | **`met`** via artifact-anchored generic envelopes bound to the committed GDS (`envelopes/item2-{analog,digital}.json`); the row stays `met` only while the stream re-hashes to its pin. **No regeneration claim is made** for either: re-running `gen_pad_ring_assembly.py` gives a different file hash (the GDS header carries a write timestamp) but an empty per-layer XOR; the digital merge step was not re-run (provenance is `layout/README.md`'s documented P&R determinism). The envelopes disclose this |
+| #9 testbenches — analog + digital | **`met`** via `klt signoff --attest 9` (`envelopes/item9-{analog,digital}.json`): every `sim/*/testbench` fragment (resp. `verification/*` bench and negative control) is present, the cold-start command exits 0, and the PDK (`gf180mcuD` @ open_pdks `c6d73a35…`) and tool versions are pinned. The analog cold start is `sim/run_corners.py --list` (manifests load); the PVT sweeps need the PDK and ngspice and are **not** re-run — their results are the append-only `sim/*/records/` |
+| #10 repo hygiene — analog + digital | **`met`** via `klt signoff --attest 10` (`envelopes/item10.json`, cited for both partitions): README, spec, LICENSE and CI workflow present; `lint.sh` (shellcheck + append-only required) and the two unit-test suites exit 0 |
 | #5, #6, #7 | `no_evidence` — the analog corner/Monte-Carlo/post-layout evidence in `sim/` and `flow/` is committed as this repo's own Markdown evidence records, which are not `klt sim`/`klt yield`/`klt pex` JSON envelopes and are rejected by the grader regardless of how sound they are. The grading gap (not the engineering gap) is real and named: see "Why some genuinely-passed work grades unmet" below |
 
 ## Partition boundary (the `kind: "mixed-signal"` declaration)
@@ -79,6 +82,10 @@ to state which committed evidence covers which silicon.
 | `manifest.json` | The block manifest: `block` (fleet-rollup identity for 2AMLogic/2am#956, which consumes exactly this file), required `kind: "mixed-signal"`, and the per-item `evidence` citations with pinned `content_hash` on every one |
 | `signoff.json` | The committed evidence record — `klt signoff --format json` output, byte-for-byte as the graded build emitted it |
 | `characterization-envelope.json` | Item 8's `kind: "generic"` wrapper (the only T1 item with no `klt` verb), asserting `measurements/characterization.md`'s own verdict — **generated** by `gen_characterization_envelope.py`, never hand-edited |
+| `attest/item{1,9}-{analog,digital}.json`, `attest/item10.json` | The versioned attestation inventories `klt signoff --attest` reads (schema `t1-attestation-inventory`); the envelope pins each inventory's raw-byte hash |
+| `envelopes/item{1,9,10}*.json` | **Tool-produced** attestation envelopes (`klt signoff --attest N --inventory … -o …`). Never hand-edit |
+| `envelopes/item2-{analog,digital}.json` | Artifact-anchored generic envelopes bound to each partition's committed GDS (no producer verb for item 2; written by hand, graded by re-hashing the stream) |
+| `derived_stamps.py`, `derived-stamps.json` | The toolchain-free item-1 freshness tripwire (below) |
 | `gen_characterization_envelope.py` | Regenerates that envelope deterministically from the committed report; `--check` is the CI mode (the same convention lint step 4 uses for generated DUTs) |
 | `../layout/erc-supply-spec.json`, `../layout/drc_reports/`, `../layout/lvs_reports/`, `../layout/erc_reports/` | The cited envelopes. Every manifest citation pins the envelope's own recorded input `content_hash`, and the grader re-hashes the artifact where the envelope names a path (`input_verified: true` on the regenerated LVS citations) |
 
@@ -90,17 +97,19 @@ binary, and the eleven-item checklist (item 11, "Power delivery
 builds newer than the PyPI `0.5.0` release. The record's `build` block names
 the exact grading code, so the pin is auditable:
 
-- **pin**: `klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@e8ca621a6961879cec1af60cc932c3b3d58ddcaa`
-  (`klt 0.5.0+ge8ca621a6961`, `grading_ruleset_id
-  sha256:c4a9f5af2a27f886a08a4436781716326f072b356bb155f83bf2d6ddfc4f46e8`)
+- **pin**: `klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@44cc42323184a2f3a440b89789bf174488a6b1e4`
+  (`klt 0.7.1.dev1744+g44cc42323184`, not a release build — `build.is_release: false`;
+  `grading_ruleset_id
+  sha256:903c436514f2e51dbe8562080f3b36537e26ca088571e457d38d57e78da9056b`). This pin is
+  required for the artifact-anchored generic envelope (klayout-tools#2718) and `klt signoff --attest`
+  (klayout-tools#2844); the previous pin, `e8ca621a`, predates both
 - **Why not PyPI `0.5.0`?** Its bundled tier doc predates item 11, so it
   renders no item-11 row at all, and its grading engine lacks the compound
   erc/lvs/power rules item 11 needs. `--tiers-doc` plus `--describe-grader`
   (see klayout-tools `docs/cli/signoff.md`'s "Identifying the grading
   build") exist to make that divergence visible, but grading against a
   pinned build that actually knows all eleven items is the honest option.
-- **Bumping the pin**: when klayout-tools ships a release with item-11
-  grading, update the pinned ref below (and in the CI job), re-run the
+- **Bumping the pin**: when klayout-tools ships a release that changes grading, update the pinned ref below (and in the CI job), re-run the
   regeneration command, and commit the fresh `signoff.json` in the same
   change so the record and the grader never disagree. CI (below) fails the
   build otherwise.
@@ -108,10 +117,14 @@ the exact grading code, so the pin is auditable:
 ## Regenerating the record
 
 ```bash
-python3 -m venv /tmp/klt-signoff && /tmp/klt-signoff/bin/pip install \
-  "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@e8ca621a6961879cec1af60cc932c3b3d58ddcaa"
+python3 -m venv .venv-klt && .venv-klt/bin/pip install \
+  "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@44cc42323184a2f3a440b89789bf174488a6b1e4"
+.venv-klt/bin/pip install -r verification/tmds_encoder/requirements.txt -r verification/tmds_serializer/requirements.txt
+export PATH="$PWD/.venv-klt/bin:$PATH"
 python3 signoff/gen_characterization_envelope.py   # if item 8's input changed
-/tmp/klt-signoff/bin/klt signoff --manifest signoff/manifest.json --format json > signoff/signoff.json
+python3 signoff/derived_stamps.py --refresh        # if a design source/netlist moved (runs klt netlist --check)
+klt signoff --attest 1  --inventory signoff/attest/item1-analog.json  -o signoff/envelopes/item1-analog.json    # and the other four
+klt signoff --manifest signoff/manifest.json --format json > signoff/signoff.json
 # exit 0 (T1) or 3 (rendered, not T1) are both fine; 1 means a malformed
 # manifest — fix it, do not commit the error envelope.
 ```
@@ -126,9 +139,13 @@ klayout-tools `examples/signoff/` documents).
 
 ## CI: the record cannot rot
 
-The `signoff` job in `.github/workflows/ci.yml` re-runs the grading command
-on every PR and push and byte-compares the fresh output against the
-committed `signoff/signoff.json`. Anything that would silently invalidate a
+The `signoff` job in `.github/workflows/ci.yml` re-attests items 1, 9 and 10
+(`klt signoff --attest N --inventory … --check <envelope>`, which re-runs every
+declared command and exits 3 on any drift of an inventory, an inventoried file,
+a check outcome or the envelope), runs `derived_stamps.py --check`, then
+re-grades the manifest with `klt signoff --manifest … --check signoff/signoff.json`
+against the committed record (that mode ignores the `build` block, which names
+the install rather than the commit). Anything that would silently invalidate a
 published verdict instead breaks the build:
 
 - **a cited artifact changes** (a regenerated GDS, an edited LVS envelope) —
@@ -153,6 +170,21 @@ envelope(s) under the pinned build (see `layout/README.md` for each cell's
 commands), refresh the manifest's pins, re-run the regeneration command, and
 commit record + evidence together. Never hand-edit `signoff/signoff.json` —
 it is grader output or it is nothing.
+
+## Item 1 freshness: what CI can and cannot prove
+
+`attest/item1-*.json` declare, per derived netlist, a freshness `check`. CI has
+no xschem, no PDK and no std-cell library, so that command is
+`derived_stamps.py --check --only <row>`: a stdlib hash tripwire over
+`derived-stamps.json`, which pins every source and derived file. It fails when
+a source or netlist moves without a re-stamp. It does **not** prove the netlist
+equals what its generator emits today; that is established when the stamp is
+written, by each row's `check_argv` (`klt netlist --check` for the analog rows,
+run by `derived_stamps.py --refresh`). The two digital rows have
+`check_argv: null` (Yosys/OpenROAD could not be run on the stamping host), so
+`--refresh` refuses to re-pin them without `--include-unverified`, and each
+row's `basis` field says what its pin rests on. Re-stamp from a host that has
+the toolchain and re-run the real flow before relying on those rows.
 
 ## Why some genuinely-passed work grades unmet
 

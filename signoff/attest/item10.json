@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 10,
+  "description": "Repo hygiene, both partitions: README, spec, license and the CI workflow, plus the CI-equivalent evidence-format and harness checks.",
+  "hygiene": [
+    "README.md",
+    "spec/tmds-tx.md",
+    "LICENSE",
+    ".github/workflows/ci.yml"
+  ],
+  "checks": [
+    {
+      "name": "lint",
+      "argv": [
+        "bash",
+        ".github/scripts/lint.sh",
+        "--require-shellcheck",
+        "--require-append-only"
+      ]
+    },
+    {
+      "name": "harness-unit-tests",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "sim/tests"
+      ]
+    },
+    {
+      "name": "lvs-guard-unit-tests",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "layout/tests"
+      ]
+    }
+  ]
+}

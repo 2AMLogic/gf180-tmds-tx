@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 1,
+  "summary": "T1 item 1 (Design sources): 9/9 attestation checks passed (klt signoff --attest)",
+  "source": "signoff/attest/item1-digital.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 9,
+    "passed_count": 9,
+    "checks": [
+      {
+        "check": "present",
+        "role": "source",
+        "path": "flow/gen_pnr_netlist.py",
+        "passed": true,
+        "content_hash": "sha256:ffe47054d0c897e18c4251a7ec3a0c483e1bef77da03c941bbfd4e7b68cd301c"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "flow/synth_tmds_encoder.py",
+        "passed": true,
+        "content_hash": "sha256:45c71bf8c95c98b15b7777c454e32b531bd71854e8dfb6c26bb6613c27c37a4c"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "rtl/tmds_encoder.v",
+        "passed": true,
+        "content_hash": "sha256:ff658e3dbadbd865f2a2c1cd45b0445835ba6306596d2efffb4d453ab144bff7"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "rtl/tmds_serializer.v",
+        "passed": true,
+        "content_hash": "sha256:c02a76dbaec3a27089233eb2d933f112de37ec5a5d46e0bd0380adbb51c9324c"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "rtl/tmds_tx_lane.v",
+        "passed": true,
+        "content_hash": "sha256:4426d20899f0abeef40e0e7af3a15bd5745b5124acc7f202634305a253db0c6a"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "flow/tmds_encoder/netlist/tmds_encoder.pnr.v",
+        "passed": true,
+        "content_hash": "sha256:2ecd8ee09a6a403fe3fcb83fb5b4aad841e79be7dbb4e50364b5900795359c4f"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "flow/tmds_encoder/netlist/tmds_encoder.synth.v",
+        "passed": true,
+        "content_hash": "sha256:dea60b1b9d296a9467c60f9174737167b0ec160332e9b2f7745252ef09a719a6"
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "flow/tmds_encoder/netlist/tmds_encoder.pnr.v",
+        "generator": "flow/gen_pnr_netlist.py (OpenROAD)",
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "digital.tmds_encoder.pnr"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "flow/tmds_encoder/netlist/tmds_encoder.synth.v",
+        "generator": "flow/synth_tmds_encoder.py (Yosys)",
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "digital.tmds_encoder.synth"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "signoff/attest/item1-digital.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:82f256c18bfa8516da7f9c91833d632f7257454c62b21e55eb571425d6bfb852"
+    }
+  }
+}

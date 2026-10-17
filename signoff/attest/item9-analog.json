@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 9,
+  "description": "Analog partition: every sim/<slug>/testbench fragment and manifest. cold_start is the harness entry point loading every manifest (no PDK/ngspice needed, so CI can run it); the PVT sweeps themselves need the pinned PDK and ngspice and are recorded append-only under sim/*/records/, they are NOT re-run by this attestation.",
+  "testbenches": [
+    "sim/cml-driver-eye-mask/testbench/cml_driver_eye_mask.spice",
+    "sim/cml-driver-eye-mask/testbench/tb.json",
+    "sim/cml-driver-eye-realmux/testbench/cml_driver_eye_realmux.spice",
+    "sim/cml-driver-eye-realmux/testbench/tb.json",
+    "sim/cml-driver-eye/testbench/cml_driver_dut.spice",
+    "sim/cml-driver-eye/testbench/cml_driver_eye.spice",
+    "sim/cml-driver-eye/testbench/tb.json",
+    "sim/cml-driver-mismatch/testbench/cml_driver_dut_mismatch.spice",
+    "sim/cml-driver-mismatch/testbench/cml_driver_mismatch.spice",
+    "sim/esd-clamp-cv/testbench/esd_clamp_cv.spice",
+    "sim/esd-clamp-cv/testbench/tb.json",
+    "sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice",
+    "sim/esd-diode-clamp-cv/testbench/tb.json",
+    "sim/smoke-cml-pair/testbench/smoke_cml_pair.spice",
+    "sim/smoke-cml-pair/testbench/tb.json",
+    "sim/tmds-final-mux-eye/testbench/tb.json",
+    "sim/tmds-final-mux-eye/testbench/tmds_final_mux_eye.spice",
+    "sim/pdk.json"
+  ],
+  "cold_start": {
+    "argv": [
+      "python3",
+      "sim/run_corners.py",
+      "--list"
+    ]
+  },
+  "pins": {
+    "pdk": {
+      "name": "gf180mcuD",
+      "revision": "c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "tools": {
+      "ngspice": "42",
+      "xschem": "3.4.4"
+    }
+  }
+}
