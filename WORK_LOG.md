@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-17
+
+- **PR #232**: feat(signoff): grade T1 item 5 digital from a klt sta envelope
+
 ### 2026-10-16
 
 - **PR #225**: Bump Repo Skills 0.24.1 -> 0.24.3
