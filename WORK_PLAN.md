@@ -11,7 +11,7 @@ for the generation logic.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
 
 ## Very Important
 
@@ -36,21 +36,20 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#227**: T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
-- **#228**: T1 items 5 and 7 (digital): emit klt sta and klt functional-verification envelopes, including the SDF-annotated run
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign
+- **#234**: docs: pad pitch and depth transposed in pad-ring survey and DR-0011
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#235**: docs(spec): correct transposed fd_io pad pitch/depth via DR-0019
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
-- **#232**: feat(signoff): grade T1 item 5 digital from a klt sta envelope
 
 ## Proposed
 
@@ -70,13 +69,13 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 3 |
-| PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
+| PRs awaiting review | 1 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 1 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
