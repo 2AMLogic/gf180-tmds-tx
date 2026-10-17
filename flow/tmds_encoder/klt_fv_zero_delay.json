@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "engine": "icarus",
+  "hdl_toplevel": "tmds_encoder",
+  "testbench": "test_tmds_encoder",
+  "status": "pass",
+  "test_count": 3,
+  "passed_count": 3,
+  "failed_count": 0,
+  "skipped_count": 0,
+  "tests": [
+    {
+      "name": "test_control_characters_and_blanking_reset",
+      "status": "passed",
+      "sim_time_ns": null,
+      "real_time_s": 0.053
+    },
+    {
+      "name": "test_exhaustive_equivalence_and_invariants",
+      "status": "passed",
+      "sim_time_ns": null,
+      "real_time_s": 0.818
+    },
+    {
+      "name": "test_long_run_cumulative_disparity_bound",
+      "status": "passed",
+      "sim_time_ns": null,
+      "real_time_s": 0.53
+    }
+  ],
+  "coverage": null,
+  "trace": null,
+  "environment": {
+    "engine": "icarus",
+    "engine_version": "13.0",
+    "cocotb_version": "2.1.0",
+    "results_xml": "/home/ubuntu/GitHub/gf180-tmds-tx/.loom/worktrees/issue-228/flow/build/klt/.klt/functional-verification/results_icarus.xml",
+    "random_seed": 1792265019,
+    "sdf": null
+  }
+}
