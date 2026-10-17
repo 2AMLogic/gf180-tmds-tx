@@ -3,6 +3,10 @@
 **Status: Accepted.** Successor to and full supersession of DR-0005
 (`spec/tmds-tx.md`), which is not deleted — its Status line points here.
 
+**Correction (2026-10-17)**: the "350 um pitch / 75 um depth" figures
+below are transposed; see DR-0019 (`spec/decisions/0019-pad-pitch-depth-correction.md`).
+The decision text is unchanged.
+
 **Numbering note**: see DR-0010's "Renumbering note" — this record was
 issue #9's originally-drafted `DR-0007`, renumbered to avoid colliding with
 the already-ratified, unrelated `DR-0007` (`spec/tmds-tx.md`'s
