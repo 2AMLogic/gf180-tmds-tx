@@ -7,6 +7,8 @@ selected.
 
 ### 2026-10-17
 
+- **PR #235**: docs(spec): correct transposed fd_io pad pitch/depth via DR-0019
+- **Issue #234** (closed): docs: pad pitch and depth transposed in pad-ring survey and DR-0011
 - **PR #232**: feat(signoff): grade T1 item 5 digital from a klt sta envelope
 
 ### 2026-10-16
