@@ -37,13 +37,12 @@ Issues currently being built (`loom:building`).
 
 - **#227**: T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign
-- **#234**: docs: pad pitch and depth transposed in pad-ring survey and DR-0011
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#235**: docs(spec): correct transposed fd_io pad pitch/depth via DR-0019
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -73,8 +72,8 @@ _None._
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 3 |
-| PRs awaiting review | 1 |
+| In Progress (`loom:building`) | 2 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 1 |
 | Architect / Hermit proposals | 0 |
