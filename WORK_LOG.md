@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-20
+
+- **PR #240**: refactor: route flow git-provenance helpers through sim.harness.report
+- **Issue #239** (closed): Consolidate duplicate git-provenance helpers: flow/synth_tmds_encoder.py vs sim/harness/report.py
+
 ### 2026-10-17
 
 - **PR #235**: docs(spec): correct transposed fd_io pad pitch/depth via DR-0019
