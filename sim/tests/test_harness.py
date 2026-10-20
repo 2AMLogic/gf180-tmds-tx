@@ -16,6 +16,7 @@ still behaves identically to the source harness.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -379,6 +380,20 @@ class GitProvenanceTests(unittest.TestCase):
         evidence_dir = self.root / "sim" / "output-voltage-tc" / "records"
         (evidence_dir / "new-record.md").write_text("# new record\n")
         self.assertFalse(report_mod.working_tree_dirty(self.root))
+
+    def test_working_tree_dirty_ignore_matches_leading_space_first_line(self):
+        # Issue #100: an unstaged ` M` entry sorting first must keep its
+        # leading space, or `line[3:]` is off by one and the ignore misses.
+        out = self.root / "flow" / "out"
+        out.mkdir(parents=True)
+        (out / "a.v").write_text("v1\n")
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "-m", "add flow output")
+        (out / "a.v").write_text("v2\n")
+        ignore = re.compile(r"^flow/out/")
+        self.assertFalse(report_mod.working_tree_dirty(self.root, ignore=ignore))
+        (self.root / "README.md").write_text("changed\n")
+        self.assertTrue(report_mod.working_tree_dirty(self.root, ignore=ignore))
 
     def test_git_provenance_falls_back_to_unknown_outside_a_git_checkout(self):
         outside = Path(tempfile.mkdtemp())
