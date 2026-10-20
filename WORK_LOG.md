@@ -7,6 +7,8 @@ selected.
 
 ### 2026-10-20
 
+- **PR #247**: refactor: share append-only evidence-record tail across flow drivers
+- **Issue #246** (closed): Dedupe append-only record-write tail across the five flow/*_tmds_encoder.py drivers
 - **PR #244**: refactor: share DUT-translator CLI scaffolding in one helper module
 - **Issue #243** (closed): Dedupe DUT-translator CLI scaffolding shared by gen_cml_driver_core_dut and gen_pad_ring_assembly_dut
 - **PR #240**: refactor: route flow git-provenance helpers through sim.harness.report
