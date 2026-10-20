@@ -165,7 +165,6 @@ TOP = "tmds_encoder"
 OUT_DIR = REPO_ROOT / "flow" / TOP
 STA_DIR = OUT_DIR / "sta"
 REPORTS_DIR = OUT_DIR / "reports"
-RECORDS_DIR = OUT_DIR / "records"
 
 NETLIST = OUT_DIR / "netlist" / f"{TOP}.synth.v"
 ROUTED_DEF = OUT_DIR / "pnr" / f"{TOP}.def"
@@ -624,15 +623,9 @@ def main() -> int:
             )
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        sha = synth._git("rev-parse", "HEAD") or "unknown"
-        dirty = synth.working_tree_dirty()
-        record_path.write_text(
-            render_record(
+        status = synth.write_flow_record(
+            rid,
+            lambda sha, dirty: render_record(
                 rid,
                 when,
                 pdk,
@@ -644,9 +637,10 @@ def main() -> int:
                 resized_instances,
                 dirty,
                 sha,
-            )
+            ),
         )
-        print(f"Evidence record written to {record_path}")
+        if status:
+            return status
 
     return 0
 

@@ -118,6 +118,7 @@ import datetime as _dt
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -215,6 +216,24 @@ _OWN_OUTPUT_RE = re.compile(r"^(?:flow/tmds_encoder/|layout/gds/)")
 
 def working_tree_dirty() -> bool:
     return _report.working_tree_dirty(REPO_ROOT, ignore=_OWN_OUTPUT_RE)
+
+
+def write_flow_record(rid: str, render: Callable[[str, bool], str]) -> int:
+    """Write ``RECORDS_DIR/<rid>.md`` from ``render(sha, dirty)``, append-only.
+
+    Shared tail of every flow driver's ``main()``: refuses (returns 1, message
+    on stderr) if the record already exists, otherwise writes it and prints
+    where. Returns 0 on success.
+    """
+    RECORDS_DIR.mkdir(parents=True, exist_ok=True)
+    record_path = RECORDS_DIR / f"{rid}.md"
+    if record_path.exists():
+        print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
+        return 1
+    sha = _git("rev-parse", "HEAD") or "unknown"
+    record_path.write_text(render(sha, working_tree_dirty()))
+    print(f"Evidence record written to {record_path}")
+    return 0
 
 
 def yosys_version() -> str:
@@ -590,13 +609,9 @@ def main() -> int:
         print(f"WARNING: {w}")
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        record_path.write_text(
-            render_record(
+        status = write_flow_record(
+            rid,
+            lambda sha, dirty: render_record(
                 rid=rid,
                 when=when,
                 pdk=pdk,
@@ -604,13 +619,14 @@ def main() -> int:
                 timing_liberty=timing_liberty,
                 yosys_v=yosys_version(),
                 counts=counts,
-                dirty=working_tree_dirty(),
+                dirty=dirty,
                 warnings=warnings,
                 log_path=log_path,
                 ys_path=ys_path,
-            )
+            ),
         )
-        print(f"Evidence record written to {record_path}")
+        if status:
+            return status
 
     return 0
 

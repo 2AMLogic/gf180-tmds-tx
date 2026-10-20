@@ -134,7 +134,6 @@ PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115's four-stage (DR-0009) P
 
 OUT_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 REPORTS_DIR = OUT_DIR / "reports"
-RECORDS_DIR = OUT_DIR / "records"
 BUILD_DIR = REPO_ROOT / "flow" / "build" / "gate_level_sim"
 
 CLOCK_PERIOD_NS = 50  # see this module's docstring, "Test clock period"
@@ -364,15 +363,11 @@ def main() -> int:
     print(f"{'PASS' if passed else 'FAIL'}: {n} test(s), {f} failed (clock period {CLOCK_PERIOD_NS} ns)")
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        sha = synth._git("rev-parse", "HEAD") or "unknown"
-        dirty = synth.working_tree_dirty()
-        record_path.write_text(render_record(rid, when, pdk, n, f, passed, dirty, sha))
-        print(f"Evidence record written to {record_path}")
+        status = synth.write_flow_record(
+            rid, lambda sha, dirty: render_record(rid, when, pdk, n, f, passed, dirty, sha)
+        )
+        if status:
+            return status
 
     return 0 if passed else 1
 
