@@ -78,7 +78,21 @@ _EVIDENCE_PATH_RE = re.compile(
 )
 
 
-def working_tree_dirty(repo_root: Path) -> bool:
+def _status_porcelain(repo_root: Path) -> str:
+    """``git status --porcelain``, stripped only of trailing newlines.
+
+    Deliberately not :func:`_run_git`: its ``.strip()`` trims the whole
+    multi-line output, eating the leading space of an unstaged ``" M"`` /
+    ``" D"`` code when that is the first line, which leaves ``line[3:]`` one
+    character short and defeats the ignore match (issue #100).
+    """
+    result = _git(repo_root, "status", "--porcelain")
+    if result is None or result.returncode != 0:
+        return ""
+    return result.stdout.rstrip("\n")
+
+
+def working_tree_dirty(repo_root: Path, ignore: re.Pattern[str] = _EVIDENCE_PATH_RE) -> bool:
     """Is the *input* tree dirty -- design, testbench, harness, docs?
 
     "Dirty" exists on a record to answer one question: can this result be
@@ -86,15 +100,16 @@ def working_tree_dirty(repo_root: Path) -> bool:
     unreproducible -- and evidence is exactly what a run leaves behind, so a
     naive ``git status --porcelain`` check reports every run after the first
     as dirty (the previous bench's own logs are sitting in the tree). Only
-    changes outside the append-only evidence directories count.
+    changes outside the paths matched by ``ignore`` (default: the append-only
+    evidence directories) count. Callers whose runs write elsewhere (the
+    ``flow/`` drivers) pass their own output-path pattern.
     """
-    status = _run_git("status", "--porcelain", cwd=repo_root)
-    for line in status.splitlines():
+    for line in _status_porcelain(repo_root).splitlines():
         path = line[3:].strip().strip('"')
         # Renames read "old -> new"; the destination is what matters here.
         if " -> " in path:
             path = path.split(" -> ", 1)[1]
-        if path and not _EVIDENCE_PATH_RE.match(path):
+        if path and not ignore.match(path):
             return True
     return False
 
