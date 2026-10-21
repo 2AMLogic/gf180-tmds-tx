@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-21
+
+- **PR #249**: Bump Repo Skills 0.24.3 -> 0.24.7
+
 ### 2026-10-20
 
 - **PR #247**: refactor: share append-only evidence-record tail across flow drivers

@@ -48,7 +48,6 @@ _None._
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
-- **#249**: Bump Repo Skills 0.24.3 -> 0.24.7
 
 ## Proposed
 
@@ -76,7 +75,7 @@ _None._
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 3 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
