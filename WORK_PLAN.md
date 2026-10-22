@@ -59,7 +59,7 @@ Issues carrying `loom:curated`.
 
 ## Proposed (Architect / Hermit)
 
-- **#242**: Consolidate duplicated pad-fold geometry: gen_pad_ring_assembly.py vs pad_pitch_fit_study.py *(hermit)*
+_None._
 
 ## Epics
 
@@ -77,6 +77,6 @@ _None._
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 3 |
-| Architect / Hermit proposals | 1 |
+| Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
