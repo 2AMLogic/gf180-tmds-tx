@@ -22,9 +22,9 @@ slot-fit/hard-error guard (`_struct_width_um`, scope item 4 of issue #149:
 size cannot be folded to fit"). A silently-wrong fold would produce a tile
 that is DRC-clean and *still* wrong -- two adjacent pad structures could
 overlap, or a structure could overrun its 350 um slot, in a way no
-per-shape DRC rule flags. These tests pin that arithmetic, ported from
-(and cross-checked against) `pad_pitch_fit_study.py`'s own already-verified
-version (issue #143).
+per-shape DRC rule flags. These tests pin that arithmetic, which has a single
+definition in `pad_pitch_fit_study.py` (issue #143's already-verified
+version) that this module imports rather than copies (issue #242).
 """
 
 from __future__ import annotations
@@ -94,9 +94,9 @@ class ClampSizeTest(unittest.TestCase):
 
 
 class ClampRowsTest(unittest.TestCase):
-    """Ported from pad_pitch_fit_study.py's own ClampRowsTest (issue #143) --
-    same arithmetic, same invariants, now pinned in this module too since
-    this module's own `clamp_rows` is what `build()` actually calls."""
+    """Mirrors pad_pitch_fit_study.py's own ClampRowsTest (issue #143) --
+    same arithmetic, same invariants, pinned here too since `clamp_rows` is
+    what `build()` actually calls."""
 
     def test_rejects_empty_clamp(self):
         for bad in (0, -1):
@@ -122,13 +122,11 @@ class ClampRowsTest(unittest.TestCase):
             expected = -(-n // gen.MAX_FINGERS_PER_ROW)  # ceil division
             self.assertEqual(len(gen.clamp_rows(n)), expected, n)
 
-    def test_agrees_with_pad_pitch_fit_studys_own_fold(self):
-        """This module ports pad_pitch_fit_study.py's fold (issue #143's
-        already-DRC-clean reference implementation) rather than re-deriving
-        it -- so the two must agree at every point in the HBM-sizing window
-        and at the as-drawn default."""
-        for n in (gen.N_FINGERS,) + HBM_WINDOW_FINGERS:
-            self.assertEqual(gen.clamp_rows(n), study.clamp_rows(n), n)
+    def test_fold_is_the_study_s_single_implementation(self):
+        """Issue #242: the fold and its constants are imported from
+        pad_pitch_fit_study.py, not copied, so they cannot drift apart."""
+        self.assertIs(gen.clamp_rows, study.clamp_rows)
+        self.assertEqual(gen.MAX_FINGERS_PER_ROW, study.MAX_FINGERS_PER_ROW)
 
 
 class StructWidthTest(unittest.TestCase):
@@ -136,7 +134,7 @@ class StructWidthTest(unittest.TestCase):
         # design/esd-capacitance-budget.md §10.2's own committed table.
         self.assertEqual(gen._struct_width_um(gen.N_FINGERS), 65.4)
 
-    def test_agrees_with_pad_pitch_fit_studys_own_fit_report(self):
+    def test_agrees_with_pad_pitch_fit_studys_fit_report(self):
         for n in (gen.N_FINGERS,) + HBM_WINDOW_FINGERS:
             self.assertAlmostEqual(
                 gen._struct_width_um(n), float(study.fit_report(n)["struct_width_um"])
@@ -165,17 +163,19 @@ class HardErrorGuardTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self._orig_max = gen.MAX_FINGERS_PER_ROW
+        # The cap lives in pad_pitch_fit_study (issue #242); `clamp_rows`
+        # reads it from there, so that is where it must be widened.
+        self._orig_max = study.MAX_FINGERS_PER_ROW
 
     def tearDown(self):
-        gen.MAX_FINGERS_PER_ROW = self._orig_max
+        study.MAX_FINGERS_PER_ROW = self._orig_max
 
     def test_no_hard_error_within_the_hbm_window(self):
         for n in (gen.N_FINGERS,) + HBM_WINDOW_FINGERS:
             self.assertLessEqual(gen._struct_width_um(n), gen.PAD_PITCH_UM)
 
     def test_struct_width_exceeds_pitch_once_a_single_row_is_forced_too_wide(self):
-        gen.MAX_FINGERS_PER_ROW = 1000
+        study.MAX_FINGERS_PER_ROW = 1000
         width = gen._struct_width_um(500)
         self.assertGreater(width, gen.PAD_PITCH_UM)
 
