@@ -69,6 +69,21 @@ from __future__ import annotations
 
 import argparse
 
+from pad_pitch_fit_study import (  # noqa: F401 -- re-exported; single source (issue #242)
+    DEFAULT_BUS_WIDTH_UM,
+    FINGER_DEPTH,
+    FINGER_L,
+    FINGER_PITCH,
+    MAX_FINGERS_PER_ROW,
+    PAD_SIDE,
+    PAD_VIA_GAP_UM,
+    ROW_GAP_UM,
+    _box,
+    _row_pitch,
+    _row_span,
+    clamp_rows,
+)
+
 try:  # pragma: no cover -- exercised by whichever environment is present
     import klayout.db as db
 except ModuleNotFoundError:  # pragma: no cover
@@ -129,24 +144,14 @@ STRAP_STITCH_PITCH_UM = 50.0  # via3/via4 stitch interval tying M3-M4-M5 togethe
 # (issue #87) via pad_pitch_fit_study.py's already-DRC-clean block-level
 # reference implementation (issue #143).
 # ---------------------------------------------------------------------------
-PAD_SIDE = 25.0  # um -- gf180mcu_fd_io__bi_t.lef's own PAD pin size
 PAD_OPENING_MARGIN = 2.5  # um -- above pad.enclosing.metal5.1's 2.0um floor
-PAD_VIA_GAP_UM = 1.5  # x gap from the last finger to the via-stack centre
 
-FINGER_L = 2.0  # um, long (periphery/width) axis of one diode finger
-FINGER_DEPTH = 1.0  # um, short axis
-FINGER_PITCH = 2.6  # um, x pitch == FINGER_L + 0.6um (>= comp.space.mv.1 0.36um)
-ROW_GAP_UM = 0.6  # um, y gap between rows -- the same margin FINGER_PITCH uses
-
-# Metal1 cathode-gather bus width -- gen_pad_v2.py's own bus is
-# `2*0.13 + CONTACT_SIZE` = 0.48 um, which is what the default reproduces.
-DEFAULT_BUS_WIDTH_UM = 2 * 0.13 + CONTACT_SIZE
-
-# Largest round per-row finger count that leaves real slot margin at each end
-# of a PAD_PITCH_UM slot once the via stack and the 25um Metal5 plate are
-# accounted for -- see pad_pitch_fit_study.py's `fit_report` (issue #143),
-# which measured this against the full HBM-sizing window.
-MAX_FINGERS_PER_ROW = 120
+# The shared fold geometry (PAD_SIDE, PAD_VIA_GAP_UM, FINGER_*, ROW_GAP_UM,
+# DEFAULT_BUS_WIDTH_UM, MAX_FINGERS_PER_ROW) and its pure-arithmetic helpers
+# (`clamp_rows`, `_row_span`, `_row_pitch`, `_box`) have one definition, in
+# pad_pitch_fit_study.py (issue #143, which measured MAX_FINGERS_PER_ROW
+# against the full HBM-sizing window) and are imported at the top of this
+# module (issue #242).
 
 # This driver's own as-drawn clamp size -- gf180_tmds_pad_v2's own 20-finger
 # array (issue #87), not yet the final HBM-qualified size
@@ -173,39 +178,6 @@ NWELL_MARGIN_UM = 0.7  # Nwell overlap of the Pplus fingers (clears NW enclosure
 # tap's Nplus clears the array's Pplus/diode_mk, near enough to stay in the
 # same Nwell island.
 NWELL_TAP_X_UM = -3.4
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
-
-
-def clamp_rows(n_fingers: int) -> list[int]:
-    """Fold `n_fingers` diode-clamp fingers into rows of at most
-    MAX_FINGERS_PER_ROW (issue #143's finding: a single row overruns
-    DR-0011's ratified 350um pitch well before an HBM-sized clamp)."""
-    if n_fingers < 1:
-        raise ValueError("clamp finger count must be >= 1")
-    rows: list[int] = []
-    remaining = n_fingers
-    while remaining > 0:
-        take = min(remaining, MAX_FINGERS_PER_ROW)
-        rows.append(take)
-        remaining -= take
-    return rows
-
-
-def _row_span(fingers_in_row: int) -> float:
-    return (fingers_in_row - 1) * FINGER_PITCH + FINGER_L
-
-
-def _row_pitch(bus_width: float) -> float:
-    """y row-to-row pitch: whichever of the diode finger or its Metal1
-    gather bus is taller, plus the same ROW_GAP_UM margin FINGER_PITCH uses
-    in x."""
-    return max(FINGER_DEPTH, bus_width) + ROW_GAP_UM
 
 
 def _struct_width_um(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> float:
