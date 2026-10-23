@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-23
+
+- **PR #258**: refactor: share gf180mcu layer table and _box across layout generators
+- **Issue #255** (closed): Consolidate duplicated gf180mcu layer table and _box helper across layout generators
+
 ### 2026-10-22
 
 - **PR #252**: refactor: import shared pad-fold geometry from pad_pitch_fit_study
