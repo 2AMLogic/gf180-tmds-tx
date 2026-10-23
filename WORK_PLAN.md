@@ -11,7 +11,7 @@ for the generation logic.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
+_None._
 
 ## Very Important
 
@@ -36,6 +36,7 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#227**: T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
+- **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
 
 ## PRs Awaiting Review
 
@@ -47,7 +48,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
+- **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
 
 ## Proposed
 
@@ -56,10 +57,11 @@ Issues carrying `loom:curated`.
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 - **#227**: T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest) *(curated)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
+- **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#255**: Consolidate duplicated gf180mcu layer table and _box helper across layout generators *(hermit)*
 
 ## Epics
 
@@ -69,14 +71,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 3 |
-| Architect / Hermit proposals | 0 |
+| Curated | 4 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
