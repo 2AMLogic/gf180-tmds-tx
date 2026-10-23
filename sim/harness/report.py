@@ -42,6 +42,7 @@ from .corners import (
     RATE_TARGET_MBPS,
     PvtPoint,
 )
+from . import evidence_store
 from .evidence_lint import _git
 from .pdk import Pdk
 from .runner import PointResult
@@ -74,7 +75,8 @@ def _run_git(*args: str, cwd: Path) -> str:
 #: Paths whose git state says nothing about whether a run is reproducible:
 #: the append-only evidence tree, which runs *write into*.
 _EVIDENCE_PATH_RE = re.compile(
-    r"^sim/(?:[^/]+/(?:%s|%s|%s)/)" % (RECORDS_DIR, SNAPSHOT_DIR, CORNERS_DIR)
+    r"^(?:sim/(?:[^/]+/(?:%s|%s|%s)/)|manifests/artifacts/)"
+    % (RECORDS_DIR, SNAPSHOT_DIR, CORNERS_DIR)
 )
 
 
@@ -636,9 +638,15 @@ def render_record(record: dict, experiment: str) -> str:
     ]
     if tb.get("dut"):
         lines.append(f"  - DUT netlist: `{tb['dut']}`")
+    stored = record.get("stored_evidence")
+    raw_logs = (
+        f"  - Stored evidence manifest: `{stored['manifest']}`"
+        if stored
+        else f"  - Raw logs: `sim/{experiment}/{CORNERS_DIR}/{record_id}/`"
+    )
     lines += [
         f"  - Netlist snapshot: `sim/{experiment}/{SNAPSHOT_DIR}/{record_id}.spice`",
-        f"  - Raw logs: `sim/{experiment}/{CORNERS_DIR}/{record_id}/`",
+        raw_logs,
         f"- **Timestamp / author**: {record['started_utc']}, {env['user']}",
         f"- **Supersedes**: {record['supersedes'] or '(none)'}",
         "",
@@ -665,6 +673,9 @@ def render_record(record: dict, experiment: str) -> str:
     ]
     for corner in record["grid"]["corners"]:
         lines.append(f"- `{corner['name']}`: {' '.join(corner['sections'])}")
+    if stored:
+        lines.append("")
+        lines += evidence_store.stored_evidence_lines(stored)
     lines += [
         "",
         "---",
