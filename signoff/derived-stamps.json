@@ -47,11 +47,11 @@
     },
     {
       "id": "digital.tmds_encoder.synth",
-      "basis": "NOT re-run: the gf180mcu_fd_sc_mcu9t5v0 std-cell library is absent on the stamping host, so Yosys cannot resynthesize. The pin rests on flow record 20260817-110611-37e197a, which cites this netlist's sha256",
+      "basis": "NOT re-run: the gf180mcu_fd_sc_mcu9t5v0 std-cell library is absent on the stamping host, so Yosys cannot resynthesize. The pin rests on flow record 20260817-110611-37e197a, which cites this netlist's sha256. flow/synth_tmds_encoder.py was re-pinned after origin/main's provenance-helper refactor (7e24c66, 8cfc986: git/provenance helpers moved to sim.harness.report; no synthesis step edited); Yosys was still NOT re-run, so the re-pin records that the script moved, not that the netlist was regenerated",
       "check_argv": null,
       "sources": {
         "rtl/tmds_encoder.v": "sha256:ff658e3dbadbd865f2a2c1cd45b0445835ba6306596d2efffb4d453ab144bff7",
-        "flow/synth_tmds_encoder.py": "sha256:45c71bf8c95c98b15b7777c454e32b531bd71854e8dfb6c26bb6613c27c37a4c"
+        "flow/synth_tmds_encoder.py": "sha256:bee1980e6a7509a9612d06c976d97ba51266e83252750394b6211fa1deebd4d8"
       },
       "derived": {
         "flow/tmds_encoder/netlist/tmds_encoder.synth.v": "sha256:dea60b1b9d296a9467c60f9174737167b0ec160332e9b2f7745252ef09a719a6"

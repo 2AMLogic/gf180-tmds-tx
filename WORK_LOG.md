@@ -5,6 +5,30 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-22
+
+- **PR #252**: refactor: import shared pad-fold geometry from pad_pitch_fit_study
+- **Issue #242** (closed): Consolidate duplicated pad-fold geometry: gen_pad_ring_assembly.py vs pad_pitch_fit_study.py
+
+### 2026-10-21
+
+- **PR #249**: Bump Repo Skills 0.24.3 -> 0.24.7
+
+### 2026-10-20
+
+- **PR #247**: refactor: share append-only evidence-record tail across flow drivers
+- **Issue #246** (closed): Dedupe append-only record-write tail across the five flow/*_tmds_encoder.py drivers
+- **PR #244**: refactor: share DUT-translator CLI scaffolding in one helper module
+- **Issue #243** (closed): Dedupe DUT-translator CLI scaffolding shared by gen_cml_driver_core_dut and gen_pad_ring_assembly_dut
+- **PR #240**: refactor: route flow git-provenance helpers through sim.harness.report
+- **Issue #239** (closed): Consolidate duplicate git-provenance helpers: flow/synth_tmds_encoder.py vs sim/harness/report.py
+
+### 2026-10-17
+
+- **PR #235**: docs(spec): correct transposed fd_io pad pitch/depth via DR-0019
+- **Issue #234** (closed): docs: pad pitch and depth transposed in pad-ring survey and DR-0011
+- **PR #232**: feat(signoff): grade T1 item 5 digital from a klt sta envelope
+
 ### 2026-10-16
 
 - **PR #225**: Bump Repo Skills 0.24.1 -> 0.24.3

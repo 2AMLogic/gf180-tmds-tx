@@ -304,7 +304,6 @@ OUT_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 PNR_DIR = OUT_DIR / "pnr"
 BUILD_DIR = REPO_ROOT / "flow" / "build"
 REPORTS_DIR = OUT_DIR / "reports"
-RECORDS_DIR = OUT_DIR / "records"
 
 LAYOUT_GDS_DIR = REPO_ROOT / "layout" / "gds"
 FINAL_DEF = PNR_DIR / "tmds_encoder.def"
@@ -821,19 +820,14 @@ def main() -> int:
         print(f"OK: merged GDS written to {FINAL_GDS} (see {gds_log})")
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        sha = synth._git("rev-parse", "HEAD") or "unknown"
-        dirty = synth.working_tree_dirty()
-        record_path.write_text(
-            render_record(
+        status = synth.write_flow_record(
+            rid,
+            lambda sha, dirty: render_record(
                 rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
-            )
+            ),
         )
-        print(f"Evidence record written to {record_path}")
+        if status:
+            return status
 
     return 0
 

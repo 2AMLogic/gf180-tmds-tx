@@ -94,7 +94,6 @@ TOP = "tmds_encoder"
 OUT_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 STA_DIR = OUT_DIR / "sta"
 REPORTS_DIR = OUT_DIR / "reports"
-RECORDS_DIR = OUT_DIR / "records"
 
 ROUTED_DEF = OUT_DIR / "pnr" / "tmds_encoder.def"
 PNR_RECORD_ID = "20260817-105608-049c240"  # issue #115's four-stage (DR-0009) P&R record, cited below
@@ -215,17 +214,14 @@ def main() -> int:
     )
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        sha = synth._git("rev-parse", "HEAD") or "unknown"
-        dirty = synth.working_tree_dirty()
-        record_path.write_text(
-            render_record(rid, when, pdk, liberty, worst_delay, net_counts, or_version, dirty, sha, log_path)
+        status = synth.write_flow_record(
+            rid,
+            lambda sha, dirty: render_record(
+                rid, when, pdk, liberty, worst_delay, net_counts, or_version, dirty, sha, log_path
+            ),
         )
-        print(f"Evidence record written to {record_path}")
+        if status:
+            return status
 
     return 0
 

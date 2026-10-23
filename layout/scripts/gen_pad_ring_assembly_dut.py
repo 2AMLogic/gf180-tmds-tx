@@ -94,11 +94,10 @@ fails CI.
 
 from __future__ import annotations
 
-import argparse
-import hashlib
 import re
-import sys
 from pathlib import Path
+
+from _dut_translator_cli import TranslationError, run_cli, sha256  # noqa: F401
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -147,14 +146,6 @@ _BARE_DECK_CLASS_RE = re.compile(r"\bnfet\b(?!_)|\bdiode\b(?!_)")
 #: unrenamed, which would produce a deck ngspice rejects outright -- exactly
 #: the failure this script exists to catch before a record is minted from it.
 DIODE_PARAM_RENAME = {"a": "area", "p": "pj"}
-
-
-class TranslationError(RuntimeError):
-    """The extracted netlist is not the shape this script knows how to bind."""
-
-
-def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def translate(text: str, source_label: str, source_sha256: str) -> str:
@@ -326,62 +317,16 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description=__doc__.splitlines()[0],
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+    return run_cli(
+        translate,
+        argv,
+        script=Path(__file__).resolve(),
+        repo_root=REPO_ROOT,
+        doc=__doc__,
+        default_input=DEFAULT_INPUT,
+        default_output=DEFAULT_OUTPUT,
+        check_test="test_pad_ring_assembly_dut.py",
     )
-    parser.add_argument(
-        "-i",
-        "--input",
-        type=Path,
-        default=DEFAULT_INPUT,
-        help=f"extracted netlist to translate (default: {DEFAULT_INPUT})",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        default=DEFAULT_OUTPUT,
-        help=f"DUT fragment to write (default: {DEFAULT_OUTPUT})",
-    )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="do not write; exit 1 if the existing output differs from a fresh "
-        "regeneration (what sim/tests/test_pad_ring_assembly_dut.py asserts)",
-    )
-    args = parser.parse_args(argv)
-
-    source = args.input.resolve()
-    try:
-        label = str(source.relative_to(REPO_ROOT))
-    except ValueError:
-        label = source.name
-
-    try:
-        rendered = translate(source.read_text(), label, sha256(source))
-    except TranslationError as exc:
-        print(f"error: {source}: {exc}", file=sys.stderr)
-        return 1
-
-    if args.check:
-        if not args.output.exists():
-            print(f"error: {args.output} does not exist", file=sys.stderr)
-            return 1
-        if args.output.read_text() != rendered:
-            print(
-                f"error: {args.output} is stale -- regenerate it with\n"
-                f"  python3 {Path(__file__).relative_to(REPO_ROOT)}",
-                file=sys.stderr,
-            )
-            return 1
-        print(f"ok: {args.output} matches a fresh regeneration")
-        return 0
-
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(rendered)
-    print(f"wrote {args.output}")
-    return 0
 
 
 if __name__ == "__main__":  # pragma: no cover

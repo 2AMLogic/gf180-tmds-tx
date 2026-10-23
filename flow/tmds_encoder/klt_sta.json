@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "engine": "openroad",
+  "engine_version": "26Q3-1510-g6cb3f2b704",
+  "hdl_toplevel": "tmds_encoder",
+  "status": "ok",
+  "def_path": "flow/tmds_encoder/pnr/tmds_encoder.def",
+  "verilog_path": null,
+  "geometry_source": "routed",
+  "wire_load_model": null,
+  "wire_load_mode": null,
+  "spef_path": "flow/tmds_encoder/sta/tmds_encoder.spef",
+  "provenance": {
+    "klt_version": "0.5.0+ge8ca621a6961",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuD",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+    },
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:5a887d9a2bdcc15699340192b7568f41dcc01909b4f707e6110ecfbec502c890",
+      "role": "layout"
+    }
+  },
+  "corners": [
+    {
+      "corner": "tt_025C_3v30",
+      "engine_log": {
+        "invocation_id": "4faa9a96c34d4940873f9ec94accf1c0",
+        "script_name": "sta_tmds_encoder__tt_025C_3v30.tcl",
+        "script_path": {
+          "path": "flow/build/klt/.klt/sta/sta_tmds_encoder__tt_025C_3v30.tcl",
+          "scope": "repo"
+        },
+        "script_sha256": "318e870abc414dc232d5738e6718affca4ca0c971b4270e320483ef4f96d8d7d",
+        "metrics_path": {
+          "path": "flow/build/klt/.klt/sta/tmds_encoder__tt_025C_3v30_metrics.json",
+          "scope": "repo"
+        },
+        "outcome": "exited",
+        "returncode": 0,
+        "directory": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/4faa9a96c34d4940873f9ec94accf1c0",
+          "scope": "repo"
+        },
+        "stdout_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/4faa9a96c34d4940873f9ec94accf1c0/stdout.log",
+          "scope": "repo"
+        },
+        "stderr_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/4faa9a96c34d4940873f9ec94accf1c0/stderr.log",
+          "scope": "repo"
+        },
+        "metadata_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/4faa9a96c34d4940873f9ec94accf1c0/invocation.json",
+          "scope": "repo"
+        },
+        "retention_errors": []
+      },
+      "worst_slack_ns": 6.75408,
+      "total_negative_slack_ns": 0,
+      "worst_hold_slack_ns": 0.69024,
+      "total_negative_hold_slack_ns": 0,
+      "fmax_mhz": 148.944,
+      "timing_status": "constrained",
+      "setup_violation_count": 0,
+      "hold_violation_count": 0,
+      "clock_skew_ns": 0.00803,
+      "estimated_power_mw": 5.6784,
+      "spef_annotation": {
+        "nets_annotated": 9,
+        "nets_total": 375,
+        "design_nets_annotated": 0,
+        "design_nets_total": 377,
+        "design_nets_missing_sample": [
+          "VDD",
+          "VSS",
+          "clk",
+          "ctrl[0]",
+          "ctrl[1]",
+          "data[0]",
+          "data[1]",
+          "data[2]",
+          "data[3]",
+          "data[4]",
+          "data[5]",
+          "data[6]",
+          "data[7]",
+          "de",
+          "rst",
+          "tmds[0]",
+          "tmds[1]",
+          "tmds[2]",
+          "tmds[3]",
+          "tmds[4]"
+        ],
+        "reader_warning_count": 0,
+        "reader_warning_sample": [],
+        "unannotated_driver_count": 7,
+        "partially_unannotated_driver_count": 0,
+        "delay_changed": true,
+        "annotation_complete": false,
+        "annotation_warning": "only 0 of 377 nets in the linked design are named by this SPEF; report_parasitic_annotation found 7 driver(s) with no parasitics attached after read_spef -- the worst_slack_ns/etc. fields above are NOT a real-parasitics measurement to the extent annotation is missing."
+      },
+      "deck": {
+        "name": "gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30",
+        "content_hash": "sha256:1157d0aa147dba75a214708197d7a046f970175d723cdec108025f6f06727c12",
+        "released": false
+      }
+    },
+    {
+      "corner": "ss_125C_3v00",
+      "engine_log": {
+        "invocation_id": "5d2a05fecb154d6da503da1dade71fcc",
+        "script_name": "sta_tmds_encoder__ss_125C_3v00.tcl",
+        "script_path": {
+          "path": "flow/build/klt/.klt/sta/sta_tmds_encoder__ss_125C_3v00.tcl",
+          "scope": "repo"
+        },
+        "script_sha256": "6c4dc2fee2b6a3f6f487c64f0257cbcecabbcef5ad8a251188b736d2b404298d",
+        "metrics_path": {
+          "path": "flow/build/klt/.klt/sta/tmds_encoder__ss_125C_3v00_metrics.json",
+          "scope": "repo"
+        },
+        "outcome": "exited",
+        "returncode": 0,
+        "directory": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/5d2a05fecb154d6da503da1dade71fcc",
+          "scope": "repo"
+        },
+        "stdout_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/5d2a05fecb154d6da503da1dade71fcc/stdout.log",
+          "scope": "repo"
+        },
+        "stderr_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/5d2a05fecb154d6da503da1dade71fcc/stderr.log",
+          "scope": "repo"
+        },
+        "metadata_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/5d2a05fecb154d6da503da1dade71fcc/invocation.json",
+          "scope": "repo"
+        },
+        "retention_errors": []
+      },
+      "worst_slack_ns": 0.28125,
+      "total_negative_slack_ns": 0,
+      "worst_hold_slack_ns": 1.361,
+      "total_negative_hold_slack_ns": 0,
+      "fmax_mhz": 75.8337,
+      "timing_status": "constrained",
+      "setup_violation_count": 0,
+      "hold_violation_count": 0,
+      "clock_skew_ns": 0.01617,
+      "estimated_power_mw": 4.782,
+      "spef_annotation": {
+        "nets_annotated": 9,
+        "nets_total": 375,
+        "design_nets_annotated": 0,
+        "design_nets_total": 377,
+        "design_nets_missing_sample": [
+          "VDD",
+          "VSS",
+          "clk",
+          "ctrl[0]",
+          "ctrl[1]",
+          "data[0]",
+          "data[1]",
+          "data[2]",
+          "data[3]",
+          "data[4]",
+          "data[5]",
+          "data[6]",
+          "data[7]",
+          "de",
+          "rst",
+          "tmds[0]",
+          "tmds[1]",
+          "tmds[2]",
+          "tmds[3]",
+          "tmds[4]"
+        ],
+        "reader_warning_count": 0,
+        "reader_warning_sample": [],
+        "unannotated_driver_count": 7,
+        "partially_unannotated_driver_count": 0,
+        "delay_changed": true,
+        "annotation_complete": false,
+        "annotation_warning": "only 0 of 377 nets in the linked design are named by this SPEF; report_parasitic_annotation found 7 driver(s) with no parasitics attached after read_spef -- the worst_slack_ns/etc. fields above are NOT a real-parasitics measurement to the extent annotation is missing."
+      },
+      "deck": {
+        "name": "gf180mcu_fd_sc_mcu9t5v0__ss_125C_3v00",
+        "content_hash": "sha256:d83917f827021eadb159f6011905bf20de632533b2953abba89266a88c2b24af",
+        "released": false
+      }
+    },
+    {
+      "corner": "ss_n40C_3v00",
+      "engine_log": {
+        "invocation_id": "1fd7dd400786495896d20c66bf17730a",
+        "script_name": "sta_tmds_encoder__ss_n40C_3v00.tcl",
+        "script_path": {
+          "path": "flow/build/klt/.klt/sta/sta_tmds_encoder__ss_n40C_3v00.tcl",
+          "scope": "repo"
+        },
+        "script_sha256": "bee23f97e7ce9852d98fa13efab0ebb86aa124bfbe10e97241873c907c768a6b",
+        "metrics_path": {
+          "path": "flow/build/klt/.klt/sta/tmds_encoder__ss_n40C_3v00_metrics.json",
+          "scope": "repo"
+        },
+        "outcome": "exited",
+        "returncode": 0,
+        "directory": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/1fd7dd400786495896d20c66bf17730a",
+          "scope": "repo"
+        },
+        "stdout_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/1fd7dd400786495896d20c66bf17730a/stdout.log",
+          "scope": "repo"
+        },
+        "stderr_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/1fd7dd400786495896d20c66bf17730a/stderr.log",
+          "scope": "repo"
+        },
+        "metadata_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/1fd7dd400786495896d20c66bf17730a/invocation.json",
+          "scope": "repo"
+        },
+        "retention_errors": []
+      },
+      "worst_slack_ns": 4.29296,
+      "total_negative_slack_ns": 0,
+      "worst_hold_slack_ns": 0.95323,
+      "total_negative_hold_slack_ns": 0,
+      "fmax_mhz": 108.991,
+      "timing_status": "constrained",
+      "setup_violation_count": 0,
+      "hold_violation_count": 0,
+      "clock_skew_ns": 0.00989,
+      "estimated_power_mw": 4.5423,
+      "spef_annotation": {
+        "nets_annotated": 9,
+        "nets_total": 375,
+        "design_nets_annotated": 0,
+        "design_nets_total": 377,
+        "design_nets_missing_sample": [
+          "VDD",
+          "VSS",
+          "clk",
+          "ctrl[0]",
+          "ctrl[1]",
+          "data[0]",
+          "data[1]",
+          "data[2]",
+          "data[3]",
+          "data[4]",
+          "data[5]",
+          "data[6]",
+          "data[7]",
+          "de",
+          "rst",
+          "tmds[0]",
+          "tmds[1]",
+          "tmds[2]",
+          "tmds[3]",
+          "tmds[4]"
+        ],
+        "reader_warning_count": 0,
+        "reader_warning_sample": [],
+        "unannotated_driver_count": 7,
+        "partially_unannotated_driver_count": 0,
+        "delay_changed": true,
+        "annotation_complete": false,
+        "annotation_warning": "only 0 of 377 nets in the linked design are named by this SPEF; report_parasitic_annotation found 7 driver(s) with no parasitics attached after read_spef -- the worst_slack_ns/etc. fields above are NOT a real-parasitics measurement to the extent annotation is missing."
+      },
+      "deck": {
+        "name": "gf180mcu_fd_sc_mcu9t5v0__ss_n40C_3v00",
+        "content_hash": "sha256:03238cd7c39382b10bd1ff526c37c9ac3c73cc92c01cd2c249cb86978bda9de3",
+        "released": false
+      }
+    },
+    {
+      "corner": "ff_125C_3v60",
+      "engine_log": {
+        "invocation_id": "11db9be38a5c4c7fb3054910094f0d2c",
+        "script_name": "sta_tmds_encoder__ff_125C_3v60.tcl",
+        "script_path": {
+          "path": "flow/build/klt/.klt/sta/sta_tmds_encoder__ff_125C_3v60.tcl",
+          "scope": "repo"
+        },
+        "script_sha256": "b014d2b75fbd93bcef2a5e025cc22a6c781a71cb5faa9ed3bdf723293987a43b",
+        "metrics_path": {
+          "path": "flow/build/klt/.klt/sta/tmds_encoder__ff_125C_3v60_metrics.json",
+          "scope": "repo"
+        },
+        "outcome": "exited",
+        "returncode": 0,
+        "directory": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/11db9be38a5c4c7fb3054910094f0d2c",
+          "scope": "repo"
+        },
+        "stdout_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/11db9be38a5c4c7fb3054910094f0d2c/stdout.log",
+          "scope": "repo"
+        },
+        "stderr_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/11db9be38a5c4c7fb3054910094f0d2c/stderr.log",
+          "scope": "repo"
+        },
+        "metadata_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/11db9be38a5c4c7fb3054910094f0d2c/invocation.json",
+          "scope": "repo"
+        },
+        "retention_errors": []
+      },
+      "worst_slack_ns": 7.90287,
+      "total_negative_slack_ns": 0,
+      "worst_hold_slack_ns": 0.587,
+      "total_negative_hold_slack_ns": 0,
+      "fmax_mhz": 179.69,
+      "timing_status": "constrained",
+      "setup_violation_count": 0,
+      "hold_violation_count": 0,
+      "clock_skew_ns": 0.0071,
+      "estimated_power_mw": 7.1661,
+      "spef_annotation": {
+        "nets_annotated": 9,
+        "nets_total": 375,
+        "design_nets_annotated": 0,
+        "design_nets_total": 377,
+        "design_nets_missing_sample": [
+          "VDD",
+          "VSS",
+          "clk",
+          "ctrl[0]",
+          "ctrl[1]",
+          "data[0]",
+          "data[1]",
+          "data[2]",
+          "data[3]",
+          "data[4]",
+          "data[5]",
+          "data[6]",
+          "data[7]",
+          "de",
+          "rst",
+          "tmds[0]",
+          "tmds[1]",
+          "tmds[2]",
+          "tmds[3]",
+          "tmds[4]"
+        ],
+        "reader_warning_count": 0,
+        "reader_warning_sample": [],
+        "unannotated_driver_count": 7,
+        "partially_unannotated_driver_count": 0,
+        "delay_changed": true,
+        "annotation_complete": false,
+        "annotation_warning": "only 0 of 377 nets in the linked design are named by this SPEF; report_parasitic_annotation found 7 driver(s) with no parasitics attached after read_spef -- the worst_slack_ns/etc. fields above are NOT a real-parasitics measurement to the extent annotation is missing."
+      },
+      "deck": {
+        "name": "gf180mcu_fd_sc_mcu9t5v0__ff_125C_3v60",
+        "content_hash": "sha256:b64f32b397097f2046e66ce7f9a4aaffc9a80c4c0bfd3c77385727268e81a016",
+        "released": false
+      }
+    },
+    {
+      "corner": "ff_n40C_3v60",
+      "engine_log": {
+        "invocation_id": "d9370ea1537748cb9df5c393da83ac67",
+        "script_name": "sta_tmds_encoder__ff_n40C_3v60.tcl",
+        "script_path": {
+          "path": "flow/build/klt/.klt/sta/sta_tmds_encoder__ff_n40C_3v60.tcl",
+          "scope": "repo"
+        },
+        "script_sha256": "7c5449771d43aa85169fc2527bf361cbbc399bf36197ab3314aec44e5783182c",
+        "metrics_path": {
+          "path": "flow/build/klt/.klt/sta/tmds_encoder__ff_n40C_3v60_metrics.json",
+          "scope": "repo"
+        },
+        "outcome": "exited",
+        "returncode": 0,
+        "directory": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/d9370ea1537748cb9df5c393da83ac67",
+          "scope": "repo"
+        },
+        "stdout_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/d9370ea1537748cb9df5c393da83ac67/stdout.log",
+          "scope": "repo"
+        },
+        "stderr_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/d9370ea1537748cb9df5c393da83ac67/stderr.log",
+          "scope": "repo"
+        },
+        "metadata_path": {
+          "path": "flow/build/klt/.klt/sta/openroad-logs/d9370ea1537748cb9df5c393da83ac67/invocation.json",
+          "scope": "repo"
+        },
+        "retention_errors": []
+      },
+      "worst_slack_ns": 9.52648,
+      "total_negative_slack_ns": 0,
+      "worst_hold_slack_ns": 0.40311,
+      "total_negative_hold_slack_ns": 0,
+      "fmax_mhz": 253.709,
+      "timing_status": "constrained",
+      "setup_violation_count": 0,
+      "hold_violation_count": 0,
+      "clock_skew_ns": 0.00668,
+      "estimated_power_mw": 6.7802,
+      "spef_annotation": {
+        "nets_annotated": 9,
+        "nets_total": 375,
+        "design_nets_annotated": 0,
+        "design_nets_total": 377,
+        "design_nets_missing_sample": [
+          "VDD",
+          "VSS",
+          "clk",
+          "ctrl[0]",
+          "ctrl[1]",
+          "data[0]",
+          "data[1]",
+          "data[2]",
+          "data[3]",
+          "data[4]",
+          "data[5]",
+          "data[6]",
+          "data[7]",
+          "de",
+          "rst",
+          "tmds[0]",
+          "tmds[1]",
+          "tmds[2]",
+          "tmds[3]",
+          "tmds[4]"
+        ],
+        "reader_warning_count": 0,
+        "reader_warning_sample": [],
+        "unannotated_driver_count": 7,
+        "partially_unannotated_driver_count": 0,
+        "delay_changed": true,
+        "annotation_complete": false,
+        "annotation_warning": "only 0 of 377 nets in the linked design are named by this SPEF; report_parasitic_annotation found 7 driver(s) with no parasitics attached after read_spef -- the worst_slack_ns/etc. fields above are NOT a real-parasitics measurement to the extent annotation is missing."
+      },
+      "deck": {
+        "name": "gf180mcu_fd_sc_mcu9t5v0__ff_n40C_3v60",
+        "content_hash": "sha256:0b48b93d6800da325a2613ff6c0b998b230a1bbd28031f6da592e9ff30066602",
+        "released": false
+      }
+    }
+  ]
+}

@@ -118,11 +118,13 @@ import datetime as _dt
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from sim.harness import report as _report  # noqa: E402
 from sim.harness.pdk import Pdk, PdkNotFound, find_pdk  # noqa: E402
 
 TOP = "tmds_encoder"
@@ -196,69 +198,42 @@ def timing_liberty_path(pdk: Pdk) -> Path:
 
 
 def _git(*args: str) -> str:
-    try:
-        result = subprocess.run(
-            ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=False
-        )
-    except OSError:
-        return ""
-    return result.stdout.strip() if result.returncode == 0 else ""
+    return _report._run_git(*args, cwd=REPO_ROOT)
 
 
 def record_id(when: _dt.datetime) -> str:
     """``<YYYYMMDD>-<HHMMSS>-<short-git-sha>``, matching sim/README.md's grammar."""
-    sha = _git("rev-parse", "--short", "HEAD") or "nogit"
-    return f"{when.strftime('%Y%m%d-%H%M%S')}-{sha}"
-
-
-def _git_status_porcelain() -> str:
-    """``git status --porcelain``, stripped only of trailing whitespace.
-
-    Deliberately NOT `_git()` (issue #100 -- found directly, not assumed):
-    `_git()`'s `.strip()` trims the *whole* multi-line stdout, which eats the
-    leading space of porcelain's unstaged-modify (`" M "`) / unstaged-delete
-    (`" D"`) status code whenever that happens to be the first line -- e.g.
-    `" M flow/tmds_encoder/netlist/tmds_encoder.synth.v"` becomes
-    `"M flow/tmds_encoder/..."`, one character short, so
-    `working_tree_dirty`'s `line[3:]` then reads `"low/tmds_encoder/..."`
-    instead of `"flow/tmds_encoder/..."` and the `flow/tmds_encoder/` exclusion
-    below silently fails to match -- a real run with zero out-of-tree changes
-    was reproducibly flagged `DIRTY` this way while building this issue's
-    evidence records. Every other line is unaffected (`.strip()` only trims
-    string boundaries, not internal lines), which is why this went unnoticed
-    until a `flow/tmds_encoder/` path happened to sort first.
-    """
-    try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain"], cwd=REPO_ROOT, capture_output=True, text=True, check=False
-        )
-    except OSError:
-        return ""
-    return result.stdout.rstrip("\n") if result.returncode == 0 else ""
+    return _report.format_record_id(_git("rev-parse", "--short", "HEAD") or "nogit", when)
 
 
 # Output trees this shared helper's callers write to, none of which counts
-# towards "dirty" -- each is exactly what that driver's own run leaves behind
-# (same reasoning as sim/harness/report.py's working_tree_dirty, adapted to
-# flow/'s output paths). `layout/gds/` is issue #100's own fix (found
-# directly, not assumed): flow/pnr_tmds_encoder.py's evidence-record text
-# already claimed this exclusion ("DIRTY (uncommitted changes outside
-# flow/tmds_encoder/ and layout/...")) but the shared helper it calls
-# (`synth.working_tree_dirty`, reused unmodified) never actually implemented
-# it, so a real PnR run with zero out-of-tree changes was reproducibly
-# flagged DIRTY purely because it writes `layout/gds/tmds_encoder.gds`.
-_OWN_OUTPUT_PREFIXES = ("flow/tmds_encoder/", "layout/gds/")
+# towards "dirty" -- each is exactly what that driver's own run leaves behind.
+# `layout/gds/` is there because flow/pnr_tmds_encoder.py writes
+# `layout/gds/tmds_encoder.gds` and its evidence text claims this exclusion
+# (issue #100).
+_OWN_OUTPUT_RE = re.compile(r"^(?:flow/tmds_encoder/|layout/gds/)")
 
 
 def working_tree_dirty() -> bool:
-    status = _git_status_porcelain()
-    for line in status.splitlines():
-        path = line[3:].strip().strip('"')
-        if " -> " in path:
-            path = path.split(" -> ", 1)[1]
-        if path and not path.startswith(_OWN_OUTPUT_PREFIXES):
-            return True
-    return False
+    return _report.working_tree_dirty(REPO_ROOT, ignore=_OWN_OUTPUT_RE)
+
+
+def write_flow_record(rid: str, render: Callable[[str, bool], str]) -> int:
+    """Write ``RECORDS_DIR/<rid>.md`` from ``render(sha, dirty)``, append-only.
+
+    Shared tail of every flow driver's ``main()``: refuses (returns 1, message
+    on stderr) if the record already exists, otherwise writes it and prints
+    where. Returns 0 on success.
+    """
+    RECORDS_DIR.mkdir(parents=True, exist_ok=True)
+    record_path = RECORDS_DIR / f"{rid}.md"
+    if record_path.exists():
+        print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
+        return 1
+    sha = _git("rev-parse", "HEAD") or "unknown"
+    record_path.write_text(render(sha, working_tree_dirty()))
+    print(f"Evidence record written to {record_path}")
+    return 0
 
 
 def yosys_version() -> str:
@@ -634,13 +609,9 @@ def main() -> int:
         print(f"WARNING: {w}")
 
     if not args.no_record:
-        RECORDS_DIR.mkdir(parents=True, exist_ok=True)
-        record_path = RECORDS_DIR / f"{rid}.md"
-        if record_path.exists():
-            print(f"ERROR: record {record_path} already exists -- refusing to overwrite", file=sys.stderr)
-            return 1
-        record_path.write_text(
-            render_record(
+        status = write_flow_record(
+            rid,
+            lambda sha, dirty: render_record(
                 rid=rid,
                 when=when,
                 pdk=pdk,
@@ -648,13 +619,14 @@ def main() -> int:
                 timing_liberty=timing_liberty,
                 yosys_v=yosys_version(),
                 counts=counts,
-                dirty=working_tree_dirty(),
+                dirty=dirty,
                 warnings=warnings,
                 log_path=log_path,
                 ys_path=ys_path,
-            )
+            ),
         )
-        print(f"Evidence record written to {record_path}")
+        if status:
+            return status
 
     return 0
 

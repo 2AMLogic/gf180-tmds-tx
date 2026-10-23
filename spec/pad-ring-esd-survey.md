@@ -104,6 +104,16 @@ full pad-opening design-rule table (bond-pad minimum size, pad-to-seal-ring
 keepout, etc.) would live in the closed-source foundry Design Rule Manual,
 which is not part of the open PDK distribution.
 
+> **Correction note (2026-10-17, issue #234; appended, original text above unchanged).**
+> The geometry in this section is transposed. `SIZE 75.000 BY 350.000` is
+> x BY y: the cell is **75 um along the ring and 350 um deep**, not "75 um
+> deep by 350 um wide". The `fill*`/`brk*` cells are 1/2/5/10 um wide by 350 um
+> tall, so x is the summable along-ring axis. `fillnc` is 0.100 um wide (not
+> 0.42 um) and the `bi_t` PAD is a 60x60 um landing at (7.5, 2) at open_pdks
+> `f6eeac7` (Metal3/4/5/5 for variants A/B/C/D), not the 25x25 um Metal5
+> landing quoted here from `c6d73a3`. See
+> `spec/decisions/0019-pad-pitch-depth-correction.md`.
+
 ## 2. ESD implant rules (`ESD.*`)
 
 `libs.tech/klayout/tech/drc/rule_decks/esd.drc` (Apache-2.0, GlobalFoundries
@@ -310,3 +320,9 @@ CLAUDE.md's friction protocol:
   any future driver layout cannot get a real LVS check today; plan on
   including at least one recognised device (as this cell does) in whatever
   sub-block needs LVS signoff, or wait for the filed fix.
+
+> **Correction note (2026-10-17, issue #234; appended, original text above unchanged).**
+> The "350um pitch / 75um depth" bullet above is transposed: the library's
+> pitch along the ring is 75um and its depth is 350um. See
+> `spec/decisions/0019-pad-pitch-depth-correction.md` for the evidence and for
+> what it does to DR-0011's fit claims.
