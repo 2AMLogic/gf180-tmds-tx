@@ -41,33 +41,29 @@ import klayout.db as db
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's layers_def.py; see spec doc).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-POLY2 = (30, 0)
-NPLUS = (32, 0)
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only)
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    METAL1,
+    METAL1_LABEL,
+    METAL2,
+    METAL3,
+    METAL4,
+    METAL5,
+    METAL5_LABEL,
+    NPLUS,
+    PAD_LAYER,
+    POLY2,
+    VIA1,
+    VIA2,
+    VIA3,
+    VIA4,
+    _box,
+)
 
 DBU = 0.001  # 1 nm, matches the installed PDK's own GDS files
 
 CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
 
 
 def build(shorted: bool = False) -> db.Layout:

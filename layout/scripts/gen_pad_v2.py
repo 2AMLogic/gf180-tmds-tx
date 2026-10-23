@@ -75,25 +75,28 @@ import klayout.db as db
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's own layers_def.py).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-POLY2 = (30, 0)
-NPLUS = (32, 0)
-PPLUS = (31, 0)
-DUALGATE = (55, 0)  # 5V/6V thick-oxide marker -- required by diode_nd2ps_06v0
-DIODE_MK = (115, 5)  # junction-diode device-recognition mark
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only)
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    DIODE_MK,
+    DUALGATE,
+    METAL1,
+    METAL1_LABEL,
+    METAL2,
+    METAL3,
+    METAL4,
+    METAL5,
+    METAL5_LABEL,
+    NPLUS,
+    PAD_LAYER,
+    POLY2,
+    PPLUS,
+    VIA1,
+    VIA2,
+    VIA3,
+    VIA4,
+    _box,
+)
 
 DBU = 0.001  # 1 nm, matches every other GDS file in this directory
 
@@ -112,13 +115,6 @@ FINGER_PITCH = 2.6  # um, center-to-center == FINGER_L + 0.6um comp.space.mv.1 m
 # -- Bond pad ---------------------------------------------------------------
 PAD_SIDE = 25.0  # um -- gf180mcu_fd_io__bi_t.lef's own PAD pin size
 PAD_OPENING_MARGIN = 2.5  # um -- comfortably above pad.enclosing.metal5.1's 2.0um floor
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
 
 
 def build(shorted: bool = False) -> db.Layout:
