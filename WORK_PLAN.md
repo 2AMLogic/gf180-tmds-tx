@@ -48,6 +48,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
+- **#231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
 - **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
 
 ## Proposed
@@ -61,7 +62,7 @@ Issues carrying `loom:curated`.
 
 ## Proposed (Architect / Hermit)
 
-- **#255**: Consolidate duplicated gf180mcu layer table and _box helper across layout generators *(hermit)*
+_None._
 
 ## Epics
 
@@ -77,8 +78,8 @@ _None._
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
+| Approved PRs awaiting merge | 2 |
 | Curated | 4 |
-| Architect / Hermit proposals | 1 |
+| Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
