@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 1,
+  "description": "Analog (and full-custom digital final mux) partition: xschem schematics+symbols and the netlists klt netlist derives from them. Freshness is gated in CI by signoff/derived_stamps.py (hash tripwire, no xschem/PDK on the runner); the real regeneration check (klt netlist --check, xschem 3.4.4, gf180mcuD) is run by `derived_stamps.py --refresh` before any re-stamp. See signoff/README.md.",
+  "sources": [
+    "design/cml_driver.sch",
+    "design/cml_driver.sym",
+    "design/tmds_final_mux.sch",
+    "design/tmds_final_mux.sym",
+    "design/xschemrc"
+  ],
+  "derived": [
+    {
+      "path": "design/netlist/cml_driver.spice",
+      "generator": "klt netlist",
+      "check": {
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "analog.cml_driver"
+        ]
+      }
+    },
+    {
+      "path": "design/netlist/tmds_final_mux.spice",
+      "generator": "klt netlist",
+      "check": {
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "analog.tmds_final_mux"
+        ]
+      }
+    }
+  ]
+}

@@ -2,6 +2,22 @@
   "block": "gf180-tmds-tx",
   "kind": "mixed-signal",
   "evidence": {
+    "1.analog": {
+      "file": "signoff/envelopes/item1-analog.json",
+      "content_hash": "sha256:14775e0010f4285935684f3487b4f70cf861283a374f91680b5a12381a3284c4"
+    },
+    "1.digital": {
+      "file": "signoff/envelopes/item1-digital.json",
+      "content_hash": "sha256:82f256c18bfa8516da7f9c91833d632f7257454c62b21e55eb571425d6bfb852"
+    },
+    "2.analog": {
+      "file": "signoff/envelopes/item2-analog.json",
+      "content_hash": "sha256:136ec1a3db4af9b039fde47595eedc71d60079bdf65b517a6c64b2cec15f3fb2"
+    },
+    "2.digital": {
+      "file": "signoff/envelopes/item2-digital.json",
+      "content_hash": "sha256:cd02b5e30ed676863118389d80828b82502923d2c954f10fd86d281d659abe8d"
+    },
     "3.analog": {
       "file": "layout/drc_reports/gf180_tmds_pad_ring_assembly.drc.json",
       "content_hash": "sha256:136ec1a3db4af9b039fde47595eedc71d60079bdf65b517a6c64b2cec15f3fb2"
@@ -25,6 +41,22 @@
     "8": {
       "file": "signoff/characterization-envelope.json",
       "content_hash": "sha256:2fbf5fd513020ab6747840be6d8919ff5ee559f428adc996a74b6375ec1c815e"
+    },
+    "9.analog": {
+      "file": "signoff/envelopes/item9-analog.json",
+      "content_hash": "sha256:7cec55e11997819e33f126502c59e1a9d3207244ec0a71cb35232723483a0000"
+    },
+    "9.digital": {
+      "file": "signoff/envelopes/item9-digital.json",
+      "content_hash": "sha256:58868d12f22291b915e33a8486b1d9f9ad5f6b3c32d9c978ae891d014361d4a8"
+    },
+    "10.analog": {
+      "file": "signoff/envelopes/item10.json",
+      "content_hash": "sha256:d8b561fec023f7e2a1176dbe4e79af4ceef1717f2635ed93fb5c52bf074185ef"
+    },
+    "10.digital": {
+      "file": "signoff/envelopes/item10.json",
+      "content_hash": "sha256:d8b561fec023f7e2a1176dbe4e79af4ceef1717f2635ed93fb5c52bf074185ef"
     },
     "11.digital": [
       {

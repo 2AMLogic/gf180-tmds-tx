@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 9,
+  "summary": "T1 item 9 (Testbenches shipped): 14/14 attestation checks passed (klt signoff --attest)",
+  "source": "signoff/attest/item9-digital.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 14,
+    "passed_count": 14,
+    "checks": [
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_encoder/negative_control/tmds_encoder_broken.v",
+        "passed": true,
+        "content_hash": "sha256:b277b513ca2dd4b0198d1552778ed917097004fa3363454a411631ae52f0f039"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_encoder/requirements.txt",
+        "passed": true,
+        "content_hash": "sha256:30631123a6e28cf65c41b81b4c7be2d822e0ed971948fbb599e889900375842c"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_encoder/runner.py",
+        "passed": true,
+        "content_hash": "sha256:170b372e32bcfebf79e8299691ccd20f195335ce72fb5df8592b9024b93f1a73"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_encoder/test_tmds_encoder.py",
+        "passed": true,
+        "content_hash": "sha256:15e3419bf39dc2b76486017bab824d4ccb79d11dadcb5559bf071a94ce22c94e"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_encoder/tmds_model.py",
+        "passed": true,
+        "content_hash": "sha256:d217ffa5cbbfffb056adffac4069f3b2e057d17f01f66a3cbae208b88644f2b9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/negative_control/tmds_serializer_broken.v",
+        "passed": true,
+        "content_hash": "sha256:d6fd298944595d1a0b0d219440d98f6ea615172d416e7f3ae2e3ff933098bc69"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/requirements.txt",
+        "passed": true,
+        "content_hash": "sha256:46914e1b0b88032ac32a24a64ca0f225d80d63c1777d64d068671ef530c3af33"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/runner.py",
+        "passed": true,
+        "content_hash": "sha256:e841ce3d61d1dd328cbca9324e41852d51cd9c4f7e3673d06be4978dbd268c6a"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/serializer_model.py",
+        "passed": true,
+        "content_hash": "sha256:141a18223543debf0e0f3bf387ace85459c623292057d3e0dbc94f7b4f3e1e38"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/test_tmds_serializer.py",
+        "passed": true,
+        "content_hash": "sha256:dd9a88e80bda7797aa42f14880c9bd4d1dcc05c88af5202e5a9c697b19795e4b"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/tmds_serializer/tmds_tx_chain.v",
+        "passed": true,
+        "content_hash": "sha256:ea936e198220292f1cd7d068ae9700fe32c3b8d996fd99be73b4b48fc57b2d05"
+      },
+      {
+        "check": "command",
+        "role": "cold_start",
+        "argv": [
+          "sh",
+          "-c",
+          "cd verification/tmds_encoder && python3 runner.py && cd ../tmds_serializer && python3 runner.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "pin",
+        "role": "pdk",
+        "passed": true,
+        "value": {
+          "name": "gf180mcuD",
+          "revision": "c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+        }
+      },
+      {
+        "check": "pin",
+        "role": "tools",
+        "passed": true,
+        "value": {
+          "cocotb": "2.0.1",
+          "iverilog": "13.0"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "signoff/attest/item9-digital.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:58868d12f22291b915e33a8486b1d9f9ad5f6b3c32d9c978ae891d014361d4a8"
+    }
+  }
+}
