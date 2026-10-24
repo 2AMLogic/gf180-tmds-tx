@@ -15,6 +15,7 @@ name: CI
 # | evidence-record format + append-only          | python3+git  | `lint` (here)  |
 # | LVS signoff verdicts + negative controls      | python3      | `lint` (here)  |
 # | characterization report cites every record    | python3+git  | `lint` (here)  |
+# | stored-evidence manifests (manifests/artifacts) | python3+git | `lint` (here)  |
 # | T1 block-manifest re-grade vs committed record | klt (pinned git ref, see `signoff/README.md`) | `signoff` (here) |
 # | testbench manifests load (`--list`)           | python3      | `test` (here)  |
 # | LVS signoff-guard unit tests (layout/tests)   | python3      | `test` (here)  |
@@ -240,6 +241,9 @@ jobs:
         # The guard must reject that pair; if this test stops failing on it,
         # the guard has stopped guarding (issue #129).
         run: python3 -m unittest discover -s layout/tests -v
+
+      - name: Stored-evidence manifest checker unit tests
+        run: python3 -m unittest discover -s scripts/tests -v
 
       - name: Environment check (informational -- no PDK on this runner)
         # sim/harness/README.md's documented contract: --check-env exits 3

@@ -42,8 +42,15 @@ What is checked, per ``sim/<slug>/records/<record-id>.md``:
   self-supporting evidence, and evidence is append-only (a defect in an
   already-committed, already-superseded record is fixed by minting a new
   head, not by editing the old one);
-- nothing under ``records/``, ``netlist-snapshots/`` or ``corners/`` has been
-  modified or deleted relative to the merge base -- evidence is append-only.
+- nothing under ``records/``, ``netlist-snapshots/`` or ``corners/``, and no
+  ``manifests/artifacts/*.manifest.json``, has been modified or deleted
+  relative to the merge base -- evidence is append-only;
+- a record that cites a stored-evidence manifest (``manifests/artifacts/
+  <slug>-<record-id>.manifest.json`` in **Links**) needs no committed logs:
+  the corner-id grammar, the rate cross-check and the log-count rule run over
+  the manifest's entry names (``sim/<slug>/corners/<record-id>/<corner-id>.log``)
+  instead, and committed files under ``corners/<record-id>/`` alongside such a
+  manifest are an error. Records without a manifest keep the rules above.
 
 What is deliberately *not* checked: the prose inside a field beyond the
 mechanical checks listed above (a record is a human/agent-written argument,
@@ -63,6 +70,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import json
 import os
 import re
 import subprocess
@@ -133,6 +141,14 @@ _RATE_RE = re.compile(r"^\d+(?:p\d+)?mbps$")
 #: used to cross-check the declared rate(s) against the per-corner logs'
 #: rate tokens. See `_check_operating_point`.
 _OPERATING_POINT_RATE_RE = re.compile(r"(\d+(?:\.\d+)?)\s*Mbps", re.IGNORECASE)
+
+#: Stored-evidence manifests (``manifests/artifacts/``): the committed half of
+#: a record whose raw logs live in the artifact store, not in git. A record
+#: cites its manifest in **Links**; the name is ``<slug>-<record-id>``.
+MANIFEST_DIR = "manifests/artifacts"
+MANIFEST_SUFFIX = ".manifest.json"
+MANIFEST_PATH_RE = re.compile(r"^manifests/artifacts/[^/]+\.manifest\.json$")
+_CITED_MANIFEST_RE = re.compile(r"manifests/artifacts/[^\s`'\")]+")
 
 #: ``sim/<slug>/<evidence-dir>/<rest>``.
 EVIDENCE_PATH_RE = re.compile(
@@ -469,6 +485,66 @@ def _check_operating_point(
     return problems
 
 
+def _cited_manifest(fields: dict) -> str | None:
+    """The ``manifests/artifacts/...`` path a record's **Links** cites, if any."""
+    links = fields.get("Links")
+    if links is None:
+        return None
+    found = _CITED_MANIFEST_RE.search(links.value)
+    return found.group(0) if found else None
+
+
+def _manifest_log_names(
+    root: Path, slug: str, record_id: str, cited: str
+) -> tuple[list, list]:
+    """``(log basenames, problems)`` from a cited stored-evidence manifest.
+
+    Entry names must be ``sim/<slug>/corners/<record-id>/<corner-id>.log`` --
+    the path the logs would have had on disk -- so the corner-id grammar and
+    the Operating point cross-check apply to them unchanged.
+    """
+    problems: list = []
+    expected = f"{MANIFEST_DIR}/{slug}-{record_id}{MANIFEST_SUFFIX}"
+    if cited != expected:
+        problems.append(Problem(cited, f"record must cite {expected}"))
+    try:
+        manifest = json.loads((root / cited).read_text(encoding="utf-8"))
+        entries = manifest["entries"]
+        names = [entry["name"] for entry in entries]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        return [], problems + [Problem(cited, f"unreadable stored-evidence manifest: {exc}")]
+    prefix = f"sim/{slug}/{CORNERS_DIR}/{record_id}/"
+    logs: list = []
+    for name in names:
+        if not isinstance(name, str) or not name.startswith(prefix) or "/" in name[len(prefix):]:
+            problems.append(Problem(cited, f"entry name {name!r} is not {prefix}<corner-id>{LOG_SUFFIX}"))
+        elif not name.endswith(LOG_SUFFIX):
+            problems.append(Problem(cited, f"entry name {name!r} is not a {LOG_SUFFIX} file"))
+        else:
+            logs.append(name[len(prefix):])
+    if not logs:
+        problems.append(Problem(cited, f"manifest names no {prefix}<corner-id>{LOG_SUFFIX} entry"))
+    return logs, problems
+
+
+def _log_names(root: Path, experiment: Experiment, record_id: str) -> list:
+    """Log basenames of a record in either form (committed logs or manifest)."""
+    on_disk = [
+        n for n in experiment.corner_files.get(record_id, []) if n.endswith(LOG_SUFFIX)
+    ]
+    path = experiment.records.get(record_id)
+    if on_disk or path is None:
+        return on_disk
+    try:
+        fields, _ = parse_fields((root / path).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError):
+        return []
+    cited = _cited_manifest(fields)
+    if cited is None:
+        return []
+    return _manifest_log_names(root, experiment.slug, record_id, cited)[0]
+
+
 def check_record(
     root: Path,
     experiment: Experiment,
@@ -526,19 +602,38 @@ def check_record(
 
     corner_dir = f"sim/{experiment.slug}/{CORNERS_DIR}/{record_id}/"
     names = experiment.corner_files.get(record_id, [])
-    logs = [name for name in names if name.endswith(LOG_SUFFIX)]
-    if not names:
-        problems.append(Problem(path, f"no raw per-corner logs at {corner_dir}"))
-    elif not logs:
-        problems.append(
-            Problem(path, f"{corner_dir} holds no <corner-id>{LOG_SUFFIX} file")
+    cited = _cited_manifest(fields)
+    if cited is not None:
+        # Stored-evidence form: bytes live in the artifact store; the corner-id
+        # and rate checks below run over the manifest's entry names instead.
+        if names:
+            problems.append(
+                Problem(
+                    path,
+                    f"cites {cited} but {corner_dir} also holds committed files -- "
+                    "stored evidence must not be committed alongside its manifest",
+                )
+            )
+        logs, manifest_problems = _manifest_log_names(
+            root, experiment.slug, record_id, cited
         )
+        problems += manifest_problems
+        problem_path = cited
+    else:
+        logs = [name for name in names if name.endswith(LOG_SUFFIX)]
+        if not names:
+            problems.append(Problem(path, f"no raw per-corner logs at {corner_dir}"))
+        elif not logs:
+            problems.append(
+                Problem(path, f"{corner_dir} holds no <corner-id>{LOG_SUFFIX} file")
+            )
+        problem_path = corner_dir
     rate_tokens: set[str] = set()
     for name in sorted(logs):
         corner_id = name[: -len(LOG_SUFFIX)]
         reason = parse_corner_id(corner_id)
         if reason:
-            problems.append(Problem(corner_dir + name, reason))
+            problems.append(Problem(problem_path + ("" if cited else name), reason))
             continue
         _, rate_token = _split_rate_token(corner_id)
         if rate_token is not None:
@@ -548,11 +643,7 @@ def check_record(
     if record_id not in superseded_ids and supersedes is not None and supersedes.value:
         predecessor = _resolve_supersedes_target(supersedes.value, record_id, experiment)
         if predecessor is not None:
-            predecessor_logs = [
-                name
-                for name in experiment.corner_files.get(predecessor, [])
-                if name.endswith(LOG_SUFFIX)
-            ]
+            predecessor_logs = _log_names(root, experiment, predecessor)
             if len(logs) < len(predecessor_logs):
                 problems.append(
                     Problem(
@@ -696,6 +787,7 @@ def check_append_only(root: Path, base_ref: str) -> tuple[list, str | None]:
         base_sha,
         "--",
         "sim",
+        MANIFEST_DIR,
     )
     if diff is None or diff.returncode != 0:
         return [], "git diff against the merge base failed"
@@ -705,7 +797,7 @@ def check_append_only(root: Path, base_ref: str) -> tuple[list, str | None]:
     for line in diff.stdout.splitlines():
         status, _, path = line.partition("\t")
         path = path.strip()
-        if not path or not EVIDENCE_PATH_RE.match(path):
+        if not path or not (EVIDENCE_PATH_RE.match(path) or MANIFEST_PATH_RE.match(path)):
             continue
         problems.append(
             Problem(
