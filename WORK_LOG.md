@@ -5,6 +5,11 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-27
+
+- **PR #231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
+- **Issue #227** (closed): T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
+
 ### 2026-10-23
 
 - **PR #258**: refactor: share gf180mcu layer table and _box across layout generators
