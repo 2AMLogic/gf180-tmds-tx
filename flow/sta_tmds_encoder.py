@@ -198,11 +198,6 @@ TARGETS: list[tuple[str, float]] = [
 # but the measured Fmax is compared against it in the evidence record.
 DR0003_INTERMEDIATE_MHZ = 371.25
 
-DRIVING_CELL = f"{pnr.STD_CELL_LIB}__inv_1"
-DRIVING_CELL_PIN = "ZN"
-DRIVING_CELL_INPUT_CAP_PF = 0.006813  # inv_1 pin(I) capacitance, tt_025C_3v30
-OUTPUT_LOAD_PF = round(4 * DRIVING_CELL_INPUT_CAP_PF, 6)
-
 # Physical-only cells P&R inserts that have no netlist counterpart.
 _PHYSICAL_ONLY_RE = re.compile(r"__(fill|filltie|endcap|fillcap|decap|antenna)")
 # A DEF component line: `- <name> <cell type> [+ ...] ;`. Captures the full
@@ -392,9 +387,9 @@ set_output_delay 0.0000 -clock clk [all_outputs]
 
 # Stated design assumptions, not measurements: drive every primary input
 # with the library's smallest inverter, and load every output with 4x that
-# inverter's own input capacitance ({DRIVING_CELL_INPUT_CAP_PF} pF).
-set_driving_cell -lib_cell {DRIVING_CELL} -pin {DRIVING_CELL_PIN} $non_clk_inputs
-set_load {OUTPUT_LOAD_PF} [all_outputs]
+# inverter's own input capacitance ({synth.DRIVING_CELL_INPUT_CAP_PF} pF).
+set_driving_cell -lib_cell {synth.DRIVING_CELL} -pin {synth.DRIVING_CELL_PIN} $non_clk_inputs
+set_load {synth.OUTPUT_LOAD_PF} [all_outputs]
 """
 
 
@@ -782,8 +777,8 @@ def render_record(
   - `set_input_delay 0` / `set_output_delay 0`: no ratified block-boundary budget
     exists, so none is assumed. This is the *most optimistic* legal choice, so a
     violation reported under it is a real violation, not a budgeting artifact.
-  - `set_driving_cell {DRIVING_CELL}` on inputs, `set_load {OUTPUT_LOAD_PF}` (4x that
-    cell's own {DRIVING_CELL_INPUT_CAP_PF} pF input capacitance) on outputs -- stated
+  - `set_driving_cell {synth.DRIVING_CELL}` on inputs, `set_load {synth.OUTPUT_LOAD_PF}` (4x that
+    cell's own {synth.DRIVING_CELL_INPUT_CAP_PF} pF input capacitance) on outputs -- stated
     assumptions, not measurements.
   - `set_propagated_clock`, `set_clock_uncertainty 0`: `flow/pnr_tmds_encoder.py`
     now runs CTS (issue #100), so the real, CTS-balanced clock net's delay is
