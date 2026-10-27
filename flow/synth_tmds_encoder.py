@@ -37,11 +37,10 @@ corners. This script now feeds ABC an explicit delay target instead:
     discipline, not a heuristic derating guess.
   - **I/O boundary assumptions** (`-constr`, ABC's own two-line format):
     `set_driving_cell`/`set_load` are kept numerically identical to
-    `flow/sta_tmds_encoder.py`'s own `DRIVING_CELL`/`OUTPUT_LOAD_PF` (the
-    smallest inverter driving inputs, 4x its own input capacitance loading
-    outputs) so the synthesis-time boundary assumption cannot be tighter
-    than what STA later checks against -- see this module's `CONSTR_*`
-    constants.
+    this module's `DRIVING_CELL`/`OUTPUT_LOAD_PF`, which `flow/pnr_tmds_encoder.py` and
+    `flow/sta_tmds_encoder.py` import (the smallest inverter driving inputs, 4x its own
+    input capacitance loading outputs) so the synthesis-time boundary assumption cannot
+    be tighter than what STA later checks against.
 
 This does not by itself guarantee closure at every corner (that is what the
 new STA evidence record this issue produces measures) -- it is the first,
@@ -161,13 +160,15 @@ SEQUENTIAL_OVERHEAD_NS = 3.2
 ABC_TARGET_NS = round(TARGET_PERIOD_NS - SEQUENTIAL_OVERHEAD_NS, 4)  # 10.2680 ns
 ABC_TARGET_PS = round(ABC_TARGET_NS * 1000)
 
-# I/O boundary assumptions for ABC's `-constr` file -- numerically identical
-# to flow/sta_tmds_encoder.py's DRIVING_CELL / OUTPUT_LOAD_PF (kept in sync
-# manually; both cite the same rationale: smallest inverter driving inputs,
-# 4x its own input capacitance loading outputs).
-CONSTR_DRIVING_CELL = f"{STD_CELL_LIB}__inv_1"
-CONSTR_DRIVING_CELL_INPUT_CAP_PF = 0.006813  # inv_1 pin(I) capacitance, tt_025C_3v30
-CONSTR_LOAD_FF = round(4 * CONSTR_DRIVING_CELL_INPUT_CAP_PF * 1000, 3)  # femtofarads, ABC's -constr unit
+# The one definition of the I/O boundary assumption: the smallest inverter
+# drives inputs, outputs are loaded with 4x its own input capacitance.
+# flow/pnr_tmds_encoder.py (`repair_timing`) and flow/sta_tmds_encoder.py
+# (sign-off STA) both import these, so all three stages share one boundary.
+DRIVING_CELL = f"{STD_CELL_LIB}__inv_1"
+DRIVING_CELL_PIN = "ZN"
+DRIVING_CELL_INPUT_CAP_PF = 0.006813  # inv_1 pin(I) capacitance, tt_025C_3v30
+OUTPUT_LOAD_PF = round(4 * DRIVING_CELL_INPUT_CAP_PF, 6)
+CONSTR_LOAD_FF = round(OUTPUT_LOAD_PF * 1000, 3)  # femtofarads, ABC's -constr unit
 
 _INSTANCE_RE = re.compile(r"^  (\S+) (\S+) \($", re.MULTILINE)
 
@@ -246,7 +247,7 @@ def build_constr_file() -> str:
     primary inputs, load (femtofarads) for primary outputs. See this
     module's docstring "Timing-driven mapping" section.
     """
-    return f"set_driving_cell {CONSTR_DRIVING_CELL}\nset_load {CONSTR_LOAD_FF}\n"
+    return f"set_driving_cell {DRIVING_CELL}\nset_load {CONSTR_LOAD_FF}\n"
 
 
 def build_abc_script() -> str:
@@ -490,9 +491,9 @@ def render_record(
     faster corner by construction -- see this module's docstring for the full
     rationale for why this is not a DR-0003 deviation.
   - I/O boundary (`-constr`, exact file: `flow/tmds_encoder/reports/{rid}.synth.constr`):
-    `set_driving_cell {CONSTR_DRIVING_CELL}` / `set_load {CONSTR_LOAD_FF}` (femtofarads)
-    -- numerically identical to `flow/sta_tmds_encoder.py`'s own
-    `DRIVING_CELL`/`OUTPUT_LOAD_PF` assumption, so synthesis cannot assume a tighter
+    `set_driving_cell {DRIVING_CELL}` / `set_load {CONSTR_LOAD_FF}` (femtofarads)
+    -- derived from the same `DRIVING_CELL`/`OUTPUT_LOAD_PF` assumption
+    `flow/sta_tmds_encoder.py` checks against, so synthesis cannot assume a tighter
     boundary than STA later checks against.
 - **Synthesis constraints**: technology mapping plus the timing-driven target above.
   Recipe: `proc; opt; fsm; opt; memory; opt; techmap; opt; dfflibmap -liberty <timing

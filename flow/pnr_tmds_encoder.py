@@ -364,12 +364,6 @@ WIRE_RC_LAYERS = {
 }
 WIRE_RC_SIGNAL_LAYER = "Metal2"  # ORFS gf180's own choice for signal nets
 WIRE_RC_CLOCK_LAYER = "Metal5"  # ...and for clock nets
-# I/O boundary assumptions for `repair_timing`, numerically identical to
-# flow/sta_tmds_encoder.py's own DRIVING_CELL/OUTPUT_LOAD_PF (kept in sync
-# manually; both cite the same rationale -- see that driver's docstring).
-SDC_DRIVING_CELL = f"{STD_CELL_LIB}__inv_1"
-SDC_DRIVING_CELL_PIN = "ZN"
-SDC_OUTPUT_LOAD_PF = 0.027252
 # `repair_timing -hold` here runs pre-route, against `estimate_parasitics
 # -placement`'s rough RC estimate (the EST-0018 "wire capacitance ... is
 # zero" warnings in this driver's own log are literal -- no `set_wire_rc` is
@@ -544,14 +538,14 @@ optimize_mirroring
 
 # Clock-tree synthesis (issue #100) -- see this module's docstring "Clock-tree
 # synthesis" section for the full recipe and rationale. Boundary constraint
-# assumptions below are numerically identical to flow/sta_tmds_encoder.py's
-# own generated SDC.
+# assumptions below come from the same synth.DRIVING_CELL/OUTPUT_LOAD_PF
+# flow/sta_tmds_encoder.py's generated SDC uses.
 create_clock -name clk -period {CTS_PERIOD_NS:.4f} [get_ports clk]
 set non_clk_inputs [get_ports {{data[*] ctrl[*] de rst}}]
 set_input_delay 0.0000 -clock clk $non_clk_inputs
 set_output_delay 0.0000 -clock clk [all_outputs]
-set_driving_cell -lib_cell {SDC_DRIVING_CELL} -pin {SDC_DRIVING_CELL_PIN} $non_clk_inputs
-set_load {SDC_OUTPUT_LOAD_PF} [all_outputs]
+set_driving_cell -lib_cell {synth.DRIVING_CELL} -pin {synth.DRIVING_CELL_PIN} $non_clk_inputs
+set_load {synth.OUTPUT_LOAD_PF} [all_outputs]
 
 # Placement-stage RC estimate (issue #115) -- see WIRE_RC_LAYERS.
 {chr(10).join(f"set_layer_rc -layer {layer} -resistance {r:.5E} -capacitance {c:.5E}" for layer, (r, c) in WIRE_RC_LAYERS.items())}
