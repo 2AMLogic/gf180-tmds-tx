@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 1,
+  "summary": "T1 item 1 (Design sources): 9/9 attestation checks passed (klt signoff --attest)",
+  "source": "signoff/attest/item1-analog.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 9,
+    "passed_count": 9,
+    "checks": [
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/cml_driver.sch",
+        "passed": true,
+        "content_hash": "sha256:9b65bf3c06a01124c3989ac51bf9e045aa2a471e8a5237929494d4142de4d6f3"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/cml_driver.sym",
+        "passed": true,
+        "content_hash": "sha256:1f4742cf847bf3133d0247116329579bcd218d5da9494f642ee6b2fbce322b55"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/tmds_final_mux.sch",
+        "passed": true,
+        "content_hash": "sha256:70a0dcdc3d0a65a17dce103102bf6480e277f7b1856a712931ed22d472b43a14"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/tmds_final_mux.sym",
+        "passed": true,
+        "content_hash": "sha256:0bcde2838a5983d881901cc943492f170a7ec1ba2383611da17667fd0571c726"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/xschemrc",
+        "passed": true,
+        "content_hash": "sha256:825230a9d65ca71f2216feca922697e087f5a603ac884c499529a30e1c66ee0f"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/cml_driver.spice",
+        "passed": true,
+        "content_hash": "sha256:30a3e6d1c2b79b07af785e7ee9638a181092d41109efdd3452d8a4470fbf90f9"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/tmds_final_mux.spice",
+        "passed": true,
+        "content_hash": "sha256:e0798f923bc6c4bc5fdc190b72f083ad4d00630991b9cb0a49b53fe611391ee7"
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/cml_driver.spice",
+        "generator": "klt netlist",
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "analog.cml_driver"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/tmds_final_mux.spice",
+        "generator": "klt netlist",
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "analog.tmds_final_mux"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "signoff/attest/item1-analog.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:14775e0010f4285935684f3487b4f70cf861283a374f91680b5a12381a3284c4"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 1,
+  "description": "Digital partition: encoder RTL and the Yosys/OpenROAD gate-level netlists derived from it. DISCLOSURE: the freshness checks are the hash tripwire only; Yosys/OpenROAD were NOT re-run when stamping (the gf180mcu_fd_sc_mcu9t5v0 std-cell library was absent on the stamping host), the pins rest on flow record 20260817-110611-37e197a. rtl/tmds_serializer.v and rtl/tmds_tx_lane.v are listed as sources but have no committed synthesized netlist (DR-0014 moves the serializer to the custom domain).",
+  "sources": [
+    "rtl/tmds_encoder.v",
+    "rtl/tmds_serializer.v",
+    "rtl/tmds_tx_lane.v",
+    "flow/synth_tmds_encoder.py",
+    "flow/gen_pnr_netlist.py"
+  ],
+  "derived": [
+    {
+      "path": "flow/tmds_encoder/netlist/tmds_encoder.synth.v",
+      "generator": "flow/synth_tmds_encoder.py (Yosys)",
+      "check": {
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "digital.tmds_encoder.synth"
+        ]
+      }
+    },
+    {
+      "path": "flow/tmds_encoder/netlist/tmds_encoder.pnr.v",
+      "generator": "flow/gen_pnr_netlist.py (OpenROAD)",
+      "check": {
+        "argv": [
+          "python3",
+          "signoff/derived_stamps.py",
+          "--check",
+          "--only",
+          "digital.tmds_encoder.pnr"
+        ]
+      }
+    }
+  ]
+}

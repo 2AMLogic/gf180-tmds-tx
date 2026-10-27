@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 9,
+  "summary": "T1 item 9 (Testbenches shipped): 21/21 attestation checks passed (klt signoff --attest)",
+  "source": "signoff/attest/item9-analog.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 21,
+    "passed_count": 21,
+    "checks": [
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye-mask/testbench/cml_driver_eye_mask.spice",
+        "passed": true,
+        "content_hash": "sha256:f644d9082072e930cbf223ccebd0275b412657f5f051416d29f0ede98297dff8"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye-mask/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:c7402e69ecb261f078a32987bc24b5683b74a97be4647e8222378aa39ed198bf"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye-realmux/testbench/cml_driver_eye_realmux.spice",
+        "passed": true,
+        "content_hash": "sha256:a2da33ef57bfcf70cf040c17369340f1f9478394be85718b36cd16b8dbac3488"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye-realmux/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:b62f778a579b58806da5e8ad3850142b4b8512949d6d9f349cf1b227697d0284"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye/testbench/cml_driver_dut.spice",
+        "passed": true,
+        "content_hash": "sha256:31f70faa38776fffc7635b6a78770cbc51f93dc29a78674161a1faaf2f4ffacb"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye/testbench/cml_driver_eye.spice",
+        "passed": true,
+        "content_hash": "sha256:d198d115e83d9c9189ae73b5c27cadf607e6e1fe7fef68a3109516c742da6c51"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-eye/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:c98acd789ca86d64d78deae6029691b1426361f5903bb32acf697066a00bde19"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-mismatch/testbench/cml_driver_dut_mismatch.spice",
+        "passed": true,
+        "content_hash": "sha256:06f5739292327b97b4caafd3cecb960e4cbfd30479e0490d34c90954478372b8"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/cml-driver-mismatch/testbench/cml_driver_mismatch.spice",
+        "passed": true,
+        "content_hash": "sha256:10a5bbce4abfcc22b18be9146a96707ac3bc53ac434b6e472b668e5b7032ed04"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/esd-clamp-cv/testbench/esd_clamp_cv.spice",
+        "passed": true,
+        "content_hash": "sha256:0738c0ae38af0aad95abbf1bae3f8275fca1c6491252f1f83f715fc13eb4e5b6"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/esd-clamp-cv/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:8b8f06a56f3e437aa45cc6bfbc7d40b468670f097db61c8914c1db77e9169667"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice",
+        "passed": true,
+        "content_hash": "sha256:922b3a1a3b562c23ba008089aca7751ace369cbf64d601dcb028d01a7b44a410"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/esd-diode-clamp-cv/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:04760a6ff16deaf252a735143a310a9812d860b14038498474c5c82f6e899cf9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/pdk.json",
+        "passed": true,
+        "content_hash": "sha256:12928ea21321c153028f3a8b3b6a2c97558a193df58fae1968542e46dd938b2e"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/smoke-cml-pair/testbench/smoke_cml_pair.spice",
+        "passed": true,
+        "content_hash": "sha256:db367b7e6a81ee508898b10d7e017483257f933015f7f008a5c9130c7326825c"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/smoke-cml-pair/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:bf3f31f8a17baa35875197b6b3868590bdfaf5cc712573bb6f8e3ef681126173"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/tmds-final-mux-eye/testbench/tb.json",
+        "passed": true,
+        "content_hash": "sha256:1d7178bbfc33008aa9d0cf36e3545c254e928aaec0f9200b922e57c54273418b"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/tmds-final-mux-eye/testbench/tmds_final_mux_eye.spice",
+        "passed": true,
+        "content_hash": "sha256:1e77eb555788a334f8a2c88e9ada976775eba79e182af04a3816577e39cf3988"
+      },
+      {
+        "check": "command",
+        "role": "cold_start",
+        "argv": [
+          "python3",
+          "sim/run_corners.py",
+          "--list"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "pin",
+        "role": "pdk",
+        "passed": true,
+        "value": {
+          "name": "gf180mcuD",
+          "revision": "c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+        }
+      },
+      {
+        "check": "pin",
+        "role": "tools",
+        "passed": true,
+        "value": {
+          "ngspice": "42",
+          "xschem": "3.4.4"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "signoff/attest/item9-analog.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:7cec55e11997819e33f126502c59e1a9d3207244ec0a71cb35232723483a0000"
+    }
+  }
+}
