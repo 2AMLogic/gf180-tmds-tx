@@ -6,7 +6,7 @@
   "summary": "Digital partition layout: the committed routed block GDS from flow/pnr_tmds_encoder.py (OpenROAD P&R, then in-process DEF->GDS merge). Regeneration is NOT claimed and was NOT re-run for this attestation: the gf180mcu_fd_sc_mcu9t5v0 std-cell library and the pinned openroad/orfs image are absent on the attesting host. What is documented (layout/README.md, tmds_encoder section) is that a re-run of the P&R stage reproduced the routed DEF byte-identically; the DEF->GDS merge was not re-verified byte-for-byte. Provenance is documented, not byte-reproduced here.",
   "source": "layout/gds/tmds_encoder.gds",
   "provenance": {
-    "klt_version": "0.7.1.dev1744+g44cc42323184",
+    "klt_version": "0.8.0",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
