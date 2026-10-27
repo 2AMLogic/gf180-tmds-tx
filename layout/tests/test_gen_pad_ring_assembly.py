@@ -40,6 +40,7 @@ sys.path.insert(0, str(REPO_ROOT / "layout" / "scripts"))
 
 import gen_pad_ring_assembly as gen  # noqa: E402
 import pad_pitch_fit_study as study  # noqa: E402
+import pad_ring_cells as cells  # noqa: E402
 
 HBM_WINDOW_FINGERS = (111, 222, 334)
 
@@ -123,9 +124,13 @@ class ClampRowsTest(unittest.TestCase):
             self.assertEqual(len(gen.clamp_rows(n)), expected, n)
 
     def test_fold_is_the_study_s_single_implementation(self):
-        """Issue #242: the fold and its constants are imported from
-        pad_pitch_fit_study.py, not copied, so they cannot drift apart."""
+        """Issues #242/#262: the fold and its constants are imported from
+        pad_ring_cells.py, not copied, so they cannot drift apart."""
         self.assertIs(gen.clamp_rows, study.clamp_rows)
+        self.assertIs(gen.clamp_rows, cells.clamp_rows)
+        for name in ("_draw_ring_strap", "_draw_substrate_tap", "_draw_production_pad"):
+            self.assertIs(getattr(gen, name), getattr(cells, name), name)
+            self.assertIs(getattr(study, name), getattr(cells, name), name)
         self.assertEqual(gen.MAX_FINGERS_PER_ROW, study.MAX_FINGERS_PER_ROW)
 
 
@@ -163,19 +168,19 @@ class HardErrorGuardTest(unittest.TestCase):
     """
 
     def setUp(self):
-        # The cap lives in pad_pitch_fit_study (issue #242); `clamp_rows`
+        # The cap lives in pad_ring_cells (issues #242, #262); `clamp_rows`
         # reads it from there, so that is where it must be widened.
-        self._orig_max = study.MAX_FINGERS_PER_ROW
+        self._orig_max = cells.MAX_FINGERS_PER_ROW
 
     def tearDown(self):
-        study.MAX_FINGERS_PER_ROW = self._orig_max
+        cells.MAX_FINGERS_PER_ROW = self._orig_max
 
     def test_no_hard_error_within_the_hbm_window(self):
         for n in (gen.N_FINGERS,) + HBM_WINDOW_FINGERS:
             self.assertLessEqual(gen._struct_width_um(n), gen.PAD_PITCH_UM)
 
     def test_struct_width_exceeds_pitch_once_a_single_row_is_forced_too_wide(self):
-        study.MAX_FINGERS_PER_ROW = 1000
+        cells.MAX_FINGERS_PER_ROW = 1000
         width = gen._struct_width_um(500)
         self.assertGreater(width, gen.PAD_PITCH_UM)
 
