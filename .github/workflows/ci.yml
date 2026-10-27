@@ -174,12 +174,15 @@ jobs:
         # KLayout engine, no PDK and no GDS in this job -- it reads the
         # committed envelopes. The one deliberate departure from the other
         # jobs' dependency-free philosophy: the grader is installed from a
-        # pinned klayout-tools commit, because the eleven-item T1 checklist
-        # (item 11, klayout-tools#2025) postdates the PyPI 0.5.0 release and
-        # `--attest` (items 1/9/10, klayout-tools#2844) postdates 0.7.0.
-        # The pin, the rationale and the bump procedure live in
-        # signoff/README.md, which this job must never disagree with.
-        run: pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@44cc42323184a2f3a440b89789bf174488a6b1e4"
+        # pinned klayout-tools release (PyPI), because the eleven-item T1
+        # checklist (item 11, klayout-tools#2025) postdates the PyPI 0.5.0
+        # release and `--attest` (items 1/9/10, klayout-tools#2844)
+        # postdates 0.7.0. The pin, the rationale and the bump procedure live
+        # in signoff/README.md, which this job must never disagree with.
+        run: |
+          set -euo pipefail
+          pip install "klayout-tools==0.8.0"
+          klt --version | tee /dev/stderr | grep -qx 'klt 0.8.0'
 
       - name: Characterization envelope freshness (generic-citation input re-hash)
         # klt signoff never re-hashes a generic envelope's input (its
