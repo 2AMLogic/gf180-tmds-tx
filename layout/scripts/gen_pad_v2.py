@@ -78,6 +78,8 @@ import klayout.db as db
 from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     COMP,
     CONTACT,
+    CONTACT_SIZE,
+    DBU,
     DIODE_MK,
     DUALGATE,
     METAL1,
@@ -96,11 +98,9 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA3,
     VIA4,
     _box,
+    make_drawers,
 )
 
-DBU = 0.001  # 1 nm, matches every other GDS file in this directory
-
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor (min-only; max not checked)
 
 # -- Diode finger array geometry -------------------------------------------
 N_FINGERS = 20
@@ -123,19 +123,7 @@ def build(shorted: bool = False) -> db.Layout:
     top_name = "gf180_tmds_pad_v2_shorted" if shorted else "gf180_tmds_pad_v2"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
-
-    def label(spec, text, x, y):
-        trans = db.DTrans(db.DPoint(x, y))
-        top.shapes(L(spec)).insert(db.DText(text, trans))
+    L, rect, label = make_drawers(layout, top)
 
     # -- diode_nd2ps_06v0 clamp: 20-finger array, cathode -> PAD ------------
     finger_boxes = []
