@@ -522,7 +522,9 @@ This section indexes the `tmds_encoder` synthesis/P&R/STA/verification
 pipeline under `flow/tmds_encoder/` and `verification/tmds_encoder/` against
 DR-0003 (`spec/tmds-tx.md`'s digital encoder/serializer row) and against the
 `klayout-tools/docs/design-evidence-tiers.md` T1 checklist items each result
-addresses. Every result below is now a PASS; item 5 (LVS) was a
+addresses. Every result below is now a PASS in this document's own numbering (its
+item 6 is not klt's T1 item 7: `signoff/signoff.json` grades T1 item 7 digital
+`no_evidence` pending the SDF run, #228); item 5 (LVS) was a
 **disclosed FAIL** until issue #142 and its row records what changed and
 why, rather than quietly flipping. Per CLAUDE.md's "Verification is the
 product" and this document's own coverage-honesty convention, each row also
