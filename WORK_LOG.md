@@ -7,6 +7,8 @@ selected.
 
 ### 2026-10-28
 
+- **PR #276**: refactor: share DBU, CONTACT_SIZE and drawing closures in gf180_layers
+- **Issue #274** (closed): Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
 - **PR #273**: docs: qualify digital T1 row 6 against klt item 7 no_evidence
 - **Issue #272** (closed): characterization.md digital T1 table: qualify local item 6 'PASS, scope-limited' against klt T1 item 7 (no_evidence)
 
