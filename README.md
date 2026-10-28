@@ -14,7 +14,7 @@ and has not been re-run on the current assembly (#222), so
 T1 item 7 (post-layout verification) is graded `no_evidence` on both
 partitions. Verdict of record:
 [`signoff/signoff.json`](signoff/signoff.json), 17/22 T1 items met at
-`69c859a`. The serializer/final-mux stage joining the digital and analog partitions
+`69c859a`. The serializer/final-mux stage joining the digital and analog partitions is
 designed, analog-verified across all five process corners, and laid out and
 DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is

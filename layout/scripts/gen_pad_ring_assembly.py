@@ -111,6 +111,7 @@ except ModuleNotFoundError:  # pragma: no cover
 from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     COMP,
     CONTACT,
+    DBU,
     DIODE_MK,
     DUALGATE,
     METAL1,
@@ -129,9 +130,9 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA3,
     VIA4,
     _box,
+    layer_cache,
 )
 
-DBU = 0.001  # 1 nm, matches every other GDS in this repo
 
 # ---------------------------------------------------------------------------
 # DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
@@ -356,12 +357,7 @@ def build(
     top_name = "gf180_tmds_pad_ring_assembly_shorted" if shorted else "gf180_tmds_pad_ring_assembly"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
+    L = layer_cache(layout)
 
     # -- Import the driver core as a flattened instance --------------------
     # `Layout.read` merges the source GDS's cells directly into the

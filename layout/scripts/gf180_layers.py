@@ -35,9 +35,38 @@ METAL5 = (81, 0)
 METAL5_LABEL = (81, 10)
 DIODE_MK = (115, 5)  # junction-diode device-recognition mark
 
+DBU = 0.001  # 1 nm, matches the installed PDK's own GDS files
+CONTACT_SIZE = 0.22  # klt's contact.width.1 floor (min-only; max not checked)
+
+
+def layer_cache(layout):
+    """Return `L(spec)`: layer index for a (layer, datatype) pair, created once."""
+    layers: dict[tuple[int, int], int] = {}
+
+    def L(spec):
+        if spec not in layers:
+            layers[spec] = layout.layer(*spec)
+        return layers[spec]
+
+    return L
+
 
 def _box(layout, x0, y0, x1, y1):
     return db.Box(
         db.DPoint(x0, y0).to_itype(layout.dbu),
         db.DPoint(x1, y1).to_itype(layout.dbu),
     )
+
+
+def make_drawers(layout, top):
+    """Return `(L, rect, label)` drawing into cell `top` of `layout`."""
+    L = layer_cache(layout)
+
+    def rect(spec, x0, y0, x1, y1):
+        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
+
+    def label(spec, text, x, y):
+        trans = db.DTrans(db.DPoint(x, y))
+        top.shapes(L(spec)).insert(db.DText(text, trans))
+
+    return L, rect, label

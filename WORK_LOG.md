@@ -5,6 +5,13 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-28
+
+- **PR #276**: refactor: share DBU, CONTACT_SIZE and drawing closures in gf180_layers
+- **Issue #274** (closed): Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
+- **PR #273**: docs: qualify digital T1 row 6 against klt item 7 no_evidence
+- **Issue #272** (closed): characterization.md digital T1 table: qualify local item 6 'PASS, scope-limited' against klt T1 item 7 (no_evidence)
+
 ### 2026-10-27
 
 - **PR #267**: refactor: share the I/O-boundary timing constants across synth, pnr and sta drivers

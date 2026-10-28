@@ -49,6 +49,8 @@ import klayout.db as db
 from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     COMP,
     CONTACT,
+    CONTACT_SIZE,
+    DBU,
     DIODE_MK,
     DUALGATE,
     METAL1,
@@ -65,11 +67,8 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA3,
     VIA4,
     _box,
+    make_drawers,
 )
-
-DBU = 0.001  # 1 nm, matches the installed PDK's own GDS files
-
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
 
 
 def build() -> db.Layout:
@@ -78,19 +77,7 @@ def build() -> db.Layout:
     top_name = "gf180_tmds_pad_diode_draft"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
-
-    def label(spec, text, x, y):
-        trans = db.DTrans(db.DPoint(x, y))
-        top.shapes(L(spec)).insert(db.DText(text, trans))
+    L, rect, label = make_drawers(layout, top)
 
     # -- diode_nd2ps_06v0 cathode: Comp, marked Nplus + Dualgate ------------
     # comp.width.mv.1 (klt's gf180mcu deck) requires >=0.30um width for any

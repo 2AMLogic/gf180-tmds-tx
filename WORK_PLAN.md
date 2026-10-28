@@ -29,7 +29,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#274**: Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
 
 ## In Progress
 
@@ -42,7 +42,7 @@ Issues currently being built (`loom:building`).
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#270**: docs: qualify post-layout verification claims against signoff item 7
 
 ## Approved (Awaiting Merge)
 
@@ -74,9 +74,9 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 1 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 0 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 4 |
 | Architect / Hermit proposals | 0 |
