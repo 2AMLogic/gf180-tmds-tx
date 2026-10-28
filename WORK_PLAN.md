@@ -36,6 +36,7 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+- **#269**: T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions
 
 ## PRs Awaiting Review
 
@@ -56,6 +57,7 @@ Issues carrying `loom:curated`.
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
+- **#269**: T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -73,10 +75,10 @@ _None._
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 3 |
+| Curated | 4 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
