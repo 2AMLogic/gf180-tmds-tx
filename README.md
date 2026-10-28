@@ -10,7 +10,7 @@ ngspice on the analog side and Yosys/OpenROAD on the digital side.
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
 and electrically post-layout-verified across all five process corners, and
 the serializer/final-mux stage joining the digital and analog partitions
-designed, analog-verified across all five process corners, and laid out and
+is designed, analog-verified across all five process corners, and laid out and
 DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is
 verified (`rtl/`, `verification/`), synthesized, placed-and-routed, and
