@@ -33,6 +33,7 @@ except ModuleNotFoundError:  # pragma: no cover
 from gf180_layers import (
     COMP,
     CONTACT,
+    CONTACT_SIZE,
     DIODE_MK,
     DUALGATE,
     METAL1,
@@ -52,7 +53,6 @@ from gf180_layers import (
     _box,
 )
 
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
 VIA_SIZE = 0.26  # via*.width.1 is a fixed 0.26 x 0.26um square at every level (klt >= 0.7)
 VIA_HALF = VIA_SIZE / 2  # default cut half-size; callers may pass their own `via_half`
 

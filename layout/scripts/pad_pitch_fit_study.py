@@ -85,6 +85,7 @@ except ModuleNotFoundError:  # pragma: no cover
 from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     COMP,
     CONTACT,
+    DBU,
     DIODE_MK,
     DUALGATE,
     METAL1,
@@ -102,6 +103,7 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA3,
     VIA4,
     _box,
+    layer_cache,
 )
 
 # Shared drawing helpers, fold arithmetic and pad/strap constants (issue #262);
@@ -128,7 +130,6 @@ from pad_ring_cells import (  # noqa: F401 -- re-exported; single source (issue 
     clamp_rows,
 )
 
-DBU = 0.001  # 1 nm, matches every other GDS in this repo
 
 # This study's committed GDS/DRC evidence was drawn with 0.30um square vias
 # (clearing via*.width.1's 0.26um floor); it passes this to the shared helpers
@@ -206,12 +207,7 @@ def build(
     layout.dbu = DBU
     top = layout.create_cell(cell_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
+    L = layer_cache(layout)
 
     total_width = 2 * PAD_PITCH_UM
     _draw_ring_strap(top, L, 0.0, total_width, *DVSS_BAND, via_half=VIA_HALF)
