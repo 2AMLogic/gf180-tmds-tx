@@ -7,6 +7,12 @@ selected.
 
 ### 2026-10-27
 
+- **PR #267**: refactor: share the I/O-boundary timing constants across synth, pnr and sta drivers
+- **PR #265**: chore: pin klayout-tools to the 0.8.0 release and regenerate the signoff record
+- **PR #263**: refactor: share pad-ring drawing helpers between fit study and assembly
+- **Issue #266** (closed): Consolidate I/O-boundary timing constants (inv_1 driver, 4x load) triplicated across synth/pnr/sta flow drivers
+- **Issue #264** (closed): Bump klayout-tools pin 44cc42323184 → 0.8.0
+- **Issue #262** (closed): Dedupe pad drawing helpers shared by pad_pitch_fit_study and gen_pad_ring_assembly
 - **PR #231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
 - **Issue #227** (closed): T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
 
