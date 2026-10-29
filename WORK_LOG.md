@@ -5,6 +5,38 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-29
+
+- **PR #281**: refactor: draw gen_pad_v2 pad and clamp via shared _draw_production_pad
+- **PR #270**: docs: qualify post-layout verification claims against signoff item 7
+- **Issue #277** (closed): Dedupe gen_pad_v2.py pad/clamp drawing onto pad_ring_cells._draw_production_pad
+- **Issue #269** (closed): T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions
+
+### 2026-10-28
+
+- **PR #279**: docs: add missing verb to README status serializer/final-mux clause
+- **Issue #278** (closed): docs: README status line lost its verb after the signoff.json qualification
+- **PR #276**: refactor: share DBU, CONTACT_SIZE and drawing closures in gf180_layers
+- **Issue #274** (closed): Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
+- **PR #273**: docs: qualify digital T1 row 6 against klt item 7 no_evidence
+- **Issue #272** (closed): characterization.md digital T1 table: qualify local item 6 'PASS, scope-limited' against klt T1 item 7 (no_evidence)
+
+### 2026-10-27
+
+- **PR #267**: refactor: share the I/O-boundary timing constants across synth, pnr and sta drivers
+- **PR #265**: chore: pin klayout-tools to the 0.8.0 release and regenerate the signoff record
+- **PR #263**: refactor: share pad-ring drawing helpers between fit study and assembly
+- **Issue #266** (closed): Consolidate I/O-boundary timing constants (inv_1 driver, 4x load) triplicated across synth/pnr/sta flow drivers
+- **Issue #264** (closed): Bump klayout-tools pin 44cc42323184 → 0.8.0
+- **Issue #262** (closed): Dedupe pad drawing helpers shared by pad_pitch_fit_study and gen_pad_ring_assembly
+- **PR #231**: feat(signoff): artifact-anchored evidence for T1 items 1, 2, 9, 10
+- **Issue #227** (closed): T1 items 1, 2, 9, 10: bump the signoff grading pin and attest with artifact-anchored envelopes (klt signoff --attest)
+
+### 2026-10-23
+
+- **PR #258**: refactor: share gf180mcu layer table and _box across layout generators
+- **Issue #255** (closed): Consolidate duplicated gf180mcu layer table and _box helper across layout generators
+
 ### 2026-10-22
 
 - **PR #252**: refactor: import shared pad-fold geometry from pad_pitch_fit_study

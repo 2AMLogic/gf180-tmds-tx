@@ -41,33 +41,28 @@ import klayout.db as db
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's layers_def.py; see spec doc).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-POLY2 = (30, 0)
-NPLUS = (32, 0)
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only)
-
-DBU = 0.001  # 1 nm, matches the installed PDK's own GDS files
-
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    CONTACT_SIZE,
+    DBU,
+    METAL1,
+    METAL1_LABEL,
+    METAL2,
+    METAL3,
+    METAL4,
+    METAL5,
+    METAL5_LABEL,
+    NPLUS,
+    PAD_LAYER,
+    POLY2,
+    VIA1,
+    VIA2,
+    VIA3,
+    VIA4,
+    _box,
+    make_drawers,
+)
 
 
 def build(shorted: bool = False) -> db.Layout:
@@ -76,19 +71,7 @@ def build(shorted: bool = False) -> db.Layout:
     top_name = "gf180_tmds_pad_min_shorted" if shorted else "gf180_tmds_pad_min"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
-
-    def label(spec, text, x, y):
-        trans = db.DTrans(db.DPoint(x, y))
-        top.shapes(L(spec)).insert(db.DText(text, trans))
+    L, rect, label = make_drawers(layout, top)
 
     # -- Grounded-gate NMOS (GGNMOS) ESD clamp: drain=PAD, gate=source=VSS --
     W = 2.0  # transistor width (um)

@@ -75,50 +75,22 @@ import klayout.db as db
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's own layers_def.py).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-POLY2 = (30, 0)
-NPLUS = (32, 0)
-PPLUS = (31, 0)
-DUALGATE = (55, 0)  # 5V/6V thick-oxide marker -- required by diode_nd2ps_06v0
-DIODE_MK = (115, 5)  # junction-diode device-recognition mark
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only)
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    CONTACT_SIZE,
+    DBU,
+    DIODE_MK,
+    DUALGATE,
+    METAL1,
+    METAL1_LABEL,
+    PPLUS,
+    make_drawers,
+)
+from pad_ring_cells import _draw_production_pad
 
-DBU = 0.001  # 1 nm, matches every other GDS file in this directory
-
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor (min-only; max not checked)
-
-# -- Diode finger array geometry -------------------------------------------
-N_FINGERS = 20
-FINGER_L = 2.0  # um, long (periphery) axis
-FINGER_DEPTH = 1.0  # um, short axis (matches gen_pad_diode_draft's comp depth)
-FINGER_PITCH = 2.6  # um, center-to-center == FINGER_L + 0.6um comp.space.mv.1 margin
-# Aggregate periphery/area this array presents to `klt extract`'s diode
-# recognition (informational; not itself DRC/LVS-checked):
-#   P_total = N_FINGERS * 2*(FINGER_L + FINGER_DEPTH) = 20 * 2*3.0 = 120 um
-#   A_total = N_FINGERS * FINGER_L * FINGER_DEPTH     = 20 * 2.0  = 40 um^2
-
-# -- Bond pad ---------------------------------------------------------------
-PAD_SIDE = 25.0  # um -- gf180mcu_fd_io__bi_t.lef's own PAD pin size
-PAD_OPENING_MARGIN = 2.5  # um -- comfortably above pad.enclosing.metal5.1's 2.0um floor
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
+N_FINGERS = 20  # this cell's clamp size; pad/clamp geometry lives in pad_ring_cells
+VIA_HALF_UM = 0.15  # 0.30um vias as recorded; helper default is 0.26um
 
 
 def build(shorted: bool = False) -> db.Layout:
@@ -127,95 +99,13 @@ def build(shorted: bool = False) -> db.Layout:
     top_name = "gf180_tmds_pad_v2_shorted" if shorted else "gf180_tmds_pad_v2"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
+    L, rect, label = make_drawers(layout, top)
 
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
-
-    def label(spec, text, x, y):
-        trans = db.DTrans(db.DPoint(x, y))
-        top.shapes(L(spec)).insert(db.DText(text, trans))
-
-    # -- diode_nd2ps_06v0 clamp: 20-finger array, cathode -> PAD ------------
-    finger_boxes = []
-    for i in range(N_FINGERS):
-        x0 = i * FINGER_PITCH
-        x1 = x0 + FINGER_L
-        finger_boxes.append((x0, x1))
-        rect(COMP, x0, 0.0, x1, FINGER_DEPTH)
-        # per-finger contact, centred
-        cx = (x0 + x1) / 2
-        rect(
-            CONTACT,
-            cx - CONTACT_SIZE / 2,
-            0.39,
-            cx + CONTACT_SIZE / 2,
-            0.39 + CONTACT_SIZE,
-        )
-
-    array_x0, array_x1 = finger_boxes[0][0], finger_boxes[-1][1]
-    margin = 0.16  # NPLUS-over-COMP margin (gen_pad_min.py convention)
-    rect(NPLUS, array_x0 - margin, 0.0 - margin, array_x1 + margin, FINGER_DEPTH + margin)
-    dg_margin = 0.30  # comfortable Dualgate-over-Comp margin
-    rect(
-        DUALGATE,
-        array_x0 - dg_margin,
-        0.0 - dg_margin,
-        array_x1 + dg_margin,
-        FINGER_DEPTH + dg_margin,
-    )
-    mk_margin = 0.40  # diode_mk covers the whole recognised-junction footprint
-    rect(
-        DIODE_MK,
-        array_x0 - mk_margin,
-        0.0 - mk_margin,
-        array_x1 + mk_margin,
-        FINGER_DEPTH + mk_margin,
-    )
-
-    # -- Metal1 cathode bus: ties every finger's contact onto one PAD net --
-    bus_y0, bus_y1 = 0.39 - 0.13, 0.39 + CONTACT_SIZE + 0.13
-    via_stack_cx = array_x1 + 1.5  # via stack sits just past the last finger
-    rect(METAL1, array_x0 - 0.10, bus_y0, via_stack_cx + 0.6, bus_y1)
-
-    # -- Via stack, Metal1 through Metal5, up to the real 25x25um bond pad --
-    stack_cy = FINGER_DEPTH / 2
-    stack_half = 0.60
-    stack_x0, stack_x1 = via_stack_cx - stack_half, via_stack_cx + stack_half
-    stack_y0, stack_y1 = stack_cy - stack_half, stack_cy + stack_half
-    for metal_spec in (METAL2, METAL3, METAL4):
-        rect(metal_spec, stack_x0, stack_y0, stack_x1, stack_y1)
-    via_half = 0.15  # 0.30um square vias, clearing via*.width.1's 0.26um floor
-    for via_spec in (VIA1, VIA2, VIA3, VIA4):
-        rect(
-            via_spec,
-            via_stack_cx - via_half,
-            stack_cy - via_half,
-            via_stack_cx + via_half,
-            stack_cy + via_half,
-        )
-    pad_half = PAD_SIDE / 2
-    rect(
-        METAL5,
-        via_stack_cx - pad_half,
-        stack_cy - pad_half,
-        via_stack_cx + pad_half,
-        stack_cy + pad_half,
-    )
-    opening_half = pad_half - PAD_OPENING_MARGIN
-    rect(
-        PAD_LAYER,
-        via_stack_cx - opening_half,
-        stack_cy - opening_half,
-        via_stack_cx + opening_half,
-        stack_cy + opening_half,
-    )
-    label(METAL5_LABEL, "PAD", via_stack_cx, stack_cy)
+    # -- diode_nd2ps_06v0 clamp + 25x25um bond pad (shared with the ring) ---
+    _draw_production_pad(top, L, 0.0, 0.0, "PAD", N_FINGERS, via_half=VIA_HALF_UM)
+    array_x0 = 0.0
+    margin = 0.16  # PPLUS-over-COMP margin (same convention as the clamp's NPLUS)
+    bus_y0 = 0.39 - 0.13  # bottom edge of the clamp's Metal1 bus (DEFAULT_BUS_WIDTH_UM)
 
     # -- Substrate tap: Pplus-covered Comp outside every Nwell, tied to VSS -
     tap_x0, tap_x1 = array_x0, array_x0 + 2.0

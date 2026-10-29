@@ -82,29 +82,59 @@ except ModuleNotFoundError:  # pragma: no cover
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's own layers_def.py).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-PPLUS = (31, 0)
-NPLUS = (32, 0)
-DUALGATE = (55, 0)  # 5V/6V thick-oxide marker -- required by diode_nd2ps_06v0
-DIODE_MK = (115, 5)  # junction-diode device-recognition mark
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    DBU,
+    DIODE_MK,
+    DUALGATE,
+    METAL1,
+    METAL1_LABEL,
+    METAL2,
+    METAL3,
+    METAL4,
+    METAL5,
+    METAL5_LABEL,
+    NPLUS,
+    PAD_LAYER,
+    PPLUS,
+    VIA1,
+    VIA2,
+    VIA3,
+    VIA4,
+    _box,
+    layer_cache,
+)
 
-DBU = 0.001  # 1 nm, matches every other GDS in this repo
+# Shared drawing helpers, fold arithmetic and pad/strap constants (issue #262);
+# re-exported here under their original names.
+from pad_ring_cells import (  # noqa: F401 -- re-exported; single source (issue #262)
+    CONTACT_SIZE,
+    DEFAULT_BUS_WIDTH_UM,
+    DVDD_BAND,
+    DVSS_BAND,
+    FINGER_DEPTH,
+    FINGER_L,
+    FINGER_PITCH,
+    MAX_FINGERS_PER_ROW,
+    PAD_OPENING_MARGIN,
+    PAD_SIDE,
+    PAD_VIA_GAP_UM,
+    ROW_GAP_UM,
+    STRAP_STITCH_PITCH_UM,
+    _draw_production_pad,
+    _draw_ring_strap,
+    _draw_substrate_tap,
+    _row_pitch,
+    _row_span,
+    clamp_rows,
+)
 
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
-VIA_HALF = 0.15  # 0.30um square vias, clearing via*.width.1's 0.26um floor
+
+# This study's committed GDS/DRC evidence was drawn with 0.30um square vias
+# (clearing via*.width.1's 0.26um floor); it passes this to the shared helpers
+# so the refactor (issue #262) leaves its geometry unchanged.
+VIA_HALF = 0.15
 
 # ---------------------------------------------------------------------------
 # DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
@@ -114,69 +144,11 @@ VIA_HALF = 0.15  # 0.30um square vias, clearing via*.width.1's 0.26um floor
 PAD_PITCH_UM = 350.0
 RING_DEPTH_UM = 75.0
 
-# Ring supply-strap bands, identical to gen_pad_ring_assembly.py's.
-DVSS_BAND = (2.0, 6.0)
-DVDD_BAND = (12.0, 16.0)
-STRAP_STITCH_PITCH_UM = 50.0
-
-# ---------------------------------------------------------------------------
-# Pad + clamp geometry, adopted verbatim from gen_pad_v2.py (issue #87).
-# ---------------------------------------------------------------------------
-PAD_SIDE = 25.0  # um -- gf180mcu_fd_io__bi_t.lef's own PAD pin size
-PAD_OPENING_MARGIN = 2.5  # um -- above pad.enclosing.metal5.1's 2.0um floor
-PAD_VIA_GAP_UM = 1.5  # x gap from the last finger to the via-stack centre
-
-FINGER_L = 2.0  # um, long (periphery/width) axis of one diode finger
-FINGER_DEPTH = 1.0  # um, short axis
-FINGER_PITCH = 2.6  # um, x pitch == FINGER_L + 0.6um (>= comp.space.mv.1 0.36um)
-ROW_GAP_UM = 0.6  # um, y gap between rows -- the same margin FINGER_PITCH uses
-
-# Metal1 cathode-gather bus width. gen_pad_v2.py's own bus is
-# `2*0.13 + CONTACT_SIZE` = 0.48 um, which is what the default reproduces.
-# `--bus-width` exists because it is a *measurable* budget term, not a
-# cosmetic one: `design/esd-capacitance-budget.md` Sec.9.3 flagged that an
-# HBM-sized clamp "would need a somewhat longer/wider Metal1 bus to gather
-# current from more fingers, which would add some additional routing
-# capacitance beyond this figure ... not literally re-measured at every
-# clamp size". Widening it here and re-running `klt extract --parasitics`
-# turns that caveat into a number.
-DEFAULT_BUS_WIDTH_UM = 2 * 0.13 + CONTACT_SIZE
-
-# Largest round per-row finger count that leaves >= 10um of slot margin at
-# each end of a PAD_PITCH_UM slot once the via stack and the 25um Metal5
-# plate are accounted for -- see `fit_report` for the arithmetic, which is
-# reported rather than asserted so the margin is auditable per run.
-MAX_FINGERS_PER_ROW = 120
-
 # y-origin of each slot's clamp array. The Metal5 plate is centred on the
 # array, so its lower edge is `PAD_STRUCT_OY_UM + array_height/2 - PAD_SIDE/2`;
 # at the single-row minimum that is 18.0 um, clearing DVDD_BAND's 16.0 um top
 # edge by 2.0 um (7x metal5.space.1's 0.28 um floor).
 PAD_STRUCT_OY_UM = 30.0
-
-
-def clamp_rows(n_fingers: int) -> list[int]:
-    """Fold `n_fingers` fingers into rows of at most MAX_FINGERS_PER_ROW."""
-    if n_fingers < 1:
-        raise ValueError("clamp finger count must be >= 1")
-    rows: list[int] = []
-    remaining = n_fingers
-    while remaining > 0:
-        take = min(remaining, MAX_FINGERS_PER_ROW)
-        rows.append(take)
-        remaining -= take
-    return rows
-
-
-def _row_span(fingers_in_row: int) -> float:
-    return (fingers_in_row - 1) * FINGER_PITCH + FINGER_L
-
-
-def _row_pitch(bus_width: float) -> float:
-    """y row-to-row pitch: whichever of the diode finger or its Metal1
-    gather bus is taller, plus the same ROW_GAP_UM margin FINGER_PITCH uses
-    in x. At the default bus width this is the finger-limited 1.6 um."""
-    return max(FINGER_DEPTH, bus_width) + ROW_GAP_UM
 
 
 def fit_report(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> dict[str, object]:
@@ -211,133 +183,6 @@ def fit_report(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> dict[
     }
 
 
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
-
-
-def _draw_ring_strap(top, L, x0: float, x1: float, y0: float, y1: float) -> None:
-    """One DVDD/DVSS supply strap: Metal3/Metal4/Metal5 drawn continuously
-    across [x0, x1] and via-stitched every STRAP_STITCH_PITCH_UM, so the
-    three levels form one electrically continuous conductor (DR-0011's
-    ring-continuity requirement). Same construction as
-    `gen_pad_ring_assembly.py`'s already-signed-off strap."""
-
-    def rect(spec, rx0, ry0, rx1, ry1):
-        top.shapes(L(spec)).insert(_box(top.layout(), rx0, ry0, rx1, ry1))
-
-    for metal_spec in (METAL3, METAL4, METAL5):
-        rect(metal_spec, x0, y0, x1, y1)
-    cy = (y0 + y1) / 2
-    x = x0 + STRAP_STITCH_PITCH_UM / 2
-    while x < x1:
-        rect(VIA3, x - VIA_HALF, cy - VIA_HALF, x + VIA_HALF, cy + VIA_HALF)
-        rect(VIA4, x - VIA_HALF, cy - VIA_HALF, x + VIA_HALF, cy + VIA_HALF)
-        x += STRAP_STITCH_PITCH_UM
-
-
-def _draw_substrate_tap(top, L, ox: float, oy: float, net_name: str) -> None:
-    """Pplus-covered Comp outside every Nwell (this tile draws no Nwell at
-    all), contacted and strapped up through Metal1/Metal2 into the Metal3
-    DVSS strap the caller has already drawn at this (ox, oy)."""
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(top.layout(), ox + x0, oy + y0, ox + x1, oy + y1))
-
-    def label(spec, text, x, y):
-        top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
-
-    rect(COMP, 0.0, 0.0, 1.0, 1.0)
-    margin = 0.16
-    rect(PPLUS, -margin, -margin, 1.0 + margin, 1.0 + margin)
-
-    cx = 0.5
-    c0_y0, c1_y0 = 0.63, 1.15
-    for cy0 in (c0_y0, c1_y0):
-        rect(CONTACT, cx - CONTACT_SIZE / 2, cy0, cx + CONTACT_SIZE / 2, cy0 + CONTACT_SIZE)
-    m1_y0, m1_y1 = c0_y0 - 0.13, c1_y0 + CONTACT_SIZE + 0.13
-    rect(METAL1, cx - 0.31, m1_y0, cx + 0.31, m1_y1)
-    label(METAL1_LABEL, net_name, cx, (m1_y0 + m1_y1) / 2)
-
-    sx0, sx1 = cx - 0.35, cx + 0.35
-    sy0, sy1 = m1_y1 - 0.10, m1_y1 + 0.60
-    rect(METAL1, sx0, sy0, sx1, sy1)
-    rect(METAL2, sx0, sy0, sx1, sy1)
-    vcy = (sy0 + sy1) / 2
-    rect(VIA1, cx - VIA_HALF, vcy - VIA_HALF, cx + VIA_HALF, vcy + VIA_HALF)
-    rect(VIA2, cx - VIA_HALF, vcy - VIA_HALF, cx + VIA_HALF, vcy + VIA_HALF)
-
-
-def _draw_production_pad(
-    top, L, ox: float, oy: float, net_name: str, n_fingers: int, bus_width: float
-) -> None:
-    """One `gf180_tmds_pad_v2`-geometry bond pad at (ox, oy): a folded
-    `diode_nd2ps_06v0` finger array, a shared Metal1 cathode bus per row plus
-    a vertical Metal1 spine tying the rows together, a Metal1-Metal5 via
-    stack, and the 25x25 um Metal5 plate / 20x20 um opening on top."""
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(top.layout(), ox + x0, oy + y0, ox + x1, oy + y1))
-
-    def label(spec, text, x, y):
-        top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
-
-    rows = clamp_rows(n_fingers)
-    array_x1 = _row_span(max(rows))
-    row_pitch = _row_pitch(bus_width)
-    array_y1 = (len(rows) - 1) * row_pitch + max(FINGER_DEPTH, bus_width)
-
-    contact_y_off = 0.39  # gen_pad_v2.py's own within-finger contact offset
-    bus_cy = contact_y_off + CONTACT_SIZE / 2
-    bus_dy0 = bus_cy - bus_width / 2
-    bus_dy1 = bus_cy + bus_width / 2
-    via_cx = array_x1 + PAD_VIA_GAP_UM
-
-    for r, count in enumerate(rows):
-        row_y0 = r * row_pitch
-        for i in range(count):
-            fx0 = i * FINGER_PITCH
-            rect(COMP, fx0, row_y0, fx0 + FINGER_L, row_y0 + FINGER_DEPTH)
-            cx = fx0 + FINGER_L / 2
-            rect(
-                CONTACT,
-                cx - CONTACT_SIZE / 2,
-                row_y0 + contact_y_off,
-                cx + CONTACT_SIZE / 2,
-                row_y0 + contact_y_off + CONTACT_SIZE,
-            )
-        rect(METAL1, -0.10, row_y0 + bus_dy0, via_cx + 0.60, row_y0 + bus_dy1)
-
-    # Implants/markers enclose the whole (possibly multi-row) array: only
-    # Comp defines the diffusion, so one rectangle per layer is equivalent to
-    # per-row rectangles and introduces no sliver spacing between rows.
-    margin = 0.16  # NPLUS-over-COMP margin (gen_pad_v2.py convention)
-    rect(NPLUS, -margin, -margin, array_x1 + margin, array_y1 + margin)
-    dg = 0.30
-    rect(DUALGATE, -dg, -dg, array_x1 + dg, array_y1 + dg)
-    mk = 0.40
-    rect(DIODE_MK, -mk, -mk, array_x1 + mk, array_y1 + mk)
-
-    # Vertical Metal1 spine: ties every row's bus onto one cathode net.
-    spine_half = max(0.60, bus_width / 2)
-    rect(METAL1, via_cx - spine_half, bus_dy0, via_cx + spine_half, (len(rows) - 1) * row_pitch + bus_dy1)
-    label(METAL1_LABEL, net_name, 1.0, (bus_dy0 + bus_dy1) / 2)
-
-    stack_cy = array_y1 / 2
-    for metal_spec in (METAL2, METAL3, METAL4):
-        rect(metal_spec, via_cx - 0.60, stack_cy - 0.60, via_cx + 0.60, stack_cy + 0.60)
-    for via_spec in (VIA1, VIA2, VIA3, VIA4):
-        rect(via_spec, via_cx - VIA_HALF, stack_cy - VIA_HALF, via_cx + VIA_HALF, stack_cy + VIA_HALF)
-
-    pad_half = PAD_SIDE / 2
-    rect(METAL5, via_cx - pad_half, stack_cy - pad_half, via_cx + pad_half, stack_cy + pad_half)
-    opening_half = pad_half - PAD_OPENING_MARGIN
-    rect(PAD_LAYER, via_cx - opening_half, stack_cy - opening_half, via_cx + opening_half, stack_cy + opening_half)
-    label(METAL5_LABEL, net_name, via_cx, stack_cy)
-
-
 def build(
     n_fingers: int,
     cell_name: str = "gf180_tmds_pad_pitch_fit",
@@ -362,24 +207,21 @@ def build(
     layout.dbu = DBU
     top = layout.create_cell(cell_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
+    L = layer_cache(layout)
 
     total_width = 2 * PAD_PITCH_UM
-    _draw_ring_strap(top, L, 0.0, total_width, *DVSS_BAND)
-    _draw_ring_strap(top, L, 0.0, total_width, *DVDD_BAND)
+    _draw_ring_strap(top, L, 0.0, total_width, *DVSS_BAND, via_half=VIA_HALF)
+    _draw_ring_strap(top, L, 0.0, total_width, *DVDD_BAND, via_half=VIA_HALF)
 
     # Substrate tap in the inter-slot gap, tied into the DVSS strap.
-    _draw_substrate_tap(top, L, PAD_PITCH_UM - 0.5, DVSS_BAND[0], "VSS")
+    _draw_substrate_tap(top, L, PAD_PITCH_UM - 0.5, DVSS_BAND[0], "VSS", via_half=VIA_HALF)
 
     struct_w = float(report["struct_width_um"])
     for slot, net in ((0, "OUTP"), (1, "OUTN")):
         slot_cx = PAD_PITCH_UM * (slot + 0.5)
-        _draw_production_pad(top, L, slot_cx - struct_w / 2, PAD_STRUCT_OY_UM, net, n_fingers, bus_width)
+        _draw_production_pad(
+            top, L, slot_cx - struct_w / 2, PAD_STRUCT_OY_UM, net, n_fingers, bus_width, via_half=VIA_HALF
+        )
 
     top.flatten(True)
     return layout, report

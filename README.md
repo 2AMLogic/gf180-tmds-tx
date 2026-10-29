@@ -8,8 +8,13 @@ ngspice on the analog side and Yosys/OpenROAD on the digital side.
 ![fleet burndown](https://raw.githubusercontent.com/2AMLogic/2am/main/fleet-metrics/charts/gf180-tmds-tx.svg)
 
 **Status: spec ratified, driver+pad-ring/ESD assembly signed off DRC/LVS-clean
-and electrically post-layout-verified across all five process corners, and
-the serializer/final-mux stage joining the digital and analog partitions
+on both partitions, with T1 item 11 met; its post-layout eye was simulated
+across all five process corners on the earlier, pre-#210 (VDD-less) revision
+and has not been re-run on the current assembly (#222), so
+T1 item 7 (post-layout verification) is graded `no_evidence` on both
+partitions. Verdict of record:
+[`signoff/signoff.json`](signoff/signoff.json), 17/22 T1 items met at
+`69c859a`. The serializer/final-mux stage joining the digital and analog partitions is
 designed, analog-verified across all five process corners, and laid out and
 DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is
@@ -127,11 +132,12 @@ encoder verified/synthesized/placed-and-routed/timing-closed, the CML
 driver schematic and its core-cell layout both simulated across the full
 PVT matrix, and the driver+pad-ring/ESD assembly
 (`gf180_tmds_pad_ring_assembly`) DRC-clean, LVS-matched, and now
-electrically PVT-verified post-layout — with real interconnect parasitics
+electrically PVT-simulated post-layout on the pre-#210 (VDD-less) revision
+— with real interconnect parasitics
 and the real ESD clamp array in circuit — across the full mandated 5-corner
 `mos` process-corner set (18 temperature/supply/rate points per corner,
-90/90 PASS), reaching the "assembly PVT-verified" rung across the full
-matrix. The pad-capacitance budget (≤ 2 pF) is met with 95–96 % headroom.
+90/90 PASS); that record has not been re-run on the current assembly
+(#222), and `signoff/signoff.json` grades T1 item 7 `no_evidence`. The pad-capacitance budget (≤ 2 pF) is met with 95–96 % headroom.
 The 10:1→2:1 serializer/final-mux stage joining the digital and analog
 partitions is now designed too — RTL verified against the encoder's own
 output, and the custom final 2:1 multiplexer captured, sized, and
@@ -151,7 +157,8 @@ ESD HBM/CDM qualification is not simulated
 (no PDK source
 characterizes the needed device parameters pre-silicon — see
 `measurements/characterization.md`). The post-layout eye-mask run against
-the extracted assembly has passed the same 90-point PVT/rate/pad-capacitance
+the extracted assembly (pre-#210, VDD-less revision; not re-run on the
+current assembly, #222) passed the same 90-point PVT/rate/pad-capacitance
 grid as its schematic counterpart (issue #160), with a worst-case margin
 of 0.859 V against the 0.2 V floor; see the
 [record](sim/cml-driver-eye-mask/records/20260905-222646-a2b1051.md).

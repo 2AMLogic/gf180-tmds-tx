@@ -46,34 +46,29 @@ import klayout.db as db
 # EXTRACTION_DECK/DECK's `diodes=(...)` entry for `diode_nd2ps_06v0`, and the
 # installed PDK's own layers_def.py; see DR-0011).
 # ---------------------------------------------------------------------------
-COMP = (22, 0)
-NPLUS = (32, 0)
-DUALGATE = (55, 0)  # 5V/6V thick-oxide marker -- required by diode_nd2ps_06v0
-DIODE_MK = (115, 5)  # junction-diode device-recognition mark
-CONTACT = (33, 0)
-METAL1 = (34, 0)
-METAL1_LABEL = (34, 10)
-VIA1 = (35, 0)
-METAL2 = (36, 0)
-VIA2 = (38, 0)
-METAL3 = (42, 0)
-VIA3 = (40, 0)
-METAL4 = (46, 0)
-VIA4 = (41, 0)
-METAL5 = (81, 0)
-METAL5_LABEL = (81, 10)
-PAD_LAYER = (37, 0)  # passivation/pad-opening marker (geom.drc: grid/angle only)
-
-DBU = 0.001  # 1 nm, matches the installed PDK's own GDS files
-
-CONTACT_SIZE = 0.22  # klt's contact.width.1 floor
-
-
-def _box(layout, x0, y0, x1, y1):
-    return db.Box(
-        db.DPoint(x0, y0).to_itype(layout.dbu),
-        db.DPoint(x1, y1).to_itype(layout.dbu),
-    )
+from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+    COMP,
+    CONTACT,
+    CONTACT_SIZE,
+    DBU,
+    DIODE_MK,
+    DUALGATE,
+    METAL1,
+    METAL1_LABEL,
+    METAL2,
+    METAL3,
+    METAL4,
+    METAL5,
+    METAL5_LABEL,
+    NPLUS,
+    PAD_LAYER,
+    VIA1,
+    VIA2,
+    VIA3,
+    VIA4,
+    _box,
+    make_drawers,
+)
 
 
 def build() -> db.Layout:
@@ -82,19 +77,7 @@ def build() -> db.Layout:
     top_name = "gf180_tmds_pad_diode_draft"
     top = layout.create_cell(top_name)
 
-    layers: dict[tuple[int, int], int] = {}
-
-    def L(spec):
-        if spec not in layers:
-            layers[spec] = layout.layer(*spec)
-        return layers[spec]
-
-    def rect(spec, x0, y0, x1, y1):
-        top.shapes(L(spec)).insert(_box(layout, x0, y0, x1, y1))
-
-    def label(spec, text, x, y):
-        trans = db.DTrans(db.DPoint(x, y))
-        top.shapes(L(spec)).insert(db.DText(text, trans))
+    L, rect, label = make_drawers(layout, top)
 
     # -- diode_nd2ps_06v0 cathode: Comp, marked Nplus + Dualgate ------------
     # comp.width.mv.1 (klt's gf180mcu deck) requires >=0.30um width for any
