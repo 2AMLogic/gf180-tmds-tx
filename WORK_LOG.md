@@ -5,8 +5,17 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-10-29
+
+- **PR #281**: refactor: draw gen_pad_v2 pad and clamp via shared _draw_production_pad
+- **PR #270**: docs: qualify post-layout verification claims against signoff item 7
+- **Issue #277** (closed): Dedupe gen_pad_v2.py pad/clamp drawing onto pad_ring_cells._draw_production_pad
+- **Issue #269** (closed): T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions
+
 ### 2026-10-28
 
+- **PR #279**: docs: add missing verb to README status serializer/final-mux clause
+- **Issue #278** (closed): docs: README status line lost its verb after the signoff.json qualification
 - **PR #276**: refactor: share DBU, CONTACT_SIZE and drawing closures in gf180_layers
 - **Issue #274** (closed): Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
 - **PR #273**: docs: qualify digital T1 row 6 against klt item 7 no_evidence
