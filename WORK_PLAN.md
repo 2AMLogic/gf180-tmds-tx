@@ -29,20 +29,19 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#274**: Consolidate layout generators' duplicated drawing closures and DBU/CONTACT_SIZE constants
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
-- **#269**: T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#270**: docs: qualify post-layout verification claims against signoff item 7
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -57,11 +56,10 @@ Issues carrying `loom:curated`.
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
-- **#269**: T1 status: correct README status-line claim 'electrically post-layout-verified' — item 7 is no_evidence on both partitions *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#282**: Trim 32 unused re-export imports from pad_pitch_fit_study.py and gen_pad_ring_assembly.py *(hermit)*
 
 ## Epics
 
@@ -74,11 +72,11 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 1 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 1 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 4 |
-| Architect / Hermit proposals | 0 |
+| Curated | 3 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
