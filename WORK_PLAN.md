@@ -11,7 +11,7 @@ for the generation logic.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
+_None._
 
 ## Very Important
 
@@ -41,13 +41,13 @@ Issues currently being built (`loom:building`).
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
+_None._
 
 ## Proposed
 
@@ -69,13 +69,13 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 1 |
-| PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
+| PRs awaiting review | 1 |
+| Approved PRs awaiting merge | 0 |
 | Curated | 3 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
