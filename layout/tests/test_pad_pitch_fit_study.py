@@ -31,6 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "layout" / "scripts"))
 
 import pad_pitch_fit_study as study  # noqa: E402
+import pad_ring_cells as cells  # noqa: E402
 
 # design/esd-capacitance-budget.md Sec.2b's HBM-sizing window, expressed in
 # this study's own units: each finger is FINGER_L (2.0 um) of clamp width.
@@ -52,9 +53,9 @@ class DR0011ConstantsTest(unittest.TestCase):
         # gen_pad_v2.py's own numbers -- the geometry Sec.9 validated the
         # <=2 pF budget against. Adopting it means adopting these exactly.
         self.assertEqual(study.PAD_SIDE, 25.0)
-        self.assertEqual(study.PAD_OPENING_MARGIN, 2.5)
+        self.assertEqual(cells.PAD_OPENING_MARGIN, 2.5)
         # pad.enclosing.metal5.1's floor is 2.0 um; the margin must clear it.
-        self.assertGreater(study.PAD_OPENING_MARGIN, 2.0)
+        self.assertGreater(cells.PAD_OPENING_MARGIN, 2.0)
 
 
 class ClampRowsTest(unittest.TestCase):
