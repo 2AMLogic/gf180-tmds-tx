@@ -109,6 +109,15 @@ sim/
       <record-id>.md                 # append-only summary record
 ```
 
+> **Stored evidence (manifest-forward).** Records minted before this rule keep
+> their raw logs committed under `corners/<record-id>/`. New runs do not: the
+> harness stages the logs in the git-ignored `sim/.work/.stage/`, stores them
+> with `klt artifact put`, and commits only
+> `manifests/artifacts/<experiment-slug>-<record-id>.manifest.json` plus the
+> record, which cites the manifest in **Links** and lists name, size and sha256
+> per object (see `manifests/artifacts/README.md`). A manifest-backed record has
+> no `corners/<record-id>/` directory.
+
 - **`<experiment-slug>`** — short, descriptive, kebab-case name for what is
   being verified (`smoke-cml-pair`, `output-voltage-tc`, ...). One directory
   per distinct claim being tested, not per run.
@@ -273,7 +282,10 @@ execute it on every PR. It reads tracked files only, needs nothing but
 - a record with no `netlist-snapshots/<record-id>.spice` or no
   `corners/<record-id>/` logs — and, symmetrically, a snapshot or corner
   directory with no summary record to cite it;
-- a `<corner-id>.log` name that does not parse under the grammar above;
+- a `<corner-id>.log` name that does not parse under the grammar above (for a
+  manifest-backed record, the log names are the manifest's entry names
+  `sim/<slug>/corners/<record-id>/<corner-id>.log`; committed files under
+  `corners/<record-id>/` alongside a cited manifest are an error);
 - a rate-bearing record (any of its per-corner logs carry a `<rate>` token)
   with a missing or empty **Operating point** or **Transient settings**
   field, or whose **Operating point** field names a different set of rates
@@ -284,7 +296,7 @@ execute it on every PR. It reads tracked files only, needs nothing but
   same experiment directory (write `(none)` when a record supersedes
   nothing);
 - **append-only violations**: any file under `records/`,
-  `netlist-snapshots/` or `corners/` modified, renamed, or deleted relative
+  `netlist-snapshots/`, `corners/` or `manifests/artifacts/*.manifest.json` modified, renamed, or deleted relative
   to the merge base with `origin/main`. Only additions are allowed.
 
 The append-only half needs real git history; where the base ref does not
