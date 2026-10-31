@@ -36,7 +36,6 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
-- **#282**: Trim 32 unused re-export imports from pad_pitch_fit_study.py and gen_pad_ring_assembly.py
 
 ## PRs Awaiting Review
 
@@ -74,7 +73,7 @@ _None._
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
