@@ -35,13 +35,13 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+_None._
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -74,8 +74,8 @@ _None._
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
-| PRs awaiting review | 1 |
+| In Progress (`loom:building`) | 0 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 4 |
 | Architect / Hermit proposals | 0 |
