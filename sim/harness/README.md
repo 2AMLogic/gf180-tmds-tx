@@ -20,7 +20,8 @@ sim/
   <experiment-slug>/        one per claim under test -- see sim/README.md
     testbench/               tb.json + netlist fragment      <- you write these
     netlist-snapshots/       frozen netlist per record        <- the harness writes these
-    corners/<record-id>/     raw <corner-id>.log per PVT (x rate) point
+    corners/<record-id>/     raw <corner-id>.log per PVT (x rate) point (legacy records only;
+                             new runs store them via the artifact broker, see below)
     records/<record-id>.md   append-only summary record
   .work/                    generated ngspice decks (git-ignored, disposable)
 ```
@@ -297,3 +298,16 @@ NMOS differential pair with the DR-0002 load topology (10 mA tail, 50 Ω/leg
 to the 3.3 V rail); its manifest sweeps both spec/tmds-tx.md operating
 points (742.5 and 270 Mbps/lane) across the full PVT matrix (90 points) and
 records differential swing, common-mode level, and 10-90 % rise/fall time.
+
+## Stored evidence
+
+`run_corners.py` does not commit raw logs. It writes them to the git-ignored
+`sim/.work/.stage/<experiment>/<record-id>/`, stores each with
+`klt artifact put` (`sim/harness/evidence_store.py`), and commits only
+`manifests/artifacts/<experiment>-<record-id>.manifest.json` plus the record,
+whose **Links** cite the manifest and whose "Stored evidence" table lists name,
+size and sha256 per object. It fails closed: with `KLT_ARTIFACT_BROKER` unset,
+or a `klt` lacking `artifact put`, it exits 3 before simulating; a broker
+failure after the grid exits 3 with the staged bytes kept and no manifest or
+record written. `--no-write` debugging runs touch neither the store nor the
+evidence tree. Layout and rules: `manifests/artifacts/README.md`.

@@ -18,7 +18,14 @@ import sys
 import time
 from pathlib import Path
 
-from . import HARNESS_VERSION, corners as corners_mod, report, runner, testbench as tb_mod
+from . import (
+    HARNESS_VERSION,
+    corners as corners_mod,
+    evidence_store,
+    report,
+    runner,
+    testbench as tb_mod,
+)
 from .pdk import PdkNotFound, find_pdk
 from .runner import NgspiceMissing
 
@@ -271,6 +278,16 @@ def run(args: argparse.Namespace) -> int:
         )
         return EXIT_ENVIRONMENT
 
+    # Raw logs are stored through the artifact broker, never committed. Fail
+    # before simulating if that is impossible (no option commits bytes).
+    if not args.no_write:
+        try:
+            evidence_store.preflight()
+            evidence_store.require_ignored_stage(evidence_store.STAGE_ROOT, REPO_ROOT)
+        except evidence_store.EvidenceStoreError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return EXIT_ENVIRONMENT
+
     experiment_dir = tb.experiment_dir
     records_dir = experiment_dir / report.RECORDS_DIR
 
@@ -282,7 +299,7 @@ def run(args: argparse.Namespace) -> int:
     git = report.git_provenance(REPO_ROOT)
     record_id = report.allocate_record_id(REPO_ROOT, records_dir, started, git=git)
     workdir = WORK_DIR / tb.experiment / record_id
-    log_dir = None if args.no_write else experiment_dir / report.CORNERS_DIR / record_id
+    log_dir = None if args.no_write else evidence_store.stage_dir(tb.experiment, record_id)
 
     if not args.quiet:
         print(f"experiment: {tb.experiment}"
@@ -373,12 +390,20 @@ def run(args: argparse.Namespace) -> int:
         )
 
     if not args.no_write:
+        try:
+            record["stored_evidence"] = evidence_store.store_run(
+                tb.experiment, record_id, log_dir, REPO_ROOT
+            )
+        except evidence_store.EvidenceStoreError as exc:
+            print(f"error: evidence not recorded: {exc}", file=sys.stderr)
+            return EXIT_ENVIRONMENT
         snapshot = report.write_netlist_snapshot(tb, experiment_dir, record_id)
         record_path = report.write_record(record, experiment_dir)
         print()
         print(f"record    : {record_path}")
         print(f"snapshot  : {snapshot}")
-        print(f"raw logs  : {log_dir}")
+        print(f"manifest  : {record['stored_evidence']['manifest']}")
+        print(f"staged    : {log_dir}  (bytes stored via klt artifact; not committed)")
     else:
         print()
         print("evidence  : not recorded (--no-write)")
