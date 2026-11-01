@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-11-01
+
+- **PR #290**: Bump Repo Skills 0.24.7 -> 0.25.1
+
 ### 2026-10-30
 
 - **PR #287**: refactor: drop 35 unused re-exported imports from pad-ring generators
