@@ -69,7 +69,7 @@ from __future__ import annotations
 
 import argparse
 
-from pad_ring_cells import (  # noqa: F401 -- re-exported; single source (issues #242, #262)
+from pad_ring_cells import (  # single source (issues #242, #262)
     CONTACT_SIZE,
     DEFAULT_BUS_WIDTH_UM,
     DVDD_BAND,
@@ -78,13 +78,9 @@ from pad_ring_cells import (  # noqa: F401 -- re-exported; single source (issues
     FINGER_L,
     FINGER_PITCH,
     MAX_FINGERS_PER_ROW,
-    PAD_OPENING_MARGIN,
     PAD_SIDE,
     PAD_VIA_GAP_UM,
-    ROW_GAP_UM,
-    STRAP_STITCH_PITCH_UM,
     VIA_HALF,
-    VIA_SIZE,
     _draw_production_pad,
     _draw_ring_strap,
     _draw_substrate_tap,
@@ -108,7 +104,7 @@ except ModuleNotFoundError:  # pragma: no cover
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's own layers_def.py).
 # ---------------------------------------------------------------------------
-from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+from gf180_layers import (  # shared layer table (issue #255)
     COMP,
     CONTACT,
     DBU,
@@ -117,18 +113,11 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     METAL1,
     METAL1_LABEL,
     METAL2,
-    METAL3,
-    METAL4,
-    METAL5,
-    METAL5_LABEL,
     NPLUS,
     NWELL,
-    PAD_LAYER,
     PPLUS,
     VIA1,
     VIA2,
-    VIA3,
-    VIA4,
     _box,
     layer_cache,
 )

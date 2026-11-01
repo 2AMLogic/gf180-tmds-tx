@@ -5,6 +5,15 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-11-01
+
+- **PR #290**: Bump Repo Skills 0.24.7 -> 0.25.1
+
+### 2026-10-30
+
+- **PR #287**: refactor: drop 35 unused re-exported imports from pad-ring generators
+- **Issue #282** (closed): Trim 32 unused re-export imports from pad_pitch_fit_study.py and gen_pad_ring_assembly.py
+
 ### 2026-10-29
 
 - **PR #281**: refactor: draw gen_pad_v2 pad and clamp via shared _draw_production_pad

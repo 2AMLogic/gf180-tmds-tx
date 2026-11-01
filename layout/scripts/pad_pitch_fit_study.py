@@ -82,46 +82,18 @@ except ModuleNotFoundError:  # pragma: no cover
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's own layers_def.py).
 # ---------------------------------------------------------------------------
-from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
-    COMP,
-    CONTACT,
-    DBU,
-    DIODE_MK,
-    DUALGATE,
-    METAL1,
-    METAL1_LABEL,
-    METAL2,
-    METAL3,
-    METAL4,
-    METAL5,
-    METAL5_LABEL,
-    NPLUS,
-    PAD_LAYER,
-    PPLUS,
-    VIA1,
-    VIA2,
-    VIA3,
-    VIA4,
-    _box,
-    layer_cache,
-)
+from gf180_layers import DBU, layer_cache
 
-# Shared drawing helpers, fold arithmetic and pad/strap constants (issue #262);
-# re-exported here under their original names.
-from pad_ring_cells import (  # noqa: F401 -- re-exported; single source (issue #262)
-    CONTACT_SIZE,
+# Shared drawing helpers, fold arithmetic and pad/strap constants (issue #262).
+from pad_ring_cells import (
     DEFAULT_BUS_WIDTH_UM,
     DVDD_BAND,
     DVSS_BAND,
     FINGER_DEPTH,
     FINGER_L,
-    FINGER_PITCH,
     MAX_FINGERS_PER_ROW,
-    PAD_OPENING_MARGIN,
     PAD_SIDE,
     PAD_VIA_GAP_UM,
-    ROW_GAP_UM,
-    STRAP_STITCH_PITCH_UM,
     _draw_production_pad,
     _draw_ring_strap,
     _draw_substrate_tap,

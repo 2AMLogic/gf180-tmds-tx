@@ -77,8 +77,8 @@ class DR0011ConstantsTest(unittest.TestCase):
         # <=2 pF budget against. Landing it here (#149) means adopting
         # these exactly.
         self.assertEqual(gen.PAD_SIDE, 25.0)
-        self.assertEqual(gen.PAD_OPENING_MARGIN, 2.5)
-        self.assertGreater(gen.PAD_OPENING_MARGIN, 2.0)  # pad.enclosing.metal5.1 floor
+        self.assertEqual(cells.PAD_OPENING_MARGIN, 2.5)
+        self.assertGreater(cells.PAD_OPENING_MARGIN, 2.0)  # pad.enclosing.metal5.1 floor
 
     def test_pad_struct_oy_clears_the_dvdd_strap_band(self):
         # Issue #143's second required change: raised from 25.0 (which put
@@ -206,7 +206,7 @@ class VddClampGeometryTest(unittest.TestCase):
 
     def test_via_cuts_are_the_fixed_026um_square(self):
         # via*.width.1 is a fixed 0.26 x 0.26 um square at every level.
-        self.assertAlmostEqual(gen.VIA_SIZE, 0.26)
+        self.assertAlmostEqual(cells.VIA_SIZE, 0.26)
         self.assertAlmostEqual(2 * gen.VIA_HALF, 0.26)
 
 
