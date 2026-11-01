@@ -53,6 +53,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
+- **#158**: Champion: Merge-Risk Hold Digest *(curated)*
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
@@ -76,7 +77,7 @@ _None._
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 3 |
+| Curated | 4 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
