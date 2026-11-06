@@ -1,0 +1,12 @@
+{
+  "rows": [
+    {"id": "pixel-clock-720p60", "class": "timing, corner-bounded", "reason": "Deterministic clock-period constraint; closed by klt sta at five corners (item 5.digital), not a distribution claim"},
+    {"id": "pixel-clock-480p", "class": "timing, corner-bounded", "reason": "Deterministic clock-period constraint; the 720p60 period is tighter and its five-corner klt sta closure (item 5.digital) bounds it"},
+    {"id": "serialization-10-bit-character", "class": "functional, deterministic", "reason": "Exact bit-level function of the inputs, checked by verification/tmds_encoder against a reference model"},
+    {"id": "supply-domain-3v3", "class": "corner-bounded", "reason": "Library corner selection; covered by the five 3.3 V corners of the klt sta run (item 5.digital)"},
+    {"id": "encoding-function-dvi-1.0", "class": "functional, deterministic", "reason": "Bit-exact equivalence to the DVI 1.0 algorithm, checked by verification/tmds_encoder and klt functional-verification (zero-delay)"},
+    {"id": "control-characters", "class": "functional, deterministic", "reason": "Fixed four-symbol table selected by control inputs, checked by verification/tmds_encoder"},
+    {"id": "latency-four-clock", "class": "functional, deterministic", "reason": "Integer cycle count, exact by construction and checked by verification/tmds_encoder"},
+    {"id": "dvi-mode-framing", "class": "scope, deterministic", "reason": "A boundary statement with no measured quantity; nothing varies from sample to sample"}
+  ]
+}

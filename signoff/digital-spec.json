@@ -1,0 +1,21 @@
+{
+  "status": "ratified",
+  "block": "tmds_encoder",
+  "sources": [
+    "spec/tmds-tx.md section 1 (RATIFIED 2026-08-05)",
+    "spec/tmds-tx.md DR-0003 (Accepted)",
+    "spec/tmds-tx.md DR-0008 (Accepted; latency superseded by DR-0009)",
+    "spec/tmds-tx.md DR-0009 (Accepted)",
+    "spec/decisions/0016-dvi-mode-framing-and-data-island-boundary.md (Accepted)"
+  ],
+  "rows": [
+    {"id": "pixel-clock-720p60", "source": "spec/tmds-tx.md section 1", "text": "Pixel clock 74.25 MHz at the 720p60 target"},
+    {"id": "pixel-clock-480p", "source": "spec/tmds-tx.md section 1", "text": "Pixel clock 27.000 MHz (nominal) at the 480p fallback"},
+    {"id": "serialization-10-bit-character", "source": "spec/tmds-tx.md section 1, DR-0003", "text": "10:1 serialization: eight data bits plus two control bits form one 10-bit TMDS character per lane per pixel clock"},
+    {"id": "supply-domain-3v3", "source": "spec/tmds-tx.md DR-0003", "text": "Synthesized domain runs on the 3.3 V library corners (3v00, 3v30, 3v60)"},
+    {"id": "encoding-function-dvi-1.0", "source": "spec/tmds-tx.md DR-0009", "text": "DVI 1.0 section 3.3 encoding function is preserved bit-for-bit across the pipeline restructuring"},
+    {"id": "control-characters", "source": "spec/tmds-tx.md DR-0009, DR-0016", "text": "The four DVI control characters are emitted when data enable is low"},
+    {"id": "latency-four-clock", "source": "spec/tmds-tx.md DR-0009", "text": "Registered latency from data, de and ctrl to tmds is four clock cycles"},
+    {"id": "dvi-mode-framing", "source": "spec/decisions/0016-dvi-mode-framing-and-data-island-boundary.md", "text": "DVI-mode framing: video and control periods only; data islands are outside this block's boundary"}
+  ]
+}

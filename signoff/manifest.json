@@ -43,6 +43,18 @@
         "file": "flow/tmds_encoder/klt_fv_zero_delay.json"
       }
     ],
+    "6.digital": {
+      "not_applicable": {
+        "spec": {
+          "file": "signoff/digital-spec.json",
+          "content_hash": "sha256:c471cc911a1678a3ad965b7af5fb1b887e9ae2f4920ae164c19ea84409fea0c1"
+        },
+        "statement": {
+          "file": "signoff/item6-digital-na.json",
+          "content_hash": "sha256:3edf22926f579c154501bbf28efea1a7a4a5ed8810ca77ba69873c828f75957c"
+        }
+      }
+    },
     "8": {
       "file": "signoff/characterization-envelope.json",
       "content_hash": "sha256:54feccf84ba057221fa9396dd409f17e35a1293f7feb454239c84a553250faa8"
