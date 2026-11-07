@@ -336,6 +336,7 @@ def build_record(
     statistical_convention: str = "",
     subset_reason: str = "",
     git: dict | None = None,
+    backend: str = "local",
 ) -> dict:
     measure_names = list(tb.measure)
     summary = summarize(results, measure_names)
@@ -364,6 +365,13 @@ def build_record(
 
     rates = sorted({p.rate_mbps for p in points if p.rate_mbps is not None})
 
+    env = environment(pdk, ngspice, repo_root, git)
+    if backend != "local":
+        # A batch-run record is told apart from a local one by its backend and
+        # per-point job ids; `ngspice` is the version the runner reported.
+        env["backend"] = backend
+        env["batch_job_ids"] = {r.point.corner_id: r.job_id for r in results if r.job_id}
+
     return {
         "record_id": record_id,
         "experiment": tb.experiment,
@@ -376,7 +384,7 @@ def build_record(
         "subset_reason": subset_reason,
         "matrix": matrix_conformance(tb, points),
         "testbench": tb.provenance(),
-        "environment": environment(pdk, ngspice, repo_root, git),
+        "environment": env,
         "grid": {
             "corners": corners,
             "temperatures_c": sorted({p.temp_c for p in points}),
@@ -657,6 +665,14 @@ def render_record(record: dict, experiment: str) -> str:
         f"- PDK: {pdk.get('variant')} @ open_pdks `{pdk.get('open_pdks_version')}`"
         f" ({pdk.get('path')}, found via {pdk.get('discovered_via')})",
         f"- ngspice: {env['ngspice']}",
+    ]
+    if env.get("backend"):
+        lines.append(
+            f"- Backend: {env['backend']}; the ngspice version above is the one the runner reported"
+        )
+        for corner_id, job_id in env.get("batch_job_ids", {}).items():
+            lines.append(f"  - batch job `{job_id}`: `{corner_id}`")
+    lines += [
         f"- Harness: sim/harness {env['harness_version']}, python {env['python']}",
         f"- git: `{git['commit']}` on `{git['branch']}`"
         + (" (dirty)" if git["dirty"] else " (clean)"),

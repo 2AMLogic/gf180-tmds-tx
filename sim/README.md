@@ -259,6 +259,40 @@ A testbench is free to name a different pattern string; these two are simply
 the ones this convention gives a name to so future testbenches do not each
 invent their own vocabulary.
 
+## Batch backend (`--backend batch`)
+
+Dispatch workers must not hand-launch `ngspice -b` grids, so the harness can
+also run each PVT point through `klt sim --backend batch` (the Spot batch
+fleet). Implemented in `sim/harness/batch.py`; the default remains
+`--backend local` and is unchanged.
+
+```
+python3 sim/run_corners.py esd-clamp-cv --backend batch --dry-run   # print requests, submit nothing
+python3 sim/run_corners.py esd-clamp-cv --backend batch             # submit one job per PVT point
+```
+
+- **One `klt sim` request per `PvtPoint`**, built from the same pieces
+  `compose_deck` uses: the `.param` block, the PDK design include, the DUT and
+  testbench includes and `tb.measure` go into a generated circuit body; the
+  PDK model library, the corner's `.lib` sections, the temperature, the
+  analysis and the measurements go into the request. `--dry-run` prints every
+  request and submits nothing (it needs no ngspice).
+- Every submit passes `--wait-for-capacity 600` (and sets
+  `batch.capacity_wait_s`); at most two submits are in flight.
+- **No local fallback.** A submit failure, an unparseable report, a missing
+  or duplicate corner, or a missing measurement makes that point `error`/
+  `failed`, so the record's status is `error` and never `pass`. A grid that
+  is not accounted for exactly once is refused (`batch.assemble`).
+- **Record differences.** A batch record carries `environment.backend:
+  batch`, a `batch job` line per corner, and the ngspice version the runner
+  reported (not this host's). Otherwise the record format is unchanged, so
+  `check_records.py` and `check_record_citations.py` apply as before.
+- Limits: one analysis per testbench (the `klt sim` request contract); a
+  result reproduces the local one only if the fleet's ngspice/PDK resolve the
+  same models. Known gap: a binned `nfet_03v3` device with a large total
+  width can fail on the fleet with `could not find a valid modelname` while
+  the same deck passes locally (see issue #229).
+
 ## Append-only rule
 
 `records/*.md` files are never edited or deleted after creation. A re-run or

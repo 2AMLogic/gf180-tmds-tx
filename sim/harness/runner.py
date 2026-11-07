@@ -211,6 +211,10 @@ class PointResult:
     deck: str = ""
     log: str = ""
     message: str = ""
+    # Batch backend only (sim/harness/batch.py); empty for a local run.
+    backend: str = "local"
+    job_id: str = ""
+    engine_version: str = ""
 
     def as_dict(self) -> dict:
         record = self.point.as_dict()
@@ -227,6 +231,9 @@ class PointResult:
             record["missing_measurements"] = self.missing
         if self.message:
             record["message"] = self.message
+        if self.backend != "local":
+            record["backend"] = self.backend
+            record["batch_job_id"] = self.job_id
         return record
 
 
