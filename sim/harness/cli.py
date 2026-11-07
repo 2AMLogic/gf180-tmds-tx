@@ -26,6 +26,7 @@ from . import (
     runner,
     testbench as tb_mod,
 )
+from . import batch as batch_mod
 from .pdk import PdkNotFound, find_pdk
 from .runner import NgspiceMissing
 
@@ -131,6 +132,19 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="MBPS",
         help="bit rates in Mbps/lane (overrides the manifest's 'rates_mbps'; "
         "only meaningful for a testbench that declares a rate axis)",
+    )
+    parser.add_argument(
+        "--backend",
+        choices=("local", "batch"),
+        default="local",
+        help="where the points run: 'local' (ngspice on this host, default) or "
+        "'batch' (klt sim --backend batch on the Spot fleet; never falls back to local)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the klt sim request for every point and submit nothing "
+        "(requires --backend batch)",
     )
     parser.add_argument("-j", "--jobs", type=int, default=0, help="parallel ngspice runs")
     parser.add_argument(
@@ -246,9 +260,14 @@ def run(args: argparse.Namespace) -> int:
     tb_path = _resolve_tb_path(args.testbench)
     tb = tb_mod.load(tb_path, dut=args.dut)
 
+    if args.dry_run and args.backend != "batch":
+        print("error: --dry-run is only meaningful with --backend batch", file=sys.stderr)
+        return EXIT_ENVIRONMENT
+    batch = args.backend == "batch"
     try:
         pdk = find_pdk()
-        ngspice = runner.ngspice_version()
+        # The batch runner reports its own ngspice version; none runs here.
+        ngspice = "pending (batch runner)" if batch else runner.ngspice_version()
     except (PdkNotFound, NgspiceMissing) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_ENVIRONMENT
@@ -268,7 +287,7 @@ def run(args: argparse.Namespace) -> int:
     # than quietly banking weak evidence.
     conformance = report.matrix_conformance(tb, points)
     subset_reason = args.subset_reason or tb.subset_reason
-    if not args.no_write and not conformance["full"] and not subset_reason:
+    if not args.no_write and not args.dry_run and not conformance["full"] and not subset_reason:
         print(
             "error: this run is a subset of the PVT matrix CLAUDE.md mandates:\n  - "
             + "\n  - ".join(conformance["missing"])
@@ -277,6 +296,15 @@ def run(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         return EXIT_ENVIRONMENT
+
+    if args.dry_run:
+        try:
+            print(batch_mod.dry_run_text(tb, pdk, points, args.timeout), end="")
+        except batch_mod.BatchError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return EXIT_ENVIRONMENT
+        print(f"# {len(points)} request(s); nothing submitted", file=sys.stderr)
+        return EXIT_OK
 
     # Raw logs are stored through the artifact broker, never committed. Fail
     # before simulating if that is impossible (no option commits bytes).
@@ -292,6 +320,8 @@ def run(args: argparse.Namespace) -> int:
     records_dir = experiment_dir / report.RECORDS_DIR
 
     jobs = args.jobs or min(8, (os.cpu_count() or 2))
+    if batch:
+        jobs = min(jobs, batch_mod.MAX_IN_FLIGHT)
     started = _dt.datetime.now(_dt.timezone.utc)
     # Sample git state *before* the run: the harness writes its own per-corner
     # logs into the tracked evidence tree, so sampling afterwards would mark
@@ -305,7 +335,9 @@ def run(args: argparse.Namespace) -> int:
         print(f"experiment: {tb.experiment}"
               + (f"  ({tb.description})" if tb.description else ""))
         print(f"pdk       : {pdk.variant} @ {pdk.version}  ({pdk.path})")
-        print(f"ngspice   : {ngspice}")
+        print(f"backend   : {args.backend}")
+        if not batch:
+            print(f"ngspice   : {ngspice}")
         if tb.dut is not None:
             print(f"dut       : {tb.dut_path}  ({tb.dut_provenance_class})")
         print(f"corners   : {', '.join(c.name for c in corner_list)}")
@@ -338,7 +370,8 @@ def run(args: argparse.Namespace) -> int:
 
     wall_start = time.monotonic()
     try:
-        results = runner.run_grid(
+        grid_runner = batch_mod.run_grid if batch else runner.run_grid
+        results = grid_runner(
             tb,
             pdk,
             points,
@@ -351,6 +384,12 @@ def run(args: argparse.Namespace) -> int:
     except NgspiceMissing as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_ENVIRONMENT
+    except batch_mod.BatchError as exc:
+        # Never fall back to a local run: report and stop.
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_SIM_ERROR
+    if batch:
+        ngspice = batch_mod.engine_summary(results)
     wall = time.monotonic() - wall_start
 
     record = report.build_record(
@@ -368,6 +407,7 @@ def run(args: argparse.Namespace) -> int:
         statistical_convention=args.statistical_convention,
         subset_reason=subset_reason,
         git=git,
+        backend=args.backend,
     )
 
     print()
