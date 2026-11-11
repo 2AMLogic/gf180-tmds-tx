@@ -24,6 +24,7 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
+- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim`
 
 ## Ready
 
@@ -57,6 +58,7 @@ Issues carrying `loom:curated`.
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
+- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -72,12 +74,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
+| Important | 2 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 4 |
+| Curated | 5 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

@@ -5,6 +5,16 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-11-07
+
+- **PR #300**: feat(sim): add klt batch backend to the PVT harness
+- **PR #298**: Bump Repo Skills 0.25.1 -> 0.25.10
+
+### 2026-11-06
+
+- **PR #297**: feat(signoff): record not_applicable for item 6 digital partition
+- **Issue #296** (closed): T1 item 6 (digital): record the not_applicable outcome for the tmds_encoder partition
+
 ### 2026-11-01
 
 - **PR #256**: feat(sim): store raw run logs via klt artifact, commit only a manifest
