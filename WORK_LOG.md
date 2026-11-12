@@ -5,6 +5,10 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-11-12
+
+- **PR #302**: Bump Repo Skills 0.25.10 -> 0.26.1
+
 ### 2026-11-07
 
 - **PR #300**: feat(sim): add klt batch backend to the PVT harness
