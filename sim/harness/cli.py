@@ -323,9 +323,10 @@ def run(args: argparse.Namespace) -> int:
     if batch:
         jobs = min(jobs, batch_mod.MAX_IN_FLIGHT)
     started = _dt.datetime.now(_dt.timezone.utc)
-    # Sample git state *before* the run: the harness writes its own per-corner
-    # logs into the tracked evidence tree, so sampling afterwards would mark
-    # every record as taken against a dirty tree.
+    # Sample git state *before* the run: the record must describe the tree
+    # the netlist was generated from. (Raw per-corner logs are staged under
+    # the git-ignored scratch root and stored via the artifact broker, so
+    # the run itself never dirties the tracked tree.)
     git = report.git_provenance(REPO_ROOT)
     record_id = report.allocate_record_id(REPO_ROOT, records_dir, started, git=git)
     workdir = WORK_DIR / tb.experiment / record_id

@@ -335,9 +335,11 @@ def run_point(
 
     ``workdir`` holds the generated deck (scratch, disposable). ``log_dir``
     -- when given -- is where the raw ngspice output lands as
-    ``<corner-id>.log``; that is the ``sim/<slug>/corners/<record-id>/``
-    directory from ``sim/README.md``. It defaults to ``workdir`` so a
-    throwaway run does not touch the evidence tree.
+    ``<corner-id>.log``; callers pass the git-ignored stage directory from
+    ``evidence_store.stage_dir`` -- raw logs are stored via the artifact
+    broker, never committed (see ``sim/README.md``'s "Stored evidence
+    (manifest-forward)" block). It defaults to ``workdir`` so a throwaway
+    run does not touch the evidence tree.
     """
     workdir.mkdir(parents=True, exist_ok=True)
     log_dir = workdir if log_dir is None else log_dir
