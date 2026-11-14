@@ -196,6 +196,28 @@ cross-checks that `transient.tstep_s`/`tstop_s` actually match the `tran`
 line in `analyses` (a drifted-apart pair is exactly the kind of mistake that
 silently invalidates a "the eye is open" claim).
 
+`options` (optional) is a list of raw ngspice option strings, each emitted as
+its own `.options <entry>` line ahead of the tolerances `transient` declares.
+On top of whatever a manifest declares, the harness always appends
+**`.options noinit`** (issue #305), which suppresses ngspice's
+operating-point node table — one line per node, and on a post-layout-extracted
+DUT one line per *parasitic* node, which was ~83% of every log this repo had
+produced and is read by nothing. It removes that one block and nothing else:
+the title, `.temp` and solver lines, `No. of Data Rows`, every warning and
+every `m_*` line are unchanged.
+
+Two escape hatches, both at the testbench's discretion:
+
+| Manifest `options` entry | Effect |
+|---|---|
+| `"noinit=0"` | **Keep** the node table. Consumed by the harness, never emitted — ngspice treats `noinit` as a presence-only flag, so `.options noinit=0` suppresses the table exactly as `.options noinit` does (verified on ngspice-47); the only way to keep it is for no `noinit` to reach the deck. Whitespace- and case-insensitive. |
+| anything else naming `noinit` | The testbench is wording the directive itself: its entry is emitted verbatim and the harness does not add a second one. |
+
+Both netlist-assembly paths — `runner.compose_deck` (local) and
+`batch.compose_body` (batch) — render this block from one shared
+`runner._option_lines`, so a deck and a `klt sim` body can never drift apart
+on what they ask ngspice for.
+
 `claim` is the default for the record's **Claim** field — the ratified spec
 line this experiment substantiates. `--claim` overrides it per run.
 
