@@ -69,7 +69,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install cocotb
-        run: pip install -r verification/tmds_encoder/requirements.txt
+        run: pip install -r verification/requirements.txt
 
       - name: Yosys elaboration smoke check (no vendor extensions)
         run: |
@@ -102,7 +102,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install cocotb
-        run: pip install -r verification/tmds_serializer/requirements.txt
+        run: pip install -r verification/requirements.txt
 
       - name: Yosys elaboration smoke check (no vendor extensions)
         # DR-0014: this stage is not synthesizable at 720p60 on this
@@ -168,7 +168,7 @@ jobs:
           iverilog -V
 
       - name: Install cocotb (item 9's digital cold start)
-        run: pip install -r verification/tmds_encoder/requirements.txt -r verification/tmds_serializer/requirements.txt
+        run: pip install -r verification/requirements.txt
 
       - name: Install the pinned klt grading build
         # The grading surface is `klt signoff --manifest`, which needs no

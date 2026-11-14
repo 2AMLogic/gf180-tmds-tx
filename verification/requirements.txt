@@ -1,0 +1,5 @@
+# Pinned verification toolchain (Python side). One copy at the verification/
+# root: every bench installs this same file, so there is exactly one cocotb
+# version across the repository. See verification/README.md for the pinned
+# Icarus Verilog / Yosys versions this was verified against.
+cocotb==2.0.1
