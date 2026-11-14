@@ -17,14 +17,13 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-_None._
+- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim`
 
 ## Important
 
 `loom:important`; taken before unlabelled work.
 
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
-- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim`
 
 ## Ready
 
@@ -73,8 +72,8 @@ _None._
 | Bucket | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Very important | 0 |
-| Important | 2 |
+| Very important | 1 |
+| Important | 1 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
