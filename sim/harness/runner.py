@@ -41,6 +41,14 @@ every node in an 8-instance copy of the DUT, not just the ~29 nodes any
 available" figure is an internal ngspice allocation-probe result, not this
 machine's real free RAM, which is why the fix is fewer requested vectors,
 not more memory).
+
+A fourth adaptation, added for issue #305: both this module's
+``compose_deck`` and ``batch.compose_body`` render their ``.options`` block
+from one shared ``_option_lines``, which appends ``.options noinit`` so
+ngspice stops printing its operating-point node table into every log. See
+``_option_lines`` for what that removes (one block, nothing else), what it
+provably does not change (every ``m_*`` line the records quote), and the two
+manifest escape hatches.
 """
 
 from __future__ import annotations
@@ -112,6 +120,76 @@ def ngspice_version() -> str:
     return out.strip().splitlines()[0] if out.strip() else "unknown"
 
 
+#: A manifest ``options`` entry of this spelling (whitespace- and
+#: case-insensitive) means "keep ngspice's operating-point node table in this
+#: bench's logs". It is a *harness-level* instruction, not an ngspice
+#: directive, so it is consumed rather than emitted: ngspice treats ``noinit``
+#: as a presence-only flag, and ``.options noinit=0`` suppresses the table
+#: exactly as ``.options noinit`` does (verified on ngspice-47 on the dispatch
+#: host), so the only way to keep the table is for no ``noinit`` to reach the
+#: deck at all.
+KEEP_OP_POINT_TABLE_OPTION = "noinit=0"
+
+#: Suppresses ngspice's "Initial Transient Solution" node table -- one line
+#: per node in the circuit, printed into every transient log by default.
+NOINIT_OPTION = "noinit"
+
+
+def _normalized_option(option: str) -> str:
+    """``" noinit = 0 "`` -> ``"noinit=0"`` -- for comparing a manifest
+    ``options`` entry against a known spelling without caring about the
+    spacing or case the manifest happened to use."""
+    return "".join(str(option).split()).lower()
+
+
+def _option_lines(tb: Testbench) -> list[str]:
+    """The ``.options`` block a deck for this testbench carries: the
+    testbench's own declared options, the tolerances its ``transient`` block
+    declares, and ``.options noinit``.
+
+    Shared by ``compose_deck`` (local backend) and ``batch.compose_body``
+    (batch backend) so the two netlist-assembly paths cannot drift apart on
+    what a deck asks ngspice for.
+
+    ``.options noinit`` (issue #305) suppresses ngspice's operating-point
+    node table. On a post-layout-extracted DUT that table is one line per
+    parasitic node and almost the whole log -- 76.8 MB of the 92.7 MB this
+    repo's 1211 committed logs hold, ~83% -- while nothing in the tree reads
+    it: every value the records quote is parsed off the ``m_*`` lines
+    (``_MEASURE_RE``). Suppressing it changes no measured result. It is the
+    one block the directive removes, verified on ngspice-47: the title,
+    ``.temp`` line, solver line, ``No. of Data Rows``, every ngspice warning
+    and every ``m_*`` value are identical with and without it, and an ``op``
+    or ``dc`` deck's output is byte-identical either way.
+
+    Two escape hatches, both at the testbench's discretion:
+
+    * ``"options": ["noinit=0"]`` -- keep the table (a debug bench reading
+      node voltages out of the log rather than out of a ``measure`` entry).
+      See ``KEEP_OP_POINT_TABLE_OPTION``.
+    * any other ``options`` entry mentioning ``noinit`` -- the testbench is
+      wording the directive itself, so the harness emits its entry verbatim
+      and does not add a second one.
+    """
+    declared = [
+        option
+        for option in tb.options
+        if _normalized_option(option) != KEEP_OP_POINT_TABLE_OPTION
+    ]
+    keep_op_point_table = len(declared) != len(tb.options)
+
+    lines = [f".options {option}" for option in declared]
+    for key in ("reltol", "abstol", "vntol"):
+        if key in tb.transient:
+            lines.append(f".options {key}={tb.transient[key]!r}")
+    already_worded = any(
+        NOINIT_OPTION in _normalized_option(option) for option in declared
+    )
+    if not keep_op_point_table and not already_worded:
+        lines.append(f".options {NOINIT_OPTION}")
+    return lines
+
+
 def compose_deck(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
     """Build the complete, self-contained ngspice deck for one PVT point."""
     rate_note = "n/a" if point.rate_mbps is None else f"{point.rate_mbps:g} Mbps/lane"
@@ -147,11 +225,7 @@ def compose_deck(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
         "",
         f".temp {point.temp_c!r}",
     ]
-    for option in tb.options:
-        lines.append(f".options {option}")
-    for key in ("reltol", "abstol", "vntol"):
-        if key in tb.transient:
-            lines.append(f".options {key}={tb.transient[key]!r}")
+    lines += _option_lines(tb)
 
     if tb.dut is not None:
         lines += [

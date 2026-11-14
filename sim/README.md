@@ -109,6 +109,25 @@ sim/
       <record-id>.md                 # append-only summary record
 ```
 
+> **What a per-corner log contains (issue #305).** From this point on the
+> harness emits `.options noinit`, so ngspice no longer prints its
+> operating-point node table ("Initial Transient Solution" -- one line per
+> node, which on a post-layout-extracted DUT is one line per *parasitic*
+> node) into the log. Everything a record quotes is unaffected: the title,
+> the `.temp` and solver lines, `No. of Data Rows`, every ngspice warning and
+> every `m_*` measurement line are identical with and without the directive,
+> and this is the only block it removes (verified on ngspice-47 by running one
+> corner of `smoke-cml-pair` both ways -- the `m_*` block is byte-identical
+> and matches the committed `20260808-032312-430859a` log). A log is therefore
+> no longer byte-verbatim ngspice *default* output; it is verbatim output of a
+> deck that asks ngspice to print less. A debug testbench that genuinely needs
+> the node table opts out with `"options": ["noinit=0"]` (see
+> `sim/harness/README.md`).
+>
+> **Forward-only.** Nothing already committed under `corners/<record-id>/` is
+> touched, re-generated or trimmed -- recorded evidence stays append-only, so
+> logs from earlier records still carry the table.
+
 > **Stored evidence (manifest-forward).** Records minted before this rule keep
 > their raw logs committed under `corners/<record-id>/`. New runs do not: the
 > harness stages the logs in the git-ignored `sim/.work/.stage/`, stores them

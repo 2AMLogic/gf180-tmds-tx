@@ -28,6 +28,7 @@ SIM_DIR = Path(__file__).resolve().parents[1]
 if str(SIM_DIR) not in sys.path:
     sys.path.insert(0, str(SIM_DIR))
 
+from harness import batch as batch_mod  # noqa: E402
 from harness import corners as corners_mod  # noqa: E402
 from harness import evidence_lint as lint_mod  # noqa: E402
 from harness import pdk as pdk_mod  # noqa: E402
@@ -504,6 +505,159 @@ class ComposeDeckSaveLineTests(unittest.TestCase):
         # trise is a raw `meas` fragment -- it prints via `meas` itself, no
         # separate `print` line (see compose_deck's own comment).
         self.assertNotIn("print m_trise", deck)
+
+
+class NoinitOptionTests(unittest.TestCase):
+    """Issue #305: both netlist-assembly paths emit ``.options noinit`` so
+    ngspice stops printing its operating-point node table into every log --
+    76.8 MB of the 92.7 MB this repo's 1211 committed logs hold, a table
+    nothing in the tree reads. ``runner.compose_deck`` (local) and
+    ``batch.compose_body`` (batch) must agree, and a testbench must be able
+    to keep the table.
+
+    Text-only: ``compose_deck``/``compose_body`` render strings, they do not
+    invoke ngspice or read the PDK/netlist files they name.
+    """
+
+    def _pdk(self) -> pdk_mod.Pdk:
+        return pdk_mod.Pdk(
+            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
+        )
+
+    def _point(self) -> corners_mod.PvtPoint:
+        return corners_mod.PvtPoint(
+            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3
+        )
+
+    def _tb(self, **extra) -> tb_mod.Testbench:
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "exp" / "testbench"
+            directory.mkdir(parents=True)
+            (directory / "frag.spice").write_text("* fragment\n")
+            manifest = {
+                "netlist": "frag.spice",
+                "measure": {"vout": "v(out)"},
+                "analyses": ["op"],
+            }
+            manifest.update(extra)
+            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
+            return tb_mod.load(directory)
+
+    def _both(self, **extra) -> tuple[list[str], list[str]]:
+        """The ``.options`` lines each backend renders for the same testbench."""
+        tb = self._tb(**extra)
+        pdk, point = self._pdk(), self._point()
+        deck = runner_mod.compose_deck(tb, pdk, point)
+        body = batch_mod.compose_body(tb, pdk, point)
+        return (
+            [ln.strip() for ln in deck.splitlines() if ln.strip().startswith(".options")],
+            [ln.strip() for ln in body.splitlines() if ln.strip().startswith(".options")],
+        )
+
+    def test_both_backends_emit_noinit_by_default(self):
+        deck_opts, body_opts = self._both()
+        self.assertIn(".options noinit", deck_opts)
+        self.assertIn(".options noinit", body_opts)
+
+    def test_both_backends_emit_the_same_options_block(self):
+        # The anti-drift assertion: one helper feeds both paths, so a deck and
+        # a batch body can never disagree about what they ask ngspice for.
+        deck_opts, body_opts = self._both(
+            rates_mbps=[742.5],
+            transient={
+                "tstep_s": 1e-11,
+                "tstop_s": 6.1e-08,
+                "tmax_s": 2e-11,
+                "reltol": 1e-06,
+                "abstol": 1e-09,
+                "vntol": 1e-06,
+            },
+            analyses=["tran 10e-12 61e-9 0 20e-12"],
+        )
+        self.assertEqual(deck_opts, body_opts)
+
+    def test_noinit_follows_the_declared_transient_tolerances(self):
+        # The directive is appended after the tolerances, so the existing
+        # reltol/abstol/vntol provenance lines are unchanged and still present.
+        deck_opts, body_opts = self._both(
+            rates_mbps=[742.5],
+            transient={
+                "tstep_s": 1e-11,
+                "tstop_s": 6.1e-08,
+                "tmax_s": 2e-11,
+                "reltol": 1e-06,
+                "abstol": 1e-09,
+                "vntol": 1e-06,
+            },
+            analyses=["tran 10e-12 61e-9 0 20e-12"],
+        )
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(
+                opts,
+                [
+                    ".options reltol=1e-06",
+                    ".options abstol=1e-09",
+                    ".options vntol=1e-06",
+                    ".options noinit",
+                ],
+            )
+
+    def test_a_manifest_options_entry_keeps_its_place_and_wording(self):
+        deck_opts, body_opts = self._both(options=["gmin=1e-13", "method=gear"])
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(
+                opts,
+                [".options gmin=1e-13", ".options method=gear", ".options noinit"],
+            )
+
+    def test_noinit_zero_manifest_entry_keeps_the_op_point_table(self):
+        # ngspice's `noinit` is a presence-only flag -- `.options noinit=0`
+        # suppresses the table exactly as `.options noinit` does -- so the
+        # opt-out has to be consumed by the harness, never passed through.
+        deck_opts, body_opts = self._both(options=["noinit=0"])
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(opts, [])
+
+    def test_noinit_zero_opt_out_is_whitespace_and_case_insensitive(self):
+        deck_opts, body_opts = self._both(options=[" NoInit = 0 "])
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(opts, [])
+
+    def test_noinit_zero_opt_out_leaves_other_declared_options_alone(self):
+        deck_opts, body_opts = self._both(options=["gmin=1e-13", "noinit=0"])
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(opts, [".options gmin=1e-13"])
+
+    def test_a_testbench_wording_noinit_itself_is_not_given_a_second_one(self):
+        deck_opts, body_opts = self._both(options=["noinit"])
+        for opts in (deck_opts, body_opts):
+            self.assertEqual(opts, [".options noinit"])
+
+    def test_noinit_does_not_change_which_measurements_are_printed(self):
+        # The suppression must be invisible to every `let`/`print`/`meas`
+        # line -- the `m_*` lines are what `_MEASURE_RE` parses out of the log.
+        tb = self._tb(
+            measure={
+                "swing": "v(outp)-v(outn)",
+                "trise": "TRIG v(vd) VAL=-0.4 RISE=1 TARG v(vd) VAL=0.4 RISE=1",
+            }
+        )
+        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        self.assertIn("let m_swing = v(outp)-v(outn)", deck)
+        self.assertIn("print m_swing", deck)
+        self.assertIn(
+            "meas tran m_trise TRIG v(vd) VAL=-0.4 RISE=1 TARG v(vd) VAL=0.4 RISE=1",
+            deck,
+        )
+
+    def test_noinit_precedes_the_control_block(self):
+        # `.options` is a deck-level directive: it must land before `.control`,
+        # not inside it.
+        tb = self._tb()
+        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        lines = deck.splitlines()
+        noinit_idx = lines.index(".options noinit")
+        self.assertLess(noinit_idx, lines.index(".control"))
 
 
 class DeviceEvidenceAppendOnlyTests(unittest.TestCase):
