@@ -125,7 +125,7 @@ the exact grading code, so the pin is auditable:
 ```bash
 python3 -m venv .venv-klt && .venv-klt/bin/pip install \
   "klayout-tools==0.8.0"
-.venv-klt/bin/pip install -r verification/tmds_encoder/requirements.txt -r verification/tmds_serializer/requirements.txt
+.venv-klt/bin/pip install -r verification/requirements.txt
 export PATH="$PWD/.venv-klt/bin:$PATH"
 python3 signoff/gen_characterization_envelope.py   # if item 8's input changed
 python3 signoff/derived_stamps.py --refresh        # if a design source/netlist moved (runs klt netlist --check)

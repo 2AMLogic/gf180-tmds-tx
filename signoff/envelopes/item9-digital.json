@@ -3,15 +3,22 @@
   "kind": "generic",
   "status": "pass",
   "t1_item": 9,
-  "summary": "T1 item 9 (Testbenches shipped): 14/14 attestation checks passed (klt signoff --attest)",
+  "summary": "T1 item 9 (Testbenches shipped): 13/13 attestation checks passed (klt signoff --attest)",
   "source": "signoff/attest/item9-digital.json",
   "attestation": {
     "producer": "klt signoff --attest",
     "inventory_schema_version": 1,
     "hash_algorithm": "sha256-raw-bytes",
-    "check_count": 14,
-    "passed_count": 14,
+    "check_count": 13,
+    "passed_count": 13,
     "checks": [
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "verification/requirements.txt",
+        "passed": true,
+        "content_hash": "sha256:1baa4d37562e52bb4e45bbe28e17bd7a4f54032a20ffd5cfde203607f17048df"
+      },
       {
         "check": "present",
         "role": "testbench",
@@ -22,16 +29,9 @@
       {
         "check": "present",
         "role": "testbench",
-        "path": "verification/tmds_encoder/requirements.txt",
-        "passed": true,
-        "content_hash": "sha256:30631123a6e28cf65c41b81b4c7be2d822e0ed971948fbb599e889900375842c"
-      },
-      {
-        "check": "present",
-        "role": "testbench",
         "path": "verification/tmds_encoder/runner.py",
         "passed": true,
-        "content_hash": "sha256:170b372e32bcfebf79e8299691ccd20f195335ce72fb5df8592b9024b93f1a73"
+        "content_hash": "sha256:a7d5c4bb702c88069ea5a21d43ca432ef7e4ee97339c7e998c6e1530f646b0e4"
       },
       {
         "check": "present",
@@ -57,16 +57,9 @@
       {
         "check": "present",
         "role": "testbench",
-        "path": "verification/tmds_serializer/requirements.txt",
-        "passed": true,
-        "content_hash": "sha256:46914e1b0b88032ac32a24a64ca0f225d80d63c1777d64d068671ef530c3af33"
-      },
-      {
-        "check": "present",
-        "role": "testbench",
         "path": "verification/tmds_serializer/runner.py",
         "passed": true,
-        "content_hash": "sha256:e841ce3d61d1dd328cbca9324e41852d51cd9c4f7e3673d06be4978dbd268c6a"
+        "content_hash": "sha256:823194ed0d05bbb718d18d5f8dcddb3669f68f21f363ae07712ad4d819ba84de"
       },
       {
         "check": "present",
@@ -131,7 +124,7 @@
         "path": "signoff/attest/item9-digital.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:58868d12f22291b915e33a8486b1d9f9ad5f6b3c32d9c978ae891d014361d4a8"
+      "content_hash": "sha256:e1c247e5b49a86999bb5d6f92278eab82a52cfdbdb8c5d15df47d36ac2fd295c"
     }
   }
 }
