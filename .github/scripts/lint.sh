@@ -141,6 +141,16 @@ if ! python3 layout/scripts/gen_pad_ring_assembly_dut.py --check; then
   echo "  regenerate with: python3 layout/scripts/gen_pad_ring_assembly_dut.py"
   status=1
 fi
+# Same check for layout/sim/tmds_final_mux_dut.spice (issue #311), mechanically
+# derived from the schematic-equivalent extraction layout/gds/tmds_final_mux.spice.
+# This one also renames the inner extracted subcircuit: the extracted cell and
+# the schematic cell share the name tmds_final_mux, and two same-named .subckt
+# definitions in one deck are resolved silently by ngspice rather than reported.
+if ! python3 layout/scripts/gen_tmds_final_mux_dut.py --check; then
+  echo "FAIL: layout/sim/tmds_final_mux_dut.spice is stale"
+  echo "  regenerate with: python3 layout/scripts/gen_tmds_final_mux_dut.py"
+  status=1
+fi
 
 echo
 echo "== 5/8 evidence records (sim/*/records) =="
