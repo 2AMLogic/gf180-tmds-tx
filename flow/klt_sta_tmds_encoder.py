@@ -41,13 +41,24 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(REPO_ROOT / "flow"))
+
+import synth_tmds_encoder as synth  # noqa: E402  (reuses STD_CELL_LIB, TARGET_PERIOD_NS)
+import sta_tmds_encoder as sta  # noqa: E402  (reuses CORNERS)
+
 FLOW_DIR = REPO_ROOT / "flow" / "tmds_encoder"
 BUILD_DIR = REPO_ROOT / "flow" / "build" / "klt"
 OUT_PATH = FLOW_DIR / "klt_sta.json"
 
-CELL_LIBRARY = "gf180mcu_fd_sc_mcu9t5v0"
-CORNERS = ["tt_025C_3v30", "ss_125C_3v00", "ss_n40C_3v00", "ff_125C_3v60", "ff_n40C_3v60"]
-CLOCK_PERIOD_NS = 13.4680  # 720p60, 74.25 MHz
+# The three physical constants of this request are the flow family's, not this
+# wrapper's: a ratified change to the pixel clock or the cell library must not
+# be able to move the rest of `flow/` while the graded `klt sta` envelope stays
+# pinned to a stale value. `sta.CORNERS` is (name, description) pairs; `klt sta`
+# takes bare names, so project the first element and keep the order.
+CELL_LIBRARY = synth.STD_CELL_LIB
+CORNERS = [c[0] for c in sta.CORNERS]
+CLOCK_PERIOD_NS = synth.TARGET_PERIOD_NS  # 720p60, 74.25 MHz -> 13.4680 ns
 
 
 def build_request() -> dict:
