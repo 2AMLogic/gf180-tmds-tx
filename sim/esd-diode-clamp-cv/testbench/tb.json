@@ -1,7 +1,7 @@
 {
   "name": "esd-diode-clamp-cv",
-  "description": "Issue #87: small-signal AC capacitance at the PAD node of the diode_nd2ps_06v0 ESD clamp from layout/gds/gf180_tmds_pad_v2.gds (DR-0011's ratified clamp device), as a function of device size, at 0 V and at the TMDS operating bias, across the full PVT matrix. Diode counterpart of sim/esd-clamp-cv (issue #12's GGNMOS study); feeds the redesigned verdict in design/esd-capacitance-budget.md. Not itself an ESD qualification (no tester, no parts).",
-  "claim": "spec/decisions/0011-pad-esd-strategy.md -- the <=2 pF/pad budget (ESD clamp + pad parasitic combined, carried forward unrelaxed from DR-0005), specifically the diode clamp's own junction-capacitance contribution as a function of clamp size, at both 0 V and the DR-0002/DR-0006 2.8-3.3 V operating bias.",
+  "description": "Issues #87 and #312: small-signal AC capacitance at the PAD node of DR-0011's ratified diode ESD clamps, across the full PVT matrix. VSS-side leg (#87): diode_nd2ps_06v0 from layout/gds/gf180_tmds_pad_v2.gds, as a function of device size, at 0 V and at the TMDS operating bias -- cap_{base,w222,w444}_{0v,opv}, whose _0v/_opv suffixes name the JUNCTION state. VDD-side leg (#312): diode_pd2nw_06v0 from layout/gds/gf180_tmds_pad_ring_assembly.gds (issue #210) at its one drawn size (area=40p pj=120u) -- cap_pd2nw_base_{pad0v,padopv}, whose suffixes name the PAD voltage, because that clamp's anode is the pad and its cathode is VDD, so its junction bias is inverted relative to nd2ps and it peaks at the OPPOSITE end of the pad-voltage axis (padopv = 0 V junction = max C = the budget-binding point). The pd2nw branches have NO RECORD yet -- nothing under records/ measures them and design/esd-capacitance-budget.md Sec.10.5a still bounds rather than measures that junction; running the grid is issue #222. Diode counterpart of sim/esd-clamp-cv (issue #12's GGNMOS study); feeds the redesigned verdict in design/esd-capacitance-budget.md. Not itself an ESD qualification (no tester, no parts).",
+  "claim": "spec/decisions/0011-pad-esd-strategy.md -- the <=2 pF/pad budget (ESD clamp + pad parasitic combined, carried forward unrelaxed from DR-0005), specifically each diode clamp leg's own junction-capacitance contribution -- the VSS-side nd2ps leg as a function of clamp size, and the VDD-side pd2nw leg at the size issue #210 drew -- at both ends of the pad-voltage axis (0 V and the DR-0002/DR-0006 2.8-3.3 V operating bias).",
   "netlist": "esd_diode_clamp_cv.spice",
   "corners": ["mos"],
   "analyses": [
@@ -13,7 +13,9 @@
     "cap_w222_0v": "abs(imag(i(vpad_w222_0v)))/(2*3.14159265358979*100meg)",
     "cap_w222_opv": "abs(imag(i(vpad_w222_opv)))/(2*3.14159265358979*100meg)",
     "cap_w444_0v": "abs(imag(i(vpad_w444_0v)))/(2*3.14159265358979*100meg)",
-    "cap_w444_opv": "abs(imag(i(vpad_w444_opv)))/(2*3.14159265358979*100meg)"
+    "cap_w444_opv": "abs(imag(i(vpad_w444_opv)))/(2*3.14159265358979*100meg)",
+    "cap_pd2nw_base_pad0v": "abs(imag(i(vpad_pd2nw_base_pad0v)))/(2*3.14159265358979*100meg)",
+    "cap_pd2nw_base_padopv": "abs(imag(i(vpad_pd2nw_base_padopv)))/(2*3.14159265358979*100meg)"
   },
   "checks": {
     "cap_w444_opv": {
