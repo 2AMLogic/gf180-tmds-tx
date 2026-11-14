@@ -50,19 +50,20 @@ the pre-#210 assembly only; later rungs are open. Other state that matters:
 
 ## Now
 
-None of these has an issue yet, and none needs a multi-corner run.
+Each of these now has an issue, filed alongside this pass; none needs a
+multi-corner run.
 
-1. **Extracted DUT for the final mux.** Add a generator that turns
+1. **Extracted DUT for the final mux (#311).** Add a generator that turns
    `layout/gds/tmds_final_mux.spice` into a simulatable fragment, following
    `layout/scripts/gen_cml_driver_core_dut.py`.
    Done when `layout/sim/tmds_final_mux_dut.spice` is committed, the generator
    has a `--check` mode run by the lint job, and a unit test covers it.
-2. **pd2nw branches in the clamp C-V testbench.** Extend
+2. **pd2nw branches in the clamp C-V testbench (#312).** Extend
    `sim/esd-diode-clamp-cv/testbench/` with `diode_pd2nw_06v0` probes at the
    drawn geometry. This is the testbench half of #222; the measurement stays
    there. Done when `sim/run_corners.py esd-diode-clamp-cv --backend batch
    --dry-run` prints requests carrying the new measures and CI is green.
-3. **Point stale references at their live targets.** `signoff/README.md`
+3. **Point stale references at their live targets (#313).** `signoff/README.md`
    still names klayout-tools#3740 (closed, not fixed) as the item 7 digital
    blocker; the live one is klayout-tools#5002. The README repo-layout tree
    omits `signoff/`, `docs/` and `manifests/`.
@@ -113,13 +114,18 @@ None of these has an issue yet, and none needs a multi-corner run.
 
 ## Blocked and waiting
 
-**No open issue is dispatchable today.** All seven are blocked or waiting:
+**Of the seven issues open at `d848ee2` (2026-11-13), none was
+dispatchable.** All seven were blocked or waiting:
 
 - #299 and #229: batch runs abort on model selection, and no numbered issue
   tracks the cause yet. #222 waits on #299, and #230 on #222.
 - #228: klayout-tools#5002. #254: a ruling on where the first real run executes.
 - #158: a maintainer digest issue, not design work.
 - DR-0017, DR-0018, DR-0019: ratification. A Status line is not flipped by hand.
+
+Issues filed after that snapshot are not covered by the list above, and some of
+them are startable — the three `## Now` items (#311, #312, #313) among them.
+For what is dispatchable right now, read the live queue, not this section.
 
 ## Not planned
 
