@@ -92,8 +92,11 @@ from pad_ring_cells import (
     FINGER_DEPTH,
     FINGER_L,
     MAX_FINGERS_PER_ROW,
+    PAD_PITCH_UM,
     PAD_SIDE,
+    PAD_STRUCT_OY_UM,
     PAD_VIA_GAP_UM,
+    RING_DEPTH_UM,
     _draw_production_pad,
     _draw_ring_strap,
     _draw_substrate_tap,
@@ -108,19 +111,12 @@ from pad_ring_cells import (
 # so the refactor (issue #262) leaves its geometry unchanged.
 VIA_HALF = 0.15
 
-# ---------------------------------------------------------------------------
-# DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
-# ring depth, from `gf180mcu_fd_io__bi_t.lef`'s `SIZE 75.000 BY 350.000`.
-# Ratified; this script checks geometry against it and never widens it.
-# ---------------------------------------------------------------------------
-PAD_PITCH_UM = 350.0
-RING_DEPTH_UM = 75.0
-
-# y-origin of each slot's clamp array. The Metal5 plate is centred on the
-# array, so its lower edge is `PAD_STRUCT_OY_UM + array_height/2 - PAD_SIDE/2`;
-# at the single-row minimum that is 18.0 um, clearing DVDD_BAND's 16.0 um top
-# edge by 2.0 um (7x metal5.space.1's 0.28 um floor).
-PAD_STRUCT_OY_UM = 30.0
+# PAD_PITCH_UM / RING_DEPTH_UM / PAD_STRUCT_OY_UM -- DR-0011's ratified 350 um
+# pad pitch / 75 um ring depth (spec/decisions/0011-pad-esd-strategy.md, from
+# `gf180mcu_fd_io__bi_t.lef`'s `SIZE 75.000 BY 350.000`) and the clamp
+# array's y-origin -- are single-sourced in pad_ring_cells.py and imported
+# above (issue #350). Ratified; this study checks geometry against them and
+# never widens them.
 
 
 def fit_report(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> dict[str, object]:

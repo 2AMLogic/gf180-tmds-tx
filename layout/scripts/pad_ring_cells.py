@@ -11,7 +11,10 @@ issue #255).
 
 The fold arithmetic (`clamp_rows`, `_row_span`, `_row_pitch`) and its
 constants moved here from `pad_pitch_fit_study.py` (issue #242's single
-implementation); both generators re-export them under their old names.
+implementation); both generators re-export them under their old names. The
+ratified DR-0011 slot constants (`PAD_PITCH_UM`, `RING_DEPTH_UM`,
+`PAD_STRUCT_OY_UM`) live here too, once (issue #350) -- two copies of a
+ratified number are two places it can silently drift.
 
 Via-cut size is the one deliberately *parameterised* value: the fit study's
 committed GDS/DRC evidence was drawn with 0.30 um cuts while the assembly
@@ -55,6 +58,21 @@ from gf180_layers import (
 
 VIA_SIZE = 0.26  # via*.width.1 is a fixed 0.26 x 0.26um square at every level (klt >= 0.7)
 VIA_HALF = VIA_SIZE / 2  # default cut half-size; callers may pass their own `via_half`
+
+# ---------------------------------------------------------------------------
+# DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
+# ring depth, from `gf180mcu_fd_io__bi_t.lef`'s `SIZE 75.000 BY 350.000`.
+# Ratified; generators check geometry against it and never widen it.
+# ---------------------------------------------------------------------------
+PAD_PITCH_UM = 350.0
+RING_DEPTH_UM = 75.0
+
+# y-origin of each slot's clamp array (single source, issues #262/#350; both
+# generators import it under this name). The Metal5 plate is centred on the
+# array, so its lower edge is `PAD_STRUCT_OY_UM + array_height/2 - PAD_SIDE/2`;
+# at the single-row minimum that is 18.0 um, clearing DVDD_BAND's 16.0 um top
+# edge by 2.0 um (7x metal5.space.1's 0.28 um floor).
+PAD_STRUCT_OY_UM = 30.0
 
 # Ring supply-strap bands (Metal3/Metal4/Metal5, DR-0011's ring-continuity
 # requirement), both comfortably inside RING_DEPTH_UM and clear of the

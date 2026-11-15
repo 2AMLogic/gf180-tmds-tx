@@ -95,9 +95,9 @@ class ClampSizeTest(unittest.TestCase):
 
 
 class ClampRowsTest(unittest.TestCase):
-    """Mirrors pad_pitch_fit_study.py's own ClampRowsTest (issue #143) --
-    same arithmetic, same invariants, pinned here too since `clamp_rows` is
-    what `build()` actually calls."""
+    """The fold's invariants, pinned once (issues #242, #350): `clamp_rows`
+    has a single definition in pad_ring_cells.py which both generators
+    import, and it is what `build()` actually calls."""
 
     def test_rejects_empty_clamp(self):
         for bad in (0, -1):
@@ -124,14 +124,18 @@ class ClampRowsTest(unittest.TestCase):
             self.assertEqual(len(gen.clamp_rows(n)), expected, n)
 
     def test_fold_is_the_study_s_single_implementation(self):
-        """Issues #242/#262: the fold and its constants are imported from
-        pad_ring_cells.py, not copied, so they cannot drift apart."""
+        """Issues #242/#262/#350: the fold, its constants and the ratified
+        DR-0011 slot numbers are imported from pad_ring_cells.py, not
+        copied, so they cannot drift apart."""
         self.assertIs(gen.clamp_rows, study.clamp_rows)
         self.assertIs(gen.clamp_rows, cells.clamp_rows)
         for name in ("_draw_ring_strap", "_draw_substrate_tap", "_draw_production_pad"):
             self.assertIs(getattr(gen, name), getattr(cells, name), name)
             self.assertIs(getattr(study, name), getattr(cells, name), name)
         self.assertEqual(gen.MAX_FINGERS_PER_ROW, study.MAX_FINGERS_PER_ROW)
+        for name in ("PAD_PITCH_UM", "RING_DEPTH_UM", "PAD_STRUCT_OY_UM"):
+            self.assertIs(getattr(gen, name), getattr(cells, name), name)
+            self.assertIs(getattr(study, name), getattr(cells, name), name)
 
 
 class StructWidthTest(unittest.TestCase):

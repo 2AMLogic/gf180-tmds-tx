@@ -69,7 +69,7 @@ from __future__ import annotations
 
 import argparse
 
-from pad_ring_cells import (  # single source (issues #242, #262)
+from pad_ring_cells import (  # single source (issues #242, #262, #350)
     CONTACT_SIZE,
     DEFAULT_BUS_WIDTH_UM,
     DVDD_BAND,
@@ -78,8 +78,11 @@ from pad_ring_cells import (  # single source (issues #242, #262)
     FINGER_L,
     FINGER_PITCH,
     MAX_FINGERS_PER_ROW,
+    PAD_PITCH_UM,
     PAD_SIDE,
+    PAD_STRUCT_OY_UM,
     PAD_VIA_GAP_UM,
+    RING_DEPTH_UM,
     VIA_HALF,
     _draw_production_pad,
     _draw_ring_strap,
@@ -123,20 +126,15 @@ from gf180_layers import (  # shared layer table (issue #255)
 )
 
 
-# ---------------------------------------------------------------------------
-# DR-0011 (spec/decisions/0011-pad-esd-strategy.md): 350um pad pitch / 75um
-# ring depth, from `gf180mcu_fd_io__bi_t.lef`'s `SIZE 75.000 BY 350.000`.
-# ---------------------------------------------------------------------------
-PAD_PITCH_UM = 350.0
-RING_DEPTH_UM = 75.0
-
-# The shared pad/strap constants (DVSS_BAND, DVDD_BAND, STRAP_STITCH_PITCH_UM,
-# PAD_SIDE, PAD_OPENING_MARGIN, PAD_VIA_GAP_UM, FINGER_*, ROW_GAP_UM,
-# DEFAULT_BUS_WIDTH_UM, MAX_FINGERS_PER_ROW), the fold arithmetic
-# (`clamp_rows`, `_row_span`, `_row_pitch`) and the strap / substrate-tap /
-# production-pad drawing helpers have one definition, in pad_ring_cells.py
-# (issue #262; the fold itself was pad_pitch_fit_study.py's, issue #143/#242),
-# shared with pad_pitch_fit_study.py and imported at the top of this module.
+# The DR-0011 slot constants (PAD_PITCH_UM, RING_DEPTH_UM, PAD_STRUCT_OY_UM)
+# and the shared pad/strap constants (DVSS_BAND, DVDD_BAND,
+# STRAP_STITCH_PITCH_UM, PAD_SIDE, PAD_OPENING_MARGIN, PAD_VIA_GAP_UM,
+# FINGER_*, ROW_GAP_UM, DEFAULT_BUS_WIDTH_UM, MAX_FINGERS_PER_ROW), the fold
+# arithmetic (`clamp_rows`, `_row_span`, `_row_pitch`) and the strap /
+# substrate-tap / production-pad drawing helpers have one definition, in
+# pad_ring_cells.py (issues #262, #350; the fold itself was
+# pad_pitch_fit_study.py's, issue #143/#242), shared with
+# pad_pitch_fit_study.py and imported at the top of this module.
 
 # This driver's own as-drawn clamp size -- gf180_tmds_pad_v2's own 20-finger
 # array (issue #87), not yet the final HBM-qualified size
@@ -144,13 +142,6 @@ RING_DEPTH_UM = 75.0
 # open). `clamp_rows` below folds any larger future size into rows, so
 # raising this later is a constant change, not a redesign.
 N_FINGERS = 20
-
-# y-origin of each pad's clamp array/via-stack/plate structure. The Metal5
-# plate is centred on the array; at 30.0 um its lower edge clears
-# DVDD_BAND's 16.0 um top edge by 2.0 um (issue #143 -- 25.0 um, this
-# module's pre-#149 value, put the plate straight through the DVDD strap
-# band once the plate grew from the placeholder's 6.6um to 25um).
-PAD_STRUCT_OY_UM = 30.0
 
 # VDD-side clamp (`diode_pd2nw_06v0`, DR-0011's symmetric P-clamp-toward-VDD
 # leg): the second finger array of each pad sits this far above the first
