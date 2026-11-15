@@ -45,7 +45,7 @@ from .corners import (
 from . import evidence_store
 from .evidence_lint import _git
 from .pdk import Pdk
-from .runner import PointResult
+from .runner import PointResult, filter_progress_trace
 from .testbench import Testbench
 
 #: Subdirectories of ``sim/<experiment-slug>/`` defined by ``sim/README.md``.
@@ -733,13 +733,32 @@ def write_record(record: dict, experiment_dir: Path) -> Path:
 
 
 def write_device_corner_log(
-    corners_dir: Path, record: str, cid: str, header: str, log: str
+    corners_dir: Path,
+    record: str,
+    cid: str,
+    header: str,
+    log: str,
+    *,
+    keep_progress_trace: bool = False,
 ) -> Path:
-    """Write ``corners/<record-id>/<corner-id>.log`` -- raw ngspice output."""
+    """Write ``corners/<record-id>/<corner-id>.log`` -- ngspice output.
+
+    ngspice's `` Reference value :`` transient solver progress trace is
+    dropped from ``log`` here, through the same one shared filter the local
+    backend applies at its own write site, so the two paths through which
+    raw ngspice text reaches a log cannot drift apart on what they drop
+    (see ``runner.filter_progress_trace``; issue #317). A device-level
+    debug run that wants the trace back passes ``keep_progress_trace=True``
+    -- the harness-level spelling of that escape hatch is the manifest
+    ``options`` entry ``runner.KEEP_PROGRESS_TRACE_OPTION``.
+    """
     out_dir = corners_dir / record
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{cid}.log"
-    path.write_text(header + log, encoding="utf-8")
+    path.write_text(
+        header + filter_progress_trace(log, keep=keep_progress_trace),
+        encoding="utf-8",
+    )
     return path
 
 

@@ -49,6 +49,14 @@ ngspice stops printing its operating-point node table into every log. See
 ``_option_lines`` for what that removes (one block, nothing else), what it
 provably does not change (every ``m_*`` line the records quote), and the two
 manifest escape hatches.
+
+A fifth adaptation, added for issue #317: the log write path filters out
+ngspice's `` Reference value :  <float>`` transient solver progress trace --
+not suppressible by any netlist directive, so the write path is the only
+lever, and it carries no measurement anyway. See
+``filter_progress_trace`` for what is dropped and what provably is not
+(every other byte survives unchanged), the two raw-ngspice-text write sites
+it is applied at, and the manifest escape hatch that keeps the trace.
 """
 
 from __future__ import annotations
@@ -182,6 +190,17 @@ KEEP_OP_POINT_TABLE_OPTION = "noinit=0"
 #: per node in the circuit, printed into every transient log by default.
 NOINIT_OPTION = "noinit"
 
+#: A manifest ``options`` entry of this spelling (whitespace- and
+#: case-insensitive) means "keep ngspice's ``Reference value :`` transient
+#: solver progress trace in this bench's logs" -- verbatim output, for a
+#: debug bench reading the solver's step values out of the log. Like
+#: ``KEEP_OP_POINT_TABLE_OPTION`` it is a *harness-level* instruction,
+#: consumed rather than emitted: the trace is not controllable by any
+#: ngspice directive (issue #317 -- on ngspice-47, ``noinit`` is
+#: presence-only and touches only the node table), so emitting the entry
+#: verbatim would only make ngspice reject the deck as an unknown option.
+KEEP_PROGRESS_TRACE_OPTION = "reftrace=1"
+
 
 def _normalized_option(option: str) -> str:
     """``" noinit = 0 "`` -> ``"noinit=0"`` -- for comparing a manifest
@@ -210,7 +229,8 @@ def _option_lines(tb: Testbench) -> list[str]:
     and every ``m_*`` value are identical with and without it, and an ``op``
     or ``dc`` deck's output is byte-identical either way.
 
-    Two escape hatches, both at the testbench's discretion:
+    Three escape hatches, all at the testbench's discretion; the first two
+    keep the node table, the third keeps the solver progress trace:
 
     * ``"options": ["noinit=0"]`` -- keep the table (a debug bench reading
       node voltages out of the log rather than out of a ``measure`` entry).
@@ -218,13 +238,22 @@ def _option_lines(tb: Testbench) -> list[str]:
     * any other ``options`` entry mentioning ``noinit`` -- the testbench is
       wording the directive itself, so the harness emits its entry verbatim
       and does not add a second one.
+    * ``"options": ["reftrace=1"]`` -- keep the ``Reference value :``
+      transient solver progress trace, which the log write path otherwise
+      drops (see ``filter_progress_trace``). Consumed for the same reason
+      as ``KEEP_OP_POINT_TABLE_OPTION``: there is no ngspice directive to
+      word. See ``KEEP_PROGRESS_TRACE_OPTION``.
     """
     declared = [
         option
         for option in tb.options
-        if _normalized_option(option) != KEEP_OP_POINT_TABLE_OPTION
+        if _normalized_option(option)
+        not in (KEEP_OP_POINT_TABLE_OPTION, KEEP_PROGRESS_TRACE_OPTION)
     ]
-    keep_op_point_table = len(declared) != len(tb.options)
+    keep_op_point_table = any(
+        _normalized_option(option) == KEEP_OP_POINT_TABLE_OPTION
+        for option in tb.options
+    )
 
     lines = [f".options {option}" for option in declared]
     for key in ("reltol", "abstol", "vntol"):
@@ -253,6 +282,81 @@ def _dut_lines(tb: Testbench) -> list[str]:
 def _testbench_include_lines(tb: Testbench) -> list[str]:
     """The testbench netlist include."""
     return [f'.include "{tb.netlist}"']
+
+
+# --------------------------------------------------------------------------
+# The log write path's one shared filter (issue #317)
+#
+# ngspice's transient solver prints its progress as `` Reference value :
+#  <float>`` lines into stdout -- one per accepted internal step, on every
+# tran analysis, at a rate nothing in the deck asked for. Across this repo's
+# 407,901 committed occurrences (13.05 MB of the 91.9 MB the committed logs
+# hold, issue #317) the shape has zero variance beyond the digits: two
+# spaces after the colon, a positive mantissa, nothing else on the line.
+# The lines carry no measurement -- a bare step value whose time axis is
+# already pinned by ``No. of Data Rows`` and the ``targ=``/``trig=`` times
+# on the ``m_*`` lines -- and nothing in the tree reads them (``git grep
+# "Reference value" -- ':!*.log'``: no matches), so both write sites through
+# which raw ngspice text reaches a log -- ``run_point`` below and
+# ``report.write_device_corner_log`` -- drop them through the one shared
+# ``filter_progress_trace`` rather than each growing its own. The batch
+# backend is deliberately not covered: its log is a klt CLI wrapper around
+# klt's own JSON report, and raw ngspice text never reaches that write.
+# --------------------------------------------------------------------------
+
+#: Matches one progress-trace line *and its newline*, anchored on both ends:
+#: the phrase must be the whole line for the match to fire, so a line that
+#: merely contains it (a warning quoting the phrase, or any spacing
+#: variation) survives untouched. The mantissa carries no sign -- the
+#: committed corpus has no negative reference value, and a hypothetical one
+#: would simply be preserved: the filter errs narrow, never wide.
+_REFERENCE_VALUE_LINE_RE = re.compile(
+    r"(?m)^ Reference value :  \d+\.\d+e[+-]\d+(?:\n|$)"
+)
+
+
+def _wants_progress_trace(tb: Testbench) -> bool:
+    """Whether this testbench's manifest asked for the ngspice trace back --
+    the ``KEEP_PROGRESS_TRACE_OPTION`` spelling in its ``options`` list,
+    compared whitespace- and case-insensitively like every manifest option."""
+    return any(
+        _normalized_option(option) == KEEP_PROGRESS_TRACE_OPTION
+        for option in tb.options
+    )
+
+
+def filter_progress_trace(text: str, *, keep: bool = False) -> str:
+    """Drop ngspice's `` Reference value :  <float>`` solver progress lines.
+
+    These are not suppressible by any netlist directive -- ``.options
+    noinit`` touches only the operating-point node table (issue #305/#317,
+    verified on ngspice-47) -- so the write path is the only lever. Applied
+    at write time, after everything that *reads* the output has seen it:
+    ``parse_measurements``, the exit-status handling and the ngspice-error
+    extraction in ``run_point`` all still see the unfiltered text, and no
+    ``m_*`` line can match the anchored pattern anyway.
+
+    Only whole matching lines are removed -- matching line plus its
+    newline -- so every other byte is preserved exactly: an output with no
+    match comes back identical, and the file's trailing newline (or absence
+    of one) is whatever ngspice produced.
+
+    ``keep=True`` returns the text verbatim: the escape hatch for a debug
+    bench that wants the trace back, driven by the manifest ``options``
+    entry ``KEEP_PROGRESS_TRACE_OPTION`` (see ``_option_lines``, which
+    consumes it the way it consumes ``KEEP_OP_POINT_TABLE_OPTION``).
+
+    Degenerate inputs pass through as themselves. Empty text in, empty text
+    out -- the same empty log the unfiltered write path would have written.
+    A log consisting solely of trace lines filters to an empty string,
+    which the evidence store's non-empty guard rejects loudly at ingest
+    (``evidence_store.store_run``); ngspice's banner makes that case
+    unreachable in practice, and a degenerate run has always been the
+    store's business to reject, not the filter's to paper over.
+    """
+    if keep:
+        return text
+    return _REFERENCE_VALUE_LINE_RE.sub("", text)
 
 
 def compose_deck(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
@@ -393,10 +497,14 @@ def run_point(
     """Simulate one PVT point. Never raises for simulation failure.
 
     ``workdir`` holds the generated deck (scratch, disposable). ``log_dir``
-    -- when given -- is where the raw ngspice output lands as
+    -- when given -- is where the ngspice output lands as
     ``<corner-id>.log``; that is the ``sim/<slug>/corners/<record-id>/``
     directory from ``sim/README.md``. It defaults to ``workdir`` so a
-    throwaway run does not touch the evidence tree.
+    throwaway run does not touch the evidence tree. The log is ngspice's
+    output with the ``Reference value :`` solver progress trace dropped
+    (see ``filter_progress_trace``; a manifest ``options`` entry
+    ``"reftrace=1"`` keeps it) -- the deck's measurements, exit status and
+    error extraction are all taken from the unfiltered text.
     """
     workdir.mkdir(parents=True, exist_ok=True)
     log_dir = workdir if log_dir is None else log_dir
@@ -431,7 +539,9 @@ def run_point(
             message=f"ngspice timed out after {timeout_s}s",
         )
     elapsed = time.monotonic() - started
-    log_path.write_text(output)
+    log_path.write_text(
+        filter_progress_trace(output, keep=_wants_progress_trace(tb))
+    )
 
     measurements = parse_measurements(output)
     missing = [name for name in tb.measure if name not in measurements]

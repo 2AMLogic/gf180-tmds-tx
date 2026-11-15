@@ -124,6 +124,23 @@ sim/
 > the node table opts out with `"options": ["noinit=0"]` (see
 > `sim/harness/README.md`).
 >
+> **What else a per-corner log drops (issue #317).** A further step from
+> verbatim output, this one below the deck: the harness's log write path also
+> filters out ngspice's ` Reference value :  <float>` lines -- the transient
+> solver's progress trace, one per accepted internal step. No netlist
+> directive suppresses these lines (verified on ngspice-47; `noinit` touches
+> only the node table), so the two write sites through which raw ngspice text
+> reaches a log -- `harness/runner.py`'s local backend and
+> `harness/report.py`'s `write_device_corner_log` -- drop them at write time
+> through the one shared `runner.filter_progress_trace`. They carry no
+> measurement and nothing in the tree reads them; every other line (`m_*`,
+> warnings, `No. of Data Rows`) is preserved byte for byte -- on issue
+> #305's representative log, this takes the post-`noinit` residual from
+> 2,016 lines to 64. A debug testbench that wants the trace back opts out
+> with `"options": ["reftrace=1"]` (see `sim/harness/README.md`). The batch
+> backend is unaffected either way: its log is a klt CLI wrapper around
+> klt's own JSON report, and raw ngspice text never reaches that write.
+>
 > **Forward-only.** Nothing already committed under `corners/<record-id>/` is
 > touched, re-generated or trimmed -- recorded evidence stays append-only, so
 > logs from earlier records still carry the table.
