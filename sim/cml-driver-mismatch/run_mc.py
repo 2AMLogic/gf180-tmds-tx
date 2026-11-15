@@ -14,10 +14,14 @@ entirely: N independent, randomly-seeded samples *per* process corner, plus
 a deterministic negative control that must fail. `sim/harness/report.py`'s
 "Device-level evidence plumbing" section (`write_device_corner_log`,
 `write_device_netlist_snapshot`, `device_write_record`) exists for exactly
-this shape of experiment -- reused here unmodified -- while PDK discovery
+this shape of experiment -- reused here -- while PDK discovery
 (`sim/harness/pdk.py`) and the five process corners' `.lib` section bundles
-(`sim/harness/corners.py`) are reused unmodified too. Nothing in
-`sim/harness/` is edited by this issue. The corner-log provenance banner and
+(`sim/harness/corners.py`) are reused unmodified too. Like the harness
+benches, the raw per-sample ngspice logs are manifest-forward: they are
+staged by `write_device_corner_log` into `evidence_store.stage_dir(...)`
+(the git-ignored scratch root), stored with `evidence_store.store_run`
+(`klt artifact put`), and only the resulting manifest plus the summary
+record are committed. The corner-log provenance banner and
 the deck composer (`compose_deck`) are, by design, built here rather than
 shared: this experiment's banner records fields no PVT-grid run has (the
 per-sample seed, the `sw_stat_mismatch` switch, and the injected
@@ -87,6 +91,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SIM_DIR = REPO_ROOT / "sim"
 sys.path.insert(0, str(SIM_DIR))
 
+from harness import evidence_store  # noqa: E402
 from harness.corners import CORNER_SETS, CORNERS, Corner  # noqa: E402
 from harness.pdk import Pdk, PdkNotFound, find_pdk  # noqa: E402
 from harness.report import (  # noqa: E402
@@ -104,7 +109,6 @@ TESTBENCH_DIR = EXPERIMENT_DIR / "testbench"
 DUT_PATH = TESTBENCH_DIR / "cml_driver_dut_mismatch.spice"
 FRAGMENT_PATH = TESTBENCH_DIR / "cml_driver_mismatch.spice"
 SNAPSHOT_DIR = EXPERIMENT_DIR / "netlist-snapshots"
-CORNERS_DIR = EXPERIMENT_DIR / "corners"
 RECORDS_DIR = EXPERIMENT_DIR / "records"
 
 CLAIM = (
@@ -344,6 +348,7 @@ def render_record(
     wall_seconds: float,
     dut_sha256: str,
     fragment_sha256: str,
+    stored: dict,
 ) -> str:
     overall_pass = all(cs.swing_pass and cs.vcm_pass for cs in stats)
     neg_ctrl_swing_fail = not _within(neg_ctrl.swing_dc, *_bounds_swing())
@@ -468,7 +473,7 @@ def render_record(
         "  - DUT netlist: `sim/cml-driver-mismatch/testbench/cml_driver_dut_mismatch.spice`"
     )
     lines.append(f"  - Netlist snapshot: `sim/cml-driver-mismatch/netlist-snapshots/{record_id}.spice`")
-    lines.append(f"  - Raw logs: `sim/cml-driver-mismatch/corners/{record_id}/`")
+    lines.append(f"  - Stored evidence manifest: `{stored['manifest']}`")
     lines.append(
         f"- **Timestamp / author**: {_dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S+00:00')}, "
         f"{environment(pdk, ngspice_v, REPO_ROOT, git)['user']}"
@@ -492,6 +497,7 @@ def render_record(
     lines.append(f"- Testbench fragment sha256: `{fragment_sha256}`")
     lines.append(f"- Wall time: {wall_seconds:.2f} s")
     lines.append("")
+    lines += evidence_store.stored_evidence_lines(stored)
     lines.append("---")
     lines.append("")
     lines.append(
@@ -519,6 +525,23 @@ def main(argv: list[str] | None = None) -> int:
     ngspice_v = ngspice_version()
 
     git = git_provenance(REPO_ROOT)
+
+    # Raw logs are stored through the artifact broker, never committed. Fail
+    # before simulating if that is impossible (no option commits bytes), so a
+    # misconfigured host aborts in seconds instead of after the whole sweep.
+    if not args.no_write:
+        try:
+            evidence_store.preflight()
+            evidence_store.require_ignored_stage(evidence_store.STAGE_ROOT, REPO_ROOT)
+        except evidence_store.EvidenceStoreError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 3
+        record_id = allocate_record_id(REPO_ROOT, RECORDS_DIR, git=git)
+        log_dir = evidence_store.stage_dir(EXPERIMENT_DIR.name, record_id)
+    else:
+        record_id = None
+        log_dir = None
+
     samples = build_samples(args.n_samples, args.base_seed)
 
     workdir = SIM_DIR / ".work" / "cml-driver-mismatch" / "debug"
@@ -564,8 +587,6 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
-    record_id = allocate_record_id(REPO_ROOT, RECORDS_DIR, git=git)
-
     dut_sha256 = hashlib.sha256(DUT_PATH.read_bytes()).hexdigest()
     fragment_sha256 = hashlib.sha256(FRAGMENT_PATH.read_bytes()).hexdigest()
 
@@ -585,7 +606,15 @@ def main(argv: list[str] | None = None) -> int:
             f"* run (UTC) : {_dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}\n"
             "* ====================================================================\n"
         )
-        write_device_corner_log(CORNERS_DIR, record_id, s.corner_id, header, s.log)
+        write_device_corner_log(log_dir, s.corner_id, header, s.log)
+
+    try:
+        stored = evidence_store.store_run(
+            EXPERIMENT_DIR.name, record_id, log_dir, REPO_ROOT
+        )
+    except evidence_store.EvidenceStoreError as exc:
+        print(f"error: evidence not recorded: {exc}", file=sys.stderr)
+        return 3
 
     write_device_netlist_snapshot(SNAPSHOT_DIR, record_id, FRAGMENT_PATH)
 
@@ -601,11 +630,13 @@ def main(argv: list[str] | None = None) -> int:
         wall_seconds=wall_seconds,
         dut_sha256=dut_sha256,
         fragment_sha256=fragment_sha256,
+        stored=stored,
     )
     device_write_record(RECORDS_DIR, record_id, body)
 
     overall_pass = all(cs.swing_pass and cs.vcm_pass for cs in stats)
     print(f"Record {record_id} written. Overall (real-design samples): {'PASS' if overall_pass else 'FAIL'}")
+    print(f"Evidence stored: {stored['manifest']} (bytes via klt artifact; not committed)")
     return 0 if overall_pass else 1
 
 

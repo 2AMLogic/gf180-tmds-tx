@@ -12,8 +12,7 @@ repo-root ``manifests/artifacts/<experiment-slug>-<record-id>.manifest.json``
 (see ``sim/README.md``'s "Stored evidence (manifest-forward)" block) -- a
 manifest-backed record has no ``corners/<record-id>/`` directory. Committed
 logs under ``corners/<record-id>/`` remain for legacy (pre-migration)
-records and for the un-migrated ``cml-driver-mismatch`` device bench
-(issue #23), which still writes them.
+records only.
 
 ``<record-id>`` is ``<YYYYMMDD>-<HHMMSS>-<short-git-sha>``.
 
@@ -740,15 +739,22 @@ def write_record(record: dict, experiment_dir: Path) -> Path:
 
 
 def write_device_corner_log(
-    corners_dir: Path,
-    record: str,
+    dest_dir: Path,
     cid: str,
     header: str,
     log: str,
     *,
     keep_progress_trace: bool = False,
 ) -> Path:
-    """Write ``corners/<record-id>/<corner-id>.log`` -- ngspice output.
+    """Write ``<dest-dir>/<corner-id>.log`` -- one ngspice output per corner.
+
+    The destination directory is supplied *flat*, with no per-record nesting:
+    a manifest-forward device bench passes the artifact store's stage
+    directory (``evidence_store.stage_dir(bench, record_id)`` -- its
+    record-id path component already encodes the run, and ``store_run`` globs
+    the directory flat, so a nested ``<record-id>/`` level here would hide
+    the staged logs from it). A legacy committed-log layout passes
+    ``corners_dir / record_id`` instead.
 
     ngspice's `` Reference value :`` transient solver progress trace is
     dropped from ``log`` here, through the same one shared filter the local
@@ -759,9 +765,8 @@ def write_device_corner_log(
     -- the harness-level spelling of that escape hatch is the manifest
     ``options`` entry ``runner.KEEP_PROGRESS_TRACE_OPTION``.
     """
-    out_dir = corners_dir / record
-    out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{cid}.log"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    path = dest_dir / f"{cid}.log"
     path.write_text(
         header + filter_progress_trace(log, keep=keep_progress_trace),
         encoding="utf-8",
