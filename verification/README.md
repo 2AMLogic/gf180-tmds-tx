@@ -11,18 +11,24 @@ negative-control rule below.
 ```
 verification/
   README.md                      this file
+  requirements.txt               pinned Python-side toolchain (cocotb, ...)
+  _bench_runner.py               shared three-leg runner skeleton (all benches)
   <bench-name>/
     <dut_model>.py                independent Python golden model(s)
     test_<bench-name>.py          cocotb testbench (the actual test cases)
     runner.py                     cold-start entry point (build + run + assert)
-    requirements.txt              pinned Python-side toolchain (cocotb, ...)
     negative_control/
-      <dut>_broken.v               deliberately-broken DUT variant (Leg 3)
+      <dut>_broken.v              deliberately-broken DUT variant (Leg 3)
 ```
 
 Each `<bench-name>/` directory verifies exactly one RTL module (named after
-it) and is self-contained: it can be run on its own from a clean checkout
-without touching any other bench directory.
+it) and stays independent of every other bench directory: it can be run on
+its own from a clean checkout, with the CWD inside the bench (`python3
+runner.py`). What the benches do share sits at this directory's root, never
+inside one another: the one pinned `requirements.txt` and the one
+`_bench_runner.py` three-leg runner skeleton each bench's `runner.py`
+imports. A bench directory lifted out of the repo on its own therefore does
+not run standalone -- it needs those two root files alongside it.
 
 Currently: `verification/tmds_encoder/` verifies `rtl/tmds_encoder.v`;
 `verification/tmds_serializer/` verifies `rtl/tmds_serializer.v` (the DR-0003/
@@ -77,7 +83,7 @@ control):
 ```bash
 cd verification/tmds_encoder
 python3 -m venv .venv && source .venv/bin/activate   # optional but recommended
-pip install -r requirements.txt
+pip install -r ../requirements.txt
 python3 runner.py
 ```
 
@@ -99,7 +105,7 @@ This is exactly what `.github/workflows/ci.yml` runs on every PR.
 
 | Tool | Verified version | Pin mechanism |
 |---|---|---|
-| cocotb | 2.0.1 | `verification/tmds_encoder/requirements.txt` |
+| cocotb | 2.0.1 | `verification/requirements.txt` |
 | Icarus Verilog | 13.0 (local); CI installs Ubuntu's `iverilog` apt package and prints `iverilog -V` in the job log | `.github/workflows/ci.yml` |
 | Yosys | 0.68+ (local, `read_verilog`/`hierarchy`/`check` only -- see "Yosys smoke check" below); CI installs Ubuntu's `yosys` apt package and prints `yosys -V` | `.github/workflows/ci.yml` |
 | Python | 3.11+ | CI: `actions/setup-python@v5` |

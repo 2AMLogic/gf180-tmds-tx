@@ -48,8 +48,21 @@ import sys
 import unittest
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPTS_DIR = REPO_ROOT / "layout" / "scripts"
+TESTS_DIR = Path(__file__).resolve().parent
+if str(TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(TESTS_DIR))
+
+from _dut_netlist import (  # noqa: E402
+    REPO_ROOT,
+    SCRIPTS_DIR,
+    _M_RE,
+    _UNITS,
+    _X_RE,
+    _cards,
+    _params,
+    _value,
+)
+
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
@@ -62,18 +75,6 @@ SCHEMATIC = REPO_ROOT / "design" / "netlist" / "tmds_final_mux.spice"
 LVS_REF = REPO_ROOT / "layout" / "lvs" / "tmds_final_mux.ref.spice"
 TB_JSON = REPO_ROOT / "sim" / "tmds-final-mux-eye" / "testbench" / "tb.json"
 
-#: Translated MOS: `X<name> <d> <g> <s> <b> <model> <params...>`
-_X_RE = re.compile(
-    r"^X(?P<name>\S+)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
-    r"(?P<model>\S+)\s*(?P<params>.*)$",
-    re.IGNORECASE,
-)
-#: Extracted MOS: `M<name> <d> <g> <s> <b> <class> <params...>`
-_M_RE = re.compile(
-    r"^M(?P<name>\S+)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
-    r"(?P<model>\S+)\s*(?P<params>.*)$",
-    re.IGNORECASE,
-)
 #: Translated resistor: `R<name> <n1> <n2> <ohms>` -- body terminal dropped.
 _R_PLAIN_RE = re.compile(
     r"^R(?P<name>\S+)\s+(?P<n1>\S+)\s+(?P<n2>\S+)\s+(?P<ohms>\S+)\s*$",
@@ -100,40 +101,10 @@ EXPECTED_WRAPPER_PINS = [
     "VDD",
     "VSS",
 ]
-_UNITS = {"u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15, "m": 1e-3}
-
-
-def _logical_cards(path: Path) -> list[str]:
-    """Non-comment, non-blank cards with `+` continuations folded in."""
-    out: list[str] = []
-    for line in path.read_text().splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("*"):
-            continue
-        if stripped.startswith("+"):
-            out[-1] = f"{out[-1]} {stripped[1:].strip()}"
-            continue
-        out.append(stripped)
-    return out
-
-
-def _cards(path: Path, pattern: re.Pattern) -> list[re.Match]:
-    return [m for m in (pattern.match(c) for c in _logical_cards(path)) if m]
-
-
-def _params(text: str) -> dict[str, str]:
-    return {
-        key.lower(): value
-        for key, value in (item.split("=", 1) for item in text.split() if "=" in item)
-    }
-
-
-def _value(text: str) -> float:
-    """SPICE scalar -> float ('2U' -> 2e-6, '0.42P' -> 4.2e-13)."""
-    text = text.strip().lower()
-    if text and text[-1] in _UNITS:
-        return float(text[:-1]) * _UNITS[text[-1]]
-    return float(text)
+#: Every non-comment logical card -- the catch-all `_cards` pattern for the
+#: one test that scans a whole deck rather than one card kind (the shared
+#: `_cards` folds `+` continuations before matching).
+_ANY_CARD_RE = re.compile(r".+")
 
 
 def _schematic_pins() -> list[str]:
@@ -262,7 +233,8 @@ class ModelBindingTests(unittest.TestCase):
         self.assertEqual(len(self.translated), len(self.extracted))
 
     def test_no_bare_deck_class_survives_on_a_card(self):
-        for card in _logical_cards(DUT):
+        for match in _cards(DUT, _ANY_CARD_RE):
+            card = match.group(0)
             self.assertNotRegex(
                 card,
                 r"\bnfet\b(?!_)",

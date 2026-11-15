@@ -42,16 +42,22 @@ _D_RE = re.compile(
 _UNITS = {"u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15, "m": 1e-3}
 
 
-def _cards(path: Path, pattern: re.Pattern) -> list[re.Match]:
-    out = []
+def _logical_cards(path: Path) -> list[str]:
+    """Non-comment, non-blank cards with `+` continuations folded in."""
+    out: list[str] = []
     for line in path.read_text().splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("*"):
             continue
-        match = pattern.match(stripped)
-        if match:
-            out.append(match)
+        if stripped.startswith("+"):
+            out[-1] = f"{out[-1]} {stripped[1:].strip()}"
+            continue
+        out.append(stripped)
     return out
+
+
+def _cards(path: Path, pattern: re.Pattern) -> list[re.Match]:
+    return [m for m in (pattern.match(c) for c in _logical_cards(path)) if m]
 
 
 def _params(text: str) -> dict[str, str]:

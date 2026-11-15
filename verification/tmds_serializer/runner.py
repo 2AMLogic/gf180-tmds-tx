@@ -2,9 +2,9 @@
 """Cold-start test runner for the TMDS serializer verification bench.
 
 Builds and simulates the DUT under Icarus Verilog via cocotb's Python runner
-API, and enforces the same three-leg verification plan
-`verification/tmds_encoder/runner.py` already enforces for the encoder (see
-verification/README.md):
+API, and enforces the same three-leg verification plan as every bench in this
+repository (see verification/README.md; orchestration delegated to the shared
+skeleton in `verification/_bench_runner.py`):
 
   - Leg 1 + Leg 2 (`--good-only` or default): `rtl/tmds_serializer.v`, wrapped
     with the real `rtl/tmds_encoder.v` by `rtl/tmds_tx_lane.v` (via
@@ -26,7 +26,7 @@ Cold-start invocation (from a clean checkout):
 
     cd verification/tmds_serializer
     python3 -m venv .venv && source .venv/bin/activate   # optional
-    pip install -r requirements.txt
+    pip install -r ../requirements.txt
     python3 runner.py
 
 See verification/README.md for pinned simulator versions and prerequisites.
@@ -34,13 +34,17 @@ See verification/README.md for pinned simulator versions and prerequisites.
 
 from __future__ import annotations
 
-import argparse
 import sys
 from pathlib import Path
 
-from cocotb_tools.runner import get_results, get_runner
-
 HERE = Path(__file__).resolve().parent
+
+# The shared three-leg skeleton lives at the verification/ root, one level up.
+sys.path.insert(0, str(HERE.parent))
+
+from _bench_runner import Leg, run_three_leg_bench  # noqa: E402
+from cocotb_tools.runner import get_results, get_runner  # noqa: E402
+
 RTL_DIR = HERE.parent.parent / "rtl"
 ENCODER = RTL_DIR / "tmds_encoder.v"
 LANE = RTL_DIR / "tmds_tx_lane.v"
@@ -49,7 +53,6 @@ GOOD_DUT = RTL_DIR / "tmds_serializer.v"
 BROKEN_DUT = HERE / "negative_control" / "tmds_serializer_broken.v"
 TEST_MODULE = "test_tmds_serializer"
 TOPLEVEL = "tmds_tx_chain"
-
 
 #: Static configurations of rtl/tmds_tx_lane.v (SEL_MODE), see DR-0018:
 #: 2 = runtime select, 0 = encoder only, 1 = external only. All three are
@@ -82,57 +85,22 @@ def run_leg(serializer_source: Path, build_subdir: str, sel_mode: int = 2) -> tu
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--good-only", action="store_true", help="only run Leg 1+2 against the real DUT"
-    )
-    parser.add_argument(
-        "--broken-only",
-        action="store_true",
-        help="only run Leg 3 against the negative control",
-    )
-    args = parser.parse_args()
-
-    if args.good_only and args.broken_only:
-        parser.error("--good-only and --broken-only are mutually exclusive")
-
-    run_good = not args.broken_only
-    run_broken = not args.good_only
-
-    ok = True
-    repo_root = HERE.parent.parent
-
-    if run_good:
-        print(f"=== Leg 1+2: {TEST_MODULE} vs. {GOOD_DUT.relative_to(repo_root)} ===")
-        for mode in SEL_MODES:
-            sub = "good" if mode == 2 else f"good_sel{mode}"
-            n, f = run_leg(GOOD_DUT, sub, mode)
-            print(f"real DUT (SEL_MODE={mode}): {n} test(s), {f} failed")
-            if f != 0:
-                print(f"FAIL: the real DUT must pass every test (SEL_MODE={mode}).")
-                ok = False
-            else:
-                print(f"PASS: real DUT passed the full bench (SEL_MODE={mode}).")
-
-    if run_broken:
-        print(
-            f"=== Leg 3 (negative control): {TEST_MODULE} vs. "
-            f"{BROKEN_DUT.relative_to(repo_root)} ==="
-        )
-        n, f = run_leg(BROKEN_DUT, "broken")
-        print(f"broken DUT: {n} test(s), {f} failed")
-        if f == 0:
-            print(
-                "FAIL: negative control did not fail -- this bench is not known to be "
-                "able to fail."
+    return run_three_leg_bench(
+        description=__doc__,
+        test_module=TEST_MODULE,
+        good_dut=GOOD_DUT,
+        broken_dut=BROKEN_DUT,
+        run_leg=run_leg,
+        good_legs=[
+            Leg(
+                build_subdir="good" if mode == 2 else f"good_sel{mode}",
+                label=f" (SEL_MODE={mode})",
+                run_kwargs={"sel_mode": mode},
             )
-            ok = False
-        else:
-            print(f"PASS: negative control correctly failed ({f}/{n} test(s)).")
-
-    print()
-    print("OVERALL:", "PASS" if ok else "FAIL")
-    return 0 if ok else 1
+            for mode in SEL_MODES
+        ],
+        broken_leg=Leg(build_subdir="broken"),
+    )
 
 
 if __name__ == "__main__":
