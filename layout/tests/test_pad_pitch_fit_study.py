@@ -19,8 +19,9 @@ conclusion (`layout/README.md`: "a single row of 334 fingers is 881.8 um,
 2.5x DR-0011's ratified 350 um pitch"), and a silently-wrong fold would
 produce a tile that is DRC-clean and *still* wrong, because two adjacent
 pad structures would overlap in a way no per-shape rule flags. These tests
-pin that arithmetic, and pin the ratified DR-0011 constants it is checked
-against, so neither can drift unnoticed.
+pin that arithmetic; the ratified DR-0011 constants it is checked against
+are pinned once, with identity checks against their single definition in
+`pad_ring_cells.py`, in `test_gen_pad_ring_assembly.py` (issue #350).
 """
 
 import sys
@@ -31,57 +32,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "layout" / "scripts"))
 
 import pad_pitch_fit_study as study  # noqa: E402
-import pad_ring_cells as cells  # noqa: E402
 
 # design/esd-capacitance-budget.md Sec.2b's HBM-sizing window, expressed in
 # this study's own units: each finger is FINGER_L (2.0 um) of clamp width.
 HBM_WINDOW_FINGERS = (111, 222, 334)
-
-
-class DR0011ConstantsTest(unittest.TestCase):
-    """DR-0011 is ratified. If these change, a decision record changed --
-    or something silently relaxed a ratified number to make a fit pass,
-    which CLAUDE.md forbids in as many words."""
-
-    def test_pad_pitch_is_the_ratified_350um(self):
-        self.assertEqual(study.PAD_PITCH_UM, 350.0)
-
-    def test_ring_depth_is_the_ratified_75um(self):
-        self.assertEqual(study.RING_DEPTH_UM, 75.0)
-
-    def test_pad_side_and_opening_margin_match_gf180_tmds_pad_v2(self):
-        # gen_pad_v2.py's own numbers -- the geometry Sec.9 validated the
-        # <=2 pF budget against. Adopting it means adopting these exactly.
-        self.assertEqual(study.PAD_SIDE, 25.0)
-        self.assertEqual(cells.PAD_OPENING_MARGIN, 2.5)
-        # pad.enclosing.metal5.1's floor is 2.0 um; the margin must clear it.
-        self.assertGreater(cells.PAD_OPENING_MARGIN, 2.0)
-
-
-class ClampRowsTest(unittest.TestCase):
-    def test_rejects_empty_clamp(self):
-        for bad in (0, -1):
-            with self.assertRaises(ValueError):
-                study.clamp_rows(bad)
-
-    def test_small_clamp_is_a_single_row(self):
-        self.assertEqual(study.clamp_rows(20), [20])
-
-    def test_every_row_is_within_the_cap(self):
-        for n in (1, 20, 111, 120, 121, 222, 334, 1000):
-            rows = study.clamp_rows(n)
-            self.assertTrue(all(r <= study.MAX_FINGERS_PER_ROW for r in rows), rows)
-
-    def test_fold_conserves_the_finger_count(self):
-        """A fold that loses or duplicates fingers would silently mis-size the
-        clamp -- the one error DRC cannot see."""
-        for n in (1, 19, 20, 111, 120, 121, 222, 334, 1000):
-            self.assertEqual(sum(study.clamp_rows(n)), n)
-
-    def test_fold_uses_the_fewest_rows_possible(self):
-        for n in (1, 120, 121, 240, 241, 334):
-            expected = -(-n // study.MAX_FINGERS_PER_ROW)  # ceil division
-            self.assertEqual(len(study.clamp_rows(n)), expected, n)
 
 
 class FitReportTest(unittest.TestCase):
