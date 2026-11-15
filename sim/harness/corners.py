@@ -212,8 +212,8 @@ class PvtPoint:
         for this point is ``<corner-id>.log`` -- for manifest-forward runs as
         the manifest entry name
         ``sim/<experiment-slug>/corners/<record-id>/<corner-id>.log``, for
-        legacy records (and the un-migrated ``cml-driver-mismatch`` bench) as
-        the committed ``corners/<record-id>/<corner-id>.log`` (e.g.
+        legacy records as the committed
+        ``corners/<record-id>/<corner-id>.log`` (e.g.
         ``ss_-40c_2.97v.log`` for a DC/op-point bench,
         ``tt_27c_3.30v_742p5mbps.log`` for a transient bench swept over the
         rate axis). The trailing ``<rate>`` field is present only when
