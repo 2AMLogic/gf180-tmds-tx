@@ -51,6 +51,8 @@ from gf180_layers import (
     CONTACT,
     CONTACT_SIZE,
     DBU,
+    DIODE_MK,
+    DUALGATE,
     METAL1,
     METAL1_LABEL,
     METAL2,
