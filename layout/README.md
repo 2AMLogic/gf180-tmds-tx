@@ -1178,7 +1178,26 @@ klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format text > layout/
 # produced by a klt build carrying klayout-tools #1968/#2036 (the report
 # `provenance` + spec content-hash fields, not yet in PyPI's 0.5.0); a
 # klt from source at or after v0.5.0-101-gfe6fe526 reproduces them.
+# NOTE (issue #320): --findings-only --omit-antenna-tables drops the
+# antenna half of the report. With no --pdk (gf180 is not in klt erc's
+# built-in antenna-limit table) nothing antenna-side is graded, so the
+# per-gate/per-level antenna tables are all-"unchecked" scaffolding;
+# this drops them (gate_count keeps the real count) and marks the
+# report antenna_tables_omitted: true. Every verdict, erc_findings and
+# the exit code are identical to the full run -- verified at the pinned
+# klayout-tools==0.8.0: exit 4 both ways, erc_status clean, and
+# erc_coverage.checked byte-identical to both the full run at the pin
+# and the committed artifact. Two caveats. (1) At that pin the omit
+# flag requires --findings-only, which rewrites coverage.skipped's
+# reason from missing_antenna_pdk to findings_only -- the report then
+# records that the run opted out, not that gf180 lacks an antenna
+# table; a pin that accepts the flag alone restores the aggregated
+# reason. (2) The committed artifact predates these flags, so a fresh
+# run is NOT byte-identical to it (gates[]/coverage shape differs);
+# regenerating -- and re-pinning signoff/manifest.json + signoff.json
+# -- is a separate, deliberate decision, not part of this recipe fix.
 klt erc layout/gds/tmds_encoder.gds layout/erc-supply-spec.json \
+  --findings-only --omit-antenna-tables \
   --format json > layout/erc_reports/tmds_encoder.erc.json
 klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.known-gap.json \
   --format json > layout/erc_reports/tmds_encoder_tie_known_gap.erc.json
@@ -1485,7 +1504,20 @@ the gate-level-verilog LVS read that supplies the verdict is documented in
 the next subsection. The committed ERC report's antenna verdicts are all
 `unchecked` (`--pdk` intentionally omitted — gf180 is not in `klt erc`'s
 built-in antenna-limit table), which per the item's own text does not
-block item 11.
+block item 11. Those ungraded antenna tables are additionally *omitted
+by flag* from any report the current recipe produces (issue #320):
+`--findings-only --omit-antenna-tables` drops the all-`unchecked`
+`gates[]` array (`gate_count` keeps the real count) and collapses the
+per-gate antenna coverage entries to one aggregate each, so
+`antenna_tables_omitted: true` is the marker a reader should see in a
+report from the current recipe — the tables are omitted deliberately,
+not missing by accident. The committed artifact predates the flag and
+still carries the full scaffolding (2.67 MB, ~67% of it all-`unchecked`
+antenna tables); regenerating it under the current recipe — measured at
+the pinned 0.8.0 as ~44 KB with every graded field identical (exit 4,
+`erc_findings`/`erc_status`/`erc_coverage.checked` byte-identical to
+the committed report) — re-pins signoff hashes and is a separate,
+deliberate decision.
 
 **Tool-version note.** The two committed reports carry
 `provenance.klt_version: "0.5.0"` from a klayout-tools source build at
