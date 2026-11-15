@@ -3,7 +3,6 @@
   "description": "Loom-managed workspace with AI development orchestration",
   "private": true,
   "scripts": {
-    "worktree:return": "./.loom/scripts/worktree-return.sh",
     "check:ci": "bash .github/scripts/lint.sh",
     "check:all": "bash .github/scripts/lint.sh && python3 -m unittest discover -s sim/tests -v",
     "test": "python3 -m unittest discover -s sim/tests -v",
