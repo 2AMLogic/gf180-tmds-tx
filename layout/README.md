@@ -1174,6 +1174,7 @@ erc-supply-spec.json                          klt erc supply spec -- the T1 item
                                               delivery) declared-supply read (issue #188, see below)
 erc-tie-spec.known-gap.json                   HISTORICAL: klt erc spec that reproduced klayout-tools#2169 (NOT a signoff spec)
 erc-tie-spec.negctl.json                      negative control: the production spec with nwell_vdd_tap pointed at VSS
+erc_reports/tmds_encoder.negctl_tie.erc.json  control: 18 erc.missing_tie -- committed negative-control report (issue #337)
 erc_reports/tmds_encoder.erc.json             klt erc supply report -- VDD and VSS each one island,
                                               both ties checked, zero findings (issue #206)
 erc-supply-spec.pad-ring.json                 klt erc supply spec for the analog pad-ring assembly (issue #207)
@@ -1253,6 +1254,12 @@ klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format text > layout/
 klt erc layout/gds/tmds_encoder.gds layout/erc-supply-spec.json \
   --findings-only --omit-antenna-tables \
   --format json > layout/erc_reports/tmds_encoder.erc.json
+# Negative control (issue #337): the committed erc.missing_tie control
+# report -- same flagged recipe as the supply read; expect exit 3 with
+# 18 erc.missing_tie findings.
+klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.negctl.json \
+  --findings-only --omit-antenna-tables \
+  --format json > layout/erc_reports/tmds_encoder.negctl_tie.erc.json
 klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.known-gap.json \
   --format json > layout/erc_reports/tmds_encoder_tie_known_gap.erc.json
 
@@ -1520,11 +1527,19 @@ below use that build and the committed GDS,
 4. *Negative control* -- `erc-tie-spec.negctl.json` is the production spec
    with `nwell_vdd_tap.net` changed to `VSS`:
    `klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.negctl.json
-   --format json` exits 3 with **18 `erc.missing_tie`** findings ("well/tub
-   tap is not connected to declared net 'VSS'", layer `nwell_vdd_tap`). A
+   --findings-only --omit-antenna-tables --format json` exits 3 with **18
+   `erc.missing_tie`** findings ("well/tub tap is not connected to declared
+   net 'VSS'", layer `nwell_vdd_tap`). A
    tie pointed at an absent net (`VDD_ABSENT`) likewise gave 18. The tie
-   check can fail. (Control reports are not committed, 2.7 MB each; the
-   spec is, and the command reproduces them.)
+   check can fail. The control report is committed --
+   `erc_reports/tmds_encoder.negctl_tie.erc.json`, 51 KB (issue #337) --
+   and is the first committed ERC report in `findings_only` shape: no
+   `gates[]`/antenna table, and `coverage.skipped`'s reason reads
+   `findings_only` (the run opted out of the aggregated antenna check,
+   which gf180 has no table for anyway -- see the issue-#320 note in the
+   regeneration block above). Every other committed report keeps
+   `findings_only: false` with per-antenna `missing_antenna_pdk` skips;
+   the shape difference is the flag, not a tool regression.
 
 The earlier standing-in evidence (kept for context, no longer load-bearing
 for ties) was:
