@@ -2,8 +2,9 @@
   "schema_version": 1,
   "kind": "t1-attestation-inventory",
   "t1_item": 9,
-  "description": "Digital partition: the cocotb benches and their negative controls. cold_start runs both verification/*/runner.py cold-start entry points (good DUT must pass, broken DUT must fail).",
+  "description": "Digital partition: the cocotb benches, their negative controls, and the shared three-leg runner skeleton (verification/_bench_runner.py) both benches delegate to. cold_start runs both verification/*/runner.py cold-start entry points (good DUT must pass, broken DUT must fail).",
   "testbenches": [
+    "verification/_bench_runner.py",
     "verification/requirements.txt",
     "verification/tmds_encoder/negative_control/tmds_encoder_broken.v",
     "verification/tmds_encoder/runner.py",
