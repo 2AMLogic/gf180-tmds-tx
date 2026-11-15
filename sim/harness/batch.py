@@ -34,7 +34,7 @@ from pathlib import Path
 
 from .corners import PvtPoint
 from .pdk import Pdk
-from .runner import DEFAULT_TIMEOUT_S, PointResult, _is_raw_meas_expr
+from .runner import DEFAULT_TIMEOUT_S, PointResult, _is_raw_meas_expr, _option_lines
 from .testbench import Testbench
 
 KLT = os.environ.get("KLT_BIN", "klt")
@@ -92,11 +92,7 @@ def compose_body(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
     for key, value in tb.params.items():
         lines.append(f".param {key}={value}")
     lines.append(f'.include "{pdk.design_include}"')
-    for option in tb.options:
-        lines.append(f".options {option}")
-    for key in ("reltol", "abstol", "vntol"):
-        if key in tb.transient:
-            lines.append(f".options {key}={tb.transient[key]!r}")
+    lines += _option_lines(tb)
     if tb.dut is not None:
         lines.append(f"* provenance: {tb.dut_provenance_class}  sha256 {tb.dut_sha256}")
         lines.append(f'.include "{tb.dut}"')

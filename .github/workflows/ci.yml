@@ -266,6 +266,15 @@ jobs:
       - name: Stored-evidence manifest checker unit tests
         run: python3 -m unittest discover -s scripts/tests -v
 
+      - name: STA request-envelope guard unit tests (no PDK, no klt required)
+        # Covers flow/klt_sta_tmds_encoder.py build_request() against the
+        # committed graded envelope flow/tmds_encoder/klt_sta.json and the
+        # ratified 720p60 clock in spec/tmds-tx.md §1. That envelope is
+        # append-only signoff evidence (signoff/manifest.json 5.digital), so
+        # a request that no longer describes it must fail loudly here
+        # (issue #324) rather than drift quietly until the next signoff run.
+        run: python3 -m unittest discover -s flow/tests -v
+
       - name: Environment check (informational -- no PDK on this runner)
         # sim/harness/README.md's documented contract: --check-env exits 3
         # and prints an actionable install hint when the PDK is absent. That
