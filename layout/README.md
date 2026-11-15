@@ -512,6 +512,8 @@ lvs_reports/tmds_final_mux*.lvs.{json,txt}            klt lvs reports, both cell
 lvs/tmds_final_mux.ref.spice            hand-written reference netlist for LVS (see that file's own header)
 lvs/tmds_final_mux.lvs_request*.json    klt lvs request documents
 tests/test_gen_tmds_final_mux.py        port list + device/resistor inventory vs. design/netlist/tmds_final_mux.spice
+scripts/gen_tmds_final_mux_dut.py       extracted netlist -> simulatable DUT fragment (issue #311)
+sim/tmds_final_mux_dut.spice            the DUT fragment post-layout re-simulation of this cell uses
 ```
 
 Regenerate and re-run signoff:
@@ -567,6 +569,58 @@ collapses out of correspondence), confirming the LVS check actually
 distinguishes connected from disconnected for this cell too. Both cells
 are enrolled in `check_lvs_signoff.py --list`'s consistency check (step
 6/6 of `.github/scripts/lint.sh`).
+
+**Simulatable DUT fragment**: as with `cml_driver_core`, the extracted
+netlist is an LVS signoff artifact and is not directly simulatable — the
+device cards name klt's extraction-deck classes (`nfet`, `ppolyf_u`) rather
+than models the PDK ships, and the extracted boundary carries an extra
+deck-synthesized body pin (`vsubs`) plus the promoted internal nodes
+`IBIAS`/`SA`/`SB`/`TAIL`/`TOP`. `scripts/gen_tmds_final_mux_dut.py`
+mechanically derives the simulatable form — MOS binding to `nfet_03v3`
+(carrying AS/AD/PS/PD through), the four `ppolyf_u` bodies as plain ngspice
+`R` elements on the extraction's own ohms (the same convention
+`lvs/tmds_final_mux.ref.spice` uses), the `vsubs`→`VSS` body tie, and a
+wrapper presenting the schematic's own 10-pin boundary:
+
+```bash
+python3 layout/scripts/gen_tmds_final_mux_dut.py   # writes layout/sim/tmds_final_mux_dut.spice
+python3 layout/scripts/gen_tmds_final_mux_dut.py --check   # CI: committed output is not stale
+```
+
+Unlike the driver core, the extracted cell and the schematic cell **share
+the name** `tmds_final_mux`, so the generator renames the inner extracted
+subcircuit to `tmds_final_mux_extracted` — two same-named `.subckt`
+definitions in one deck are resolved *silently* by ngspice rather than
+reported. Nothing in the fragment is hand-written:
+`sim/tests/test_tmds_final_mux_dut.py` re-derives it and independently
+asserts the wrapper boundary against `design/netlist/tmds_final_mux.spice`'s
+`**.subckt` line, the resistor network against
+`lvs/tmds_final_mux.ref.spice`, and that `sim/tmds-final-mux-eye`'s
+`v(xmux_m.sa)` / `v(xmux_m.tail)` probes still resolve.
+
+**What that fragment does not model**: no interconnect parasitics
+(`klt extract --parasitics` was not used), no NRD/NRS diffusion sheet
+counts, and — specific to this cell — **no poly sheet-rho corner
+dependence**. The extraction reports each `ppolyf_u` body as ohms with no
+`r_width`/`r_length`, and `R = rsh·(r_length/r_width)` fixes only the ratio,
+so the committed `R` elements are corner-invariant. A multi-corner run
+against this fragment therefore does *not* exercise
+`design/tmds-final-mux-sizing.md` §3's process-invariance argument (that
+`RC`/`RLP`/`RLN`/`RREF` cancel because they share one `rsh_ppolyf_u`) — that
+axis is absent, not swept. The generator's header states this so a later
+re-simulation does not misread the resulting schematic-vs-extracted
+difference as a layout effect. That is a property of the *input*, not a klt
+limitation — klt's `--pdk` binding is geometry-parameterized for gf180mcu
+`ppolyf_u` (`r_length`/`r_width`, read off the extracted device), so
+recovering the corner dependence means a `--pdk`-bound re-extraction, not a
+change to this translator. The committed input is the `--deck` form because
+that is the LVS signoff artifact and it carries per-device AS/AD/PS/PD;
+anyone switching should re-verify what the `--pdk` form carries on the MOS
+side at the klt build in use. (No klayout-tools friction issue was filed for
+this: the capability exists.) The fragment is also **not** a drop-in
+`--dut` for `sim/tmds-final-mux-eye`, whose `tb.json` consumes the composite
+`sim/dut/tmds_output_stage.spice` (mux plus a real `cml_driver`); building
+that composite and running it are tracked separately.
 
 **Friction filed (CLAUDE.md's friction protocol)**: this cell's net graph
 (`OUTP`/`OUTN`/`TAIL` on one side, `SA`/`SB`/`TOP` on the other, joined
