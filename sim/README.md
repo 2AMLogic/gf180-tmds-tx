@@ -109,6 +109,42 @@ sim/
       <record-id>.md                 # append-only summary record
 ```
 
+> **What a per-corner log contains (issue #305).** From this point on the
+> harness emits `.options noinit`, so ngspice no longer prints its
+> operating-point node table ("Initial Transient Solution" -- one line per
+> node, which on a post-layout-extracted DUT is one line per *parasitic*
+> node) into the log. Everything a record quotes is unaffected: the title,
+> the `.temp` and solver lines, `No. of Data Rows`, every ngspice warning and
+> every `m_*` measurement line are identical with and without the directive,
+> and this is the only block it removes (verified on ngspice-47 by running one
+> corner of `smoke-cml-pair` both ways -- the `m_*` block is byte-identical
+> and matches the committed `20260808-032312-430859a` log). A log is therefore
+> no longer byte-verbatim ngspice *default* output; it is verbatim output of a
+> deck that asks ngspice to print less. A debug testbench that genuinely needs
+> the node table opts out with `"options": ["noinit=0"]` (see
+> `sim/harness/README.md`).
+>
+> **What else a per-corner log drops (issue #317).** A further step from
+> verbatim output, this one below the deck: the harness's log write path also
+> filters out ngspice's ` Reference value :  <float>` lines -- the transient
+> solver's progress trace, one per accepted internal step. No netlist
+> directive suppresses these lines (verified on ngspice-47; `noinit` touches
+> only the node table), so the two write sites through which raw ngspice text
+> reaches a log -- `harness/runner.py`'s local backend and
+> `harness/report.py`'s `write_device_corner_log` -- drop them at write time
+> through the one shared `runner.filter_progress_trace`. They carry no
+> measurement and nothing in the tree reads them; every other line (`m_*`,
+> warnings, `No. of Data Rows`) is preserved byte for byte -- on issue
+> #305's representative log, this takes the post-`noinit` residual from
+> 2,016 lines to 64. A debug testbench that wants the trace back opts out
+> with `"options": ["reftrace=1"]` (see `sim/harness/README.md`). The batch
+> backend is unaffected either way: its log is a klt CLI wrapper around
+> klt's own JSON report, and raw ngspice text never reaches that write.
+>
+> **Forward-only.** Nothing already committed under `corners/<record-id>/` is
+> touched, re-generated or trimmed -- recorded evidence stays append-only, so
+> logs from earlier records still carry the table.
+
 > **Stored evidence (manifest-forward).** Records minted before this rule keep
 > their raw logs committed under `corners/<record-id>/`. New runs do not: the
 > harness stages the logs in the git-ignored `sim/.work/.stage/`, stores them

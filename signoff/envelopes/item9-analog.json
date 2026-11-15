@@ -94,14 +94,14 @@
         "role": "testbench",
         "path": "sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice",
         "passed": true,
-        "content_hash": "sha256:922b3a1a3b562c23ba008089aca7751ace369cbf64d601dcb028d01a7b44a410"
+        "content_hash": "sha256:e250e1cf600219adbf70ca8baa24e12754a067464bdadcef6da10059a3faf1f0"
       },
       {
         "check": "present",
         "role": "testbench",
         "path": "sim/esd-diode-clamp-cv/testbench/tb.json",
         "passed": true,
-        "content_hash": "sha256:04760a6ff16deaf252a735143a310a9812d860b14038498474c5c82f6e899cf9"
+        "content_hash": "sha256:f672789fbb671c8fb859d3b87c5fe55024e11a667ff93b777f01ccbc9877e7a7"
       },
       {
         "check": "present",

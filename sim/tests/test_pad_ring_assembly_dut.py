@@ -32,8 +32,22 @@ import unittest
 from collections import defaultdict
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPTS_DIR = REPO_ROOT / "layout" / "scripts"
+TESTS_DIR = Path(__file__).resolve().parent
+if str(TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(TESTS_DIR))
+
+from _dut_netlist import (  # noqa: E402
+    REPO_ROOT,
+    SCRIPTS_DIR,
+    _D_RE,
+    _M_RE,
+    _X_RE,
+    _cards,
+    _params,
+    _value,
+    assert_wrapper_pin_order,
+)
+
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
@@ -42,47 +56,6 @@ import gen_pad_ring_assembly_dut as gen  # noqa: E402
 EXTRACTED = REPO_ROOT / "layout" / "gds" / "gf180_tmds_pad_ring_assembly.spice"
 DUT = REPO_ROOT / "layout" / "sim" / "gf180_tmds_pad_ring_assembly_dut.spice"
 LVS_REF = REPO_ROOT / "layout" / "lvs" / "gf180_tmds_pad_ring_assembly.ref.spice"
-SCHEMATIC_DUT = (
-    REPO_ROOT / "sim" / "cml-driver-eye" / "testbench" / "cml_driver_dut.spice"
-)
-
-_X_RE = re.compile(
-    r"^X(?P<name>\S+)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
-    r"(?P<model>\S+)\s*(?P<params>.*)$",
-    re.IGNORECASE,
-)
-_D_RE = re.compile(
-    r"^D(?P<name>\S+)\s+(?P<a>\S+)\s+(?P<c>\S+)\s+(?P<model>\S+)\s*(?P<params>.*)$",
-    re.IGNORECASE,
-)
-_UNITS = {"u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15, "m": 1e-3}
-
-
-def _cards(path: Path, pattern: re.Pattern) -> list[re.Match]:
-    out = []
-    for line in path.read_text().splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("*"):
-            continue
-        match = pattern.match(stripped)
-        if match:
-            out.append(match)
-    return out
-
-
-def _params(text: str) -> dict[str, str]:
-    return {
-        key.lower(): value
-        for key, value in (item.split("=", 1) for item in text.split() if "=" in item)
-    }
-
-
-def _value(text: str) -> float:
-    """SPICE scalar -> float ('2U' -> 2e-6, '0.42P' -> 4.2e-13)."""
-    text = text.strip().lower()
-    if text and text[-1] in _UNITS:
-        return float(text[:-1]) * _UNITS[text[-1]]
-    return float(text)
 
 
 class RegenerationTests(unittest.TestCase):
@@ -240,19 +213,10 @@ class WrapperTests(unittest.TestCase):
         self.text = DUT.read_text()
 
     def test_wrapper_pin_order_matches_the_schematic_dut(self):
-        schematic = re.search(
-            r"^\.subckt\s+cml_driver\s+(.*)$",
-            SCHEMATIC_DUT.read_text(),
-            re.IGNORECASE | re.MULTILINE,
-        )
-        post_layout = re.search(
-            r"^\.subckt\s+cml_driver\s+(.*)$", self.text, re.IGNORECASE | re.MULTILINE
-        )
-        self.assertIsNotNone(schematic)
-        self.assertIsNotNone(post_layout)
-        self.assertEqual(schematic.group(1).split(), post_layout.group(1).split())
-        self.assertEqual(
-            post_layout.group(1).split(),
+        assert_wrapper_pin_order(
+            self,
+            self.text,
+            "cml_driver",
             ["OUTP", "OUTN", "INP", "INN", "IBIAS", "VSS"],
         )
 
@@ -341,13 +305,8 @@ class TopologyFoldTests(unittest.TestCase):
         # The LVS reference is written in klt lvs's schematic-equivalent
         # plain-element form (M-cards naming the bare 'nfet' class), not the
         # X-card/nfet_03v3 form the extraction and this DUT use.
-        m_re = re.compile(
-            r"^M(?P<name>\S+)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
-            r"(?P<model>\S+)\s*(?P<params>.*)$",
-            re.IGNORECASE,
-        )
         reference = {}
-        for match in _cards(LVS_REF, m_re):
+        for match in _cards(LVS_REF, _M_RE):
             params = _params(match.group("params"))
             reference[match.group("name")] = (
                 match.group("g"),
