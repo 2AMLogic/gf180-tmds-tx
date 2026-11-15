@@ -97,7 +97,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from _dut_translator_cli import TranslationError, run_cli, sha256  # noqa: F401
+from _dut_translator_cli import TranslationError, run_cli
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
