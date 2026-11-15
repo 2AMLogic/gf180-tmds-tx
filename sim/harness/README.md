@@ -94,8 +94,10 @@ temperatures × 3 supplies = 45 operating points for a DC/op-point testbench;
 a transient testbench with two `rates_mbps` doubles that to 90.
 
 Each point becomes one `<corner-id>` — `<process>_<temp>c_<supply>v[_<rate>]`,
-the naming `sim/README.md` ratifies — and one raw log under
-`corners/<record-id>/`.
+the naming `sim/README.md` ratifies — and one raw `<corner-id>.log`, stored
+via the artifact broker for manifest-forward runs (see "Stored evidence"
+below) or committed under `corners/<record-id>/` for legacy records and the
+un-migrated device benches.
 
 Override any axis from the command line:
 
@@ -293,7 +295,7 @@ writes, under `sim/<experiment-slug>/`:
 |---|---|
 | `records/<record-id>.md` | the append-only summary record (the fields from `sim/README.md`, plus an Environment section with PDK / ngspice / harness / git provenance and the per-corner model sections) |
 | `netlist-snapshots/<record-id>.spice` | verbatim frozen copy of the testbench fragment, with its sha256 |
-| `corners/<record-id>/<corner-id>.log` | raw ngspice output, one file per PVT (x rate) point |
+| `corners/<record-id>/<corner-id>.log` | raw ngspice output, one file per PVT (x rate) point (legacy records and the un-migrated device benches only; manifest-forward runs store them via the artifact broker, see "Stored evidence" below) |
 
 Nothing is ever overwritten: the runner refuses to write over an existing
 record or snapshot, and mints a later record-id if one is somehow already
