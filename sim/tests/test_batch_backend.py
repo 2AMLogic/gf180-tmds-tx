@@ -234,6 +234,21 @@ def _body_shared_lines(body: str) -> list[str]:
     ]
 
 
+def _provenance_lines(text: str) -> list[str]:
+    """The ``* provenance:`` comment lines of a composer's output.
+
+    ``_deck_shared_lines`` and ``_body_shared_lines`` strip every comment, so
+    the provenance line ``runner._dut_lines`` emits above the DUT ``.include``
+    never reaches that comparison -- a wrong ``sha256`` or provenance class on
+    either side would go unnoticed. This is its dedicated check: the two
+    composers must emit the identical provenance list, one line for a bench
+    with a DUT and none for a bench without one.
+    """
+    return [
+        line for line in text.splitlines() if line.startswith("* provenance:")
+    ]
+
+
 class SharedCompositionTests(unittest.TestCase):
     """The two composers must never drift apart (issue #308).
 
@@ -244,7 +259,9 @@ class SharedCompositionTests(unittest.TestCase):
     still measure, and still write a well-formed record. These tests are that
     alarm. Both composers now assemble the shared directives from one set of
     helpers in ``runner``, so a directive added in the right place reaches
-    both; adding one to a single composer instead fails here.
+    both; adding one to a single composer instead fails here. The DUT
+    provenance comment is compared separately by ``_provenance_lines`` --
+    the directive comparison strips comments, so it cannot see that line.
     """
 
     def _benches(self):
@@ -273,6 +290,12 @@ class SharedCompositionTests(unittest.TestCase):
                     _body_shared_lines(body),
                     f"{tb.name} @ {point.corner_id}: the local deck and the "
                     f"batch body disagree on the shared circuit definition",
+                )
+                self.assertEqual(
+                    _provenance_lines(deck),
+                    _provenance_lines(body),
+                    f"{tb.name} @ {point.corner_id}: the local deck and the "
+                    f"batch body disagree on the DUT provenance comment",
                 )
                 checked += 1
         self.assertGreater(checked, 0)
@@ -305,6 +328,38 @@ class SharedCompositionTests(unittest.TestCase):
             deck = runner_mod.compose_deck(tb, pdk, point)
             body = batch_mod.compose_body(tb, pdk, point)
         self.assertNotEqual(_deck_shared_lines(deck), _body_shared_lines(body))
+
+    def test_a_provenance_divergence_is_caught(self):
+        """The provenance check fails when the composers' DUT comments drift.
+
+        Mirrors ``test_a_directive_added_to_only_one_composer_is_caught``:
+        patching ``runner._dut_lines`` moves ``compose_deck`` only -- ``batch``
+        holds its own import-time reference. The bench must have a DUT or no
+        provenance line exists to diverge. The divergence is confined to the
+        comment (the ``.include`` stays shared), so the directive comparison
+        stays green and only ``_provenance_lines`` can catch this.
+        """
+        tb = tb_mod.load(SIM_DIR / "cml-driver-eye")
+        point = self._grid(tb)[0]
+        pdk = _Pdk()
+        real = runner_mod._dut_lines
+
+        def tampered_comment(t):
+            lines = real(t)
+            if not lines:
+                return lines
+            return ["* provenance: Bogus  sha256 deadbeef", *lines[1:]]
+
+        with mock.patch.object(runner_mod, "_dut_lines", tampered_comment):
+            deck = runner_mod.compose_deck(tb, pdk, point)
+            body = batch_mod.compose_body(tb, pdk, point)
+            self.assertEqual(
+                _deck_shared_lines(deck),
+                _body_shared_lines(body),
+                "the directive comparison strips comments, so it must stay "
+                "green on a comment-only divergence",
+            )
+        self.assertNotEqual(_provenance_lines(deck), _provenance_lines(body))
 
 
 if __name__ == "__main__":
