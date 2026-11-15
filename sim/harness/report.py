@@ -6,7 +6,14 @@ produces a Markdown summary record at
     sim/<experiment-slug>/records/<record-id>.md
 
 alongside a frozen netlist at ``netlist-snapshots/<record-id>.spice`` and the
-raw per-corner ngspice logs at ``corners/<record-id>/<corner-id>.log``.
+raw per-corner ngspice logs. Storage is manifest-forward: the harness stages
+the logs, stores them as artifact-store objects, and cites them from the
+repo-root ``manifests/artifacts/<experiment-slug>-<record-id>.manifest.json``
+(see ``sim/README.md``'s "Stored evidence (manifest-forward)" block) -- a
+manifest-backed record has no ``corners/<record-id>/`` directory. Committed
+logs under ``corners/<record-id>/`` remain for legacy (pre-migration)
+records and for the un-migrated ``cml-driver-mismatch`` device bench
+(issue #23), which still writes them.
 
 ``<record-id>`` is ``<YYYYMMDD>-<HHMMSS>-<short-git-sha>``.
 
@@ -251,9 +258,9 @@ def evaluate_checks(
 def environment(pdk: Pdk, ngspice: str, repo_root: Path, git: dict | None = None) -> dict:
     """Reproducibility provenance for the record.
 
-    ``git`` should be sampled *before* the run starts. The harness writes its
-    own per-corner logs into the tracked evidence tree, so sampling afterwards
-    would report every record as taken against a dirty tree.
+    ``git`` should be sampled *before* the run starts: the record must
+    describe the tree the netlist came from, not the tree after the run
+    wrote its evidence out of it.
     """
     try:
         user = getpass.getuser()
