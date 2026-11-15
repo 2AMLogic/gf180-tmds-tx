@@ -512,6 +512,8 @@ lvs_reports/tmds_final_mux*.lvs.{json,txt}            klt lvs reports, both cell
 lvs/tmds_final_mux.ref.spice            hand-written reference netlist for LVS (see that file's own header)
 lvs/tmds_final_mux.lvs_request*.json    klt lvs request documents
 tests/test_gen_tmds_final_mux.py        port list + device/resistor inventory vs. design/netlist/tmds_final_mux.spice
+scripts/gen_tmds_final_mux_dut.py       extracted netlist -> simulatable DUT fragment (issue #311)
+sim/tmds_final_mux_dut.spice            the DUT fragment post-layout re-simulation of this cell uses
 ```
 
 Regenerate and re-run signoff:
@@ -567,6 +569,58 @@ collapses out of correspondence), confirming the LVS check actually
 distinguishes connected from disconnected for this cell too. Both cells
 are enrolled in `check_lvs_signoff.py --list`'s consistency check (step
 6/6 of `.github/scripts/lint.sh`).
+
+**Simulatable DUT fragment**: as with `cml_driver_core`, the extracted
+netlist is an LVS signoff artifact and is not directly simulatable — the
+device cards name klt's extraction-deck classes (`nfet`, `ppolyf_u`) rather
+than models the PDK ships, and the extracted boundary carries an extra
+deck-synthesized body pin (`vsubs`) plus the promoted internal nodes
+`IBIAS`/`SA`/`SB`/`TAIL`/`TOP`. `scripts/gen_tmds_final_mux_dut.py`
+mechanically derives the simulatable form — MOS binding to `nfet_03v3`
+(carrying AS/AD/PS/PD through), the four `ppolyf_u` bodies as plain ngspice
+`R` elements on the extraction's own ohms (the same convention
+`lvs/tmds_final_mux.ref.spice` uses), the `vsubs`→`VSS` body tie, and a
+wrapper presenting the schematic's own 10-pin boundary:
+
+```bash
+python3 layout/scripts/gen_tmds_final_mux_dut.py   # writes layout/sim/tmds_final_mux_dut.spice
+python3 layout/scripts/gen_tmds_final_mux_dut.py --check   # CI: committed output is not stale
+```
+
+Unlike the driver core, the extracted cell and the schematic cell **share
+the name** `tmds_final_mux`, so the generator renames the inner extracted
+subcircuit to `tmds_final_mux_extracted` — two same-named `.subckt`
+definitions in one deck are resolved *silently* by ngspice rather than
+reported. Nothing in the fragment is hand-written:
+`sim/tests/test_tmds_final_mux_dut.py` re-derives it and independently
+asserts the wrapper boundary against `design/netlist/tmds_final_mux.spice`'s
+`**.subckt` line, the resistor network against
+`lvs/tmds_final_mux.ref.spice`, and that `sim/tmds-final-mux-eye`'s
+`v(xmux_m.sa)` / `v(xmux_m.tail)` probes still resolve.
+
+**What that fragment does not model**: no interconnect parasitics
+(`klt extract --parasitics` was not used), no NRD/NRS diffusion sheet
+counts, and — specific to this cell — **no poly sheet-rho corner
+dependence**. The extraction reports each `ppolyf_u` body as ohms with no
+`r_width`/`r_length`, and `R = rsh·(r_length/r_width)` fixes only the ratio,
+so the committed `R` elements are corner-invariant. A multi-corner run
+against this fragment therefore does *not* exercise
+`design/tmds-final-mux-sizing.md` §3's process-invariance argument (that
+`RC`/`RLP`/`RLN`/`RREF` cancel because they share one `rsh_ppolyf_u`) — that
+axis is absent, not swept. The generator's header states this so a later
+re-simulation does not misread the resulting schematic-vs-extracted
+difference as a layout effect. That is a property of the *input*, not a klt
+limitation — klt's `--pdk` binding is geometry-parameterized for gf180mcu
+`ppolyf_u` (`r_length`/`r_width`, read off the extracted device), so
+recovering the corner dependence means a `--pdk`-bound re-extraction, not a
+change to this translator. The committed input is the `--deck` form because
+that is the LVS signoff artifact and it carries per-device AS/AD/PS/PD;
+anyone switching should re-verify what the `--pdk` form carries on the MOS
+side at the klt build in use. (No klayout-tools friction issue was filed for
+this: the capability exists.) The fragment is also **not** a drop-in
+`--dut` for `sim/tmds-final-mux-eye`, whose `tb.json` consumes the composite
+`sim/dut/tmds_output_stage.spice` (mux plus a real `cml_driver`); building
+that composite and running it are tracked separately.
 
 **Friction filed (CLAUDE.md's friction protocol)**: this cell's net graph
 (`OUTP`/`OUTN`/`TAIL` on one side, `SA`/`SB`/`TOP` on the other, joined
@@ -1178,7 +1232,26 @@ klt lvs layout/lvs/tmds_encoder.lvs_request_shorted.json --format text > layout/
 # produced by a klt build carrying klayout-tools #1968/#2036 (the report
 # `provenance` + spec content-hash fields, not yet in PyPI's 0.5.0); a
 # klt from source at or after v0.5.0-101-gfe6fe526 reproduces them.
+# NOTE (issue #320): --findings-only --omit-antenna-tables drops the
+# antenna half of the report. With no --pdk (gf180 is not in klt erc's
+# built-in antenna-limit table) nothing antenna-side is graded, so the
+# per-gate/per-level antenna tables are all-"unchecked" scaffolding;
+# this drops them (gate_count keeps the real count) and marks the
+# report antenna_tables_omitted: true. Every verdict, erc_findings and
+# the exit code are identical to the full run -- verified at the pinned
+# klayout-tools==0.8.0: exit 4 both ways, erc_status clean, and
+# erc_coverage.checked byte-identical to both the full run at the pin
+# and the committed artifact. Two caveats. (1) At that pin the omit
+# flag requires --findings-only, which rewrites coverage.skipped's
+# reason from missing_antenna_pdk to findings_only -- the report then
+# records that the run opted out, not that gf180 lacks an antenna
+# table; a pin that accepts the flag alone restores the aggregated
+# reason. (2) The committed artifact predates these flags, so a fresh
+# run is NOT byte-identical to it (gates[]/coverage shape differs);
+# regenerating -- and re-pinning signoff/manifest.json + signoff.json
+# -- is a separate, deliberate decision, not part of this recipe fix.
 klt erc layout/gds/tmds_encoder.gds layout/erc-supply-spec.json \
+  --findings-only --omit-antenna-tables \
   --format json > layout/erc_reports/tmds_encoder.erc.json
 klt erc layout/gds/tmds_encoder.gds layout/erc-tie-spec.known-gap.json \
   --format json > layout/erc_reports/tmds_encoder_tie_known_gap.erc.json
@@ -1485,7 +1558,20 @@ the gate-level-verilog LVS read that supplies the verdict is documented in
 the next subsection. The committed ERC report's antenna verdicts are all
 `unchecked` (`--pdk` intentionally omitted — gf180 is not in `klt erc`'s
 built-in antenna-limit table), which per the item's own text does not
-block item 11.
+block item 11. Those ungraded antenna tables are additionally *omitted
+by flag* from any report the current recipe produces (issue #320):
+`--findings-only --omit-antenna-tables` drops the all-`unchecked`
+`gates[]` array (`gate_count` keeps the real count) and collapses the
+per-gate antenna coverage entries to one aggregate each, so
+`antenna_tables_omitted: true` is the marker a reader should see in a
+report from the current recipe — the tables are omitted deliberately,
+not missing by accident. The committed artifact predates the flag and
+still carries the full scaffolding (2.67 MB, ~67% of it all-`unchecked`
+antenna tables); regenerating it under the current recipe — measured at
+the pinned 0.8.0 as ~44 KB with every graded field identical (exit 4,
+`erc_findings`/`erc_status`/`erc_coverage.checked` byte-identical to
+the committed report) — re-pins signoff hashes and is a separate,
+deliberate decision.
 
 **Tool-version note.** The two committed reports carry
 `provenance.klt_version: "0.5.0"` from a klayout-tools source build at

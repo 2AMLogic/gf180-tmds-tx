@@ -6,7 +6,14 @@ produces a Markdown summary record at
     sim/<experiment-slug>/records/<record-id>.md
 
 alongside a frozen netlist at ``netlist-snapshots/<record-id>.spice`` and the
-raw per-corner ngspice logs at ``corners/<record-id>/<corner-id>.log``.
+raw per-corner ngspice logs. Storage is manifest-forward: the harness stages
+the logs, stores them as artifact-store objects, and cites them from the
+repo-root ``manifests/artifacts/<experiment-slug>-<record-id>.manifest.json``
+(see ``sim/README.md``'s "Stored evidence (manifest-forward)" block) -- a
+manifest-backed record has no ``corners/<record-id>/`` directory. Committed
+logs under ``corners/<record-id>/`` remain for legacy (pre-migration)
+records and for the un-migrated ``cml-driver-mismatch`` device bench
+(issue #23), which still writes them.
 
 ``<record-id>`` is ``<YYYYMMDD>-<HHMMSS>-<short-git-sha>``.
 
@@ -45,7 +52,7 @@ from .corners import (
 from . import evidence_store
 from .evidence_lint import _git
 from .pdk import Pdk
-from .runner import PointResult
+from .runner import PointResult, filter_progress_trace
 from .testbench import Testbench
 
 #: Subdirectories of ``sim/<experiment-slug>/`` defined by ``sim/README.md``.
@@ -251,9 +258,9 @@ def evaluate_checks(
 def environment(pdk: Pdk, ngspice: str, repo_root: Path, git: dict | None = None) -> dict:
     """Reproducibility provenance for the record.
 
-    ``git`` should be sampled *before* the run starts. The harness writes its
-    own per-corner logs into the tracked evidence tree, so sampling afterwards
-    would report every record as taken against a dirty tree.
+    ``git`` should be sampled *before* the run starts: the record must
+    describe the tree the netlist came from, not the tree after the run
+    wrote its evidence out of it.
     """
     try:
         user = getpass.getuser()
@@ -733,13 +740,32 @@ def write_record(record: dict, experiment_dir: Path) -> Path:
 
 
 def write_device_corner_log(
-    corners_dir: Path, record: str, cid: str, header: str, log: str
+    corners_dir: Path,
+    record: str,
+    cid: str,
+    header: str,
+    log: str,
+    *,
+    keep_progress_trace: bool = False,
 ) -> Path:
-    """Write ``corners/<record-id>/<corner-id>.log`` -- raw ngspice output."""
+    """Write ``corners/<record-id>/<corner-id>.log`` -- ngspice output.
+
+    ngspice's `` Reference value :`` transient solver progress trace is
+    dropped from ``log`` here, through the same one shared filter the local
+    backend applies at its own write site, so the two paths through which
+    raw ngspice text reaches a log cannot drift apart on what they drop
+    (see ``runner.filter_progress_trace``; issue #317). A device-level
+    debug run that wants the trace back passes ``keep_progress_trace=True``
+    -- the harness-level spelling of that escape hatch is the manifest
+    ``options`` entry ``runner.KEEP_PROGRESS_TRACE_OPTION``.
+    """
     out_dir = corners_dir / record
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{cid}.log"
-    path.write_text(header + log, encoding="utf-8")
+    path.write_text(
+        header + filter_progress_trace(log, keep=keep_progress_trace),
+        encoding="utf-8",
+    )
     return path
 
 

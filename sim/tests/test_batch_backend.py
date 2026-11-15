@@ -27,6 +27,7 @@ from harness import batch as batch_mod  # noqa: E402
 from harness import cli as cli_mod  # noqa: E402
 from harness import corners as corners_mod  # noqa: E402
 from harness import report as report_mod  # noqa: E402
+from harness import runner as runner_mod  # noqa: E402
 from harness import testbench as tb_mod  # noqa: E402
 from harness.pdk import Pdk  # noqa: E402
 
@@ -195,6 +196,170 @@ class BatchBackendTests(unittest.TestCase):
         d = PointResult(point=point, status="ok").as_dict()
         self.assertNotIn("backend", d)
         self.assertNotIn("batch_job_id", d)
+
+
+def _deck_shared_lines(deck: str) -> list[str]:
+    """The directives of a full local deck that the batch body must also carry.
+
+    Drops exactly what ``batch.build_request`` turns into request fields
+    instead of body text -- the ``.lib`` process sections, ``.temp``, and the
+    whole ``.control``/``.endc``/``.end`` measurement block -- plus the deck's
+    comments, section banners and blank lines. What is left is the shared
+    circuit definition, which must match ``compose_body`` line for line.
+    """
+    out: list[str] = []
+    in_control = False
+    for line in deck.splitlines():
+        if in_control:
+            if line == ".end":
+                in_control = False
+            continue
+        if line == ".control":
+            in_control = True
+            continue
+        if not line.strip() or line.startswith("*"):
+            continue
+        if line.startswith(".lib ") or line.startswith(".temp"):
+            continue
+        out.append(line)
+    return out
+
+
+def _body_shared_lines(body: str) -> list[str]:
+    """``compose_body``'s own output minus its header comment and blanks."""
+    return [
+        line
+        for line in body.splitlines()
+        if line.strip() and not line.startswith("*")
+    ]
+
+
+def _provenance_lines(text: str) -> list[str]:
+    """The ``* provenance:`` comment lines of a composer's output.
+
+    ``_deck_shared_lines`` and ``_body_shared_lines`` strip every comment, so
+    the provenance line ``runner._dut_lines`` emits above the DUT ``.include``
+    never reaches that comparison -- a wrong ``sha256`` or provenance class on
+    either side would go unnoticed. This is its dedicated check: the two
+    composers must emit the identical provenance list, one line for a bench
+    with a DUT and none for a bench without one.
+    """
+    return [
+        line for line in text.splitlines() if line.startswith("* provenance:")
+    ]
+
+
+class SharedCompositionTests(unittest.TestCase):
+    """The two composers must never drift apart (issue #308).
+
+    ``runner.compose_deck`` and ``batch.compose_body`` describe the same
+    circuit through two backends. If one gains a directive the other does not,
+    a batch record and a local record of the same bench stop describing the
+    same circuit -- and nothing would announce it: both paths would still run,
+    still measure, and still write a well-formed record. These tests are that
+    alarm. Both composers now assemble the shared directives from one set of
+    helpers in ``runner``, so a directive added in the right place reaches
+    both; adding one to a single composer instead fails here. The DUT
+    provenance comment is compared separately by ``_provenance_lines`` --
+    the directive comparison strips comments, so it cannot see that line.
+    """
+
+    def _benches(self):
+        for directory in tb_mod.discover(SIM_DIR):
+            yield tb_mod.load(directory)
+
+    def _grid(self, tb):
+        return corners_mod.build_grid(
+            corners_mod.resolve_corners(list(tb.corners)),
+            list(tb.temperatures_c),
+            corners_mod.supply_points(tb.nominal_supply_v, tb.supply_tolerance),
+            list(tb.rates_mbps) or None,
+        )
+
+    def test_every_bench_and_point_agrees_on_shared_directives(self):
+        pdk = _Pdk()
+        benches = list(self._benches())
+        self.assertGreaterEqual(len(benches), 2, "expected several benches to check")
+        checked = 0
+        for tb in benches:
+            for point in self._grid(tb):
+                deck = runner_mod.compose_deck(tb, pdk, point)
+                body = batch_mod.compose_body(tb, pdk, point)
+                self.assertEqual(
+                    _deck_shared_lines(deck),
+                    _body_shared_lines(body),
+                    f"{tb.name} @ {point.corner_id}: the local deck and the "
+                    f"batch body disagree on the shared circuit definition",
+                )
+                self.assertEqual(
+                    _provenance_lines(deck),
+                    _provenance_lines(body),
+                    f"{tb.name} @ {point.corner_id}: the local deck and the "
+                    f"batch body disagree on the DUT provenance comment",
+                )
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_coverage_spans_dut_and_rate_axis_variants(self):
+        """The check above is only a guard if it sees every shape of bench."""
+        shapes = {
+            (tb.dut is not None, bool(tb.rates_mbps)) for tb in self._benches()
+        }
+        self.assertIn((True, True), shapes, "no bench with a DUT and a rate axis")
+        self.assertIn((False, False), shapes, "no bench without a DUT or rate axis")
+
+    def test_a_directive_added_to_only_one_composer_is_caught(self):
+        """The guard fails when the two composers are made to disagree.
+
+        Without this, a guard that silently stopped comparing anything would
+        still pass. Injecting a divergence into one composer's shared helper
+        must break the comparison.
+        """
+        tb = tb_mod.load(SIM_DIR / "esd-clamp-cv")
+        point = self._grid(tb)[0]
+        pdk = _Pdk()
+        real = runner_mod._option_lines
+
+        with mock.patch.object(
+            runner_mod, "_option_lines", lambda t: real(t) + [".options noinit"]
+        ):
+            # compose_deck reads the patched helper; compose_body holds its own
+            # reference to the real one, so the two now disagree.
+            deck = runner_mod.compose_deck(tb, pdk, point)
+            body = batch_mod.compose_body(tb, pdk, point)
+        self.assertNotEqual(_deck_shared_lines(deck), _body_shared_lines(body))
+
+    def test_a_provenance_divergence_is_caught(self):
+        """The provenance check fails when the composers' DUT comments drift.
+
+        Mirrors ``test_a_directive_added_to_only_one_composer_is_caught``:
+        patching ``runner._dut_lines`` moves ``compose_deck`` only -- ``batch``
+        holds its own import-time reference. The bench must have a DUT or no
+        provenance line exists to diverge. The divergence is confined to the
+        comment (the ``.include`` stays shared), so the directive comparison
+        stays green and only ``_provenance_lines`` can catch this.
+        """
+        tb = tb_mod.load(SIM_DIR / "cml-driver-eye")
+        point = self._grid(tb)[0]
+        pdk = _Pdk()
+        real = runner_mod._dut_lines
+
+        def tampered_comment(t):
+            lines = real(t)
+            if not lines:
+                return lines
+            return ["* provenance: Bogus  sha256 deadbeef", *lines[1:]]
+
+        with mock.patch.object(runner_mod, "_dut_lines", tampered_comment):
+            deck = runner_mod.compose_deck(tb, pdk, point)
+            body = batch_mod.compose_body(tb, pdk, point)
+            self.assertEqual(
+                _deck_shared_lines(deck),
+                _body_shared_lines(body),
+                "the directive comparison strips comments, so it must stay "
+                "green on a comment-only divergence",
+            )
+        self.assertNotEqual(_provenance_lines(deck), _provenance_lines(body))
 
 
 if __name__ == "__main__":
