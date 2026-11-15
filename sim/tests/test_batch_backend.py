@@ -291,11 +291,33 @@ class SharedCompositionTests(unittest.TestCase):
                     f"{tb.name} @ {point.corner_id}: the local deck and the "
                     f"batch body disagree on the shared circuit definition",
                 )
+                deck_provenance = _provenance_lines(deck)
+                body_provenance = _provenance_lines(body)
                 self.assertEqual(
-                    _provenance_lines(deck),
-                    _provenance_lines(body),
+                    deck_provenance,
+                    body_provenance,
                     f"{tb.name} @ {point.corner_id}: the local deck and the "
                     f"batch body disagree on the DUT provenance comment",
+                )
+                # A renamed prefix would empty both sides and let the
+                # comparison above pass vacuously, so the count itself is
+                # pinned: one line for a bench with a DUT, none without.
+                expected_provenance = 1 if tb.dut is not None else 0
+                self.assertEqual(
+                    len(deck_provenance),
+                    expected_provenance,
+                    f"{tb.name} @ {point.corner_id}: expected "
+                    f"{expected_provenance} provenance comment on the deck -- "
+                    f"_provenance_lines no longer matches what _dut_lines "
+                    f"emits",
+                )
+                self.assertEqual(
+                    len(body_provenance),
+                    expected_provenance,
+                    f"{tb.name} @ {point.corner_id}: expected "
+                    f"{expected_provenance} provenance comment on the batch "
+                    f"body -- _provenance_lines no longer matches what "
+                    f"_dut_lines emits",
                 )
                 checked += 1
         self.assertGreater(checked, 0)
@@ -335,7 +357,10 @@ class SharedCompositionTests(unittest.TestCase):
         Mirrors ``test_a_directive_added_to_only_one_composer_is_caught``:
         patching ``runner._dut_lines`` moves ``compose_deck`` only -- ``batch``
         holds its own import-time reference. The bench must have a DUT or no
-        provenance line exists to diverge. The divergence is confined to the
+        provenance line exists to diverge. The bogus line is derived from
+        production output (``real(t)[0]``), not a hard-coded literal, so a
+        renamed provenance prefix empties both sides and the closing
+        assertion fails too (issue #340). The divergence is confined to the
         comment (the ``.include`` stays shared), so the directive comparison
         stays green and only ``_provenance_lines`` can catch this.
         """
@@ -348,7 +373,7 @@ class SharedCompositionTests(unittest.TestCase):
             lines = real(t)
             if not lines:
                 return lines
-            return ["* provenance: Bogus  sha256 deadbeef", *lines[1:]]
+            return [lines[0].replace("sha256 ", "sha256 bogus"), *lines[1:]]
 
         with mock.patch.object(runner_mod, "_dut_lines", tampered_comment):
             deck = runner_mod.compose_deck(tb, pdk, point)
