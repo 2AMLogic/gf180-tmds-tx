@@ -41,7 +41,7 @@ import klayout.db as db
 # gf180mcu GDS layer/datatype pairs (klayout_tools/decks/gf180mcu.py
 # EXTRACTION_DECK/DECK and the installed PDK's layers_def.py; see spec doc).
 # ---------------------------------------------------------------------------
-from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+from gf180_layers import (
     COMP,
     CONTACT,
     CONTACT_SIZE,
@@ -60,7 +60,6 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA2,
     VIA3,
     VIA4,
-    _box,
     make_drawers,
 )
 

@@ -46,7 +46,7 @@ import klayout.db as db
 # EXTRACTION_DECK/DECK's `diodes=(...)` entry for `diode_nd2ps_06v0`, and the
 # installed PDK's own layers_def.py; see DR-0011).
 # ---------------------------------------------------------------------------
-from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
+from gf180_layers import (
     COMP,
     CONTACT,
     CONTACT_SIZE,
@@ -66,7 +66,6 @@ from gf180_layers import (  # noqa: F401 -- shared layer table (issue #255)
     VIA2,
     VIA3,
     VIA4,
-    _box,
     make_drawers,
 )
 

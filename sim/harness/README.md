@@ -94,8 +94,10 @@ temperatures × 3 supplies = 45 operating points for a DC/op-point testbench;
 a transient testbench with two `rates_mbps` doubles that to 90.
 
 Each point becomes one `<corner-id>` — `<process>_<temp>c_<supply>v[_<rate>]`,
-the naming `sim/README.md` ratifies — and one raw log under
-`corners/<record-id>/`.
+the naming `sim/README.md` ratifies — and one raw `<corner-id>.log`, stored
+via the artifact broker for manifest-forward runs (see "Stored evidence"
+below) or committed under `corners/<record-id>/` for legacy records and the
+un-migrated device benches.
 
 Override any axis from the command line:
 
@@ -206,12 +208,14 @@ produced and is read by nothing. It removes that one block and nothing else:
 the title, `.temp` and solver lines, `No. of Data Rows`, every warning and
 every `m_*` line are unchanged.
 
-Two escape hatches, both at the testbench's discretion:
+Three escape hatches, all at the testbench's discretion; the first two keep
+the node table, the third keeps the solver progress trace:
 
 | Manifest `options` entry | Effect |
 |---|---|
 | `"noinit=0"` | **Keep** the node table. Consumed by the harness, never emitted — ngspice treats `noinit` as a presence-only flag, so `.options noinit=0` suppresses the table exactly as `.options noinit` does (verified on ngspice-47); the only way to keep it is for no `noinit` to reach the deck. Whitespace- and case-insensitive. |
 | anything else naming `noinit` | The testbench is wording the directive itself: its entry is emitted verbatim and the harness does not add a second one. |
+| `"reftrace=1"` | **Keep** ngspice's ` Reference value :` transient solver progress trace (issue #317). Consumed by the harness, never emitted — there is no ngspice directive for it, so `runner.run_point` (local backend) and `report.write_device_corner_log` drop these lines from the log at write time (`runner.filter_progress_trace`, the one shared filter) unless this entry is present. Everything else in the log survives byte for byte. Whitespace- and case-insensitive. |
 
 Both netlist-assembly paths — `runner.compose_deck` (local) and
 `batch.compose_body` (batch) — render this block from one shared
@@ -291,7 +295,7 @@ writes, under `sim/<experiment-slug>/`:
 |---|---|
 | `records/<record-id>.md` | the append-only summary record (the fields from `sim/README.md`, plus an Environment section with PDK / ngspice / harness / git provenance and the per-corner model sections) |
 | `netlist-snapshots/<record-id>.spice` | verbatim frozen copy of the testbench fragment, with its sha256 |
-| `corners/<record-id>/<corner-id>.log` | raw ngspice output, one file per PVT (x rate) point |
+| `corners/<record-id>/<corner-id>.log` | raw ngspice output, one file per PVT (x rate) point (legacy records and the un-migrated device benches only; manifest-forward runs store them via the artifact broker, see "Stored evidence" below) |
 
 Nothing is ever overwritten: the runner refuses to write over an existing
 record or snapshot, and mints a later record-id if one is somehow already
