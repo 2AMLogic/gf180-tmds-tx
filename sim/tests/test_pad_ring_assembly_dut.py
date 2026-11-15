@@ -203,7 +203,13 @@ class ModelBindingTests(unittest.TestCase):
                 (src.group("d"), src.group("g"), src.group("s"), src.group("b")),
                 (dst.group("d"), dst.group("g"), dst.group("s"), dst.group("b")),
             )
-            self.assertEqual(_params(src.group("params")), _params(dst.group("params")))
+            src_params = _params(src.group("params"))
+            self.assertEqual(src_params, _params(dst.group("params")))
+            # The deck writes L/W/AS on the card and AD/PS/PD on a `+`
+            # continuation line, so a non-folding parser silently drops the
+            # second half of every device's parameters -- assert the folded
+            # set itself, not just that the two sides agree.
+            self.assertEqual(sorted(src_params), ["ad", "as", "l", "pd", "ps", "w"])
 
 
 class WrapperTests(unittest.TestCase):
