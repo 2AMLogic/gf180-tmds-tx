@@ -65,7 +65,7 @@
     },
     "9.digital": {
       "file": "signoff/envelopes/item9-digital.json",
-      "content_hash": "sha256:58868d12f22291b915e33a8486b1d9f9ad5f6b3c32d9c978ae891d014361d4a8"
+      "content_hash": "sha256:982315ab82bc1c0d8fe1b9bfce4f807ffd43d42325a53c2823ee9e3abdbc9f28"
     },
     "10.analog": {
       "file": "signoff/envelopes/item10.json",
