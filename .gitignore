@@ -6,6 +6,10 @@ __pycache__/
 .DS_Store
 
 sim/build/
+# sim/ harness: manifest-forward runs store logs via the artifact broker and
+# commit none. The un-migrated Monte Carlo bench (sim/cml-driver-mismatch/run_mc.py,
+# report.write_device_corner_log) still commits its per-corner logs as evidence.
+!sim/cml-driver-mismatch/corners/**/*.log
 # flow/ synthesis: per-record Yosys logs are committed evidence (append-only
 # record trail), so they escape the *.log rule.
 !flow/*/reports/**/*.log
