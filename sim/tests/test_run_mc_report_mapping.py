@@ -203,6 +203,11 @@ class RunAllGuardTests(unittest.TestCase):
             {n: self.BASE_SEED + k * 1000 + 1 for k, n in enumerate(names)},
         )
         self.assertEqual(self.run_seeds["mcneg"], self.BASE_SEED)
+        # Nominal is a deterministic point: no seed requested, none recorded.
+        self.assertIsNone(self.run_seeds["nominal"])
+        nominal = [s for s in samples if s.label == "nominal"]
+        self.assertEqual(len(nominal), len(names))
+        self.assertTrue(all(s.seed is None for s in nominal))
         expected = {f"{n}_mc{i:03d}_27c_3.30v" for n in names for i in range(1, self.N + 1)}
         expected |= {f"{n}_nominal_27c_3.30v" for n in names}
         expected.add("tt_mcneg_27c_3.30v")
