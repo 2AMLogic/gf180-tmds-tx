@@ -124,6 +124,20 @@ python3 sim/run_corners.py smoke-cml-pair --corners tt --temps 27 \
     --subset-reason "debugging the 742.5 Mbps edge only; not a full-matrix claim"
 ```
 
+## Monte Carlo requests (`batch.build_mc_request`)
+
+The PVT grid above is deterministic. A statistical (Monte Carlo) bench -- today
+only `sim/cml-driver-mismatch/run_mc.py` -- does not run its own ngspice pool:
+it builds `klt sim` requests with `monte_carlo` through
+`batch.build_mc_request` and submits them through `batch.submit_request`, the
+same boundary (and the same `--wait-for-capacity 600`, no local fallback) as
+the PVT benches. Pin the per-sample seeds with `seed_mode: sequential`
+(sample `j` runs `.options seed=` `seed + j`) so a `base + draw_index`
+campaign is reproducible; a single-unit run (one corner, `n=1`) may use
+`backend="local"`. Statistics from the fleet are not bit-identical to an
+older locally-run record, so a migrated run mints a new record that states
+its seeding.
+
 ## The bit-rate axis
 
 `spec/tmds-tx.md` §1 defines two operating points this repo's transient

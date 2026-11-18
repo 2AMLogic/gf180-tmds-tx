@@ -387,5 +387,48 @@ class SharedCompositionTests(unittest.TestCase):
         self.assertNotEqual(_provenance_lines(deck), _provenance_lines(body))
 
 
+class McRequestTests(unittest.TestCase):
+    """``build_mc_request`` -- the Monte Carlo request the mismatch bench submits."""
+
+    MEAS = [{"name": "swing_dc", "expr": "v(outn)-v(outp)"}]
+
+    def build(self, **kw):
+        return batch_mod.build_mc_request(
+            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            measurements=self.MEAS, temp_c=27.0, **kw,
+        )
+
+    def test_monte_carlo_request_pins_sequential_seeds(self):
+        request = self.build(n=30, seed=20260815)
+        self.assertEqual(request["backend"], "batch")
+        self.assertEqual(request["batch"]["capacity_wait_s"], 600)
+        self.assertEqual(request["analysis"], {"kind": "op", "args": ""})
+        self.assertEqual(
+            request["monte_carlo"],
+            {"n": 30, "seed": 20260815, "vary": "mismatch",
+             "seed_mode": "sequential", "seed_scope": "point"},
+        )
+        self.assertEqual([c["name"] for c in request["corners"]["process"]], ["ff"])
+
+    def test_ngspice_init_is_carried_into_options(self):
+        self.assertNotIn("ngspice_init", self.build(n=3, seed=1)["options"])
+        request = self.build(n=3, seed=1, ngspice_init=("set ngbehavior=hsa",))
+        self.assertEqual(request["options"]["ngspice_init"], ["set ngbehavior=hsa"])
+
+    def test_deterministic_request_has_no_monte_carlo(self):
+        self.assertNotIn("monte_carlo", self.build(n=None))
+
+    def test_local_single_unit_request_carries_no_batch_block(self):
+        request = self.build(n=1, seed=7, backend="local")
+        self.assertEqual(request["backend"], "local")
+        self.assertNotIn("batch", request)
+
+    def test_corner_values_skips_non_numeric(self):
+        corner = {"measurements": [
+            {"name": "a", "value": 1}, {"name": "b", "value": None}, {"name": "c", "value": True},
+        ]}
+        self.assertEqual(batch_mod.corner_values(corner), {"a": 1.0})
+
+
 if __name__ == "__main__":
     unittest.main()

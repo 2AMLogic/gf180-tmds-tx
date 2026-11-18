@@ -207,7 +207,7 @@ def _load_run_mc():
 
     Loading it runs only imports and constant definitions -- no PDK
     discovery, ngspice probe or sweep -- so the evidence path is exercised
-    with the fake ``klt`` and a stubbed ``run_sample``, never a real
+    with the fake ``klt`` and a stubbed ``run_all``, never a real
     simulation and never the real evidence tree.
     """
     path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
@@ -265,7 +265,7 @@ class RunMcEvidencePathTests(StoreCase):
             ngspice_version=lambda: "ngspice-47-test",
         )
         self.sweep_calls = 0
-        self._swap(self.run_mc, run_sample=self._fake_run_sample)
+        self._swap(self.run_mc, run_all=self._fake_run_all)
         bin_dir = self.root / "bin"
         bin_dir.mkdir(exist_ok=True)
         klt = bin_dir / "klt"
@@ -282,15 +282,34 @@ class RunMcEvidencePathTests(StoreCase):
         for name, value in attrs.items():
             setattr(obj, name, value)
 
-    def _fake_run_sample(self, pdk, s, workdir):
+    def _fake_run_all(self, pdk, workdir, n_samples, base_seed):
+        """Stand-in for ``run_mc.run_all`` (the `klt sim` submit): the same
+        Sample set it returns -- N Monte Carlo samples per process corner, one
+        nominal per corner, one negative control -- with canned values."""
         self.sweep_calls += 1
-        s.log = self.FAKE_LOG
-        s.status = "ok"
-        if s.label == "mcneg":
-            s.swing_dc, s.vcm_dc = 0.1, 2.0  # outside DR-0002: control must fail
-        else:
-            s.swing_dc, s.vcm_dc = 0.5, 3.0
-        return s
+        rc = self.run_mc
+        tt = rc.CORNERS["tt"]
+
+        def sample(corner, label, sw, par_tail, swing, vcm):
+            return rc.Sample(
+                corner_id=f"{corner.name}_{label}_{rc.TEMP_C:g}c_{rc.VDD_V:.2f}v",
+                corner=corner, label=label, seed=base_seed, sw_stat_mismatch=sw,
+                par_pair=rc.PAR_PAIR_NOMINAL, par_tail=par_tail,
+                par_mirror=rc.PAR_MIRROR_NOMINAL, status="ok",
+                swing_dc=swing, vcm_dc=vcm, log=self.FAKE_LOG,
+            )
+
+        samples = []
+        for name in rc.CORNER_SETS["mos"]:
+            corner = rc.CORNERS[name]
+            samples += [
+                sample(corner, f"mc{i:03d}", 1, rc.PAR_TAIL_NOMINAL, 0.5, 3.0)
+                for i in range(1, n_samples + 1)
+            ]
+            samples.append(sample(corner, "nominal", 0, rc.PAR_TAIL_NOMINAL, 0.5, 3.0))
+        # outside DR-0002: the negative control must fail
+        samples.append(sample(tt, "mcneg", 1, rc.NEG_CTRL_PAR_TAIL, 0.1, 2.0))
+        return samples, ["job-test-1"]
 
     def _record_id(self) -> str:
         records = sorted((self.root / "sim" / self.BENCH / "records").glob("*.md"))
