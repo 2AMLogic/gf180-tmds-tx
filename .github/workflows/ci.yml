@@ -35,10 +35,19 @@ name: CI
 # shape of the evidence a PR adds, and enforces the append-only rule against
 # the merge base.
 
+# The merge queue (merge_group) runs this workflow as a trial merge of the
+# queued PR onto the queue's recorded base. `GITHUB_BASE_REF` is empty on
+# that event, so the append-only evidence check (which must diff against
+# that base, not whatever origin/main is at checkout) gets the queue's
+# `merge_group.base_sha` plumbed in as $MERGE_GROUP_BASE_SHA by the steps
+# that run it -- and evidence_lint.py fails rather than falling back if it
+# is missing there (issue #355). `github.ref` is unique per merge-queue
+# entry, so the concurrency group below needs no change.
 on:
   pull_request:
   push:
     branches: [main]
+  merge_group:
 
 permissions:
   contents: read
@@ -141,7 +150,17 @@ jobs:
         # --require-append-only: same argument for the merge base -- if it stops
         # resolving, fail loudly instead of passing on a skipped check.
         # Same script `npm run lint` runs locally.
-        run: .github/scripts/lint.sh --require-shellcheck --require-append-only
+        env:
+          EVENT: ${{ github.event_name }}
+          MG_BASE: ${{ github.event.merge_group.base_sha }}
+        run: |
+          # The queue's recorded base, not checkout-time origin/main: on
+          # merge_group GITHUB_BASE_REF is empty (issue #355). Inert on every
+          # other event, whose behavior is unchanged.
+          if [ "$EVENT" = "merge_group" ]; then
+            export MERGE_GROUP_BASE_SHA="$MG_BASE"
+          fi
+          .github/scripts/lint.sh --require-shellcheck --require-append-only
 
   signoff:
     name: T1 signoff manifest (klt re-grade vs committed record)
@@ -207,8 +226,17 @@ jobs:
         # inventoried file, a check outcome or the envelope itself exits 3.
         # Never rewrites anything. Item 2's envelopes are artifact-anchored
         # (no producer): the manifest re-grade below re-hashes their GDS.
+        env:
+          EVENT: ${{ github.event_name }}
+          MG_BASE: ${{ github.event.merge_group.base_sha }}
         run: |
           set -euo pipefail
+          # Item 10's inventory re-runs lint.sh, whose append-only check needs
+          # the queue's base on a merge_group event (issue #355); inert on
+          # every other event.
+          if [ "$EVENT" = "merge_group" ]; then
+            export MERGE_GROUP_BASE_SHA="$MG_BASE"
+          fi
           klt signoff --attest 1 --inventory signoff/attest/item1-analog.json --check signoff/envelopes/item1-analog.json
           klt signoff --attest 1 --inventory signoff/attest/item1-digital.json --check signoff/envelopes/item1-digital.json
           klt signoff --attest 9 --inventory signoff/attest/item9-analog.json --check signoff/envelopes/item9-analog.json

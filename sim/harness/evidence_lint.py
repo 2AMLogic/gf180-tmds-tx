@@ -739,8 +739,37 @@ def _git(root: Path, *args: str):
         return None
 
 
+def merge_group_event() -> bool:
+    """Whether this run is a merge-queue trial merge (GITHUB_EVENT_NAME)."""
+    return os.environ.get("GITHUB_EVENT_NAME", "").strip() == "merge_group"
+
+
+class MergeGroupBaseError(ValueError):
+    """A merge_group event without a usable base commit (issue #355)."""
+
+
 def default_base_ref() -> str:
-    """The ref a PR is diffed against: the PR base branch, else origin/main."""
+    """The ref a PR is diffed against: the PR base branch, else origin/main.
+
+    On a merge_group event ``GITHUB_BASE_REF`` is empty, and ``origin/main``
+    at checkout is *not* the base the queue merges onto -- the queue's
+    recorded base is ``github.event.merge_group.base_sha``, which ci.yml
+    plumbs in as ``$MERGE_GROUP_BASE_SHA``. A missing base raises
+    ``MergeGroupBaseError`` there instead of falling back: silently diffing
+    against checkout-time ``origin/main`` would verify the wrong base
+    (issue #355). A base that does not resolve fails the same way in
+    ``main()`` -- on merge_group an append-only SKIP is a failure, never a
+    pass.
+    """
+    if merge_group_event():
+        sha = os.environ.get("MERGE_GROUP_BASE_SHA", "").strip()
+        if not sha:
+            raise MergeGroupBaseError(
+                "merge_group event but $MERGE_GROUP_BASE_SHA is empty "
+                "(github.event.merge_group.base_sha missing?) -- refusing to "
+                "fall back to origin/main"
+            )
+        return sha
     base = os.environ.get("GITHUB_BASE_REF", "").strip()
     return f"origin/{base}" if base else "origin/main"
 
@@ -829,7 +858,8 @@ def main(argv=None) -> int:
         "--base-ref",
         default=None,
         help="ref the append-only check diffs against (default: $GITHUB_BASE_REF, "
-        "else origin/main)",
+        "else origin/main; on merge_group events $MERGE_GROUP_BASE_SHA, which is "
+        "required there)",
     )
     parser.add_argument(
         "--require-append-only",
@@ -856,18 +886,22 @@ def main(argv=None) -> int:
 
     problems = check_experiments(root, experiments)
 
-    base_ref = args.base_ref or default_base_ref()
-    append_only_problems, skip_reason = check_append_only(root, base_ref)
-    if skip_reason is None:
-        if not append_only_problems:
-            print(f"append-only: clean against the merge base with {base_ref}")
-    elif args.require_append_only:
-        problems.append(
-            Problem("", f"append-only check could not run: {skip_reason}")
-        )
+    try:
+        base_ref = args.base_ref or default_base_ref()
+    except MergeGroupBaseError as exc:
+        problems.append(Problem("", f"append-only base: {exc}"))
     else:
-        print(f"SKIP: append-only check -- {skip_reason}")
-    problems += append_only_problems
+        append_only_problems, skip_reason = check_append_only(root, base_ref)
+        if skip_reason is None:
+            if not append_only_problems:
+                print(f"append-only: clean against the merge base with {base_ref}")
+        elif args.require_append_only or merge_group_event():
+            problems.append(
+                Problem("", f"append-only check could not run: {skip_reason}")
+            )
+        else:
+            print(f"SKIP: append-only check -- {skip_reason}")
+        problems += append_only_problems
 
     for problem in problems:
         print(problem)
