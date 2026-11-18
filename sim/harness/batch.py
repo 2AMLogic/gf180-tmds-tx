@@ -142,6 +142,70 @@ def build_request(
     }
 
 
+def build_mc_request(
+    pdk: Pdk,
+    corners,
+    netlist_name: str,
+    *,
+    measurements: list[dict],
+    temp_c: float,
+    n: int | None = None,
+    seed: int | None = None,
+    vary: str = "mismatch",
+    seed_mode: str = "sequential",
+    seed_scope: str = "point",
+    analysis: tuple[str, str] = ("op", ""),
+    ngspice_init: tuple[str, ...] = (),
+    backend: str = "batch",
+    timeout_s: int = DEFAULT_TIMEOUT_S,
+) -> dict:
+    """A ``klt sim`` request for a Monte Carlo (or, with ``n=None``, a plain
+    multi-corner deterministic) run of an already-written circuit body.
+
+    ``monte_carlo`` is omitted when ``n`` is None. With ``seed_mode``
+    ``sequential`` sample ``k`` (0-based) runs ``.options seed=<seed>+k``, so a
+    campaign documented as ``base + draw_index`` is reproducible draw-for-draw.
+    ``backend`` is ``batch`` except for a single-unit run (one corner, n=1),
+    which host rules allow locally. ``ngspice_init`` lines become the request's
+    ``options.ngspice_init`` (a ``.spiceinit`` in the unit's directory), the
+    reproducible way to select a compatibility mode such as
+    ``set ngbehavior=hsa`` instead of relying on a host ``~/.spiceinit``.
+    Used by sim/cml-driver-mismatch/run_mc.py.
+    """
+    kind, args = analysis
+    model_lib = Path(pdk.model_lib)
+    try:
+        lib_rel = str(model_lib.relative_to(pdk.path))
+    except ValueError:
+        lib_rel = str(model_lib)
+    request = {
+        "netlist": netlist_name,
+        "engine": "ngspice",
+        "backend": backend,
+        "models": {"pdk": pdk.variant, "lib": lib_rel},
+        "corners": {
+            "process": [{"name": c.name, "sections": list(c.sections)} for c in corners],
+            "temperature_c": [temp_c],
+        },
+        "analysis": {"kind": kind, "args": args},
+        "measurements": list(measurements),
+        "options": {"timeout_s": timeout_s, "keep_artifacts": True},
+    }
+    if ngspice_init:
+        request["options"]["ngspice_init"] = list(ngspice_init)
+    if n is not None:
+        request["monte_carlo"] = {
+            "n": n,
+            "seed": seed,
+            "vary": vary,
+            "seed_mode": seed_mode,
+            "seed_scope": seed_scope,
+        }
+    if backend == "batch":
+        request["batch"] = {"capacity_wait_s": CAPACITY_WAIT_S}
+    return request
+
+
 def write_point_files(
     tb: Testbench, pdk: Pdk, point: PvtPoint, workdir: Path, timeout_s: int = DEFAULT_TIMEOUT_S
 ) -> Path:
@@ -263,6 +327,48 @@ def run_point(
         result.status = "error"
         result.message = f"klt sim exit {proc.returncode} despite a complete report"
     return result
+
+
+def submit_request(
+    request_path: Path, out_dir: Path, *, backend: str = "batch", klt: str | None = None
+) -> tuple[dict, str]:
+    """Run one prepared ``klt sim`` request file and return ``(report, transcript)``.
+
+    The single submit path for requests this module did not build point-by-point
+    (the Monte Carlo bench). ``backend`` ``batch`` always passes
+    ``--wait-for-capacity``; ``local`` is for a single-unit run only. Raises
+    ``BatchError`` when klt is missing or prints no JSON report -- a failed
+    submit is never papered over with a local grid.
+    """
+    klt = klt or KLT
+    cmd = [klt, "sim", str(request_path), "--backend", backend]
+    if backend == "batch":
+        cmd += ["--wait-for-capacity", str(CAPACITY_WAIT_S)]
+    cmd += ["--format", "json", "-o", str(out_dir)]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    except FileNotFoundError as exc:
+        raise BatchError(f"{klt!r} not found on PATH; no local fallback") from exc
+    transcript = (
+        f"$ {' '.join(cmd)}\nexit={proc.returncode}\n--- stdout ---\n{proc.stdout}\n"
+        f"--- stderr ---\n{proc.stderr}\n"
+    )
+    try:
+        report = json.loads(proc.stdout)
+    except ValueError as exc:
+        err = (proc.stderr.strip().splitlines() or ["no output"])[-1]
+        raise BatchError(f"klt sim exit {proc.returncode}, no JSON report: {err}") from exc
+    return report, transcript
+
+
+def corner_values(corner: dict) -> dict[str, float]:
+    """Numeric measurement values of one ``klt sim`` report corner entry."""
+    out: dict[str, float] = {}
+    for m in corner.get("measurements") or []:
+        value = m.get("value")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            out[m.get("name")] = float(value)
+    return out
 
 
 def assemble(points: list[PvtPoint], results: list[PointResult]) -> list[PointResult]:
