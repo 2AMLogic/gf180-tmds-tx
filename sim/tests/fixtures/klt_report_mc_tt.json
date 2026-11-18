@@ -1,0 +1,98 @@
+{
+  "_provenance": "Entries captured verbatim (artifact paths, rss and diagnostics trimmed) from the klt sim reports behind record 20261118-172641-0900d2d, fetched via `klt artifact get` from its committed manifest.",
+  "corners": [
+    {
+      "corner_id": "tt/novdd/27C/mc0",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.4697662
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.065116
+        }
+      ],
+      "monte_carlo": {
+        "mismatch_seed": 562518904,
+        "process_seed": 716749428,
+        "sample_index": 0,
+        "seed": 20260815,
+        "seed_mode": "sequential",
+        "seed_scope": "point"
+      },
+      "process": "tt",
+      "runtime_s": 0.325,
+      "status": "pass",
+      "temperature_c": 27.0
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc1",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.4699224
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.065038
+        }
+      ],
+      "monte_carlo": {
+        "mismatch_seed": 637498963,
+        "process_seed": 716749428,
+        "sample_index": 1,
+        "seed": 20260816,
+        "seed_mode": "sequential",
+        "seed_scope": "point"
+      },
+      "process": "tt",
+      "runtime_s": 0.323,
+      "status": "pass",
+      "temperature_c": 27.0
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc2",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.4694388
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.065279
+        }
+      ],
+      "monte_carlo": {
+        "mismatch_seed": 283599909,
+        "process_seed": 716749428,
+        "sample_index": 2,
+        "seed": 20260817,
+        "seed_mode": "sequential",
+        "seed_scope": "point"
+      },
+      "process": "tt",
+      "runtime_s": 0.324,
+      "status": "pass",
+      "temperature_c": 27.0
+    }
+  ]
+}

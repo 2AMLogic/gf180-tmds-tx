@@ -1,0 +1,206 @@
+"""``run_mc`` report -> ``Sample`` mapping tests (issue #359).
+
+    python3 -m unittest sim.tests.test_run_mc_report_mapping -v
+
+Report dicts are fed straight into ``run_mc._samples_from_report`` and
+``run_mc.run_all`` (with ``_run`` stubbed to return a report). The fixtures
+under ``sim/tests/fixtures/`` are entries captured from real ``klt sim``
+reports (see their ``_provenance`` key). No PDK, ngspice or network.
+"""
+
+from __future__ import annotations
+
+import copy
+import importlib.util
+import json
+import sys
+import unittest
+from pathlib import Path
+
+SIM_DIR = Path(__file__).resolve().parents[1]
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+if str(SIM_DIR) not in sys.path:
+    sys.path.insert(0, str(SIM_DIR))
+
+from harness import batch  # noqa: E402
+from harness import evidence_lint  # noqa: E402
+from harness.corners import CORNER_SETS, CORNERS  # noqa: E402
+
+
+def _load_run_mc():
+    path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
+    name = "cml_driver_mismatch_run_mc_mapping"
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module  # dataclass processing resolves annotations via sys.modules
+    spec.loader.exec_module(module)
+    return module
+
+
+run_mc = _load_run_mc()
+
+
+def _fixture(name: str) -> dict:
+    return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
+
+
+def _map(report, corners, *, mc: bool):
+    if mc:
+        return run_mc._samples_from_report(
+            report, "", corners, lambda i: f"mc{i + 1:03d}", run_mc.PAR_TAIL_NOMINAL, 1,
+            lambda c, i: 20260815 + i,
+        )
+    return run_mc._samples_from_report(
+        report, "", corners, lambda i: "nominal", run_mc.PAR_TAIL_NOMINAL, 0, lambda c, i: None
+    )
+
+
+class McReportTests(unittest.TestCase):
+    def setUp(self):
+        self.report = _fixture("klt_report_mc_tt.json")
+        self.samples = _map(self.report, [CORNERS["tt"]], mc=True)
+
+    def test_n_entries_give_n_samples_in_order(self):
+        self.assertEqual(len(self.samples), len(self.report["corners"]))
+        self.assertEqual([s.label for s in self.samples], ["mc001", "mc002", "mc003"])
+
+    def test_ids_match_the_evidence_lint_grammar(self):
+        for s in self.samples:
+            self.assertIsNone(evidence_lint.parse_corner_id(s.corner_id), s.corner_id)
+        self.assertEqual(self.samples[0].corner_id, "tt_mc001_27c_3.30v")
+
+    def test_seeds_are_the_ones_the_report_states(self):
+        stated = [e["monte_carlo"]["seed"] for e in self.report["corners"]]
+        self.assertEqual([s.seed for s in self.samples], stated)
+
+    def test_values_and_status_come_from_the_measurements(self):
+        first = self.samples[0]
+        self.assertEqual(first.status, "ok")
+        self.assertEqual(first.swing_dc, 0.4697662)
+        self.assertEqual(first.vcm_dc, 3.065116)
+
+    def test_index_extraction_uses_the_trailing_mc_number(self):
+        report = copy.deepcopy(self.report)
+        report["corners"][0]["corner_id"] = "tt/novdd/27C/mc11"
+        self.assertEqual(_map(report, [CORNERS["tt"]], mc=True)[0].label, "mc012")
+
+
+class NominalReportTests(unittest.TestCase):
+    def setUp(self):
+        self.report = _fixture("klt_report_nominal.json")
+        self.corners = [CORNERS[n] for n in ("tt", "ss", "ff")]
+        self.samples = _map(self.report, self.corners, mc=False)
+
+    def test_one_nominal_sample_per_corner_without_seed(self):
+        self.assertEqual([s.corner.name for s in self.samples], ["tt", "ss", "ff"])
+        for s in self.samples:
+            self.assertEqual(s.label, "nominal")
+            self.assertIsNone(s.seed)
+            self.assertEqual(s.status, "ok")
+            self.assertIsNone(evidence_lint.parse_corner_id(s.corner_id), s.corner_id)
+        self.assertEqual(self.samples[1].corner_id, "ss_nominal_27c_3.30v")
+
+
+class ErrorEntryTests(unittest.TestCase):
+    def setUp(self):
+        self.report = _fixture("klt_report_mc_tt.json")
+
+    def _graded(self, mutate):
+        report = copy.deepcopy(self.report)
+        mutate(report["corners"][1])
+        samples = _map(report, [CORNERS["tt"]], mc=True)
+        self.assertEqual(len(samples), len(self.report["corners"]))  # still counted in N
+        return samples
+
+    def test_status_error_is_an_error_sample(self):
+        samples = self._graded(lambda e: e.update(status="error"))
+        self.assertEqual([s.status for s in samples], ["ok", "error", "ok"])
+
+    def test_status_inconclusive_is_an_error_sample(self):
+        samples = self._graded(lambda e: e.update(status="inconclusive"))
+        self.assertEqual(samples[1].status, "error")
+
+    def test_missing_vcm_dc_is_an_error_sample(self):
+        samples = self._graded(
+            lambda e: e.update(measurements=[m for m in e["measurements"] if m["name"] != "vcm_dc"])
+        )
+        self.assertEqual(samples[1].status, "error")
+        self.assertIsNone(samples[1].vcm_dc)
+
+    def test_missing_swing_dc_is_an_error_sample(self):
+        samples = self._graded(lambda e: e.update(measurements=[]))
+        self.assertEqual(samples[1].status, "error")
+        self.assertIsNone(samples[1].swing_dc)
+
+
+class RunAllGuardTests(unittest.TestCase):
+    """``run_all`` with ``_run`` stubbed to return canned reports."""
+
+    N = 3
+    BASE_SEED = 20260814  # first tt sample seed = base + 1 = the fixture's 20260815
+
+    def setUp(self):
+        self.mc = _fixture("klt_report_mc_tt.json")
+        nominal = _fixture("klt_report_nominal.json")
+        # The fixture holds tt/ss/ff; fs/sf units are the tt entry re-keyed.
+        for name in ("fs", "sf"):
+            entry = copy.deepcopy(nominal["corners"][0])
+            entry["corner_id"] = f"{name}/novdd/27C"
+            entry["process"] = name
+            nominal["corners"].append(entry)
+        self.nominal = nominal
+        self.neg = {"corners": [copy.deepcopy(self.mc["corners"][0])]}
+        self.neg["corners"][0]["corner_id"] = "tt/novdd/27C"
+        self._orig = run_mc._run
+        self.addCleanup(setattr, run_mc, "_run", self._orig)
+
+    def _stub(self, *, mc=None, nominal=None, neg=None):
+        reports = {
+            "nominal": nominal or self.nominal,
+            "mcneg": neg or self.neg,
+        }
+
+        def fake_run(pdk, workdir, name, corners, **kw):
+            if name.startswith("mc_"):
+                report = copy.deepcopy(mc or self.mc)  # tt entries re-keyed to this corner
+                for entry in report["corners"]:
+                    entry["corner_id"] = entry["corner_id"].replace("tt/", f"{corners[0].name}/", 1)
+                return report, ""
+            return reports[name], ""
+
+        run_mc._run = fake_run
+
+    def _run_all(self):
+        return run_mc.run_all(None, Path("."), self.N, self.BASE_SEED)
+
+    def test_complete_reports_map_every_unit(self):
+        self._stub()
+        samples, _jobs = self._run_all()
+        n_corners = len(CORNER_SETS["mos"])
+        self.assertEqual(len(samples), n_corners * self.N + n_corners + 1)
+        self.assertEqual([s.status for s in samples].count("ok"), len(samples))
+
+    def test_short_mc_report_raises(self):
+        short = copy.deepcopy(self.mc)
+        short["corners"].pop()
+        self._stub(mc=short)
+        with self.assertRaisesRegex(batch.BatchError, r"report has 2 units, expected 3"):
+            self._run_all()
+
+    def test_short_nominal_report_raises(self):
+        short = copy.deepcopy(self.nominal)
+        short["corners"].pop()
+        self._stub(nominal=short)
+        with self.assertRaisesRegex(batch.BatchError, r"nominal: report has 4 units, expected 5"):
+            self._run_all()
+
+    def test_short_negative_control_report_raises(self):
+        self._stub(neg={"corners": []})
+        with self.assertRaisesRegex(
+            batch.BatchError, r"negative control: report has 0 units, expected 1"
+        ):
+            self._run_all()
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,77 @@
+{
+  "_provenance": "Entries captured verbatim (artifact paths, rss and diagnostics trimmed) from the klt sim reports behind record 20261118-172641-0900d2d, fetched via `klt artifact get` from its committed manifest.",
+  "corners": [
+    {
+      "corner_id": "tt/novdd/27C",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.470169
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.064914
+        }
+      ],
+      "monte_carlo": null,
+      "process": "tt",
+      "runtime_s": 0.328,
+      "status": "pass",
+      "temperature_c": 27.0
+    },
+    {
+      "corner_id": "ss/novdd/27C",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.4592235
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.070383
+        }
+      ],
+      "monte_carlo": null,
+      "process": "ss",
+      "runtime_s": 0.329,
+      "status": "pass",
+      "temperature_c": 27.0
+    },
+    {
+      "corner_id": "ff/novdd/27C",
+      "measurements": [
+        {
+          "margin": null,
+          "name": "swing_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 0.4827686
+        },
+        {
+          "margin": null,
+          "name": "vcm_dc",
+          "status": "pass",
+          "unit": null,
+          "value": 3.058615
+        }
+      ],
+      "monte_carlo": null,
+      "process": "ff",
+      "runtime_s": 0.326,
+      "status": "pass",
+      "temperature_c": 27.0
+    }
+  ]
+}
