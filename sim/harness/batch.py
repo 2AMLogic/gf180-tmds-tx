@@ -427,3 +427,16 @@ def engine_summary(results: list[PointResult]) -> str:
     """The ngspice version(s) the batch runner reported, for the record."""
     versions = sorted({r.engine_version for r in results if r.engine_version})
     return ", ".join(f"ngspice-{v}" if v.isdigit() else v for v in versions) or "unreported (batch)"
+
+
+def engine_from_reports(reports: list[dict]) -> str:
+    """Like :func:`engine_summary`, for raw ``klt sim`` reports: the ngspice
+    version(s) their ``environment.engine_version`` fields state."""
+    versions = sorted(
+        {
+            str((r.get("environment") or {}).get("engine_version") or "")
+            for r in reports
+        }
+        - {""}
+    )
+    return ", ".join(f"ngspice-{v}" if v.isdigit() else v for v in versions) or "unreported (batch)"

@@ -47,11 +47,11 @@ def _fixture(name: str) -> dict:
 def _map(report, corners, *, mc: bool):
     if mc:
         return run_mc._samples_from_report(
-            report, "", corners, lambda i: f"mc{i + 1:03d}", run_mc.PAR_TAIL_NOMINAL, 1,
+            report, corners, lambda i: f"mc{i + 1:03d}", run_mc.PAR_TAIL_NOMINAL, 1,
             lambda c, i: 20260815 + i,
         )
     return run_mc._samples_from_report(
-        report, "", corners, lambda i: "nominal", run_mc.PAR_TAIL_NOMINAL, 0, lambda c, i: None
+        report, corners, lambda i: "nominal", run_mc.PAR_TAIL_NOMINAL, 0, lambda c, i: None
     )
 
 
@@ -82,6 +82,10 @@ class McReportTests(unittest.TestCase):
     def test_index_extraction_uses_the_trailing_mc_number(self):
         report = copy.deepcopy(self.report)
         report["corners"][0]["corner_id"] = "tt/novdd/27C/mc11"
+        # the entry's monte_carlo.sample_index is authoritative (#358) ...
+        self.assertEqual(_map(report, [CORNERS["tt"]], mc=True)[0].label, "mc001")
+        # ... and the trailing mcN is the fallback when the report states none
+        del report["corners"][0]["monte_carlo"]["sample_index"]
         self.assertEqual(_map(report, [CORNERS["tt"]], mc=True)[0].label, "mc012")
 
 
@@ -175,7 +179,7 @@ class RunAllGuardTests(unittest.TestCase):
 
     def test_complete_reports_map_every_unit(self):
         self._stub()
-        samples, _jobs = self._run_all()
+        samples, _jobs, _engine = self._run_all()
         n_corners = len(CORNER_SETS["mos"])
         self.assertEqual(len(samples), n_corners * self.N + n_corners + 1)
         self.assertEqual([s.status for s in samples].count("ok"), len(samples))

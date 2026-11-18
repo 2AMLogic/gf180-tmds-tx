@@ -262,7 +262,6 @@ class RunMcEvidencePathTests(StoreCase):
             find_pdk=lambda: pdk_mod.Pdk(
                 path=self.root / "fake-pdk", variant="gf180mcuD", source="test fixture"
             ),
-            ngspice_version=lambda: "ngspice-47-test",
         )
         self.sweep_calls = 0
         self._swap(self.run_mc, run_all=self._fake_run_all)
@@ -309,7 +308,9 @@ class RunMcEvidencePathTests(StoreCase):
             samples.append(sample(corner, "nominal", 0, rc.PAR_TAIL_NOMINAL, 0.5, 3.0))
         # outside DR-0002: the negative control must fail
         samples.append(sample(tt, "mcneg", 1, rc.NEG_CTRL_PAR_TAIL, 0.1, 2.0))
-        return samples, ["job-test-1"]
+        # run_all is a 3-tuple: the engine string now comes from the reports'
+        # environment.engine_version (it was the removed ngspice_version swap)
+        return samples, ["job-test-1"], "ngspice-47-test"
 
     def _record_id(self) -> str:
         records = sorted((self.root / "sim" / self.BENCH / "records").glob("*.md"))
