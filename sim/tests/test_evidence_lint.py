@@ -19,12 +19,14 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SIM_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = SIM_DIR.parent
@@ -421,11 +423,121 @@ class AppendOnlyTests(unittest.TestCase):
         self.assertIn("not a git checkout", skipped)
 
 
+@unittest.skipUnless(shutil.which("git"), "git is not installed")
+class MergeGroupBaseTests(unittest.TestCase):
+    """The merge-queue (merge_group) base contract, issue #355.
+
+    On a merge_group event ``GITHUB_BASE_REF`` is empty, and ``origin/main``
+    at checkout is not the base the queue merges onto. The base must come
+    from the event payload, plumbed in by ci.yml as ``$MERGE_GROUP_BASE_SHA``
+    (``github.event.merge_group.base_sha``), and a missing or unresolvable
+    base there FAILS rather than silently falling back to ``origin/main``.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.git("init", "--quiet")
+        self.git("config", "user.email", "test@example.invalid")
+        self.git("config", "user.name", "test")
+        write_experiment(self.root)
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "-m", "seed evidence")
+        self.base = self.git("rev-parse", "HEAD").stdout.strip()
+
+    def git(self, *args: str):
+        return subprocess.run(
+            ("git", *args),
+            cwd=str(self.root),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+
+    @staticmethod
+    def merge_group_env(base_sha: str) -> dict:
+        """The runner environment on a merge_group event (no GITHUB_BASE_REF)."""
+        return {
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_BASE_REF": "",
+            "MERGE_GROUP_BASE_SHA": base_sha,
+        }
+
+    def run_cli(self, environ: dict, *argv: str) -> tuple:
+        buffer = io.StringIO()
+        with mock.patch.dict(os.environ, environ):
+            with contextlib.redirect_stdout(buffer):
+                code = evidence_lint.main(list(argv))
+        return code, buffer.getvalue()
+
+    def test_default_base_ref_returns_the_plumbed_sha(self):
+        with mock.patch.dict(os.environ, self.merge_group_env("abc123")):
+            self.assertEqual(evidence_lint.default_base_ref(), "abc123")
+
+    def test_default_base_ref_fails_without_a_base(self):
+        with mock.patch.dict(os.environ, self.merge_group_env("")):
+            with self.assertRaises(evidence_lint.MergeGroupBaseError):
+                evidence_lint.default_base_ref()
+
+    def test_the_plumbed_base_resolves_and_gates_the_diff(self):
+        argv = ("--root", str(self.root), "--quiet")
+        code, out = self.run_cli(self.merge_group_env(self.base), *argv)
+        self.assertEqual(code, 0, out)
+        self.assertIn(f"clean against the merge base with {self.base}", out)
+        record = self.root / "sim/output-voltage-tc/records" / f"{RECORD_ID}.md"
+        record.write_text(record.read_text() + "\n- **Note**: typo fix\n")
+        code, out = self.run_cli(self.merge_group_env(self.base), *argv)
+        self.assertEqual(code, 1)
+        self.assertIn("modified since", out)
+
+    def test_a_missing_base_fails_rather_than_falling_back(self):
+        code, out = self.run_cli(
+            self.merge_group_env(""), "--root", str(self.root), "--quiet"
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("MERGE_GROUP_BASE_SHA", out)
+        self.assertIn("merge_group", out)
+        self.assertNotIn("SKIP: append-only check", out)
+
+    def test_an_unresolvable_base_fails_without_the_require_flag(self):
+        unavailable = "deadbeef" + "0" * 32  # well-formed 40-hex, absent here
+        self.assertEqual(len(unavailable), 40)
+        code, out = self.run_cli(
+            self.merge_group_env(unavailable), "--root", str(self.root), "--quiet"
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("could not run", out)
+
+    def test_non_merge_group_events_ignore_the_merge_group_env(self):
+        # pull_request semantics are untouched: the base is still
+        # origin/$GITHUB_BASE_REF (here unresolvable -> SKIP, exit 0), and an
+        # ambient MERGE_GROUP_BASE_SHA is inert.
+        env = {
+            "GITHUB_EVENT_NAME": "pull_request",
+            "GITHUB_BASE_REF": "nope",
+            "MERGE_GROUP_BASE_SHA": self.base,
+        }
+        code, out = self.run_cli(env, "--root", str(self.root), "--quiet")
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP: append-only check", out)
+        self.assertIn("origin/nope", out)
+        self.assertNotIn(self.base, out)
+
+
 class CliTests(unittest.TestCase):
     def run_cli(self, *argv: str) -> tuple:
+        # Hermetic against the ambient CI event context: on a merge_group
+        # runner GITHUB_EVENT_NAME is set repo-wide, and this suite tests the
+        # non-merge-group behaviour of main() (SKIP semantics, the committed
+        # corpus). The merge-group contract itself is MergeGroupBaseTests'
+        # subject, with the environment it needs supplied explicitly.
+        neutral = {"GITHUB_EVENT_NAME": "", "MERGE_GROUP_BASE_SHA": ""}
         buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            code = evidence_lint.main(list(argv))
+        with mock.patch.dict(os.environ, neutral):
+            with contextlib.redirect_stdout(buffer):
+                code = evidence_lint.main(list(argv))
         return code, buffer.getvalue()
 
     def test_the_committed_corpus_passes_end_to_end(self):

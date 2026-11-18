@@ -159,7 +159,9 @@ echo "== 5/8 evidence records (sim/*/records) =="
 # rate-bearing record), <record-id> naming, the corner-id grammar (including
 # the bit-rate axis), and the append-only rule -- enforced instead of merely
 # documented. Tracked files only, same as collect() above; the append-only
-# half diffs against the merge base with origin/main and SKIPs (unless
+# half diffs against the merge base with origin/main (on a merge_group event,
+# the queue's $MERGE_GROUP_BASE_SHA, which ci.yml plumbs in -- a missing or
+# unresolvable base there fails rather than falling back) and SKIPs (unless
 # --require-append-only) where that ref does not resolve.
 if ! python3 sim/check_records.py ${EVIDENCE_ARGS[@]+"${EVIDENCE_ARGS[@]}"}; then
   echo "FAIL: evidence records"
