@@ -164,7 +164,10 @@ class RunAllGuardTests(unittest.TestCase):
             "mcneg": neg or self.neg,
         }
 
+        self.run_seeds = {}
+
         def fake_run(pdk, workdir, name, corners, **kw):
+            self.run_seeds[name] = kw.get("seed")
             if name.startswith("mc_"):
                 report = copy.deepcopy(mc or self.mc)  # tt entries re-keyed to this corner
                 for entry in report["corners"]:
@@ -185,19 +188,25 @@ class RunAllGuardTests(unittest.TestCase):
         self.assertEqual([s.status for s in samples].count("ok"), len(samples))
 
     def test_run_all_supplies_ids_and_seeds(self):
-        """Pin the label/seed lambdas `run_all` supplies (not the fixture's own)."""
+        """Pin the ids `run_all` supplies and the per-corner seed block it requests.
+
+        Sample seeds come from the report (#358), so the k*1000 block is
+        observable only as the ``seed`` kwarg `run_all` passes to `_run`.
+        """
         self._stub()
-        samples, _jobs = self._run_all()
-        names = list(CORNER_SETS["mos"])
-        got = {s.corner_id: s.seed for s in samples}
-        expected = {}
-        for k, name in enumerate(names):
-            for i in range(1, self.N + 1):
-                expected[f"{name}_mc{i:03d}_27c_3.30v"] = self.BASE_SEED + k * 1000 + i
-        for name in names:
-            expected[f"{name}_nominal_27c_3.30v"] = None
-        expected["tt_mcneg_27c_3.30v"] = self.BASE_SEED
-        self.assertEqual(got, expected)
+        samples, _jobs, _engine = self._run_all()
+        # Spelled out, not read from CORNER_SETS: the record's "k: 0=tt, 1=ff, ..."
+        # prose is the contract, so a reorder of the tuple must fail here.
+        names = ("tt", "ff", "ss", "fs", "sf")
+        self.assertEqual(
+            {n: self.run_seeds[f"mc_{n}"] for n in names},
+            {n: self.BASE_SEED + k * 1000 + 1 for k, n in enumerate(names)},
+        )
+        self.assertEqual(self.run_seeds["mcneg"], self.BASE_SEED)
+        expected = {f"{n}_mc{i:03d}_27c_3.30v" for n in names for i in range(1, self.N + 1)}
+        expected |= {f"{n}_nominal_27c_3.30v" for n in names}
+        expected.add("tt_mcneg_27c_3.30v")
+        self.assertEqual({s.corner_id for s in samples}, expected)
         self.assertEqual(len(samples), len(expected))  # no duplicate ids collapsed
 
     def test_short_mc_report_raises(self):
