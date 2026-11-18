@@ -98,7 +98,6 @@ from harness.report import (  # noqa: E402
     write_device_corner_log,
     write_device_netlist_snapshot,
 )
-from harness.runner import ngspice_version  # noqa: E402
 
 EXPERIMENT_DIR = SIM_DIR / "cml-driver-mismatch"
 TESTBENCH_DIR = EXPERIMENT_DIR / "testbench"
@@ -206,16 +205,41 @@ def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, ba
     return batch.submit_request(request_path, workdir / f"{name}.out", backend=backend)
 
 
-def _samples_from_report(report, transcript, corners, label_of, par_tail, sw, seed_of):
+def _sample_identity(entry, raw_cid, *, need_index):
+    """``(sample_index, reported_seed)`` for one report corner entry.
+
+    The report's ``monte_carlo`` block is authoritative; the trailing ``mcN`` of
+    the corner id is the fallback for an entry without it. ``reported_seed`` is
+    ``None`` when the report does not state one (the caller then derives it).
+    A Monte Carlo entry with no recoverable index is a ``BatchError``."""
+    mc = entry.get("monte_carlo")
+    mc = mc if isinstance(mc, dict) else {}
+    index = mc.get("sample_index")
+    if isinstance(index, bool) or not isinstance(index, int):
+        m = re.search(r"mc(\d+)$", raw_cid)
+        index = int(m.group(1)) if m else None
+    seed = mc.get("seed")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        seed = None
+    if need_index and index is None:
+        raise batch.BatchError(
+            f"corner {raw_cid!r}: Monte Carlo entry has neither monte_carlo.sample_index "
+            "nor a trailing mcN in its corner id"
+        )
+    return index, seed
+
+
+def _samples_from_report(report, corners, label_of, par_tail, sw, seed_of, *, need_index=False):
     """Map a `klt sim` report's corner entries to Samples; a unit with no
-    values stays status ``error`` (never dropped from N)."""
+    values stays status ``error`` (never dropped from N). Sample index and
+    seed come from the entry's ``monte_carlo`` block; ``seed_of`` is only the
+    fallback when the report states no seed."""
     by_name = {c.name: c for c in corners}
     out = []
     for entry in report.get("corners") or []:
         raw_cid = str(entry.get("corner_id", ""))
         corner = by_name[raw_cid.split("/")[0].split("_")[0]]  # mos corner names carry no underscore
-        m = re.search(r"mc(\d+)$", raw_cid)
-        index = int(m.group(1)) if m else None
+        index, reported_seed = _sample_identity(entry, raw_cid, need_index=need_index)
         label = label_of(index)
         # Ratified corner-id grammar (sim/README.md): <process>_<temp>c_<supply>;
         # the sample label rides in the process field (`tt_mc001`), as before.
@@ -228,7 +252,8 @@ def _samples_from_report(report, transcript, corners, label_of, par_tail, sw, se
         out.append(
             Sample(
                 corner_id=cid, corner=corner, label=label,
-                seed=seed_of(corner, index), sw_stat_mismatch=sw,
+                seed=reported_seed if reported_seed is not None else seed_of(corner, index),
+                sw_stat_mismatch=sw,
                 par_pair=PAR_PAIR_NOMINAL, par_tail=par_tail, par_mirror=PAR_MIRROR_NOMINAL,
                 status="ok" if ok else "error",
                 swing_dc=values.get("swing_dc"), vcm_dc=values.get("vcm_dc"),
@@ -244,11 +269,13 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
     one deterministic mismatch=0 request over all corners (fleet), and the
     single-unit negative control (the one run host rules allow locally).
 
-    Returns ``(samples, job_ids)``. Raises ``batch.BatchError`` on a failed
+    Returns ``(samples, job_ids, ngspice)`` where ``ngspice`` is the engine
+    version(s) the reports state (not this host's probe). Raises ``batch.BatchError`` on a failed
     submit -- there is no local fallback."""
     corners = [CORNERS[name] for name in CORNER_SETS["mos"]]
     samples: list[Sample] = []
     jobs: list[str] = []
+    reports: list[dict] = []
 
     def job_of(report):
         remote = (report.get("environment") or {}).get("remote") or {}
@@ -259,14 +286,15 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
         # so this corner's sample i (1..N) keeps the pre-migration
         # base_seed + k*1000 + i seed.
         first = base_seed + k * 1000 + 1
-        report, transcript = _run(
+        report, _transcript = _run(
             pdk, workdir, f"mc_{corner.name}", [corner], sw_stat_mismatch=1,
             par_tail=PAR_TAIL_NOMINAL, n=n_samples, seed=first, backend="batch",
         )
         jobs.append(job_of(report))
+        reports.append(report)
         got = _samples_from_report(
-            report, transcript, [corner], lambda i: f"mc{i + 1:03d}", PAR_TAIL_NOMINAL, 1,
-            lambda c, i: first + i,
+            report, [corner], lambda i: f"mc{i + 1:03d}", PAR_TAIL_NOMINAL, 1,
+            lambda c, i: first + i, need_index=True,
         )
         if len(got) != n_samples:
             raise batch.BatchError(
@@ -274,13 +302,14 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
             )
         samples += got
 
-    report, transcript = _run(
+    report, _transcript = _run(
         pdk, workdir, "nominal", corners, sw_stat_mismatch=0,
         par_tail=PAR_TAIL_NOMINAL, n=None, seed=None, backend="batch",
     )
     jobs.append(job_of(report))
+    reports.append(report)
     nominal = _samples_from_report(
-        report, transcript, corners, lambda i: "nominal", PAR_TAIL_NOMINAL, 0, lambda c, i: None
+        report, corners, lambda i: "nominal", PAR_TAIL_NOMINAL, 0, lambda c, i: None
     )
     if len(nominal) != len(corners):
         raise batch.BatchError(f"nominal: report has {len(nominal)} units, expected {len(corners)}")
@@ -290,17 +319,19 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
     # the SAME unmodified mismatch machinery. See the module docstring. One
     # unit at the base seed: a single local run, not a grid.
     tt = CORNERS["tt"]
-    report, transcript = _run(
+    report, _transcript = _run(
         pdk, workdir, "mcneg", [tt], sw_stat_mismatch=1,
         par_tail=NEG_CTRL_PAR_TAIL, n=1, seed=base_seed, backend="local",
     )
     neg = _samples_from_report(
-        report, transcript, [tt], lambda i: "mcneg", NEG_CTRL_PAR_TAIL, 1, lambda c, i: base_seed
+        report, [tt], lambda i: "mcneg", NEG_CTRL_PAR_TAIL, 1, lambda c, i: base_seed,
+        need_index=True,
     )
     if len(neg) != 1:
         raise batch.BatchError(f"negative control: report has {len(neg)} units, expected 1")
     samples += neg
-    return samples, [j for j in jobs if j]
+    reports.append(report)
+    return samples, [j for j in jobs if j], batch.engine_from_reports(reports)
 
 
 def _within(value: float, lo: float, hi: float) -> bool:
@@ -552,8 +583,6 @@ def main(argv: list[str] | None = None) -> int:
     except PdkNotFound as exc:
         print(str(exc), file=sys.stderr)
         return 3
-    ngspice_v = ngspice_version()
-
     git = git_provenance(REPO_ROOT)
 
     # Raw logs are stored through the artifact broker, never committed. Fail
@@ -575,7 +604,7 @@ def main(argv: list[str] | None = None) -> int:
     workdir = SIM_DIR / ".work" / "cml-driver-mismatch" / "debug"
     started = time.monotonic()
     try:
-        results, job_ids = run_all(pdk, workdir, args.n_samples, args.base_seed)
+        results, job_ids, ngspice_v = run_all(pdk, workdir, args.n_samples, args.base_seed)
     except batch.BatchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
