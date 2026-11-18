@@ -246,6 +246,17 @@ process corner × 5 process corners = 150 statistical points**, plus one
 | Single-ended swing 400–600 mV under local device mismatch | **PASS** | [`sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md`](../sim/cml-driver-mismatch/records/20260815-044555-9e8a33a.md) | Worst observed sample across all 150 points: **456.8 mV** (`ss`) to **485.3 mV** (`ff`) — inside the window at every sample, with 56.8 mV of margin to the 400 mV floor. Per-corner 1σ ≤ 1.32 mV. |
 | Common mode 2.8–3.3 V under local device mismatch | **PASS** | same record | Worst observed sample: **3.0573 V** (`ff`) to **3.0716 V** (`ss`) — inside the window at every sample. Per-corner 1σ ≤ 0.66 mV. |
 
+**Fleet re-run (issue #347).** A second record,
+[`sim/cml-driver-mismatch/records/20261118-172641-0900d2d.md`](../sim/cml-driver-mismatch/records/20261118-172641-0900d2d.md),
+re-runs the same experiment (same base seed, N = 30 per process corner, same
+negative control) as `klt sim` `monte_carlo` requests on the batch fleet instead
+of a hand-rolled local ngspice pool. It is a **cross-check of the 2026-08-15
+record, not a replacement**: the per-sample seeds are the same integers, but the
+request's deck composition and the fleet's ngspice build differ, so compare the
+distributions, not individual samples. Its grades (see the record's table) back
+the same two sub-claims above; the numbers quoted in the table above remain
+those of the 2026-08-15 record.
+
 **How it is graded, and why that matters.** The PASS/FAIL roll-up uses the
 **observed min/max across the N samples**, not a σ-projection from the
 per-corner mean — so a heavy-tailed sample cannot be hidden behind a Gaussian

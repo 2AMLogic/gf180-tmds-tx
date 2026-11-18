@@ -212,10 +212,14 @@ def _samples_from_report(report, transcript, corners, label_of, par_tail, sw, se
     by_name = {c.name: c for c in corners}
     out = []
     for entry in report.get("corners") or []:
-        cid = str(entry.get("corner_id", ""))
-        corner = by_name[cid.split("/")[0]]
-        m = re.search(r"mc(\d+)$", cid)
+        raw_cid = str(entry.get("corner_id", ""))
+        corner = by_name[raw_cid.split("/")[0].split("_")[0]]  # mos corner names carry no underscore
+        m = re.search(r"mc(\d+)$", raw_cid)
         index = int(m.group(1)) if m else None
+        label = label_of(index)
+        # Ratified corner-id grammar (sim/README.md): <process>_<temp>c_<supply>;
+        # the sample label rides in the process field (`tt_mc001`), as before.
+        cid = f"{corner.name}_{label}_{TEMP_C:g}c_{VDD_V:.2f}v"
         values = batch.corner_values(entry)
         ok = (
             entry.get("status") not in ("error", "inconclusive")
@@ -223,7 +227,7 @@ def _samples_from_report(report, transcript, corners, label_of, par_tail, sw, se
         )
         out.append(
             Sample(
-                corner_id=cid, corner=corner, label=label_of(index),
+                corner_id=cid, corner=corner, label=label,
                 seed=seed_of(corner, index), sw_stat_mismatch=sw,
                 par_pair=PAR_PAIR_NOMINAL, par_tail=par_tail, par_mirror=PAR_MIRROR_NOMINAL,
                 status="ok" if ok else "error",
@@ -633,7 +637,7 @@ def main(argv: list[str] | None = None) -> int:
             f"* run (UTC) : {_dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}\n"
             "* ====================================================================\n"
         )
-        write_device_corner_log(log_dir, s.corner_id.replace("/", "_"), header, s.log)
+        write_device_corner_log(log_dir, s.corner_id, header, s.log)
 
     try:
         stored = evidence_store.store_run(
