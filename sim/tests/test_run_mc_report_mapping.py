@@ -180,6 +180,22 @@ class RunAllGuardTests(unittest.TestCase):
         self.assertEqual(len(samples), n_corners * self.N + n_corners + 1)
         self.assertEqual([s.status for s in samples].count("ok"), len(samples))
 
+    def test_run_all_supplies_ids_and_seeds(self):
+        """Pin the label/seed lambdas `run_all` supplies (not the fixture's own)."""
+        self._stub()
+        samples, _jobs = self._run_all()
+        names = list(CORNER_SETS["mos"])
+        got = {s.corner_id: s.seed for s in samples}
+        expected = {}
+        for k, name in enumerate(names):
+            for i in range(1, self.N + 1):
+                expected[f"{name}_mc{i:03d}_27c_3.30v"] = self.BASE_SEED + k * 1000 + i
+        for name in names:
+            expected[f"{name}_nominal_27c_3.30v"] = None
+        expected["tt_mcneg_27c_3.30v"] = self.BASE_SEED
+        self.assertEqual(got, expected)
+        self.assertEqual(len(samples), len(expected))  # no duplicate ids collapsed
+
     def test_short_mc_report_raises(self):
         short = copy.deepcopy(self.mc)
         short["corners"].pop()
