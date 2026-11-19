@@ -8,6 +8,7 @@
     "test": "python3 -m unittest discover -s sim/tests -v",
     "sim:env": "python3 sim/run_corners.py --check-env",
     "sim:list": "python3 sim/run_corners.py --list",
-    "lint": "bash .github/scripts/lint.sh"
+    "lint": "bash .github/scripts/lint.sh",
+    "check:attest": "python3 scripts/check_attest_files.py"
   }
 }
