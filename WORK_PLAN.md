@@ -7,6 +7,7 @@ outside the markers is touched. See `.claude/skills/loom-guide/guide.md`
 for the generation logic.
 
 <!-- guide:plan-body:start -->
+_Generated: 2026-11-19T07:27:51Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -17,18 +18,18 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-_None._
+- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(held)*
 
 ## Important
 
 `loom:important`; taken before unlabelled work.
 
-- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
-- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim`
+- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(held)*
+- **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
 
 ## Ready
 
-Human-approved issues ready for implementation (`loom:issue`).
+Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
 _None._
 
@@ -36,13 +37,13 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#368**: fix(signoff): stop README churn drifting item 10; add pin tripwire and re-attest *(held)*
 
 ## Approved (Awaiting Merge)
 
@@ -54,15 +55,18 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#158**: Champion: Merge-Risk Hold Digest *(curated)*
-- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
-- **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
-- **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
-- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(curated)*
+- **#158**: Champion: Merge-Risk Hold Digest *(curated)* *(held)*
+- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)* *(held)*
+- **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)* *(held)*
+- **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)* *(held)*
+- **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(curated)* *(held)*
+- **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI *(curated)*
+- **#313**: docs: point the item 7 digital blocker at klayout-tools#5002 and complete the README repo-layout tree *(curated)* *(held)*
+- **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)* *(held)*
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#326**: Remove the two pad_pitch_fit *.parasitics_critical_net.json reports: 392 KB whose only new content says the measurement never ran *(hermit)* *(held)*
 
 ## Epics
 
@@ -73,13 +77,13 @@ _None._
 | Bucket | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Very important | 0 |
+| Very important | 1 |
 | Important | 2 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 0 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 5 |
-| Architect / Hermit proposals | 0 |
+| Curated | 8 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

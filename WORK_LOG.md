@@ -5,6 +5,79 @@ Maintained automatically by the Guide triage agent's document-maintenance
 phase — see `.claude/skills/loom-guide/guide.md` for how entries are
 selected.
 
+### 2026-11-18
+
+- **PR #367**: test(sim): pin nominal seed=None in run_all request and samples
+- **PR #365**: test(sim): pin MC seed-block corner order against a literal
+- **PR #363**: test(sim): pin ids and seeds supplied by run_all
+- **PR #360**: fix(sim): read MC provenance from klt sim reports
+- **PR #361**: test(sim): cover run_mc's klt sim report-to-Sample mapping
+- **PR #357**: feat(sim): run the mismatch Monte Carlo as klt sim monte_carlo requests
+- **PR #356**: ci: run the append-only evidence gate on merge_group against the queue's recorded base
+- **Issue #366** (closed): Pin the nominal request's seed=None in test_run_all_supplies_ids_and_seeds
+- **Issue #364** (closed): The record's k-to-corner seed-block mapping ("k: 0=tt, 1=ff, ...") is not pinned by any test
+- **Issue #362** (closed): run_all's sample label and seed lambdas are untested: four off-by-one mutations leave the suite green
+- **Issue #358** (closed): run_mc.py re-derives provenance the klt sim report already states (ngspice version, per-sample seed/index)
+- **Issue #359** (closed): No unit test for run_mc.py's klt sim report -> Sample mapping (_samples_from_report)
+- **Issue #347** (closed): Retire run_mc.py's hand-rolled local ngspice pool in favour of klt sim monte_carlo
+- **Issue #355** (closed): Merge queue: add the merge_group trigger to the required-check workflow(s)
+
+### 2026-11-17
+
+- **PR #354**: chore(loom): resync installed Loom to v0.19.1306
+
+### 2026-11-16
+
+- **PR #352**: chore(loom): resync installed Loom to v0.19.1302
+
+### 2026-11-15
+
+- **PR #351**: refactor: single-source DR-0011 pad constants in pad_ring_cells.py, dedupe their tests
+- **PR #349**: Move cml-driver-mismatch MC logs to the artifact store, forward-only
+- **PR #348**: test: pin provenance-extractor non-vacuity in the shared-composition guard
+- **PR #346**: erc: commit the tmds_encoder well-tie negative-control report (51 KB findings-only shape)
+- **PR #331**: fix: narrow sim/*/corners log negation to the un-migrated bench, drop stale committed-log comments
+- **PR #343**: fix: rewrite negctl ERC spec comment to describe its own control
+- **PR #344**: test: fold SPICE continuations in the shared DUT parser and convert the mux suite to it
+- **PR #327**: refactor(verification): one cocotb pin file, one shared three-leg runner skeleton
+- **PR #322**: feat: add extracted-DUT generator for tmds_final_mux
+- **PR #338**: docs: add --findings-only --omit-antenna-tables to the tmds_encoder ERC recipe
+- **PR #342**: docs: qualify harness log-location docstrings for manifest-forward storage
+- **PR #339**: test: compare composer provenance comments in the shared-composition guard
+- **PR #335**: layout: drop blanket noqa:F401 and six dead imports from layout/scripts
+- **PR #336**: feat(sim/harness): drop ngspice's Reference value trace from corner logs
+- **PR #315**: refactor(sim/harness): assemble both backends' netlists from one set of helpers
+- **PR #323**: refactor(flow): source klt sta constants from their flow-family single source
+- **PR #333**: chore: remove dead worktree:return npm script
+- **PR #328**: refactor: single-source extracted-DUT test scaffolding into _dut_netlist
+- **PR #330**: test: guard the klt sta request against the committed graded envelope
+- **Issue #350** (closed): Single-source DR-0011 pad constants and drop duplicated ClampRows/DR0011 tests
+- **Issue #345** (closed): Migrate sim/cml-driver-mismatch/run_mc.py to the artifact store and drop its .gitignore carve-out
+- **Issue #340** (closed): sim/tests: the new provenance guard goes silently vacuous if _dut_lines renames its comment prefix
+- **Issue #337** (closed): Commit the ERC negative-control reports now that the flagged recipe keeps them at ~51 KB (follow-on to #320)
+- **Issue #314** (closed): Remove the dead sim/*/corners .gitignore negation and two comments that still claim logs are committed
+- **Issue #341** (closed): layout/erc-supply-spec.json's own Run: block still shows the pre-flag klt erc recipe (follow-on to #320/#338)
+- **Issue #329** (closed): Convert test_tmds_final_mux_dut.py onto sim/tests/_dut_netlist.py (landed with #328)
+- **Issue #307** (closed): Collapse duplicated cocotb bench scaffolding in verification/: one pin file, one three-leg runner skeleton
+- **Issue #311** (closed): Generate a simulatable extracted DUT for tmds_final_mux (layout/sim/tmds_final_mux_dut.spice)
+- **Issue #320** (closed): Drop 2.53 MB of all-unchecked antenna scaffolding from tmds_encoder.erc.json: add --omit-antenna-tables to the klt erc recipe
+- **Issue #332** (closed): Harness docstrings still claim raw logs are committed (report.py, corners.py, harness/README.md)
+- **Issue #334** (closed): sim/tests: the composer drift guard does not compare the DUT provenance comment
+- **Issue #309** (closed): Drop the blanket `# noqa: F401` in layout/scripts: it suppresses a linter CI never runs, and 6 imports have already rotted behind it
+- **Issue #308** (closed): sim/harness: one netlist-assembly path for both backends — compose_body re-implements compose_deck line for line
+- **Issue #319** (closed): flow/klt_sta_tmds_encoder.py retypes the cell library, corner list, and clock period the flow family already single-sources
+- **Issue #321** (closed): Remove dead npm script worktree:return: its target was deleted by a Loom resync
+- **Issue #318** (closed): Single-source the extracted-DUT test scaffolding: sim/tests duplicates 67 lines the generators already share
+- **Issue #324** (closed): flow/ has no test suite, so nothing guards the klt sta request against the graded envelope it produced
+
+### 2026-11-14
+
+- **PR #310**: docs: roadmap as of 2026-11-13
+- **PR #316**: feat(sim/harness): emit .options noinit from one shared options builder
+- **PR #325**: sim: probe the VDD-side diode_pd2nw_06v0 clamp in esd-diode-clamp-cv
+- **Issue #305** (closed): Suppress ngspice's initial-transient node table in harness logs: 76.8 MB of 92.7 MB no tool reads
+- **Issue #312** (closed): sim/esd-diode-clamp-cv: add diode_pd2nw_06v0 probes to the testbench (testbench half of #222)
+
 ### 2026-11-12
 
 - **PR #302**: Bump Repo Skills 0.25.10 -> 0.26.1
@@ -100,12 +173,11 @@ selected.
 - **PR #216**: chore(loom): drop onIdle [auditor] — follow the fleet idle-role setting
 
 ### 2026-10-08
+
 - **PR #211**: T1 item 11 (analog): klt erc supply spec + report for pad-ring assembly (#207)
 - **Issue #207** (closed): T1 item 11 (analog): add a klt erc supply spec and report for the pad-ring assembly and cite it
 - **PR #208**: feat(erc): declare well ties in digital supply spec; item 11 digital met (#206)
 - **Issue #206** (closed): T1 item 11 (digital): declare well and substrate ties[] in layout/erc-supply-spec.json and re-run klt erc
-
-
 - **PR #204**: feat: per-lane external 10-bit character input + select (DR-0018); ratify DR-0016
 - **Issue #186** (closed): Define the block-level top's external 10-bit character input (DR-0016 Option A enabler)
 
