@@ -342,13 +342,15 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models  # ... wi
   once at `tt_27c_3.30v` (job `klt-sim-0521bf3eb1ac`, 2026-11-20): the worker
   confirmed it ran the staged closure (`models_staged: true`), the staged and
   runner-reported file digests matched by name and `sha256`, the PDK stamp
-  and ngspice engine build both compared `match` — and the identical abort
-  reproduced on the same `w=222u nf=111` instance. Staging therefore removes
-  the PDK-tree and engine-build hypotheses for this point, but does not make
-  it pass; the remaining difference is in deck/init assembly (the worker's
-  ngspice ran with no compatibility mode selected — `ngspice_init: None` in
-  the receipt — where gf180mcu's HSPICE-style vendor deck is known to need
-  one, see `sim/cml-driver-mismatch/run_mc.py`'s `NGSPICE_INIT`). Follow-up
+  compared `match` and the ngspice version banners (what klt compares; not a
+  build identity) matched — and the identical abort reproduced on the same
+  `w=222u nf=111` instance. The observation is therefore that the abort
+  persisted with the submitted model closure and matching banners; staging
+  does not make this point pass. One *hypothesis*, not established by this
+  probe: the worker's ngspice ran with no compatibility mode selected
+  (`ngspice_init: None` in the receipt) where gf180mcu's HSPICE-style vendor
+  deck is known to need one (see `sim/cml-driver-mismatch/run_mc.py`'s
+  `NGSPICE_INIT`), i.e. a difference in deck/init assembly. Testing it
   lives in #299/#229; staging is *not* a working route for this point.
 
 ## Append-only rule

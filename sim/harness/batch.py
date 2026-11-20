@@ -270,6 +270,22 @@ def _failed(point: PvtPoint, status: str, message: str, seconds: float = 0.0, lo
     )
 
 
+def models_staged_from_report(report: dict) -> bool | None:
+    """The worker-reported model-staging state of a ``klt sim`` report.
+
+    Read from ``environment.remote.worker_environment.pdk.models_staged``
+    (klt ``docs/cli/sim.md``, worker receipt fields): ``True`` = the worker ran
+    the submitted model closure, ``False`` = its own image PDK. Anything else
+    -- an older receipt, a missing or non-boolean field, an unavailable worker
+    environment -- is ``None`` (unknown), never a guess.
+    """
+    remote = ((report or {}).get("environment") or {}).get("remote") or {}
+    worker_env = remote.get("worker_environment")
+    pdk = worker_env.get("pdk") if isinstance(worker_env, dict) else None
+    staged = pdk.get("models_staged") if isinstance(pdk, dict) else None
+    return staged if isinstance(staged, bool) else None
+
+
 def _parse_report(point: PvtPoint, tb: Testbench, report: dict, log_name: str) -> PointResult:
     corners = report.get("corners")
     if not isinstance(corners, list):
@@ -283,11 +299,7 @@ def _parse_report(point: PvtPoint, tb: Testbench, report: dict, log_name: str) -
     remote = (report.get("environment") or {}).get("remote") or {}
     job_id = str(remote.get("job_id") or "")
     engine = str((report.get("environment") or {}).get("engine_version") or "")
-    # Worker-reported staging state: True/False when the receipt states it,
-    # None for an older receipt that predates the metadata.
-    models_staged = (remote.get("pdk") or {}).get("models_staged")
-    if not isinstance(models_staged, bool):
-        models_staged = None
+    models_staged = models_staged_from_report(report)
     values: dict[str, float] = {}
     for m in corner.get("measurements") or []:
         value = m.get("value")

@@ -453,9 +453,9 @@ class PointResult:
     job_id: str = ""
     engine_version: str = ""
     # What the batch worker reported about its model inputs (receipt field
-    # ``environment.remote.pdk.models_staged``): True = it ran the submitted
-    # model closure, False = it ran its own image PDK, None = the receipt
-    # predates the metadata. Always None for a local run.
+    # ``environment.remote.worker_environment.pdk.models_staged``): True = it
+    # ran the submitted model closure, False = it ran its own image PDK, None =
+    # unknown (receipt omits it). Always None for a local run.
     models_staged: bool | None = None
 
     def as_dict(self) -> dict:

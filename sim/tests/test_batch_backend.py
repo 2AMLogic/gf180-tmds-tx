@@ -51,8 +51,11 @@ if mode == "missing": corners = []
 if mode == "duplicate": corners = [corner(), corner()]
 if mode == "failed": corners = [corner("error", drop=names[:1])]
 env = {{"engine_version": "46", "remote": {{"job_id": "job-" + cid}}}}
-if mode == "staged": env["remote"]["pdk"] = {{"models_staged": True}}
-if mode == "image": env["remote"]["pdk"] = {{"models_staged": False}}
+if mode == "staged": env["remote"]["worker_environment"] = {{"pdk": {{"models_staged": True}}}}
+if mode == "image": env["remote"]["worker_environment"] = {{"pdk": {{"models_staged": False}}}}
+if mode == "noworkerenv": env["remote"]["worker_environment"] = None
+if mode == "nostagedfield": env["remote"]["worker_environment"] = {{"pdk": {{}}}}
+if mode == "legacypath": env["remote"]["pdk"] = {{"models_staged": True}}
 print(json.dumps({{"status": "pass", "corners": corners, "environment": env}}))
 '''
 
@@ -300,21 +303,35 @@ class BatchBackendTests(unittest.TestCase):
                 self.assertIn(f"- Model inputs: {note}", text)
 
     def test_record_marks_staging_unknown_for_older_receipts(self):
-        # The default stub receipt carries no pdk.models_staged (an older klt).
+        # The default stub receipt carries no worker_environment.pdk.models_staged.
         results = self.grid()
         self.assertEqual({r.models_staged for r in results}, {None})
         record = self.status(results)
         self.assertIsNone(record["environment"]["models_staged"])
         self.assertIsNone(record["points"][0]["models_staged"])
         text = report_mod.render_record(record, self.tb.experiment)
-        self.assertIn("- Model inputs: unknown (receipt predates staging metadata)", text)
+        self.assertIn("- Model inputs: unknown (the receipt omits the worker staging field)", text)
 
-    def test_mixed_worker_staging_reports_are_called_out(self):
-        self.set_modes({"tt_27c_3.30v": "staged"})
+    def test_missing_or_unavailable_worker_metadata_stays_unknown(self):
+        # Not-yet-nested path, null worker_environment, absent field: all unknown.
+        cids = {p.corner_id for p in self.points}
+        for mode in ("legacypath", "noworkerenv", "nostagedfield"):
+            with self.subTest(mode=mode):
+                self.set_modes({cid: mode for cid in cids})
+                results = self.grid()
+                self.assertEqual({r.models_staged for r in results}, {None})
+
+    def test_mixed_worker_staging_reports_are_called_out_per_point(self):
+        pts = [p.corner_id for p in self.points]
+        self.assertGreaterEqual(len(pts), 3)
+        self.set_modes({pts[0]: "staged", pts[1]: "image"})  # the rest: unknown
         record = self.status(self.grid())
         self.assertEqual(record["environment"]["models_staged"], "mixed")
         text = report_mod.render_record(record, self.tb.experiment)
         self.assertIn("mixed worker reports", text)
+        self.assertIn(f"`{pts[0]}` -- model inputs: staged", text)
+        self.assertIn(f"`{pts[1]}` -- model inputs: image models", text)
+        self.assertIn(f"`{pts[2]}` -- model inputs: unknown", text)
 
     def test_run_mc_passes_stage_models_to_the_fleet_requests(self):
         run_mc = _load_run_mc()

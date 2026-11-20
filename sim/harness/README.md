@@ -157,9 +157,10 @@ flag the built requests and the `--dry-run` output are unchanged, and both
 The batch record then carries the *worker's* staging report, not just the
 request's intent: `environment.models_staged` (and a per-point
 `models_staged`) is `True`/`False` per what the receipt's
-`environment.remote.pdk.models_staged` states, rendered as a "Model inputs"
-line (staged / image models / unknown for a receipt that predates the
-metadata, "mixed" if the reports disagree). This is deliberately separate
+`environment.remote.worker_environment.pdk.models_staged` states, rendered as a "Model inputs"
+line (staged / image models / unknown when the receipt omits the field or
+the worker environment is unavailable; "mixed" if the reports disagree, in
+which case the record lists each point's state beside its corner and job id). This is deliberately separate
 from the record's local PDK provenance: one describes what the client used
 to build the request, the other what the worker actually executed.
 
