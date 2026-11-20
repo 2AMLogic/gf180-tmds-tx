@@ -138,6 +138,32 @@ campaign is reproducible; a single-unit run (one corner, `n=1`) may use
 older locally-run record, so a migrated run mints a new record that states
 its seeding.
 
+## Staging the client's model inputs (`--stage-models`)
+
+By default a batch request names only the PDK variant and the model library
+path, and the worker resolves them against the fleet image's PDK tree. When
+that is not the tree the client validated against, `klt sim` offers
+`options.stage_model_inputs` (klt `docs/cli/sim.md`, "Staging the request's
+model inputs"): the submitter's `models.lib` and its full `.include`/`.lib`
+closure ship with the job, so the fleet executes the client's own models.
+
+`run_corners.py --backend batch --stage-models` sets it on every per-point
+request; `sim/cml-driver-mismatch/run_mc.py --stage-models` sets it on the
+fleet Monte Carlo and reference requests (a local single-unit request never
+stages — it already runs this host's own models). Default off: without the
+flag the built requests and the `--dry-run` output are unchanged, and both
+`build_request` and `build_mc_request` omit the option entirely.
+
+The batch record then carries the *worker's* staging report, not just the
+request's intent: `environment.models_staged` (and a per-point
+`models_staged`) is `True`/`False` per what the receipt's
+`environment.remote.worker_environment.pdk.models_staged` states, rendered as a "Model inputs"
+line (staged / image models / unknown when the receipt omits the field or
+the worker environment is unavailable; "mixed" if the reports disagree, in
+which case the record lists each point's state beside its corner and job id). This is deliberately separate
+from the record's local PDK provenance: one describes what the client used
+to build the request, the other what the worker actually executed.
+
 ## The bit-rate axis
 
 `spec/tmds-tx.md` §1 defines two operating points this repo's transient

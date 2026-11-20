@@ -452,6 +452,11 @@ class PointResult:
     backend: str = "local"
     job_id: str = ""
     engine_version: str = ""
+    # What the batch worker reported about its model inputs (receipt field
+    # ``environment.remote.worker_environment.pdk.models_staged``): True = it
+    # ran the submitted model closure, False = it ran its own image PDK, None =
+    # unknown (receipt omits it). Always None for a local run.
+    models_staged: bool | None = None
 
     def as_dict(self) -> dict:
         record = self.point.as_dict()
@@ -471,6 +476,7 @@ class PointResult:
         if self.backend != "local":
             record["backend"] = self.backend
             record["batch_job_id"] = self.job_id
+            record["models_staged"] = self.models_staged
         return record
 
 

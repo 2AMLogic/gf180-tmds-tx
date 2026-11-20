@@ -182,7 +182,7 @@ class RunAllGuardTests(unittest.TestCase):
 
     def test_complete_reports_map_every_unit(self):
         self._stub()
-        samples, _jobs, _engine = self._run_all()
+        samples, _jobs, _engine, _staging = self._run_all()
         n_corners = len(CORNER_SETS["mos"])
         self.assertEqual(len(samples), n_corners * self.N + n_corners + 1)
         self.assertEqual([s.status for s in samples].count("ok"), len(samples))
@@ -194,7 +194,7 @@ class RunAllGuardTests(unittest.TestCase):
         observable only as the ``seed`` kwarg `run_all` passes to `_run`.
         """
         self._stub()
-        samples, _jobs, _engine = self._run_all()
+        samples, _jobs, _engine, _staging = self._run_all()
         # Spelled out, not read from CORNER_SETS: the record's "k: 0=tt, 1=ff, ..."
         # prose is the contract, so a reorder of the tuple must fail here.
         names = ("tt", "ff", "ss", "fs", "sf")

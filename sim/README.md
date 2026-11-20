@@ -305,6 +305,7 @@ fleet). Implemented in `sim/harness/batch.py`; the default remains
 ```
 python3 sim/run_corners.py esd-clamp-cv --backend batch --dry-run   # print requests, submit nothing
 python3 sim/run_corners.py esd-clamp-cv --backend batch             # submit one job per PVT point
+python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models  # ... with this client's model closure
 ```
 
 - **One `klt sim` request per `PvtPoint`**, built from the same pieces
@@ -323,11 +324,34 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch             # submit one
   batch`, a `batch job` line per corner, and the ngspice version the runner
   reported (not this host's). Otherwise the record format is unchanged, so
   `check_records.py` and `check_record_citations.py` apply as before.
+- **`--stage-models`** sets `options.stage_model_inputs: true` on every
+  request (per-point and Monte Carlo; `sim/cml-driver-mismatch/run_mc.py`
+  takes the same flag), so the submitter's `models.lib` and its full
+  `.include`/`.lib` closure ship with the job and the fleet executes this
+  client's own models instead of the fleet image's PDK tree. Default off —
+  without the flag the requests (and `--dry-run` output) are unchanged. A
+  batch record notes what the *worker* reported (`environment.models_staged`,
+  rendered as a "Model inputs" line): staged / image models / unknown for a
+  receipt that predates the metadata. This is worker evidence, kept separate
+  from the local PDK provenance the record also carries.
 - Limits: one analysis per testbench (the `klt sim` request contract); a
   result reproduces the local one only if the fleet's ngspice/PDK resolve the
   same models. Known gap: a binned `nfet_03v3` device with a large total
   width can fail on the fleet with `could not find a valid modelname` while
-  the same deck passes locally (see issue #229).
+  the same deck passes locally (see issue #229). `--stage-models` was probed
+  once at `tt_27c_3.30v` (job `klt-sim-0521bf3eb1ac`, 2026-11-20): the worker
+  confirmed it ran the staged closure (`models_staged: true`), the staged and
+  runner-reported file digests matched by name and `sha256`, the PDK stamp
+  compared `match` and the ngspice version banners (what klt compares; not a
+  build identity) matched — and the identical abort reproduced on the same
+  `w=222u nf=111` instance. The observation is therefore that the abort
+  persisted with the submitted model closure and matching banners; staging
+  does not make this point pass. One *hypothesis*, not established by this
+  probe: the worker's ngspice ran with no compatibility mode selected
+  (`ngspice_init: None` in the receipt) where gf180mcu's HSPICE-style vendor
+  deck is known to need one (see `sim/cml-driver-mismatch/run_mc.py`'s
+  `NGSPICE_INIT`), i.e. a difference in deck/init assembly. Testing it
+  lives in #299/#229; staging is *not* a working route for this point.
 
 ## Append-only rule
 

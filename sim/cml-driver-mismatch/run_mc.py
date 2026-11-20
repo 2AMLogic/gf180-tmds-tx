@@ -95,6 +95,9 @@ from harness.report import (  # noqa: E402
     environment,
     git_provenance,
     allocate_record_id,
+    models_staged_state,
+    models_staged_summary,
+    models_staged_text,
     write_device_corner_log,
     write_device_netlist_snapshot,
 )
@@ -189,8 +192,13 @@ def write_body(
     )
 
 
-def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, backend):
-    """Write body + request ``name`` and submit it; return (report, transcript)."""
+def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, backend,
+         stage_model_inputs=False):
+    """Write body + request ``name`` and submit it; return (report, transcript).
+
+    ``stage_model_inputs`` reaches only the batch requests (see
+    ``batch.build_mc_request``); the local negative control keeps running on
+    this host's own models."""
     body = f"{name}.body.spice"
     write_body(
         pdk, workdir / body, sw_stat_mismatch=sw_stat_mismatch,
@@ -199,6 +207,7 @@ def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, ba
     request = batch.build_mc_request(
         pdk, corners, body, measurements=MEASUREMENTS, temp_c=TEMP_C,
         n=n, seed=seed, backend=backend, ngspice_init=NGSPICE_INIT,
+        stage_model_inputs=stage_model_inputs,
     )
     request_path = workdir / f"{name}.request.json"
     request_path.write_text(json.dumps(request, indent=2) + "\n")
@@ -264,18 +273,27 @@ def _samples_from_report(report, corners, label_of, par_tail, sw, seed_of, *, ne
     return out
 
 
-def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
+def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int,
+            stage_model_inputs: bool = False):
     """Submit the sweep: one Monte Carlo request per process corner (fleet),
     one deterministic mismatch=0 request over all corners (fleet), and the
     single-unit negative control (the one run host rules allow locally).
+    ``stage_model_inputs`` opts the fleet requests into
+    ``options.stage_model_inputs`` (this client's own model closure); the
+    local negative control is unchanged either way.
 
-    Returns ``(samples, job_ids, ngspice)`` where ``ngspice`` is the engine
-    version(s) the reports state (not this host's probe). Raises ``batch.BatchError`` on a failed
+    Returns ``(samples, job_ids, ngspice, fleet_staging)`` where ``ngspice`` is
+    the engine version(s) the reports state (not this host's probe) and
+    ``fleet_staging`` lists ``(request name, job id, models_staged)`` per fleet
+    request, ``models_staged`` being the worker-reported state (True/False, or
+    None when the receipt omits it). The local negative control is not a fleet
+    job and is excluded. Raises ``batch.BatchError`` on a failed
     submit -- there is no local fallback."""
     corners = [CORNERS[name] for name in CORNER_SETS["mos"]]
     samples: list[Sample] = []
     jobs: list[str] = []
     reports: list[dict] = []
+    fleet_staging: list[tuple[str, str, bool | None]] = []
 
     def job_of(report):
         remote = (report.get("environment") or {}).get("remote") or {}
@@ -289,9 +307,13 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
         report, _transcript = _run(
             pdk, workdir, f"mc_{corner.name}", [corner], sw_stat_mismatch=1,
             par_tail=PAR_TAIL_NOMINAL, n=n_samples, seed=first, backend="batch",
+            stage_model_inputs=stage_model_inputs,
         )
         jobs.append(job_of(report))
         reports.append(report)
+        fleet_staging.append(
+            (f"mc_{corner.name}", job_of(report), batch.models_staged_from_report(report))
+        )
         got = _samples_from_report(
             report, [corner], lambda i: f"mc{i + 1:03d}", PAR_TAIL_NOMINAL, 1,
             lambda c, i: first + i, need_index=True,
@@ -305,9 +327,11 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
     report, _transcript = _run(
         pdk, workdir, "nominal", corners, sw_stat_mismatch=0,
         par_tail=PAR_TAIL_NOMINAL, n=None, seed=None, backend="batch",
+        stage_model_inputs=stage_model_inputs,
     )
     jobs.append(job_of(report))
     reports.append(report)
+    fleet_staging.append(("nominal", job_of(report), batch.models_staged_from_report(report)))
     nominal = _samples_from_report(
         report, corners, lambda i: "nominal", PAR_TAIL_NOMINAL, 0, lambda c, i: None
     )
@@ -331,7 +355,7 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
         raise batch.BatchError(f"negative control: report has {len(neg)} units, expected 1")
     samples += neg
     reports.append(report)
-    return samples, [j for j in jobs if j], batch.engine_from_reports(reports)
+    return samples, [j for j in jobs if j], batch.engine_from_reports(reports), fleet_staging
 
 
 def _within(value: float, lo: float, hi: float) -> bool:
@@ -405,6 +429,7 @@ def render_record(
     dut_sha256: str,
     fragment_sha256: str,
     stored: dict,
+    fleet_staging: list | None = None,
 ) -> str:
     overall_pass = all(cs.swing_pass and cs.vcm_pass for cs in stats)
     neg_ctrl_swing_fail = not _within(neg_ctrl.swing_dc, *_bounds_swing())
@@ -439,6 +464,16 @@ def render_record(
         f"Fleet job ids: {', '.join(job_ids) or '(none reported)'} (negative control ran as "
         "one local single-unit run)."
     )
+    if fleet_staging:
+        summary = models_staged_summary(staged for _n, _j, staged in fleet_staging)
+        lines.append(
+            f"  - Model inputs (worker-reported, fleet requests only; the local negative "
+            f"control is excluded): {models_staged_text(summary)}"
+        )
+        for name, job, staged in fleet_staging:
+            lines.append(
+                f"    - request `{name}`, job `{job or 'n/a'}`: {models_staged_state(staged)}"
+            )
     lines.append(
         "  - **Subset of the mandated PVT matrix**: this record holds temperature and "
         "supply at nominal and sweeps the full process-corner set (tt/ff/ss/fs/sf) "
@@ -576,6 +611,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--n-samples", type=int, default=30, help="Monte Carlo samples per process corner (default: 30)")
     parser.add_argument("--base-seed", type=int, default=20260814, help="deterministic base seed (default: 20260814)")
     parser.add_argument("--no-write", action="store_true", help="run everything but write nothing to records/")
+    parser.add_argument(
+        "--stage-models", action="store_true",
+        help="set options.stage_model_inputs on the fleet requests so the batch "
+        "workers run this client's own model closure instead of the fleet "
+        "image's PDK (the local negative control is unaffected)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -604,7 +645,10 @@ def main(argv: list[str] | None = None) -> int:
     workdir = SIM_DIR / ".work" / "cml-driver-mismatch" / "debug"
     started = time.monotonic()
     try:
-        results, job_ids, ngspice_v = run_all(pdk, workdir, args.n_samples, args.base_seed)
+        results, job_ids, ngspice_v, fleet_staging = run_all(
+            pdk, workdir, args.n_samples, args.base_seed,
+            stage_model_inputs=args.stage_models,
+        )
     except batch.BatchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
@@ -692,6 +736,7 @@ def main(argv: list[str] | None = None) -> int:
         dut_sha256=dut_sha256,
         fragment_sha256=fragment_sha256,
         stored=stored,
+        fleet_staging=fleet_staging,
     )
     device_write_record(RECORDS_DIR, record_id, body)
 
