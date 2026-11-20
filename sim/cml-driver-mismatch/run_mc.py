@@ -189,8 +189,13 @@ def write_body(
     )
 
 
-def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, backend):
-    """Write body + request ``name`` and submit it; return (report, transcript)."""
+def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, backend,
+         stage_model_inputs=False):
+    """Write body + request ``name`` and submit it; return (report, transcript).
+
+    ``stage_model_inputs`` reaches only the batch requests (see
+    ``batch.build_mc_request``); the local negative control keeps running on
+    this host's own models."""
     body = f"{name}.body.spice"
     write_body(
         pdk, workdir / body, sw_stat_mismatch=sw_stat_mismatch,
@@ -199,6 +204,7 @@ def _run(pdk, workdir, name, corners, *, sw_stat_mismatch, par_tail, n, seed, ba
     request = batch.build_mc_request(
         pdk, corners, body, measurements=MEASUREMENTS, temp_c=TEMP_C,
         n=n, seed=seed, backend=backend, ngspice_init=NGSPICE_INIT,
+        stage_model_inputs=stage_model_inputs,
     )
     request_path = workdir / f"{name}.request.json"
     request_path.write_text(json.dumps(request, indent=2) + "\n")
@@ -264,10 +270,14 @@ def _samples_from_report(report, corners, label_of, par_tail, sw, seed_of, *, ne
     return out
 
 
-def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
+def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int,
+            stage_model_inputs: bool = False):
     """Submit the sweep: one Monte Carlo request per process corner (fleet),
     one deterministic mismatch=0 request over all corners (fleet), and the
     single-unit negative control (the one run host rules allow locally).
+    ``stage_model_inputs`` opts the fleet requests into
+    ``options.stage_model_inputs`` (this client's own model closure); the
+    local negative control is unchanged either way.
 
     Returns ``(samples, job_ids, ngspice)`` where ``ngspice`` is the engine
     version(s) the reports state (not this host's probe). Raises ``batch.BatchError`` on a failed
@@ -289,6 +299,7 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
         report, _transcript = _run(
             pdk, workdir, f"mc_{corner.name}", [corner], sw_stat_mismatch=1,
             par_tail=PAR_TAIL_NOMINAL, n=n_samples, seed=first, backend="batch",
+            stage_model_inputs=stage_model_inputs,
         )
         jobs.append(job_of(report))
         reports.append(report)
@@ -305,6 +316,7 @@ def run_all(pdk: Pdk, workdir: Path, n_samples: int, base_seed: int):
     report, _transcript = _run(
         pdk, workdir, "nominal", corners, sw_stat_mismatch=0,
         par_tail=PAR_TAIL_NOMINAL, n=None, seed=None, backend="batch",
+        stage_model_inputs=stage_model_inputs,
     )
     jobs.append(job_of(report))
     reports.append(report)
@@ -576,6 +588,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--n-samples", type=int, default=30, help="Monte Carlo samples per process corner (default: 30)")
     parser.add_argument("--base-seed", type=int, default=20260814, help="deterministic base seed (default: 20260814)")
     parser.add_argument("--no-write", action="store_true", help="run everything but write nothing to records/")
+    parser.add_argument(
+        "--stage-models", action="store_true",
+        help="set options.stage_model_inputs on the fleet requests so the batch "
+        "workers run this client's own model closure instead of the fleet "
+        "image's PDK (the local negative control is unaffected)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -604,7 +622,10 @@ def main(argv: list[str] | None = None) -> int:
     workdir = SIM_DIR / ".work" / "cml-driver-mismatch" / "debug"
     started = time.monotonic()
     try:
-        results, job_ids, ngspice_v = run_all(pdk, workdir, args.n_samples, args.base_seed)
+        results, job_ids, ngspice_v = run_all(
+            pdk, workdir, args.n_samples, args.base_seed,
+            stage_model_inputs=args.stage_models,
+        )
     except batch.BatchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

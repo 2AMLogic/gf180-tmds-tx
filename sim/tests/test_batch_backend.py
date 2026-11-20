@@ -10,6 +10,7 @@ with a canned ``klt sim`` JSON envelope (or a failure) per point.
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 import io
 import json
 import stat
@@ -50,6 +51,8 @@ if mode == "missing": corners = []
 if mode == "duplicate": corners = [corner(), corner()]
 if mode == "failed": corners = [corner("error", drop=names[:1])]
 env = {{"engine_version": "46", "remote": {{"job_id": "job-" + cid}}}}
+if mode == "staged": env["remote"]["pdk"] = {{"models_staged": True}}
+if mode == "image": env["remote"]["pdk"] = {{"models_staged": False}}
 print(json.dumps({{"status": "pass", "corners": corners, "environment": env}}))
 '''
 
@@ -64,6 +67,19 @@ class _Pdk:
     path = Path("/pdk/gf180mcuD")
     model_lib = "/pdk/gf180mcuD/libs.tech/ngspice/sm141064.ngspice"
     design_include = "/pdk/gf180mcuD/libs.tech/ngspice/design.ngspice"
+
+
+def _load_run_mc():
+    """Load sim/cml-driver-mismatch/run_mc.py under its own module name (the
+    same loader trick test_run_mc_report_mapping.py uses; a distinct name so
+    the two test modules do not share sys.modules state)."""
+    path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
+    name = "cml_driver_mismatch_run_mc_batch"
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module  # dataclass processing resolves annotations via sys.modules
+    spec.loader.exec_module(module)
+    return module
 
 
 class BatchBackendTests(unittest.TestCase):
@@ -92,7 +108,8 @@ class BatchBackendTests(unittest.TestCase):
         record = report_mod.build_record(
             tb=self.tb, pdk=mock.MagicMock(provenance=lambda: {}), points=self.points,
             results=results, ngspice=batch_mod.engine_summary(results), repo_root=self.tmp,
-            record_id="r", started_utc="t", wall_seconds=1.0, git={"commit": "x"}, backend="batch",
+            record_id="r", started_utc="t", wall_seconds=1.0,
+            git={"commit": "x", "branch": "feature/x", "dirty": False}, backend="batch",
         )
         return record
 
@@ -196,6 +213,135 @@ class BatchBackendTests(unittest.TestCase):
         d = PointResult(point=point, status="ok").as_dict()
         self.assertNotIn("backend", d)
         self.assertNotIn("batch_job_id", d)
+        self.assertNotIn("models_staged", d)
+
+    def test_stage_model_inputs_off_by_default(self):
+        request = batch_mod.build_request(self.tb, _Pdk(), self.points[1], "b.spice")
+        self.assertNotIn("stage_model_inputs", request["options"])
+        mc = batch_mod.build_mc_request(
+            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
+            temp_c=27.0, n=3, seed=1,
+        )
+        self.assertNotIn("stage_model_inputs", mc["options"])
+
+    def test_stage_model_inputs_flag_sets_the_option(self):
+        request = batch_mod.build_request(
+            self.tb, _Pdk(), self.points[1], "b.spice", stage_model_inputs=True
+        )
+        self.assertIs(request["options"]["stage_model_inputs"], True)
+        mc = batch_mod.build_mc_request(
+            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
+            temp_c=27.0, n=3, seed=1, stage_model_inputs=True,
+        )
+        self.assertIs(mc["options"]["stage_model_inputs"], True)
+        # A local single-unit request never stages: it already runs this
+        # host's own models (run_mc.py's negative control).
+        local = batch_mod.build_mc_request(
+            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
+            temp_c=27.0, n=1, seed=7, backend="local", stage_model_inputs=True,
+        )
+        self.assertNotIn("stage_model_inputs", local["options"])
+
+    def _dry_run_output(self, extra):
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch("subprocess.run") as run, mock.patch.object(
+            cli_mod, "find_pdk", return_value=_Pdk()
+        ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cli_mod.main(["esd-clamp-cv", "--backend", "batch", "--dry-run", *extra])
+        self.assertEqual(code, 0)
+        run.assert_not_called()
+        self.assertIn("nothing submitted", err.getvalue())
+        return out.getvalue()
+
+    def test_dry_run_default_omits_stage_model_inputs(self):
+        text = self._dry_run_output([])
+        self.assertNotIn("stage_model_inputs", text)
+        # ... and the printed document is exactly the canonical default
+        # request per point, byte for byte.
+        points = corners_mod.build_grid(
+            corners_mod.resolve_corners(list(self.tb.corners)),
+            list(self.tb.temperatures_c),
+            corners_mod.supply_points(self.tb.nominal_supply_v, self.tb.supply_tolerance),
+            None,
+        )
+        self.assertEqual(text, batch_mod.dry_run_text(self.tb, _Pdk(), points))
+
+    def test_dry_run_with_stage_models_prints_the_option(self):
+        text = self._dry_run_output(["--stage-models"])
+        chunks = text.split("# point ")[1:]
+        self.assertGreaterEqual(len(chunks), 1)
+        for chunk in chunks:
+            request = json.loads(chunk.split("\n", 1)[1])
+            self.assertIs(request["options"]["stage_model_inputs"], True)
+
+    def test_stage_models_requires_batch_backend(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertNotEqual(
+                cli_mod.main(["esd-clamp-cv", "--stage-models", "--dry-run"]), 0
+            )
+
+    def test_record_distinguishes_worker_staging_states(self):
+        cids = {p.corner_id for p in self.points}
+        for mode, expected, note in (
+            ("staged", True, "staged from this client"),
+            ("image", False, "fleet image models"),
+        ):
+            with self.subTest(mode=mode):
+                self.set_modes({cid: mode for cid in cids})
+                results = self.grid()
+                self.assertEqual({r.models_staged for r in results}, {expected})
+                record = self.status(results)
+                self.assertIs(record["environment"]["models_staged"], expected)
+                self.assertEqual(record["points"][0]["models_staged"], expected)
+                text = report_mod.render_record(record, self.tb.experiment)
+                self.assertIn(f"- Model inputs: {note}", text)
+
+    def test_record_marks_staging_unknown_for_older_receipts(self):
+        # The default stub receipt carries no pdk.models_staged (an older klt).
+        results = self.grid()
+        self.assertEqual({r.models_staged for r in results}, {None})
+        record = self.status(results)
+        self.assertIsNone(record["environment"]["models_staged"])
+        self.assertIsNone(record["points"][0]["models_staged"])
+        text = report_mod.render_record(record, self.tb.experiment)
+        self.assertIn("- Model inputs: unknown (receipt predates staging metadata)", text)
+
+    def test_mixed_worker_staging_reports_are_called_out(self):
+        self.set_modes({"tt_27c_3.30v": "staged"})
+        record = self.status(self.grid())
+        self.assertEqual(record["environment"]["models_staged"], "mixed")
+        text = report_mod.render_record(record, self.tb.experiment)
+        self.assertIn("mixed worker reports", text)
+
+    def test_run_mc_passes_stage_models_to_the_fleet_requests(self):
+        run_mc = _load_run_mc()
+        seen = []
+
+        def fake_submit(request_path, out_dir, *, backend="batch"):
+            seen.append((json.loads(Path(request_path).read_text()), backend))
+            return {"corners": [], "environment": {}}, ""
+
+        workdir = self.tmp / "mcwork"
+        with mock.patch.object(batch_mod, "submit_request", fake_submit):
+            run_mc._run(
+                _Pdk(), workdir, "mc_tt", [corners_mod.CORNERS["tt"]],
+                sw_stat_mismatch=1, par_tail=run_mc.PAR_TAIL_NOMINAL,
+                n=3, seed=1, backend="batch", stage_model_inputs=True,
+            )
+            run_mc._run(
+                _Pdk(), workdir, "mcneg", [corners_mod.CORNERS["tt"]],
+                sw_stat_mismatch=1, par_tail=run_mc.NEG_CTRL_PAR_TAIL,
+                n=1, seed=7, backend="local", stage_model_inputs=True,
+            )
+        fleet_request, backend = seen[0]
+        self.assertEqual(backend, "batch")
+        self.assertIs(fleet_request["options"]["stage_model_inputs"], True)
+        local_request, _ = seen[1]
+        self.assertEqual(local_request["backend"], "local")
+        self.assertNotIn("stage_model_inputs", local_request["options"])
 
 
 def _deck_shared_lines(deck: str) -> list[str]:

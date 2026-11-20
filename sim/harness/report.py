@@ -254,6 +254,37 @@ def evaluate_checks(
     return failures
 
 
+def _models_staged_summary(results: list) -> object:
+    """Collapse the per-point worker-reported staging states to one record value.
+
+    ``True``/``False`` when every receipt agrees, ``None`` when no receipt
+    carried the metadata (older klt), the string ``"mixed"`` when the reports
+    disagree. Kept separate from ``environment.pdk`` (the *local* PDK the
+    request was built against) so worker evidence stays distinguishable from
+    client metadata.
+    """
+    values = {r.models_staged for r in results}
+    if values == {True}:
+        return True
+    if values == {False}:
+        return False
+    if values == {None}:
+        return None
+    return "mixed"
+
+
+def _models_staged_text(staged) -> str:
+    """The one-line Markdown summary of the worker-reported staging state."""
+    if staged is True:
+        return ("staged from this client (`options.stage_model_inputs`: the "
+                "worker ran the submitted model closure)")
+    if staged is False:
+        return "fleet image models (nothing staged; the worker ran its own PDK tree)"
+    if staged == "mixed":
+        return "mixed worker reports (see the per-point `models_staged` values)"
+    return "unknown (receipt predates staging metadata)"
+
+
 def environment(pdk: Pdk, ngspice: str, repo_root: Path, git: dict | None = None) -> dict:
     """Reproducibility provenance for the record.
 
@@ -377,6 +408,9 @@ def build_record(
         # per-point job ids; `ngspice` is the version the runner reported.
         env["backend"] = backend
         env["batch_job_ids"] = {r.point.corner_id: r.job_id for r in results if r.job_id}
+        # What the worker *reported* about its model inputs -- separate from
+        # env["pdk"], which is the local PDK the request was built against.
+        env["models_staged"] = _models_staged_summary(results)
 
     return {
         "record_id": record_id,
@@ -678,6 +712,7 @@ def render_record(record: dict, experiment: str) -> str:
         )
         for corner_id, job_id in env.get("batch_job_ids", {}).items():
             lines.append(f"  - batch job `{job_id}`: `{corner_id}`")
+        lines.append(f"- Model inputs: {_models_staged_text(env.get('models_staged'))}")
     lines += [
         f"- Harness: sim/harness {env['harness_version']}, python {env['python']}",
         f"- git: `{git['commit']}` on `{git['branch']}`"

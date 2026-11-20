@@ -116,14 +116,26 @@ def build_request(
     point: PvtPoint,
     netlist_name: str,
     timeout_s: int = DEFAULT_TIMEOUT_S,
+    stage_model_inputs: bool = False,
 ) -> dict:
-    """The ``klt sim`` request document for one PVT point."""
+    """The ``klt sim`` request document for one PVT point.
+
+    ``stage_model_inputs`` adds ``options.stage_model_inputs: true`` so the
+    submitter's ``models.lib`` and its full ``.include``/``.lib`` closure
+    ship with the job and the fleet executes the client's own models
+    (klt docs/cli/sim.md, "Staging the request's model inputs") instead of
+    the fleet image's PDK tree. Default off: the printed request is
+    unchanged for existing callers.
+    """
     kind, args = _analysis(tb)
     model_lib = Path(pdk.model_lib)
     try:
         lib_rel = str(model_lib.relative_to(pdk.path))
     except ValueError:
         lib_rel = str(model_lib)
+    options = {"timeout_s": timeout_s, "keep_artifacts": True}
+    if stage_model_inputs:
+        options["stage_model_inputs"] = True
     return {
         "netlist": netlist_name,
         "engine": "ngspice",
@@ -137,7 +149,7 @@ def build_request(
         },
         "analysis": {"kind": kind, "args": args},
         "measurements": _measurements(tb, kind),
-        "options": {"timeout_s": timeout_s, "keep_artifacts": True},
+        "options": options,
         "batch": {"capacity_wait_s": CAPACITY_WAIT_S},
     }
 
@@ -158,6 +170,7 @@ def build_mc_request(
     ngspice_init: tuple[str, ...] = (),
     backend: str = "batch",
     timeout_s: int = DEFAULT_TIMEOUT_S,
+    stage_model_inputs: bool = False,
 ) -> dict:
     """A ``klt sim`` request for a Monte Carlo (or, with ``n=None``, a plain
     multi-corner deterministic) run of an already-written circuit body.
@@ -170,6 +183,9 @@ def build_mc_request(
     ``options.ngspice_init`` (a ``.spiceinit`` in the unit's directory), the
     reproducible way to select a compatibility mode such as
     ``set ngbehavior=hsa`` instead of relying on a host ``~/.spiceinit``.
+    ``stage_model_inputs`` adds ``options.stage_model_inputs: true`` on batch
+    requests only (see ``build_request``); a local single-unit run already
+    executes this host's own models, so staging it would be meaningless.
     Used by sim/cml-driver-mismatch/run_mc.py.
     """
     kind, args = analysis
@@ -178,6 +194,9 @@ def build_mc_request(
         lib_rel = str(model_lib.relative_to(pdk.path))
     except ValueError:
         lib_rel = str(model_lib)
+    options = {"timeout_s": timeout_s, "keep_artifacts": True}
+    if stage_model_inputs and backend == "batch":
+        options["stage_model_inputs"] = True
     request = {
         "netlist": netlist_name,
         "engine": "ngspice",
@@ -189,7 +208,7 @@ def build_mc_request(
         },
         "analysis": {"kind": kind, "args": args},
         "measurements": list(measurements),
-        "options": {"timeout_s": timeout_s, "keep_artifacts": True},
+        "options": options,
     }
     if ngspice_init:
         request["options"]["ngspice_init"] = list(ngspice_init)
@@ -207,25 +226,40 @@ def build_mc_request(
 
 
 def write_point_files(
-    tb: Testbench, pdk: Pdk, point: PvtPoint, workdir: Path, timeout_s: int = DEFAULT_TIMEOUT_S
+    tb: Testbench,
+    pdk: Pdk,
+    point: PvtPoint,
+    workdir: Path,
+    timeout_s: int = DEFAULT_TIMEOUT_S,
+    stage_model_inputs: bool = False,
 ) -> Path:
     """Write the body and request for ``point`` under ``workdir``; return the request path."""
     workdir.mkdir(parents=True, exist_ok=True)
     body_name = f"{point.corner_id}.body.spice"
     (workdir / body_name).write_text(compose_body(tb, pdk, point))
-    request = build_request(tb, pdk, point, body_name, timeout_s=timeout_s)
+    request = build_request(
+        tb, pdk, point, body_name, timeout_s=timeout_s,
+        stage_model_inputs=stage_model_inputs,
+    )
     path = workdir / f"{point.corner_id}.request.json"
     path.write_text(json.dumps(request, indent=2) + "\n")
     return path
 
 
 def dry_run_text(
-    tb: Testbench, pdk: Pdk, points: list[PvtPoint], timeout_s: int = DEFAULT_TIMEOUT_S
+    tb: Testbench,
+    pdk: Pdk,
+    points: list[PvtPoint],
+    timeout_s: int = DEFAULT_TIMEOUT_S,
+    stage_model_inputs: bool = False,
 ) -> str:
     """Printable requests for every point; submits nothing."""
     chunks = []
     for point in points:
-        request = build_request(tb, pdk, point, f"{point.corner_id}.body.spice", timeout_s)
+        request = build_request(
+            tb, pdk, point, f"{point.corner_id}.body.spice", timeout_s,
+            stage_model_inputs=stage_model_inputs,
+        )
         chunks.append(f"# point {point.corner_id}\n" + json.dumps(request, indent=2))
     return "\n".join(chunks) + "\n"
 
@@ -249,6 +283,11 @@ def _parse_report(point: PvtPoint, tb: Testbench, report: dict, log_name: str) -
     remote = (report.get("environment") or {}).get("remote") or {}
     job_id = str(remote.get("job_id") or "")
     engine = str((report.get("environment") or {}).get("engine_version") or "")
+    # Worker-reported staging state: True/False when the receipt states it,
+    # None for an older receipt that predates the metadata.
+    models_staged = (remote.get("pdk") or {}).get("models_staged")
+    if not isinstance(models_staged, bool):
+        models_staged = None
     values: dict[str, float] = {}
     for m in corner.get("measurements") or []:
         value = m.get("value")
@@ -280,6 +319,7 @@ def _parse_report(point: PvtPoint, tb: Testbench, report: dict, log_name: str) -
         backend="batch",
         job_id=job_id,
         engine_version=engine,
+        models_staged=models_staged,
     )
     return result
 
@@ -292,13 +332,16 @@ def run_point(
     timeout_s: int = DEFAULT_TIMEOUT_S,
     log_dir: Path | None = None,
     klt: str | None = None,
+    stage_model_inputs: bool = False,
 ) -> PointResult:
     """Submit one point to the batch fleet. Never raises for a sim failure and
     never runs ngspice locally."""
     klt = klt or KLT
     log_dir = workdir if log_dir is None else log_dir
     log_dir.mkdir(parents=True, exist_ok=True)
-    request_path = write_point_files(tb, pdk, point, workdir, timeout_s)
+    request_path = write_point_files(
+        tb, pdk, point, workdir, timeout_s, stage_model_inputs=stage_model_inputs
+    )
     out_dir = workdir / f"{point.corner_id}.out"
     log_name = f"{point.corner_id}.log"
     cmd = [
@@ -403,6 +446,7 @@ def run_grid(
     on_result=None,
     log_dir: Path | None = None,
     klt: str | None = None,
+    stage_model_inputs: bool = False,
 ) -> list[PointResult]:
     """Submit every point; results come back in grid order."""
     _analysis(tb)  # refuse an inexpressible bench before submitting anything
@@ -410,7 +454,10 @@ def run_grid(
     jobs = max(1, min(jobs, MAX_IN_FLIGHT))
 
     def _one(point):
-        result = run_point(tb, pdk, point, workdir, timeout_s, log_dir, klt)
+        result = run_point(
+            tb, pdk, point, workdir, timeout_s, log_dir, klt,
+            stage_model_inputs=stage_model_inputs,
+        )
         if on_result is not None:
             on_result(result)
         return result

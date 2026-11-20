@@ -146,6 +146,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="print the klt sim request for every point and submit nothing "
         "(requires --backend batch)",
     )
+    parser.add_argument(
+        "--stage-models",
+        action="store_true",
+        help="set options.stage_model_inputs on every request so the fleet "
+        "runs this client's own model closure (models.lib plus its "
+        ".include/.lib tree) instead of the fleet image's PDK; requires "
+        "--backend batch",
+    )
     parser.add_argument("-j", "--jobs", type=int, default=0, help="parallel ngspice runs")
     parser.add_argument(
         "--timeout",
@@ -263,6 +271,9 @@ def run(args: argparse.Namespace) -> int:
     if args.dry_run and args.backend != "batch":
         print("error: --dry-run is only meaningful with --backend batch", file=sys.stderr)
         return EXIT_ENVIRONMENT
+    if args.stage_models and args.backend != "batch":
+        print("error: --stage-models is only meaningful with --backend batch", file=sys.stderr)
+        return EXIT_ENVIRONMENT
     batch = args.backend == "batch"
     try:
         pdk = find_pdk()
@@ -299,7 +310,12 @@ def run(args: argparse.Namespace) -> int:
 
     if args.dry_run:
         try:
-            print(batch_mod.dry_run_text(tb, pdk, points, args.timeout), end="")
+            print(
+                batch_mod.dry_run_text(
+                    tb, pdk, points, args.timeout, stage_model_inputs=args.stage_models
+                ),
+                end="",
+            )
         except batch_mod.BatchError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return EXIT_ENVIRONMENT
@@ -370,6 +386,7 @@ def run(args: argparse.Namespace) -> int:
         print(f"[{completed:>3}/{len(points)}] {flag} {result.point.corner_id:<32} {detail}")
 
     wall_start = time.monotonic()
+    stage_kw = {"stage_model_inputs": args.stage_models} if batch else {}
     try:
         grid_runner = batch_mod.run_grid if batch else runner.run_grid
         results = grid_runner(
@@ -381,6 +398,7 @@ def run(args: argparse.Namespace) -> int:
             timeout_s=args.timeout,
             on_result=progress,
             log_dir=log_dir,
+            **stage_kw,
         )
     except NgspiceMissing as exc:
         print(f"error: {exc}", file=sys.stderr)

@@ -281,7 +281,7 @@ class RunMcEvidencePathTests(StoreCase):
         for name, value in attrs.items():
             setattr(obj, name, value)
 
-    def _fake_run_all(self, pdk, workdir, n_samples, base_seed):
+    def _fake_run_all(self, pdk, workdir, n_samples, base_seed, stage_model_inputs=False):
         """Stand-in for ``run_mc.run_all`` (the `klt sim` submit): the same
         Sample set it returns -- N Monte Carlo samples per process corner, one
         nominal per corner, one negative control -- with canned values."""
