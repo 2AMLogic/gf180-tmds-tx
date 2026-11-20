@@ -27,6 +27,8 @@
     "spb_c0": "TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 RISE=2",
     "trise_c0": "TRIG v(vd_c0) VAL=-0.4 RISE=1 TARG v(vd_c0) VAL=0.4 RISE=1",
     "tfall_c0": "TRIG v(vd_c0) VAL=0.4 FALL=2 TARG v(vd_c0) VAL=-0.4 FALL=2",
+    "trise_ui_c0": "m_trise_c0/m_ui_ref",
+    "tfall_ui_c0": "m_tfall_c0/m_ui_ref",
     "dj_ui_c0": "(max(max(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0)-min(min(m_spa_c0-m_spa_in,m_spb_c0-m_spb_in),0))/m_ui_ref",
     "swing_c0": "vecmax(v(outp_c0)*v(winc))-vecmin(v(outp_c0)+10*(1-v(winc)))",
     "vpp_c0": "vecmax(v(outp_c0)*v(win))-vecmin(v(outp_c0)+10*(1-v(win)))",
@@ -36,6 +38,8 @@
     "spb_c1": "TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 RISE=2",
     "trise_c1": "TRIG v(vd_c1) VAL=-0.4 RISE=1 TARG v(vd_c1) VAL=0.4 RISE=1",
     "tfall_c1": "TRIG v(vd_c1) VAL=0.4 FALL=2 TARG v(vd_c1) VAL=-0.4 FALL=2",
+    "trise_ui_c1": "m_trise_c1/m_ui_ref",
+    "tfall_ui_c1": "m_tfall_c1/m_ui_ref",
     "dj_ui_c1": "(max(max(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0)-min(min(m_spa_c1-m_spa_in,m_spb_c1-m_spb_in),0))/m_ui_ref",
     "swing_c1": "vecmax(v(outp_c1)*v(winc))-vecmin(v(outp_c1)+10*(1-v(winc)))",
     "vpp_c1": "vecmax(v(outp_c1)*v(win))-vecmin(v(outp_c1)+10*(1-v(win)))",
@@ -50,6 +54,8 @@
     "spb_c2": "TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 RISE=2",
     "trise_c2": "TRIG v(vd_c2) VAL=-0.4 RISE=1 TARG v(vd_c2) VAL=0.4 RISE=1",
     "tfall_c2": "TRIG v(vd_c2) VAL=0.4 FALL=2 TARG v(vd_c2) VAL=-0.4 FALL=2",
+    "trise_ui_c2": "m_trise_c2/m_ui_ref",
+    "tfall_ui_c2": "m_tfall_c2/m_ui_ref",
     "dj_ui_c2": "(max(max(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0)-min(min(m_spa_c2-m_spa_in,m_spb_c2-m_spb_in),0))/m_ui_ref",
     "swing_c2": "vecmax(v(outp_c2)*v(winc))-vecmin(v(outp_c2)+10*(1-v(winc)))",
     "vpp_c2": "vecmax(v(outp_c2)*v(win))-vecmin(v(outp_c2)+10*(1-v(win)))",
@@ -154,6 +160,30 @@
       "min": 8e-3,
       "max": 12e-3,
       "description": "Tail current from the ideal 500 uA reference through the cell's 1:20 mirror, with the driver's inputs now at the real mux's DC levels. The 8-12 mA window is design/cml-driver-sizing.md's derived tail-current tolerance; a real mux that under-drives the switch pair shows up here as a tail current the termination cannot account for."
+    },
+    "trise_ui_c0": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed): 10-90 % rise time <= 20 % of the operating UI, 0 pF pad, with the real DR-0003 multiplexer driving the cell. Graded as the ratio m_trise_c0/m_ui_ref because the bound is rate-dependent (~269 ps at 742.5 Mbps, ~741 ps at 270 Mbps) -- a fixed absolute max on m_trise_c0 would be wrong at the other rate; the absolute measures stay reported alongside. Mirrors sim/cml-driver-eye's trise_ui_c0 (the row's primary bench); the 20 % figure is Proposed and tracked with ratified: false in signoff/analog-spec.json."
+    },
+    "tfall_ui_c0": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed), falling edge, 0 pF pad: m_tfall_c0/m_ui_ref <= 20 % of the operating UI, same rate-normalisation rationale as trise_ui_c0."
+    },
+    "trise_ui_c1": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed), rising edge, 1 pF pad: m_trise_c1/m_ui_ref <= 20 % of the operating UI."
+    },
+    "tfall_ui_c1": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed), falling edge, 1 pF pad: m_tfall_c1/m_ui_ref <= 20 % of the operating UI."
+    },
+    "trise_ui_c2": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed), rising edge at DR-0005's full 2 pF pad-capacitance budget: m_trise_c2/m_ui_ref <= 20 % of the operating UI. The tightest measured point -- design/cml-driver-sizing.md section 5/8 measures up to 251.6 ps absolute here at 742.5 Mbps on the ideal-source bench, 93 % of the ~269 ps bound."
+    },
+    "tfall_ui_c2": {
+      "max": 0.2,
+      "description": "DR-0013 section 3 row 5 (Proposed), falling edge at DR-0005's full 2 pF pad-capacitance budget: m_tfall_c2/m_ui_ref <= 20 % of the operating UI."
     },
     "ui_ref": {
       "min_spread_pct": 50.0,
