@@ -7,7 +7,7 @@ outside the markers is touched. See `.claude/skills/loom-guide/guide.md`
 for the generation logic.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-20T18:55:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-20T21:08:15Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -31,21 +31,24 @@ _None._
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-- **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure
-- **#371**: T1 item 7 (analog) prep: klt pex-shaped testbench requests for the post-#210 pad-ring assembly, plus an extract-only body-bias report
-- **#372**: T1 item 5 (analog) prep: commit the DR-0013 row-to-measure map and give row 5 (rise/fall) a graded check
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
+- **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure
+- **#371**: T1 item 7 (analog) prep: klt pex-shaped testbench requests for the post-#210 pad-ring assembly, plus an extract-only body-bias report
+- **#372**: T1 item 5 (analog) prep: commit the DR-0013 row-to-measure map and give row 5 (rise/fall) a graded check
+- **#373**: Remove obsolete DRC and LVS verdicts from new place-and-route records
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
 - **#368**: fix(signoff): stop README churn drifting item 10; add pin tripwire and re-attest *(held)*
+- **#376**: flow: drop stale DRC/LVS verdicts from P&R record template
 
 ## Approved (Awaiting Merge)
 
@@ -72,7 +75,6 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#326**: Remove the two pad_pitch_fit *.parasitics_critical_net.json reports: 392 KB whose only new content says the measurement never ran *(hermit)* *(held)*
-- **#373**: Remove obsolete DRC and LVS verdicts from new place-and-route records *(hermit)*
 
 ## Epics
 
@@ -85,11 +87,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 2 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 3 |
-| In Progress (`loom:building`) | 1 |
-| PRs awaiting review | 1 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
+| In Progress (`loom:building`) | 5 |
+| PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 11 |
-| Architect / Hermit proposals | 2 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
