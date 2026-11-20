@@ -177,6 +177,32 @@ commands), refresh the manifest's pins, re-run the regeneration command, and
 commit record + evidence together. Never hand-edit `signoff/signoff.json` —
 it is grader output or it is nothing.
 
+### Item 10: the hash-pinned hygiene files
+
+`attest/item10.json` pins the raw-byte hash of four tracked files:
+`README.md`, `spec/tmds-tx.md`, `LICENSE` and `.github/workflows/ci.yml`.
+Editing any of them drifts `envelopes/item10.json` and reds the `signoff` job.
+
+- **Volatile prose does not belong in `README.md`.** Status, commit refs and
+  verdict counts go in `WORK_PLAN.md` / `WORK_LOG.md` (not inventoried); the
+  verdict of record is `signoff.json`. Guide's docs passes must not stage
+  `README.md` (`guide.docsMaintenance.pinnedPaths` in `.loom/config.json`).
+- **Re-attesting is the owner's sign-off action, not an agent's.** Per
+  klayout-tools `docs/cli/signoff.md` ("Item 10") an agent never regenerates the
+  envelope to clear a red check, and an envelope diff in an unrelated PR is a red
+  flag. The one exception (klayout-tools#5603): a PR whose *declared subject* is
+  the hygiene-evidence change may carry the re-attested envelope, provided the
+  body names the hygiene files changed, the owner reviews and approves it, and no
+  agent merges it (`loom:operator`). A Judge approval is not the owner's.
+- **Fast tripwire.** `python3 scripts/check_attest_files.py` (CI `lint` job,
+  `npm run check:attest`) names the drifted file without `klt`. It is a report
+  only and is deliberately not a `lint.sh` step: `lint.sh` is itself an attested
+  item-10 check, so the tripwire would make the envelope unregenerable.
+- **Measured 2026-11-14** (`klayout-tools==0.8.0`): after a hygiene edit only
+  `envelopes/item10.json` moves; `manifest.json` pins the inventory's hash, not
+  the envelope's, and a full re-grade is byte-identical to `signoff.json`. No
+  manifest re-pin or re-grade follows.
+
 ## Item 1 freshness: what CI can and cannot prove
 
 `attest/item1-*.json` declare, per derived netlist, a freshness `check`. CI has

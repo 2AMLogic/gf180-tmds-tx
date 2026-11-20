@@ -123,5 +123,12 @@
         ]
       }
     ]
+  },
+  "guide": {
+    "docsMaintenance": {
+      "pinnedPaths": [
+        "README.md"
+      ]
+    }
   }
 }
