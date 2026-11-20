@@ -1,0 +1,216 @@
+{
+  "netlist": "bodies/cml-driver-eye-mask_2.97v_742.5mbps.spice",
+  "engine": "ngspice",
+  "backend": "batch",
+  "models": {
+    "pdk": "gf180mcuD",
+    "lib": "libs.tech/ngspice/sm141064.ngspice",
+    "param_file": "libs.tech/ngspice/design.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "bjt_ff",
+          "diode_ff",
+          "moscap_ff",
+          "mimcap_ff"
+        ]
+      },
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "bjt_ss",
+          "diode_ss",
+          "moscap_ss",
+          "mimcap_ss"
+        ]
+      },
+      {
+        "name": "fs",
+        "sections": [
+          "fs",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "sf",
+        "sections": [
+          "sf",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "20e-12 560e-9 0 40e-12"
+  },
+  "measurements": [
+    {
+      "name": "ui_ref",
+      "spice": ".meas tran ui_ref TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=1"
+    },
+    {
+      "name": "height_c0_0",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_0)))-vecmax(v(vd_c0)-10*(1-v(comb0_0)))"
+    },
+    {
+      "name": "height_c0_1",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_1)))-vecmax(v(vd_c0)-10*(1-v(comb0_1)))"
+    },
+    {
+      "name": "height_c0_2",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_2)))-vecmax(v(vd_c0)-10*(1-v(comb0_2)))"
+    },
+    {
+      "name": "height_c0_3",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_3)))-vecmax(v(vd_c0)-10*(1-v(comb0_3)))"
+    },
+    {
+      "name": "height_c0_4",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_4)))-vecmax(v(vd_c0)-10*(1-v(comb0_4)))"
+    },
+    {
+      "name": "height_c0_5",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_5)))-vecmax(v(vd_c0)-10*(1-v(comb0_5)))"
+    },
+    {
+      "name": "height_c0_6",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_6)))-vecmax(v(vd_c0)-10*(1-v(comb0_6)))"
+    },
+    {
+      "name": "height_c0_7",
+      "expr": "vecmin(v(vd_c0)+10*(1-v(comb1_7)))-vecmax(v(vd_c0)-10*(1-v(comb0_7)))"
+    },
+    {
+      "name": "eyeh_max_c0",
+      "expr": "max(max(max(max(max(max(max(height_c0_0,height_c0_1),height_c0_2),height_c0_3),height_c0_4),height_c0_5),height_c0_6),height_c0_7)"
+    },
+    {
+      "name": "eyemask_margin_c0",
+      "expr": "max(max(min(min(min(min(min(height_c0_0,height_c0_1),height_c0_2),height_c0_3),height_c0_4),height_c0_5),min(min(min(min(min(height_c0_1,height_c0_2),height_c0_3),height_c0_4),height_c0_5),height_c0_6)),min(min(min(min(min(height_c0_2,height_c0_3),height_c0_4),height_c0_5),height_c0_6),height_c0_7))"
+    },
+    {
+      "name": "height_c1_0",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_0)))-vecmax(v(vd_c1)-10*(1-v(comb0_0)))"
+    },
+    {
+      "name": "height_c1_1",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_1)))-vecmax(v(vd_c1)-10*(1-v(comb0_1)))"
+    },
+    {
+      "name": "height_c1_2",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_2)))-vecmax(v(vd_c1)-10*(1-v(comb0_2)))"
+    },
+    {
+      "name": "height_c1_3",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_3)))-vecmax(v(vd_c1)-10*(1-v(comb0_3)))"
+    },
+    {
+      "name": "height_c1_4",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_4)))-vecmax(v(vd_c1)-10*(1-v(comb0_4)))"
+    },
+    {
+      "name": "height_c1_5",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_5)))-vecmax(v(vd_c1)-10*(1-v(comb0_5)))"
+    },
+    {
+      "name": "height_c1_6",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_6)))-vecmax(v(vd_c1)-10*(1-v(comb0_6)))"
+    },
+    {
+      "name": "height_c1_7",
+      "expr": "vecmin(v(vd_c1)+10*(1-v(comb1_7)))-vecmax(v(vd_c1)-10*(1-v(comb0_7)))"
+    },
+    {
+      "name": "eyeh_max_c1",
+      "expr": "max(max(max(max(max(max(max(height_c1_0,height_c1_1),height_c1_2),height_c1_3),height_c1_4),height_c1_5),height_c1_6),height_c1_7)"
+    },
+    {
+      "name": "eyemask_margin_c1",
+      "expr": "max(max(min(min(min(min(min(height_c1_0,height_c1_1),height_c1_2),height_c1_3),height_c1_4),height_c1_5),min(min(min(min(min(height_c1_1,height_c1_2),height_c1_3),height_c1_4),height_c1_5),height_c1_6)),min(min(min(min(min(height_c1_2,height_c1_3),height_c1_4),height_c1_5),height_c1_6),height_c1_7))"
+    },
+    {
+      "name": "height_c2_0",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_0)))-vecmax(v(vd_c2)-10*(1-v(comb0_0)))"
+    },
+    {
+      "name": "height_c2_1",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_1)))-vecmax(v(vd_c2)-10*(1-v(comb0_1)))"
+    },
+    {
+      "name": "height_c2_2",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_2)))-vecmax(v(vd_c2)-10*(1-v(comb0_2)))"
+    },
+    {
+      "name": "height_c2_3",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_3)))-vecmax(v(vd_c2)-10*(1-v(comb0_3)))"
+    },
+    {
+      "name": "height_c2_4",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_4)))-vecmax(v(vd_c2)-10*(1-v(comb0_4)))"
+    },
+    {
+      "name": "height_c2_5",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_5)))-vecmax(v(vd_c2)-10*(1-v(comb0_5)))"
+    },
+    {
+      "name": "height_c2_6",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_6)))-vecmax(v(vd_c2)-10*(1-v(comb0_6)))"
+    },
+    {
+      "name": "height_c2_7",
+      "expr": "vecmin(v(vd_c2)+10*(1-v(comb1_7)))-vecmax(v(vd_c2)-10*(1-v(comb0_7)))"
+    },
+    {
+      "name": "eyeh_max_c2",
+      "expr": "max(max(max(max(max(max(max(height_c2_0,height_c2_1),height_c2_2),height_c2_3),height_c2_4),height_c2_5),height_c2_6),height_c2_7)"
+    },
+    {
+      "name": "eyemask_margin_c2",
+      "expr": "max(max(min(min(min(min(min(height_c2_0,height_c2_1),height_c2_2),height_c2_3),height_c2_4),height_c2_5),min(min(min(min(min(height_c2_1,height_c2_2),height_c2_3),height_c2_4),height_c2_5),height_c2_6)),min(min(min(min(min(height_c2_2,height_c2_3),height_c2_4),height_c2_5),height_c2_6),height_c2_7))"
+    }
+  ],
+  "options": {
+    "timeout_s": 300,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set wnflag=1",
+      "set num_threads=1"
+    ]
+  },
+  "batch": {
+    "capacity_wait_s": 600,
+    "max_units_per_job": 11
+  }
+}
