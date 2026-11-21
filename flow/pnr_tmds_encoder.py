@@ -50,7 +50,9 @@ every run:
 2. Dead ties such as ``assign cnt[0] = 1'h0;`` are dropped rather than fed
    through. Every bit such an assign drives has zero fanout in the
    synthesized netlist (verified by re-searching the written netlist with
-   the assigns removed, not assumed -- see ``live_assign_targets``): Yosys's
+   the assigns removed, not assumed -- see the shared validator's
+   ``live_assign_targets`` in ``flow/synth_assign_check.py``, which since
+   issue #384 the synth-mode LVS reference generator runs too): Yosys's
    own `opt`/`abc` folded whatever used to read those bits to a constant (the
    running-disparity accumulator's LSB, the two deltas' LSBs -- all three are
    structurally even -- and the candidate output words' two bits that do not
@@ -295,6 +297,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "flow"))
 
 from sim.harness.pdk import Pdk, PdkNotFound, find_pdk  # noqa: E402
+import synth_assign_check  # noqa: E402  (shared dead-tie validation, issue #384)
 import synth_tmds_encoder as synth  # noqa: E402  (reuses record_id/_git/working_tree_dirty)
 
 TOP = "tmds_encoder"
@@ -430,83 +433,30 @@ def lef_paths(pdk: Pdk) -> tuple[Path, Path, Path, Path, Path]:
 #: deltas) where the pre-DR-0009 netlist had exactly one (`cnt`).
 _SIGNED_WIRE_RE = re.compile(r"^(?P<lead>\s*wire )signed (?P<rest>\[)", re.MULTILINE)
 
-#: A top-level continuous assignment in the written netlist, e.g.
-#: `  assign cnt[0] = 1'h0;` or `  assign word_keep_s3[9:8] = { 1'h0, qm8_s3 };`.
-_ASSIGN_RE = re.compile(
-    r"^  assign (?P<net>\w+)\[(?P<msb>\d+)(?::(?P<lsb>\d+))?\] = (?P<rhs>[^;]+);\n",
-    re.MULTILINE,
-)
-
 
 def preprocess_netlist_for_openroad(src: Path, dst: Path) -> None:
     """The two mechanical, documented deltas from this module's docstring.
 
     Both are applied generically rather than to one hard-coded net name, and
     both re-verify their own precondition every run: the signedness strip is
-    purely syntactic, and an `assign` is dropped only after mechanically
-    confirming every bit it drives has zero fanout in the same netlist. A
-    *live* top-level assign would be a real structural change, so it raises
+    purely syntactic, and an `assign` is dropped only after the shared
+    dead-tie validator (`flow/synth_assign_check.py`, issue #384) confirms
+    every top-level assignment matches the recognized bit-select form and
+    every bit it drives has zero fanout in the same netlist. A *live*
+    top-level assign would be a real structural change, so it raises
     instead of being silently dropped.
     """
     text = src.read_text()
 
-    all_assigns = re.findall(r"^  assign .*$", text, re.MULTILINE)
-    recognized = len(_ASSIGN_RE.findall(text))
-    if len(all_assigns) != recognized:
-        raise PnrError(
-            f"netlist has {len(all_assigns)} top-level continuous assignment(s) but only "
-            f"{recognized} match the bit-select form this preprocessing step understands -- "
-            "investigate before place-and-route rather than passing an unrecognized "
-            "construct through to OpenROAD's reader"
-        )
-
-    live = live_assign_targets(text)
-    if live:
-        raise PnrError(
-            "netlist contains top-level continuous assignment(s) whose target bits "
-            f"are actually read: {', '.join(live)} -- the dead-tie preprocessing step "
-            "documented in this module's docstring no longer applies, investigate "
-            "before place-and-route"
-        )
+    try:
+        synth_assign_check.validate_dead_tie_assigns(text)
+    except synth_assign_check.SynthAssignError as exc:
+        raise PnrError(f"{exc}; investigate before place-and-route") from None
 
     text = _SIGNED_WIRE_RE.sub(lambda m: m.group("lead") + m.group("rest"), text)
-    text = _ASSIGN_RE.sub("", text)
+    text = synth_assign_check.strip_dead_tie_assigns(text)
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(text)
-
-
-def assign_target_bits(text: str) -> list[str]:
-    """Every `<net>[<bit>]` a top-level continuous assignment drives."""
-    targets: list[str] = []
-    for m in _ASSIGN_RE.finditer(text):
-        msb = int(m.group("msb"))
-        lsb = int(m.group("lsb")) if m.group("lsb") is not None else msb
-        lo, hi = min(msb, lsb), max(msb, lsb)
-        targets.extend(f"{m.group('net')}[{bit}]" for bit in range(lo, hi + 1))
-    return targets
-
-
-def live_assign_targets(text: str) -> list[str]:
-    """Assign-driven bits that something *other than* the assign itself reads.
-
-    Measured by deleting every top-level continuous assignment first and then
-    searching what remains -- which is exactly the netlist P&R would see once
-    the dead ties are dropped -- rather than by counting occurrences and
-    guessing how many of them belong to the assign's own left-hand side (a
-    range assign such as `foo[9:8] = ...` never spells its individual bits
-    out, so occurrence-counting undercounts it).
-    """
-    without_assigns = _ASSIGN_RE.sub("", text)
-    return [
-        target
-        for target in assign_target_bits(text)
-        if dead_net_fanout_count(without_assigns, target) > 0
-    ]
-
-
-def dead_net_fanout_count(text: str, net: str) -> int:
-    """Occurrences of the exact bit-select `net` in `text`."""
-    return len(re.findall(re.escape(net), text))
 
 
 def build_tcl(
