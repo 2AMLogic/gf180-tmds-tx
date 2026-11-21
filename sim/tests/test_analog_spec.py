@@ -1,15 +1,18 @@
-"""``signoff/analog-spec.json`` DR-0013 row-map tests (issue #372).
+"""``signoff/analog-spec.json`` DR-0013 row-map tests (issues #372, #383).
 
     python3 -m unittest sim.tests.test_analog_spec -v
 
 The committed map from every DR-0013 section 3 spec row to the testbench
 measure/check that grades it must not be able to rot: every row id appears
 exactly once, every named testbench / measure / check exists in that
-bench's ``tb.json``, rows 5 and 6 stay unratified, and every row records a
+bench's ``tb.json``, rows 5 and 6 stay unratified, every row records a
 disposition (graded evidence, a gap with its ``closes_with``, or DR-0013's
-explicit N/A-by-design). The DR row ids are parsed from the decision record
-itself, so a future DR-0013 edit that adds or renumbers a row breaks this
-test until the map is updated. No PDK, ngspice or network.
+explicit N/A-by-design), and every row's ``target`` restates the *complete*
+Target cell of its DR-0013 section 3 row (numbers, units, comparisons and
+qualifiers alike -- presentation alone is normalized, #383). The DR rows
+are parsed from the decision record itself, so a future DR-0013 edit that
+adds, renumbers or re-words a row breaks this test until the map follows.
+No PDK, ngspice or network.
 """
 
 from __future__ import annotations
@@ -26,11 +29,34 @@ DR_PATH = REPO / "spec" / "decisions" / "0013-operating-conditions.md"
 
 # DR-0013 section 3's table is the only numeric-first-cell table in the
 # record (the section 1 PVT matrix table's first cells are axis names).
-_ROW_RE = re.compile(r"^\|\s*(\d+)\s*\|", re.MULTILINE)
+_ROW_RE = re.compile(r"^\|\s*(\d+)\s*\|")
+
+# Presentation-only normalization for the target comparison (#383): strip
+# Markdown emphasis (bold / code spans) and collapse whitespace. Nothing
+# else -- the map must use the source's own characters (en dashes, ~=,
+# minus signs, section signs), so a changed bound or qualifier can never
+# normalize away.
+_EMPHASIS_RE = re.compile(r"\*\*|`")
+_WS_RE = re.compile(r"\s+")
+
+
+def normalize_target_text(text: str) -> str:
+    return _WS_RE.sub(" ", _EMPHASIS_RE.sub("", text)).strip()
+
+
+def dr0013_rows() -> list[tuple[str, str]]:
+    """(row id, raw Target cell) per DR-0013 section 3 row, parsed once."""
+    rows: list[tuple[str, str]] = []
+    for line in DR_PATH.read_text(encoding="utf-8").splitlines():
+        match = _ROW_RE.match(line)
+        if match:
+            cells = line.split("|")
+            rows.append((match.group(1), cells[3].strip()))
+    return rows
 
 
 def dr0013_row_ids() -> list[str]:
-    return _ROW_RE.findall(DR_PATH.read_text(encoding="utf-8"))
+    return [rid for rid, _ in dr0013_rows()]
 
 
 def load_spec() -> dict:
@@ -48,13 +74,16 @@ def problems(spec: dict) -> list[str]:
     out: list[str] = []
     rows = spec.get("rows", [])
     ids = [str(r.get("id")) for r in rows]
-    for rid in dr0013_row_ids():
+    dr_rows = dr0013_rows()
+    dr_ids = [rid for rid, _ in dr_rows]
+    dr_targets = {rid: normalize_target_text(cell) for rid, cell in dr_rows}
+    for rid in dr_ids:
         n = ids.count(rid)
         if n != 1:
             out.append(
                 f"DR-0013 row {rid}: appears {n}x in the map, expected exactly once"
             )
-    extra = [i for i in ids if i not in dr0013_row_ids()]
+    extra = [i for i in ids if i not in dr_ids]
     if extra:
         out.append(f"row ids not present in DR-0013 section 3: {extra}")
 
@@ -73,6 +102,17 @@ def problems(spec: dict) -> list[str]:
             out.append(
                 f"row {rid}: a declared gap must carry closes_with "
                 f"(the open issue that would close it, or null)"
+            )
+        target = row.get("target")
+        if not isinstance(target, str) or not normalize_target_text(target):
+            out.append(
+                f"row {rid}: target must restate DR-0013 section 3's Target cell"
+            )
+        elif rid in dr_targets and normalize_target_text(target) != dr_targets[rid]:
+            out.append(
+                f"row {rid}: target disagrees with DR-0013 section 3's Target cell "
+                f"(map: {normalize_target_text(target)!r}; "
+                f"DR-0013: {dr_targets[rid]!r})"
             )
         evidence = row.get("evidence", [])
         for entry in evidence:
@@ -120,6 +160,14 @@ class AnalogSpecMapTests(unittest.TestCase):
         # pass on an empty id list.
         self.assertEqual(dr0013_row_ids(), [str(i) for i in range(1, 12)])
 
+    def test_dr0013_parser_extracts_nonempty_target_cells(self):
+        # Same guard for the Target column: an empty cell list would make
+        # every target comparison below vacuous.
+        for rid, cell in dr0013_rows():
+            self.assertTrue(
+                normalize_target_text(cell), f"row {rid}: empty Target cell"
+            )
+
     def test_map_covers_every_row_and_every_name_exists(self):
         self.assertEqual(problems(load_spec()), [])
 
@@ -159,6 +207,56 @@ class AnalogSpecMapTests(unittest.TestCase):
             any("exactly once" in p for p in problems(spec)),
             problems(spec),
         )
+
+    def test_negative_target_bound_mutation_is_reported(self):
+        spec = load_spec()
+        for row in spec["rows"]:
+            if str(row["id"]) == "1":
+                row["target"] = row["target"].replace("600", "900")
+        self.assertTrue(
+            any("row 1" in p and "target disagrees" in p for p in problems(spec)),
+            problems(spec),
+        )
+
+    def test_negative_target_qualifier_removal_is_reported(self):
+        # A condensed restatement that drops the simultaneous-eye
+        # qualifier must fail, not silently pass as "close enough" -- the
+        # failure mode #383 was filed against.
+        spec = load_spec()
+        for row in spec["rows"]:
+            if str(row["id"]) == "6":
+                row["target"] = row["target"].replace(
+                    ", both measured simultaneously", ""
+                )
+        self.assertTrue(
+            any("row 6" in p and "target disagrees" in p for p in problems(spec)),
+            problems(spec),
+        )
+
+    def test_negative_dash_substitution_is_reported(self):
+        # The map must use the source's characters: an ASCII hyphen where
+        # DR-0013 writes an en dash is a (small but real) disagreement.
+        spec = load_spec()
+        for row in spec["rows"]:
+            if str(row["id"]) == "1":
+                row["target"] = row["target"].replace("–", "-")
+        self.assertTrue(
+            any("row 1" in p and "target disagrees" in p for p in problems(spec)),
+            problems(spec),
+        )
+
+    def test_formatting_only_target_edit_still_passes(self):
+        # Presentation alone is normalized: added Markdown emphasis and
+        # extra whitespace must not trip the comparison.
+        spec = load_spec()
+        for row in spec["rows"]:
+            if str(row["id"]) == "1":
+                row["target"] = "**" + row["target"] + "**"
+            if str(row["id"]) == "2":
+                row["target"] = row["target"].replace(
+                    "3.3 V", "3.3  V"
+                )
+        self.assertEqual(problems(spec), [])
 
 
 if __name__ == "__main__":
