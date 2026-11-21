@@ -1,0 +1,52 @@
+* gf180_tmds_pad_ring_assembly.spice -- simulatable schematic DUT for the
+* assembled driver+pad-ring+ESD block, for `klt pex` request bodies under
+* sim/pex/ (issue #371, the testbench half of #230's T1 item 7 evidence).
+*
+* NOT a layout artifact: this is the *simulation* DUT the schematic leg of
+* every sim/pex request `.include`s, and the `--reference-netlist` the
+* extract-only report under layout/pex_reports/ was diffed against. It is
+* assembled from three signed-off sources, hand-merged once here:
+*
+*   1. layout/lvs/gf180_tmds_pad_ring_assembly.ref.spice -- the LVS-signed
+*      connectivity (driver devices, both clamp polarities, which nets the
+*      VDD-side clamps hang from). That file stays folded-W/L `nfet` for
+*      klt lvs's schematic-equivalent contract; this DUT instead instantiates
+*      the sized, PDK-bound devices so both legs simulate on the real models.
+*   2. sim/cml-driver-eye/testbench/cml_driver_dut.spice -- those sized,
+*      PDK-bound MOS instances, verbatim (nfet_03v3, full geometry params,
+*      m=/nf= multiplicity exactly as the schematic's own eye bench runs
+*      them). This is also what removes the `model_set` model_mismatch the
+*      LVS reference produced (reference-only `nfet` vs extracted-only
+*      `nfet_03v3`): the extracted netlist's devices are nfet_03v3.
+*   3. sim/esd-diode-clamp-cv/testbench/esd_diode_clamp_cv.spice -- the
+*      clamp model names and aggregate geometry syntax
+*      (`area=40p pj=120u`: 20 fingers x A=2p/P=6u per pad, the same
+*      combined-card convention layout/lvs/*.ref.spice established).
+*
+* Pin declaration: `klt extract --pins IBIAS,INN,INP,OUTN,OUTP,VDD,VSS`
+* writes its `.SUBCKT` header in exactly this order (real ports
+* alphabetical; TAIL not promoted), verified against the post-#210 GDS --
+* see layout/pex_reports/. `klt pex` reuses the bench's X line
+* byte-identically on both legs and refuses a pin-count or pin-ORDER
+* mismatch, so the schematic DUT must declare this same pin sequence, and
+* the shared `cml_driver` wrapper in every sim/pex body wires this order
+* positionally. sim/pex/gen_requests.py --check re-asserts both on every
+* lint run, so a same-count permutation cannot slip through silently.
+*
+* The extractor supplies the substrate tie (its own `.GLOBAL vsubs` +
+* `Rvsubs_dctie`); the schematic side needs none -- every nfet_03v3 body
+* terminal is wired to VSS directly, matching the drawn Pplus/Comp substrate
+* tap the assembly's layout carries (see the LVS reference's own header).
+.SUBCKT gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP VDD VSS
+*.pinname IBIAS INN INP OUTN OUTP VDD VSS
+XM1 OUTP INP TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XM2 OUTN INN TAIL VSS nfet_03v3 L=0.28u W=128u nf=64 ad=11.52p as=11.88p pd=139.52u ps=143.88u nrd=1.40625m nrs=1.40625m sa=0 sb=0
++ sd=0 m=1
+XMT TAIL IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=20
+XMB IBIAS IBIAS VSS VSS nfet_03v3 L=0.5u W=20u nf=10 ad=1.8p as=2.16p pd=21.8u ps=26.16u nrd=9m nrs=9m sa=0 sb=0 sd=0 m=1
+D1 VSS OUTP diode_nd2ps_06v0 area=40p pj=120u
+D2 VSS OUTN diode_nd2ps_06v0 area=40p pj=120u
+D3 OUTP VDD diode_pd2nw_06v0 area=40p pj=120u
+D4 OUTN VDD diode_pd2nw_06v0 area=40p pj=120u
+.ENDS gf180_tmds_pad_ring_assembly

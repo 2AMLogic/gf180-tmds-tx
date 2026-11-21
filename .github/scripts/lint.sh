@@ -151,6 +151,16 @@ if ! python3 layout/scripts/gen_tmds_final_mux_dut.py --check; then
   echo "  regenerate with: python3 layout/scripts/gen_tmds_final_mux_dut.py"
   status=1
 fi
+# Same check for the klt pex request set under sim/pex/ (issue #371):
+# requests/bodies are generated from the eye-bench definitions by
+# sim/pex/gen_requests.py, so a bench edit must flow into the pex requests
+# with one regen. --check also re-asserts the klt pex body contracts
+# (exactly one DUT .include per body, positional seven-pin wrapper order).
+if ! python3 sim/pex/gen_requests.py --check; then
+  echo "FAIL: sim/pex/requests are stale or structurally invalid"
+  echo "  regenerate with: python3 sim/pex/gen_requests.py"
+  status=1
+fi
 
 echo
 echo "== 5/8 evidence records (sim/*/records) =="

@@ -1807,3 +1807,53 @@ detect that short; LVS does. A VDD-to-VSS short control on the layout side was
 not drawn: the `negctl-vdd-tie` spec control stands in for "VDD tap removed or
 mis-tied", and the `_shorted` LVS control keeps proving LVS distinguishes
 connected from disconnected on this reference.
+
+### T1 item 7 prep (issue #371): the extract-only PEX report of the assembly
+
+`layout/pex_reports/gf180_tmds_pad_ring_assembly.pex_extract.json` is the
+committed `klt pex --extract-only` report for the post-#210 assembly GDS,
+produced by klt `0.9.3.dev2575+g6bd18bbc8637` (klayout 0.30.12, PDK
+gf180mcuD, deck gf180mcu) against the new simulatable schematic DUT
+`sim/pex/gf180_tmds_pad_ring_assembly.spice` as `--reference-netlist`
+(`--pins IBIAS,INN,INP,OUTN,OUTP,VDD,VSS`). It exits 4 / `status:
+"not_checked"` / `measurement.mode: "extract-only"` with empty `delta` and
+`testbenches`, exactly as extract-only mode defines. `provenance.input.
+content_hash` is `sha256:136ec1a3db4af9b039fde47595eedc71d60079bdf65b517a6c64b2cec15f3fb2`
+— the same GDS content hash `signoff/manifest.json` already cites for items
+2-4 analog — and `reference_netlist_sha256` is
+`sha256:581c87aebd4293b488912cd3bd3163c332b17916d5aee00933ed3c872885902e`,
+the committed DUT. The extracted `.SUBCKT` header and the DUT's are
+identical, `gf180_tmds_pad_ring_assembly IBIAS INN INP OUTN OUTP VDD VSS` —
+same seven names in the same order (compare directly; extract-only mode
+checks neither the bench instance nor pin order itself).
+
+**Body bias — every device body lands on a biased net.** The report's
+`body_bias` block, verbatim:
+
+```json
+{
+ "status": "biased",
+ "unbiased_device_count": 0,
+ "unbiased_nets": [],
+ "unbiased_pmos_body_nets": []
+}
+```
+
+**`extraction.model`** (verbatim from the report; four fields, quoted
+exactly):
+
+- capacitance: `net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net`
+- coupling: `vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled`
+- resistance: `single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star`
+- frequency: `quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior`
+
+**`model_mismatch`** against the simulation DUT is `kind: "count_only"`
+(`reference_only: []`, `extracted_only: []`): both legs instantiate exactly
+`nfet_03v3` / `diode_nd2ps_06v0` / `diode_pd2nw_06v0` — the `model_set`
+mismatch the LVS reference produced (reference-only `nfet` vs extracted-only
+`nfet_03v3`) is gone — and the remaining difference is instance
+multiplicity only (reference 4/2/2 vs extracted 338/40/40), the expected
+finger/multiplier decomposition of the drawn layout. #371's requests and
+this report are the prep for #230's multi-corner PEX delta; the item-7
+citation itself stays with #230 (`signoff/manifest.json` and
+`signoff/signoff.json` are unchanged by #371).

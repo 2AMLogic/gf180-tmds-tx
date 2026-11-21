@@ -1,0 +1,276 @@
+{
+  "netlist": "bodies/cml-driver-eye_3.63v_742.5mbps.spice",
+  "engine": "ngspice",
+  "backend": "batch",
+  "models": {
+    "pdk": "gf180mcuD",
+    "lib": "libs.tech/ngspice/sm141064.ngspice",
+    "param_file": "libs.tech/ngspice/design.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "bjt_ff",
+          "diode_ff",
+          "moscap_ff",
+          "mimcap_ff"
+        ]
+      },
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "bjt_ss",
+          "diode_ss",
+          "moscap_ss",
+          "mimcap_ss"
+        ]
+      },
+      {
+        "name": "fs",
+        "sections": [
+          "fs",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "sf",
+        "sections": [
+          "sf",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "10e-12 61e-9 0 20e-12"
+  },
+  "measurements": [
+    {
+      "name": "ui_ref",
+      "spice": ".meas tran ui_ref TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=1"
+    },
+    {
+      "name": "spa_in",
+      "spice": ".meas tran spa_in TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_in",
+      "spice": ".meas tran spb_in TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=2"
+    },
+    {
+      "name": "spa_c0",
+      "spice": ".meas tran spa_c0 TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_c0",
+      "spice": ".meas tran spb_c0 TRIG v(vd_c0) VAL=0 FALL=1 TARG v(vd_c0) VAL=0 RISE=2"
+    },
+    {
+      "name": "trise_c0",
+      "spice": ".meas tran trise_c0 TRIG v(vd_c0) VAL=-0.4 RISE=1 TARG v(vd_c0) VAL=0.4 RISE=1"
+    },
+    {
+      "name": "tfall_c0",
+      "spice": ".meas tran tfall_c0 TRIG v(vd_c0) VAL=0.4 FALL=2 TARG v(vd_c0) VAL=-0.4 FALL=2"
+    },
+    {
+      "name": "spa_c1",
+      "spice": ".meas tran spa_c1 TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_c1",
+      "spice": ".meas tran spb_c1 TRIG v(vd_c1) VAL=0 FALL=1 TARG v(vd_c1) VAL=0 RISE=2"
+    },
+    {
+      "name": "trise_c1",
+      "spice": ".meas tran trise_c1 TRIG v(vd_c1) VAL=-0.4 RISE=1 TARG v(vd_c1) VAL=0.4 RISE=1"
+    },
+    {
+      "name": "tfall_c1",
+      "spice": ".meas tran tfall_c1 TRIG v(vd_c1) VAL=0.4 FALL=2 TARG v(vd_c1) VAL=-0.4 FALL=2"
+    },
+    {
+      "name": "spa_c2",
+      "spice": ".meas tran spa_c2 TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_c2",
+      "spice": ".meas tran spb_c2 TRIG v(vd_c2) VAL=0 FALL=1 TARG v(vd_c2) VAL=0 RISE=2"
+    },
+    {
+      "name": "trise_c2",
+      "spice": ".meas tran trise_c2 TRIG v(vd_c2) VAL=-0.4 RISE=1 TARG v(vd_c2) VAL=0.4 RISE=1"
+    },
+    {
+      "name": "tfall_c2",
+      "spice": ".meas tran tfall_c2 TRIG v(vd_c2) VAL=0.4 FALL=2 TARG v(vd_c2) VAL=-0.4 FALL=2"
+    },
+    {
+      "name": "spa_cmis",
+      "spice": ".meas tran spa_cmis TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_cmis",
+      "spice": ".meas tran spb_cmis TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 RISE=2"
+    },
+    {
+      "name": "dj_ui_c0",
+      "spice": ".meas tran dj_ui_c0 PARAM='(max(max(spa_c0-spa_in,spb_c0-spb_in),0)-min(min(spa_c0-spa_in,spb_c0-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "dj_ui_c1",
+      "spice": ".meas tran dj_ui_c1 PARAM='(max(max(spa_c1-spa_in,spb_c1-spb_in),0)-min(min(spa_c1-spa_in,spb_c1-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "dj_ui_c2",
+      "spice": ".meas tran dj_ui_c2 PARAM='(max(max(spa_c2-spa_in,spb_c2-spb_in),0)-min(min(spa_c2-spa_in,spb_c2-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "dj_ui_cmis",
+      "spice": ".meas tran dj_ui_cmis PARAM='(max(max(spa_cmis-spa_in,spb_cmis-spb_in),0)-min(min(spa_cmis-spa_in,spb_cmis-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "swing_c0",
+      "expr": "vecmax(v(outp_c0)*v(winc))-vecmin(v(outp_c0)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vpp_c0",
+      "expr": "vecmax(v(outp_c0)*v(win))-vecmin(v(outp_c0)+10*(1-v(win)))"
+    },
+    {
+      "name": "vcm_c0",
+      "expr": "(vecmax(v(outp_c0)*v(winc))+vecmin(v(outp_c0)+10*(1-v(winc)))+vecmax(v(outn_c0)*v(winc))+vecmin(v(outn_c0)+10*(1-v(winc))))/4"
+    },
+    {
+      "name": "swing_c1",
+      "expr": "vecmax(v(outp_c1)*v(winc))-vecmin(v(outp_c1)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vpp_c1",
+      "expr": "vecmax(v(outp_c1)*v(win))-vecmin(v(outp_c1)+10*(1-v(win)))"
+    },
+    {
+      "name": "vcm_c1",
+      "expr": "(vecmax(v(outp_c1)*v(winc))+vecmin(v(outp_c1)+10*(1-v(winc)))+vecmax(v(outn_c1)*v(winc))+vecmin(v(outn_c1)+10*(1-v(winc))))/4"
+    },
+    {
+      "name": "swing_c2",
+      "expr": "vecmax(v(outp_c2)*v(winc))-vecmin(v(outp_c2)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vpp_c2",
+      "expr": "vecmax(v(outp_c2)*v(win))-vecmin(v(outp_c2)+10*(1-v(win)))"
+    },
+    {
+      "name": "vcm_c2",
+      "expr": "(vecmax(v(outp_c2)*v(winc))+vecmin(v(outp_c2)+10*(1-v(winc)))+vecmax(v(outn_c2)*v(winc))+vecmin(v(outn_c2)+10*(1-v(winc))))/4"
+    },
+    {
+      "name": "swing_cmis",
+      "expr": "vecmax(v(outp_cmis)*v(winc))-vecmin(v(outp_cmis)+10*(1-v(winc)))"
+    },
+    {
+      "name": "swing_avcclo",
+      "expr": "vecmax(v(outp_vlo)*v(winc))-vecmin(v(outp_vlo)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vcm_avcclo",
+      "expr": "(vecmax(v(outp_vlo)*v(winc))+vecmin(v(outp_vlo)+10*(1-v(winc)))+vecmax(v(outn_vlo)*v(winc))+vecmin(v(outn_vlo)+10*(1-v(winc))))/4"
+    },
+    {
+      "name": "swing_avcchi",
+      "expr": "vecmax(v(outp_vhi)*v(winc))-vecmin(v(outp_vhi)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vcm_avcchi",
+      "expr": "(vecmax(v(outp_vhi)*v(winc))+vecmin(v(outp_vhi)+10*(1-v(winc)))+vecmax(v(outn_vhi)*v(winc))+vecmin(v(outn_vhi)+10*(1-v(winc))))/4"
+    },
+    {
+      "name": "vgs_sw_max",
+      "expr": "vecmax((v(inp)-v(xvhi.xcore.tail))*v(win))"
+    },
+    {
+      "name": "vgd_sw_max",
+      "expr": "vecmax(abs(v(inp)-v(outp_vhi))*v(win))"
+    },
+    {
+      "name": "vds_sw_max",
+      "expr": "vecmax((v(outp_vhi)-v(xvhi.xcore.tail))*v(win))"
+    },
+    {
+      "name": "vgs_tail_max",
+      "expr": "vecmax(v(ib_vhi)*v(win))"
+    },
+    {
+      "name": "vds_tail_max",
+      "expr": "vecmax(v(xvhi.xcore.tail)*v(win))"
+    },
+    {
+      "name": "swing_dc",
+      "expr": "vecmax(v(outn_z))-vecmax(v(outp_z))"
+    },
+    {
+      "name": "vcm_dc",
+      "expr": "(vecmax(v(outn_z))+vecmax(v(outp_z)))/2"
+    },
+    {
+      "name": "ioff_dc",
+      "expr": "(vecmax(v(avcc))-vecmax(v(outn_z)))/50"
+    },
+    {
+      "name": "itail_dc",
+      "expr": "((vecmax(v(avcc))-vecmax(v(outp_z)))+(vecmax(v(avcc))-vecmax(v(outn_z))))/50"
+    },
+    {
+      "name": "icell_dc",
+      "expr": "vecmax(i(vsens_z))"
+    },
+    {
+      "name": "ro_leg",
+      "expr": "(vecmax(v(outp_zb))-vecmax(v(outp_za)))/(vecmax(i(vforce_za))-vecmax(i(vforce_zb)))"
+    }
+  ],
+  "options": {
+    "timeout_s": 300,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set wnflag=1",
+      "set num_threads=1"
+    ]
+  },
+  "batch": {
+    "capacity_wait_s": 600,
+    "max_units_per_job": 11
+  }
+}
