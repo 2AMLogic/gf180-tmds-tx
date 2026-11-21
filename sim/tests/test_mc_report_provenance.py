@@ -17,6 +17,8 @@ if str(SIM_DIR) not in sys.path:
     sys.path.insert(0, str(SIM_DIR))
 
 from harness import batch  # noqa: E402
+from harness.corners import CORNERS, PvtPoint  # noqa: E402
+from harness.runner import PointResult  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location(
     "run_mc", SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
@@ -70,6 +72,21 @@ class SampleIdentityTests(unittest.TestCase):
 
 
 class EngineVersionTests(unittest.TestCase):
+    """Both entry points share one rendering rule (issue #381)."""
+
+    MIXED = ("ngspice-48", "47", "46", "47", "")
+
+    @staticmethod
+    def _results(versions):
+        return [
+            PointResult(
+                point=PvtPoint(corner=CORNERS["tt"], temp_c=27.0, vdd=3.3),
+                status="ok",
+                engine_version=v,
+            )
+            for v in versions
+        ]
+
     def test_reads_report_versions(self):
         reports = [
             {"environment": {"engine_version": "47"}},
@@ -80,6 +97,26 @@ class EngineVersionTests(unittest.TestCase):
 
     def test_unreported(self):
         self.assertEqual(batch.engine_from_reports([{}]), "unreported (batch)")
+
+    def test_mixed_versions_render_identically(self):
+        expected = "ngspice-46, ngspice-47, ngspice-48"
+        reports = [{"environment": {"engine_version": v}} for v in self.MIXED]
+        self.assertEqual(batch.engine_from_reports(reports), expected)
+        self.assertEqual(batch.engine_summary(self._results(self.MIXED)), expected)
+
+    def test_unreported_through_both_entry_points(self):
+        self.assertEqual(
+            batch.engine_summary(self._results(("", ""))), "unreported (batch)"
+        )
+        self.assertEqual(
+            batch.engine_from_reports([{}, {"environment": None}, {"environment": {}}]),
+            "unreported (batch)",
+        )
+
+    def test_absent_null_and_empty_environment_are_unreported(self):
+        for report in ({}, {"environment": None}, {"environment": {}}):
+            with self.subTest(report=report):
+                self.assertEqual(batch.engine_from_reports([report]), "unreported (batch)")
 
 
 if __name__ == "__main__":
