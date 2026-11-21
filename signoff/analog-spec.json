@@ -1,0 +1,176 @@
+{
+  "block": "analog",
+  "description": "The analog counterpart of signoff/digital-spec.json: one entry per spec/decisions/0013-operating-conditions.md section 3 row, mapped to the sim/ testbench check that grades it or recorded as a declared gap. This file is the committed DR-0013 row-to-measure map (#372); it is deliberately NOT cited from signoff/manifest.json yet -- citing it is #229's step, so no grade moves. Targets, limits and statuses restate DR-0013 exactly; nothing here ratifies, relaxes or reclassifies a row. Validated by sim/tests/test_analog_spec.py.",
+  "sources": [
+    "spec/decisions/0013-operating-conditions.md (Accepted) -- section 1 PVT matrix and section 3 rows",
+    "spec/decisions/0015-esd-hbm-cdm-qualification-tracking.md (Accepted) -- row 11 disposition",
+    "spec/decisions/0017-pll-sourcing-and-135mhz-half-rate-retarget.md (Accepted) -- the PLL is sourced from a sibling canary; row 3's end-to-end figure needs its clock"
+  ],
+  "corners": {
+    "matrix": "DR-0013 section 1, ratified verbatim: 5 MOS process corners (tt, ff, ss, fs, sf) x {-40, 27, 125} C x {2.97, 3.30, 3.63} V (3.3 V domain, +-10 %), cross-producted with both bit rates {742.5, 270.0} Mbps/lane. res_ff/res_ss/bjt_ff/bjt_ss additionally required for any claim depending on resistor or BJT device parameters.",
+    "binding": "Current-mode driver rows bind at ss_-40c_2.97v or ss_125c_2.97v (DR-0013 section 1); every graded row still runs the full matrix rather than assuming it."
+  },
+  "rows": [
+    {
+      "id": "1",
+      "row": "Single-ended output swing",
+      "target": "400-600 mV",
+      "ratified": true,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "checks": ["swing_c0", "swing_c1", "swing_c2", "swing_cmis"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "checks": ["swing_c0", "swing_c1", "swing_c2", "swing_cmis"]
+        }
+      ],
+      "note": "swing_cmis grades the deliberate 1 pF leg-to-leg mismatch copy. AVCC-sensitivity copies (swing_avcclo/avcchi) are measured, not checked; DR-0006's supply-tracking derating is graded in design/cml-driver-sizing.md section 8."
+    },
+    {
+      "id": "2",
+      "row": "Common-mode voltage (nominal AVCC = 3.3 V)",
+      "target": "2.8-3.3 V",
+      "ratified": true,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "checks": ["vcm_c0", "vcm_c1", "vcm_c2"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "checks": ["vcm_c0", "vcm_c1", "vcm_c2"]
+        }
+      ],
+      "note": "vcm_avcclo/avcchi carry the DR-0006 supply-tracking sensitivity, measured and compared in design/cml-driver-sizing.md section 8."
+    },
+    {
+      "id": "3",
+      "row": "Total TMDS output jitter (informative, DVI-class)",
+      "target": "<= 0.25 UI p-p",
+      "ratified": true,
+      "informative": true,
+      "gap": "No end-to-end measurement route: the total figure includes the PLL's jitter contribution and the PLL is outside this repository (DR-0017 -- sourced from a sibling canary; this block specifies only the interface and jitter budget it requires). This block's own contribution is row 4, which is graded below. No open issue in this repository would close this row; it lands when a PLL-model (or silicon) end-to-end jitter bench exists.",
+      "closes_with": null
+    },
+    {
+      "id": "4",
+      "row": "This block's own jitter contribution",
+      "target": "<= 0.15 UI p-p",
+      "ratified": true,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "checks": ["dj_ui_c0", "dj_ui_c1", "dj_ui_c2", "dj_ui_cmis"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "checks": ["dj_ui_c0", "dj_ui_c1", "dj_ui_c2", "dj_ui_cmis"]
+        }
+      ],
+      "note": "Deterministic jitter only (ISI + rise/fall asymmetry); the realmux bench grades the harder mux-plus-driver contribution referenced to the ideal clock."
+    },
+    {
+      "id": "5",
+      "row": "10-90 % output rise/fall time",
+      "target": "<= 20 % of the operating UI (~269 ps @ 742.5 Mbps, ~741 ps @ 270 Mbps)",
+      "ratified": false,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "measures": ["trise_c0", "tfall_c0", "trise_c1", "tfall_c1", "trise_c2", "tfall_c2", "ui_ref"],
+          "checks": ["trise_ui_c0", "tfall_ui_c0", "trise_ui_c1", "tfall_ui_c1", "trise_ui_c2", "tfall_ui_c2"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "measures": ["trise_c0", "tfall_c0", "trise_c1", "tfall_c1", "trise_c2", "tfall_c2", "ui_ref"],
+          "checks": ["trise_ui_c0", "tfall_ui_c0", "trise_ui_c1", "tfall_ui_c1", "trise_ui_c2", "tfall_ui_c2"]
+        }
+      ],
+      "note": "The bound is rate-dependent, so the graded checks normalise the absolute trise_c*/tfall_c* measures by the measured UI (trise_c*/m_ui_ref etc.) and bound the ratio at 0.20 -- one bound correct at both rates, where a fixed absolute max would be wrong at the other. Proposed target (engineering judgement, no DVI 1.0 rise/fall citation anywhere in this repository), hence ratified: false -- grading it does not promote it. sim/tmds-final-mux-eye measures trise_m/trise_n on the mux output, not the driver pad, so it is not a row-5 bench."
+    },
+    {
+      "id": "6",
+      "row": "Passing-eye criterion",
+      "target": "eye height >= 50 % of the row-1 swing floor (>= 200 mV) AND eye width >= 0.75 UI, simultaneously, at the eye's widest opening",
+      "ratified": false,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye-mask",
+          "primary": true,
+          "measures": ["eyemask_margin_c0", "eyemask_margin_c1", "eyemask_margin_c2", "ui_ref"],
+          "checks": ["eyemask_margin_c0", "eyemask_margin_c1", "eyemask_margin_c2"]
+        }
+      ],
+      "note": "The eyemask_margin_* checks grade height AND width together (PRBS7 pattern, every 0.75 UI window scanned). Proposed target, derived arithmetically from rows 1 and 3, hence ratified: false."
+    },
+    {
+      "id": "7",
+      "row": "Single-ended output impedance / return loss",
+      "target": "N/A by design (not Proposed)",
+      "ratified": true,
+      "na_by_design": "DR-0013 row 7's rationale: DR-0002's topology is current-mode open-drain, intentionally not source-matched to the receiver-side 50 ohm/leg termination, so a transmitter-reference-plane return-loss row would grade the wrong physics. The design intent is confirmed measured: ro_leg = 11.0-56.8 kOhm across the full matrix, always >= 220x the termination (design/cml-driver-sizing.md section 8, from sim/cml-driver-eye's ro_leg measure). Return loss for this channel is governed by the receiver's termination quality (off-block) and the pad/board parasitics already captured in row 5's bandwidth analysis. DR-0013 explicitly distinguishes this from Proposed (a number merely missing); whether a row no tool can evidence is a gap or something else is an operator question under the tier doc, not decided here or there."
+    },
+    {
+      "id": "8",
+      "row": "Device voltage stress (Vgs/Vgd/Vds)",
+      "target": "<= 3.63 V rated (3.3 V core devices at nominal +10 % supply corner), positive margin required",
+      "ratified": true,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "checks": ["vgs_sw_max", "vgd_sw_max", "vds_sw_max", "vgs_tail_max", "vds_tail_max"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "checks": ["vgs_sw_max", "vgd_sw_max", "vds_sw_max", "vgs_tail_max", "vds_tail_max"]
+        },
+        {
+          "testbench": "sim/tmds-final-mux-eye",
+          "checks": ["vgs_mu_max", "vds_mu_max", "vds_mt_max"],
+          "note": "The final multiplexer's own devices against the same 3.63 V rated ceiling (the bench's checks cite sim/cml-driver-eye's device-stress rows as their basis)."
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "row": "Tail current",
+      "target": "8-12 mA",
+      "ratified": true,
+      "evidence": [
+        {
+          "testbench": "sim/cml-driver-eye",
+          "primary": true,
+          "checks": ["itail_dc"]
+        },
+        {
+          "testbench": "sim/cml-driver-eye-realmux",
+          "checks": ["itail_dc"]
+        }
+      ],
+      "note": "Rate-independent DC row; the 8-12 mA window is the tolerance design/cml-driver-sizing.md section 2 derives around the ~10 mA nominal."
+    },
+    {
+      "id": "10",
+      "row": "Pad capacitance budget",
+      "target": "<= 2 pF per data/clock pad",
+      "ratified": true,
+      "gap": "No graded bench check: sim/esd-clamp-cv and sim/esd-diode-clamp-cv measure the clamp C-V per width, but their only check (cap_w444_opv) is a 50 pF broken-probe sanity ceiling, explicitly not a DR-0005/0011 compliance gate -- the <= 2 pF comparison is a design-doc computation over every corner's measured value (design/esd-capacitance-budget.md section 9: a drawn 25x25 um pad plus the ratified diode_nd2ps_06v0 clamp at 0.225-0.652 pF, cell-level PASS with 67-89 % headroom). Open legs: the pd2nw (VDD-side) clamp C-V is unmeasured since the #210 VDD-side clamp addition, and the block-level gf180_tmds_pad_ring_assembly does not yet use that pad geometry -- both under #222's re-run scope.",
+      "closes_with": 222
+    },
+    {
+      "id": "11",
+      "row": "ESD (HBM/CDM)",
+      "target": "HBM >= 2 kV (JEDEC JS-001), CDM >= 500 V (JEDEC JS-002)",
+      "ratified": true,
+      "gap": "Accepted pre-silicon limitation, not schedulable work (DR-0015, which closed #145): no source in the installed gf180mcu PDK characterizes ESD failure current density, breakdown voltage, or snapback/trigger behavior for any device family, so real HBM/CDM qualification cannot happen before silicon exists. The clamp-device class is signed off (DR-0011) and the HBM sizing estimate is measured against the capacitance budget. Re-opens on real silicon/ESD-tester data or a PDK-sourced ESD electrical dataset, per DR-0015's Consequences -- no open issue in this repository would close it.",
+      "closes_with": null
+    }
+  ]
+}
