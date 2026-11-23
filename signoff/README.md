@@ -90,6 +90,8 @@ to state which committed evidence covers which silicon.
 | `envelopes/item2-{analog,digital}.json` | Artifact-anchored generic envelopes bound to each partition's committed GDS (no producer verb for item 2; written by hand, graded by re-hashing the stream) |
 | `derived_stamps.py`, `derived-stamps.json` | The toolchain-free item-1 freshness tripwire (below) |
 | `gen_characterization_envelope.py` | Regenerates that envelope deterministically from the committed report; `--check` is the CI mode (the same convention lint step 4 uses for generated DUTs) |
+| `analog-spec.json` | The committed DR-0013 §3 row-to-measure map (#372, extended by #383): every row id, disposition, and target text — the targets are matched against DR-0013 §3's own Target cells by `sim/tests/test_analog_spec.py`, so map and decision record cannot silently disagree. Deliberately not yet cited from `manifest.json` (citing it is #229's step) |
+| `check_gap_issues.py` | Read-only `closes_with` liveness check (#383), below |
 | `../layout/erc-supply-spec.json`, `../layout/drc_reports/`, `../layout/lvs_reports/`, `../layout/erc_reports/` | The cited envelopes. Every manifest citation pins the envelope's own recorded input `content_hash`, and the grader re-hashes the artifact where the envelope names a path (`input_verified: true` on the regenerated LVS citations) |
 
 ## The pinned grading build
@@ -142,6 +144,32 @@ change (a stale pin renders `stale_evidence`, never a false pass).
 Run from the repo root: file-backed evidence paths resolve against the
 invoking process's working directory (the same convention
 klayout-tools `examples/signoff/` documents).
+
+## Gap-closer liveness: `check_gap_issues.py` (analog map, #383)
+
+A declared gap in `analog-spec.json` must name the **open** issue that
+would close it. The offline suite (`sim/tests/test_analog_spec.py`)
+checks the key exists and the target text matches DR-0013 §3; whether the
+named closer is *still open* is a live question, so it is a read-only
+command the signoff reviewer runs when consuming the map — never CI, and
+never an automated write to GitHub:
+
+```bash
+python3 signoff/check_gap_issues.py            # queries 2AMLogic/gf180-tmds-tx via gh api
+python3 signoff/check_gap_issues.py --spec signoff/analog-spec.json --repo OWNER/NAME
+```
+
+- Each gap with a positive-integer `closes_with` is looked up once and
+  must be an **open issue**; an explicit `null` is skipped with no request
+  (it records "no open issue would close this row" in the gap text).
+- Closed, missing, malformed and pull-request references are reported
+  with their row and reference.
+- Exit `0` = every non-null closer is open; `1` = problems found; `2` =
+  **the GitHub API could not be queried** (no `gh`, no network, bad
+  credentials) — a distinct, retryable diagnostic, not a verdict on the
+  map. Re-run when the API is reachable.
+- Offline fixture coverage lives in `sim/tests/test_gap_issue_check.py`;
+  no unit test touches the network.
 
 ## CI: the record cannot rot
 
