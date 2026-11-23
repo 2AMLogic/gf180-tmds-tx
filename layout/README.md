@@ -968,7 +968,7 @@ gds/pad_pitch_fit_n334_wide_bus.gds                the same top-of-window tile w
 drc_reports/pad_pitch_fit_*.fit.json               computed fit report (x/y margins, fold, clearances)
 drc_reports/pad_pitch_fit_*.drc.{json,txt}         klt drc reports
 drc_reports/pad_pitch_fit_*.parasitics.json        klt extract --parasitics reports
-drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json  the same, with lateral coupling enabled on both pad nets
+drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json  the same, re-run requesting lateral (same-layer) coupling on both pad nets (--critical-net OUTP/OUTN) — unmeasured on this deck; see the 20-finger note below
 drc_reports/pad_pitch_fit_n{20,334}.components.json  klt components ring-continuity reports
 ```
 
@@ -999,7 +999,9 @@ done
 python3 scripts/pad_pitch_fit_study.py -o gds/pad_pitch_fit_n334_wide_bus.gds \
     --clamp-fingers 334 --bus-width 4.0 --report drc_reports/pad_pitch_fit_n334_wide_bus.fit.json
 
-# Ring continuity, and the lateral-coupling cross-check (see below).
+# Ring continuity, and the lateral-coupling runs: the critical-net
+# extraction requests same-layer coupling on OUTP/OUTN, but on this deck
+# it measures none (see the 20-finger note below).
 for n in 20 334; do
   klt components gds/pad_pitch_fit_n$n.gds --top gf180_tmds_pad_pitch_fit \
       --conductors '[{"name":"m3","layer":[42,0]},{"name":"m4","layer":[46,0]},{"name":"m5","layer":[81,0]}]' \
@@ -1085,20 +1087,34 @@ Two things worth reading off that table rather than skipping:
 
 - **The 20-finger row reproduces §9.3's cell-level 12.185 fF exactly.** The
   same geometry measures the same capacitance placed in a 350 µm ring slot
-  beside the straps as it does standing alone — a useful cross-check of §9.3,
-  and a bounded one. It was checked rather than assumed: re-running with
-  lateral coupling explicitly enabled on both pad nets
+  beside the straps as it does standing alone — agreement between two runs
+  of the same extraction model, and a bounded one. Pad-to-strap *lateral*
+  coupling is **unmeasured** in these runs, not measured zero: re-running
+  with lateral coupling requested on both pad nets
   (`--critical-net OUTP --critical-net OUTN`,
-  `drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`) returns
-  `cc_count: 0`, `total_coupling_capacitance_ff: 0.0` and identical per-net
-  figures. The reason is geometric: the Metal5 pad plate and the Metal5
-  supply straps are 2.0 µm apart, far outside the layer's own
-  minimum-spacing lookback that `klt`'s lateral-coupling pass uses, and they
-  nowhere vertically overlap (the unconditional coupling case). So the straps
-  contribute no coupling term *under this extractor's model at this
-  separation* — which is a statement about a 2.0 µm gap and a quasi-static
-  per-net model, not a claim that a physical ring has no pad-to-strap
-  coupling. §6's `klt` coverage limitations apply unchanged.
+  `drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`, `klt`
+  0.3.0) returns `cc_count: 0`, `total_coupling_capacitance_ff: 0.0` and
+  identical per-net figures because the `gf180mcu` deck's
+  `PARASITICS.metal_sidewalls` table curates no lateral (same-layer)
+  coupling coefficient for any metal level — the reports' own `warnings[]`
+  record that the pass reports zero for every requested net regardless of
+  geometry, and their `metals_without_coefficient` /
+  `overlap_pairs_without_coefficient` lists are empty, isolating the
+  sidewall table as the one gap. An earlier version of this note explained
+  the zero geometrically — the Metal5 pad plate 2.0 µm from the Metal5
+  straps, outside the lateral pass's minimum-spacing lookback. That
+  explanation is retired (issue #326's operator ruling): the lateral pass
+  never ran a geometric test on this deck, so the gap's size proves
+  nothing. The vertical (crossover) pass, which this deck does support and
+  `klt` computes unconditionally, genuinely found no pad-to-strap term
+  (each pad net's `coupled` list is empty). Whether a physical ring has
+  pad-to-strap lateral coupling is therefore not settled by these
+  artifacts; `design/esd-capacitance-budget.md` §6's coverage limitations
+  record the missing coefficients. Upstream has since curated gf180mcu
+  sidewall coefficients
+  ([klayout-tools#5742](https://github.com/2AMLogic/klayout-tools/issues/5742),
+  closed by [PR #6309](https://github.com/2AMLogic/klayout-tools/pull/6309)),
+  so a re-run on a newer `klt` would measure it.
 - **The wide-bus row closes §9.3's open caveat with a measurement.** §9.3
   said an HBM-sized clamp "would need a somewhat longer/wider Metal1 bus …
   which would add some additional routing capacitance beyond this figure …
