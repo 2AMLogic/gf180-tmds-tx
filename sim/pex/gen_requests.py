@@ -151,6 +151,17 @@ MAX_UNITS_PER_JOB = 11
 NODE_REWRITES = (("xvhi.tail", "xvhi.xcore.tail"),)
 
 _M_REF_RE = re.compile(r"\bm_([A-Za-z_][A-Za-z0-9_]*)\b")
+
+
+def _node_re(node: str) -> re.Pattern[str]:
+    """Match ``node`` as a complete SPICE node name: case-insensitive (SPICE
+    node names are), and not embedded in a longer hierarchical name -- so
+    ``xvhi.tail`` matches ``XVHI.TAIL`` but not ``xxvhi.tail`` (a separate
+    instance's probe) or ``xvhi.tail2``."""
+    return re.compile(rf"(?<![\w.]){re.escape(node)}(?![\w.])", re.IGNORECASE)
+
+
+_NODE_REWRITE_RES = tuple((_node_re(old), old, new) for old, new in NODE_REWRITES)
 _INCLUDE_RE = re.compile(r"^\s*\.inc(lude)?\b", re.IGNORECASE)
 _SUBCKT_RE = re.compile(r"^\.subckt\s+(\S+)\s+(.*)$", re.IGNORECASE)
 
@@ -209,8 +220,8 @@ def _rewrite_expr(expr: str) -> str:
       an unknown vector);
     - the wrapper node translation (:data:`NODE_REWRITES`).
     """
-    for old, new in NODE_REWRITES:
-        expr = expr.replace(old, new)
+    for pattern, _old, new in _NODE_REWRITE_RES:
+        expr = pattern.sub(new, expr)
     return _M_REF_RE.sub(r"\1", expr)
 
 
@@ -320,8 +331,8 @@ def _translate_measurements(tb) -> list[dict]:
     # not cover it.
     for entry in entries:
         text = entry["spice"] if "spice" in entry else entry["expr"]
-        for old, _ in NODE_REWRITES:
-            if old in text:
+        for pattern, old, _new in _NODE_REWRITE_RES:
+            if pattern.search(text):
                 raise SystemExit(
                     f"{tb.name}: node rewrite for {old!r} incomplete in "
                     f"{entry['name']!r}"

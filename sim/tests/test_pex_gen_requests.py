@@ -145,6 +145,49 @@ class NodeRewriteTests(unittest.TestCase):
         self.assertIn("node rewrite", str(ctx.exception))
         self.assertIn("tail_rise", str(ctx.exception))
 
+    def test_uppercase_node_spelling_rewritten_in_expr_and_param(self):
+        # SPICE node names are case-insensitive: the hidden node spelled
+        # in uppercase is the same node and must be rewritten too.
+        entries = gen._translate_measurements(_tb({
+            "ui_ref": RAW_UI,
+            "vds_tail_max": "vecmax(v(XVHI.TAIL)*v(win))",  # expr form
+            "scaled": "m_ui_ref*v(XVHI.TAIL)",               # PARAM form
+        }))
+        by_name = {entry["name"]: entry for entry in entries}
+        self.assertEqual(
+            by_name["vds_tail_max"]["expr"],
+            "vecmax(v(xvhi.xcore.tail)*v(win))",
+        )
+        self.assertEqual(
+            by_name["scaled"]["spice"],
+            ".meas tran scaled PARAM='ui_ref*v(xvhi.xcore.tail)'",
+        )
+
+    def test_uppercase_raw_card_rejected(self):
+        with self.assertRaises(SystemExit) as ctx:
+            gen._translate_measurements(_tb({
+                "tail_rise": (
+                    "TRIG v(XVHI.TAIL) VAL=0.5 RISE=1"
+                    " TARG v(XVHI.TAIL) VAL=0.5 FALL=1"
+                ),
+            }))
+        self.assertIn("tail_rise", str(ctx.exception))
+
+    def test_longer_hierarchical_name_not_matched(self):
+        # xxvhi.tail is a different instance's node: a verbatim raw card
+        # probing it is preserved, and an expr probing it is not rewritten.
+        raw = "TRIG v(xxvhi.tail) VAL=0.5 RISE=1 TARG v(xxvhi.tail) VAL=0.5 FALL=1"
+        entries = gen._translate_measurements(_tb({
+            "tail_w": raw,
+            "other": "vecmax(v(xxvhi.tail)) + vecmax(v(xvhi.tail))",
+        }))
+        by_name = {entry["name"]: entry for entry in entries}
+        self.assertEqual(by_name["tail_w"]["spice"], f".meas tran tail_w {raw}")
+        self.assertEqual(
+            by_name["other"]["expr"],
+            "vecmax(v(xxvhi.tail)) + vecmax(v(xvhi.xcore.tail))",
+        )
+
 
 class MixedDependencyRejectionTests(unittest.TestCase):
     """A dependency spanning a ``.meas`` card result and an expression
