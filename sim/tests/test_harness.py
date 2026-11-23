@@ -37,6 +37,29 @@ from harness import runner as runner_mod  # noqa: E402
 from harness import testbench as tb_mod  # noqa: E402
 
 
+def _load_testbench(
+    case: unittest.TestCase, manifest: dict, netlist_body: str = "* fragment\n"
+) -> tb_mod.Testbench:
+    """Write ``manifest`` and its netlist fragment into a fresh temporary
+    directory, register that directory's removal with the calling test's
+    ``addCleanup``, and load a Testbench with the real loader (issue #394).
+
+    The directory outlives the call: unlike a Testbench returned from inside
+    a ``TemporaryDirectory`` context manager -- whose files are deleted
+    before any assertion runs -- the loaded Testbench's netlist file and its
+    ``netlist_sha256``/``manifest_sha256`` stay readable until the calling
+    test's own cleanup. Tests needing two fixtures in one method simply call
+    this twice; each call gets its own directory.
+    """
+    tmp = tempfile.mkdtemp()
+    case.addCleanup(shutil.rmtree, tmp, True)
+    directory = Path(tmp) / "exp" / "testbench"
+    directory.mkdir(parents=True)
+    (directory / "frag.spice").write_text(netlist_body)
+    (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
+    return tb_mod.load(directory)
+
+
 class CornerIdRateAxisTests(unittest.TestCase):
     def test_corner_id_without_rate_matches_unadapted_grammar(self):
         corner = corners_mod.CORNERS["tt"]
@@ -163,30 +186,21 @@ class OperatingPointCheckTests(unittest.TestCase):
 
 
 class TestbenchTransientValidationTests(unittest.TestCase):
-    def _write_manifest(self, tmp: Path, manifest: dict, netlist_body: str = "* fragment\n") -> Path:
-        directory = tmp / "my-experiment" / "testbench"
-        directory.mkdir(parents=True)
-        (directory / "frag.spice").write_text(netlist_body)
-        (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-        return directory
-
     def test_rates_without_transient_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
                 {
                     "netlist": "frag.spice",
                     "measure": {"x": "v(x)"},
                     "rates_mbps": [742.5],
                 },
             )
-            with self.assertRaises(ValueError):
-                tb_mod.load(directory)
 
     def test_transient_without_rates_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
                 {
                     "netlist": "frag.spice",
                     "measure": {"x": "v(x)"},
@@ -194,13 +208,11 @@ class TestbenchTransientValidationTests(unittest.TestCase):
                     "analyses": ["tran 2e-12 20e-9"],
                 },
             )
-            with self.assertRaises(ValueError):
-                tb_mod.load(directory)
 
     def test_transient_missing_required_key_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
                 {
                     "netlist": "frag.spice",
                     "measure": {"x": "v(x)"},
@@ -209,13 +221,11 @@ class TestbenchTransientValidationTests(unittest.TestCase):
                     "analyses": ["tran 2e-12 20e-9"],
                 },
             )
-            with self.assertRaises(ValueError):
-                tb_mod.load(directory)
 
     def test_transient_with_no_tran_analysis_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
                 {
                     "netlist": "frag.spice",
                     "measure": {"x": "v(x)"},
@@ -224,13 +234,11 @@ class TestbenchTransientValidationTests(unittest.TestCase):
                     "analyses": ["op"],
                 },
             )
-            with self.assertRaises(ValueError):
-                tb_mod.load(directory)
 
     def test_transient_settings_disagreeing_with_tran_line_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
                 {
                     "netlist": "frag.spice",
                     "measure": {"x": "v(x)"},
@@ -239,58 +247,47 @@ class TestbenchTransientValidationTests(unittest.TestCase):
                     "analyses": ["tran 2e-12 20e-9"],
                 },
             )
-            with self.assertRaises(ValueError):
-                tb_mod.load(directory)
 
     def test_valid_transient_testbench_loads(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
-                {
-                    "netlist": "frag.spice",
-                    "measure": {"x": "v(x)"},
-                    "rates_mbps": [742.5, 270.0],
-                    "transient": {
-                        "tstep_s": 2e-12,
-                        "tstop_s": 20e-9,
-                        "reltol": 1e-6,
-                    },
-                    "analyses": ["tran 2e-12 20e-9"],
+        tb = _load_testbench(
+            self,
+            {
+                "netlist": "frag.spice",
+                "measure": {"x": "v(x)"},
+                "rates_mbps": [742.5, 270.0],
+                "transient": {
+                    "tstep_s": 2e-12,
+                    "tstop_s": 20e-9,
+                    "reltol": 1e-6,
                 },
-            )
-            tb = tb_mod.load(directory)
-            self.assertEqual(tb.rates_mbps, (742.5, 270.0))
-            self.assertEqual(tb.transient["reltol"], 1e-6)
+                "analyses": ["tran 2e-12 20e-9"],
+            },
+        )
+        self.assertEqual(tb.rates_mbps, (742.5, 270.0))
+        self.assertEqual(tb.transient["reltol"], 1e-6)
 
     def test_dc_testbench_with_no_rate_axis_loads_unchanged(self):
         """A manifest with neither `rates_mbps` nor `transient` behaves
         exactly like the un-adapted gf180-bandgap harness."""
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = self._write_manifest(
-                Path(tmp),
-                {
-                    "netlist": "frag.spice",
-                    "measure": {"x": "v(x)"},
-                },
-            )
-            tb = tb_mod.load(directory)
-            self.assertEqual(tb.rates_mbps, ())
-            self.assertEqual(tb.transient, {})
+        tb = _load_testbench(
+            self,
+            {
+                "netlist": "frag.spice",
+                "measure": {"x": "v(x)"},
+            },
+        )
+        self.assertEqual(tb.rates_mbps, ())
+        self.assertEqual(tb.transient, {})
 
 
 class MatrixConformanceRateAxisTests(unittest.TestCase):
     def _tb(self, rates_mbps=()):
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp) / "exp" / "testbench"
-            directory.mkdir(parents=True)
-            (directory / "frag.spice").write_text("* fragment\n")
-            manifest = {"netlist": "frag.spice", "measure": {"x": "v(x)"}}
-            if rates_mbps:
-                manifest["rates_mbps"] = list(rates_mbps)
-                manifest["transient"] = {"tstep_s": 2e-12, "tstop_s": 20e-9}
-                manifest["analyses"] = ["tran 2e-12 20e-9"]
-            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-            return tb_mod.load(directory)
+        manifest = {"netlist": "frag.spice", "measure": {"x": "v(x)"}}
+        if rates_mbps:
+            manifest["rates_mbps"] = list(rates_mbps)
+            manifest["transient"] = {"tstep_s": 2e-12, "tstop_s": 20e-9}
+            manifest["analyses"] = ["tran 2e-12 20e-9"]
+        return _load_testbench(self, manifest)
 
     def test_full_dc_matrix_has_no_missing_axes(self):
         tb = self._tb()
@@ -326,6 +323,16 @@ class MatrixConformanceRateAxisTests(unittest.TestCase):
         )
         conformance = report_mod.matrix_conformance(tb, points)
         self.assertTrue(conformance["full"], conformance["missing"])
+
+    def test_loaded_fixture_files_stay_readable_until_cleanup(self):
+        # Issue #394: the fixture helper must not return from inside a
+        # TemporaryDirectory context manager -- the loaded Testbench's
+        # netlist file and both content hashes must stay readable through
+        # the assertions that use the fixture.
+        tb = self._tb(rates_mbps=(742.5,))
+        self.assertTrue(tb.netlist.exists())
+        self.assertTrue(tb.netlist_sha256)
+        self.assertTrue(tb.manifest_sha256)
 
 
 class GitProvenanceTests(unittest.TestCase):
@@ -431,13 +438,9 @@ class ComposeDeckSaveLineTests(unittest.TestCase):
         )
 
     def _tb(self, measure: dict) -> tb_mod.Testbench:
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp) / "exp" / "testbench"
-            directory.mkdir(parents=True)
-            (directory / "frag.spice").write_text("* fragment\n")
-            manifest = {"netlist": "frag.spice", "measure": measure, "analyses": ["op"]}
-            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-            return tb_mod.load(directory)
+        return _load_testbench(
+            self, {"netlist": "frag.spice", "measure": measure, "analyses": ["op"]}
+        )
 
     def test_measure_vector_refs_collects_let_expression_vectors(self):
         tb = self._tb({"swing": "vecmax(v(outp))-vecmin(v(outn))", "icc": "i(vsens)"})
@@ -530,18 +533,13 @@ class NoinitOptionTests(unittest.TestCase):
         )
 
     def _tb(self, **extra) -> tb_mod.Testbench:
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp) / "exp" / "testbench"
-            directory.mkdir(parents=True)
-            (directory / "frag.spice").write_text("* fragment\n")
-            manifest = {
-                "netlist": "frag.spice",
-                "measure": {"vout": "v(out)"},
-                "analyses": ["op"],
-            }
-            manifest.update(extra)
-            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-            return tb_mod.load(directory)
+        manifest = {
+            "netlist": "frag.spice",
+            "measure": {"vout": "v(out)"},
+            "analyses": ["op"],
+        }
+        manifest.update(extra)
+        return _load_testbench(self, manifest)
 
     def _both(self, **extra) -> tuple[list[str], list[str]]:
         """The ``.options`` lines each backend renders for the same testbench."""
@@ -781,18 +779,13 @@ class ProgressTraceOptionTests(unittest.TestCase):
     """
 
     def _tb(self, **extra) -> tb_mod.Testbench:
-        with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp) / "exp" / "testbench"
-            directory.mkdir(parents=True)
-            (directory / "frag.spice").write_text("* fragment\n")
-            manifest = {
-                "netlist": "frag.spice",
-                "measure": {"vout": "v(out)"},
-                "analyses": ["op"],
-            }
-            manifest.update(extra)
-            (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-            return tb_mod.load(directory)
+        manifest = {
+            "netlist": "frag.spice",
+            "measure": {"vout": "v(out)"},
+            "analyses": ["op"],
+        }
+        manifest.update(extra)
+        return _load_testbench(self, manifest)
 
     def _both(self, **extra) -> tuple[list[str], list[str]]:
         """The ``.options`` lines each backend renders for the same testbench."""

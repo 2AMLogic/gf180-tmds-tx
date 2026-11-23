@@ -1,6 +1,6 @@
 {
   "block": "analog",
-  "description": "The analog counterpart of signoff/digital-spec.json: one entry per spec/decisions/0013-operating-conditions.md section 3 row, mapped to the sim/ testbench check that grades it or recorded as a declared gap. This file is the committed DR-0013 row-to-measure map (#372); it is deliberately NOT cited from signoff/manifest.json yet -- citing it is #229's step, so no grade moves. Targets, limits and statuses restate DR-0013 exactly; nothing here ratifies, relaxes or reclassifies a row. Validated by sim/tests/test_analog_spec.py.",
+  "description": "The analog counterpart of signoff/digital-spec.json: one entry per spec/decisions/0013-operating-conditions.md section 3 row, mapped to the sim/ testbench check that grades it or recorded as a declared gap. This file is the committed DR-0013 row-to-measure map (#372); it is deliberately NOT cited from signoff/manifest.json yet -- citing it is #229's step, so no grade moves. Targets, limits and statuses restate DR-0013 exactly; nothing here ratifies, relaxes or reclassifies a row. Validated by sim/tests/test_analog_spec.py, which matches every row's target text against DR-0013 section 3's own Target cell (issue #383); gap-closer liveness (every non-null closes_with still naming an open issue) is checked on demand by signoff/check_gap_issues.py.",
   "sources": [
     "spec/decisions/0013-operating-conditions.md (Accepted) -- section 1 PVT matrix and section 3 rows",
     "spec/decisions/0015-esd-hbm-cdm-qualification-tracking.md (Accepted) -- row 11 disposition",
@@ -14,7 +14,7 @@
     {
       "id": "1",
       "row": "Single-ended output swing",
-      "target": "400-600 mV",
+      "target": "400–600 mV",
       "ratified": true,
       "evidence": [
         {
@@ -32,7 +32,7 @@
     {
       "id": "2",
       "row": "Common-mode voltage (nominal AVCC = 3.3 V)",
-      "target": "2.8-3.3 V",
+      "target": "2.8–3.3 V",
       "ratified": true,
       "evidence": [
         {
@@ -77,7 +77,7 @@
     {
       "id": "5",
       "row": "10-90 % output rise/fall time",
-      "target": "<= 20 % of the operating UI (~269 ps @ 742.5 Mbps, ~741 ps @ 270 Mbps)",
+      "target": "<= 20 % of the operating UI (≈ 269 ps @ 742.5 Mbps, ≈ 741 ps @ 270 Mbps)",
       "ratified": false,
       "evidence": [
         {
@@ -97,7 +97,7 @@
     {
       "id": "6",
       "row": "Passing-eye criterion",
-      "target": "eye height >= 50 % of the row-1 swing floor (>= 200 mV) AND eye width >= 0.75 UI, simultaneously, at the eye's widest opening",
+      "target": "Proposed — eye height >= 50 % of the row-1 swing floor (>= 200 mV, using the 400 mV DR-0002 minimum) and eye width >= (1 − row-3's 0.25 UI budget) = >= 0.75 UI, both measured simultaneously at the eye's widest opening, no fixed sampling instant assumed",
       "ratified": false,
       "evidence": [
         {
@@ -112,14 +112,14 @@
     {
       "id": "7",
       "row": "Single-ended output impedance / return loss",
-      "target": "N/A by design (not Proposed)",
+      "target": "N/A by design, not Proposed — see rationale below",
       "ratified": true,
       "na_by_design": "DR-0013 row 7's rationale: DR-0002's topology is current-mode open-drain, intentionally not source-matched to the receiver-side 50 ohm/leg termination, so a transmitter-reference-plane return-loss row would grade the wrong physics. The design intent is confirmed measured: ro_leg = 11.0-56.8 kOhm across the full matrix, always >= 220x the termination (design/cml-driver-sizing.md section 8, from sim/cml-driver-eye's ro_leg measure). Return loss for this channel is governed by the receiver's termination quality (off-block) and the pad/board parasitics already captured in row 5's bandwidth analysis. DR-0013 explicitly distinguishes this from Proposed (a number merely missing); whether a row no tool can evidence is a gap or something else is an operator question under the tier doc, not decided here or there."
     },
     {
       "id": "8",
       "row": "Device voltage stress (Vgs/Vgd/Vds)",
-      "target": "<= 3.63 V rated (3.3 V core devices at nominal +10 % supply corner), positive margin required",
+      "target": "<= 3.63 V rated (3.3 V core devices, +10 % supply corner), positive margin required",
       "ratified": true,
       "evidence": [
         {
@@ -141,7 +141,7 @@
     {
       "id": "9",
       "row": "Tail current",
-      "target": "8-12 mA",
+      "target": "8–12 mA (this cell's own derived tolerance around the ~10 mA nominal §1 states)",
       "ratified": true,
       "evidence": [
         {
@@ -167,7 +167,8 @@
     {
       "id": "11",
       "row": "ESD (HBM/CDM)",
-      "target": "HBM >= 2 kV (JEDEC JS-001), CDM >= 500 V (JEDEC JS-002)",
+      "target": "HBM >= 2 kV, CDM >= 500 V",
+      "target_supplement": "(JEDEC JS-001) / (JEDEC JS-002) — the standard names DR-0013's target cell omits; they come verbatim from DR-0011, DR-0015 and spec/tmds-tx.md, and are kept outside the compared target per #383.",
       "ratified": true,
       "gap": "Accepted pre-silicon limitation, not schedulable work (DR-0015, which closed #145): no source in the installed gf180mcu PDK characterizes ESD failure current density, breakdown voltage, or snapback/trigger behavior for any device family, so real HBM/CDM qualification cannot happen before silicon exists. The clamp-device class is signed off (DR-0011) and the HBM sizing estimate is measured against the capacitance budget. Re-opens on real silicon/ESD-tester data or a PDK-sourced ESD electrical dataset, per DR-0015's Consequences -- no open issue in this repository would close it.",
       "closes_with": null

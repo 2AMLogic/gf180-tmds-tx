@@ -7,7 +7,7 @@ outside the markers is touched. See `.claude/skills/loom-guide/guide.md`
 for the generation logic.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-20T21:08:15Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T15:45:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -31,24 +31,23 @@ _None._
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-_None._
+- **#381**: Share ngspice version formatting between batch points and Monte Carlo reports
+- **#384**: Share the synth assignment check between P&R and the encoder LVS reference generator
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
-- **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure
-- **#371**: T1 item 7 (analog) prep: klt pex-shaped testbench requests for the post-#210 pad-ring assembly, plus an extract-only body-bias report
-- **#372**: T1 item 5 (analog) prep: commit the DR-0013 row-to-measure map and give row 5 (rise/fall) a graded check
-- **#373**: Remove obsolete DRC and LVS verdicts from new place-and-route records
+- **#396**: flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
 - **#368**: fix(signoff): stop README churn drifting item 10; add pin tripwire and re-attest *(held)*
-- **#376**: flow: drop stale DRC/LVS verdicts from P&R record template
+- **#387**: refactor: share the synth dead-tie assign check between P&R and the LVS reference generator
+- **#397**: refactor(flow): drop never-interpolated params from render_record
 
 ## Approved (Awaiting Merge)
 
@@ -67,14 +66,14 @@ Issues carrying `loom:curated`.
 - **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(curated)* *(held)*
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI *(curated)*
 - **#313**: docs: point the item 7 digital blocker at klayout-tools#5002 and complete the README repo-layout tree *(curated)* *(held)*
-- **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)* *(held)*
-- **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure *(curated)*
-- **#371**: T1 item 7 (analog) prep: klt pex-shaped testbench requests for the post-#210 pad-ring assembly, plus an extract-only body-bias report *(curated)*
-- **#372**: T1 item 5 (analog) prep: commit the DR-0013 row-to-measure map and give row 5 (rise/fall) a graded check *(curated)*
+- **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)*
+- **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure *(curated)* *(held)*
+- **#381**: Share ngspice version formatting between batch points and Monte Carlo reports *(curated)*
+- **#396**: flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-- **#326**: Remove the two pad_pitch_fit *.parasitics_critical_net.json reports: 392 KB whose only new content says the measurement never ran *(hermit)* *(held)*
+_None._
 
 ## Epics
 
@@ -87,11 +86,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 2 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
-| In Progress (`loom:building`) | 5 |
-| PRs awaiting review | 2 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
+| In Progress (`loom:building`) | 2 |
+| PRs awaiting review | 3 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 11 |
-| Architect / Hermit proposals | 1 |
+| Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

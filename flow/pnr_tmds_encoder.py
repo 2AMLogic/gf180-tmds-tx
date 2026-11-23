@@ -817,7 +817,7 @@ def main() -> int:
         status = synth.write_flow_record(
             rid,
             lambda sha, dirty: render_record(
-                rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+                rid, when, pdk, metrics, dirty, sha, gds_log
             ),
         )
         if status:
@@ -827,7 +827,7 @@ def main() -> int:
 
 
 def render_record(
-    rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+    rid, when, pdk, metrics, dirty, sha, gds_log
 ) -> str:
     return f"""\
 # Record {rid}
@@ -886,58 +886,14 @@ def render_record(
      (see "Scope" above), but the quantitative multi-corner setup/hold
      verdict remains `flow/sta_tmds_encoder.py`'s job, re-run separately
      against this record's DEF.
-  1a. **DRC/LVS reports not re-run against this record's GDS (disclosed, not
-     silently stale)**: `layout/drc_reports/tmds_encoder.drc.json`/`.txt` and
-     `layout/lvs_reports/tmds_encoder.lvs.json`/`.txt` (items 2/3 below) were
-     generated against the *pre-#100* GDS (no CTS, no hold repair). Placement
-     and routing both change once CTS/hold-repair buffers are inserted, so
-     those reports describe a superseded layout, not this record's GDS.
-     Re-running `klt drc`/`klt extract`/`klt lvs` against the new GDS is
-     outside issue #100's scope (digital timing closure, not physical
-     verification) and is left as an explicit, disclosed follow-up rather
-     than silently re-asserting stale numbers here.
-  2. **DRC** (pre-#100 GDS, see 1a): `klt drc` reports `status: violations` against the merged GDS
-     (188 violations, all `mim.space.1`, none attributed to a
-     `source_cell`) -- see `layout/drc_reports/tmds_encoder.drc.json`/`.txt`
-     and `layout/README.md`'s `tmds_encoder` section. Filed as
-     [#1033](https://github.com/2AMLogic/klayout-tools/issues/1033): the
-     curated gf180mcu deck's `mim.space.1` rule is a general
-     Metal4-to-Metal4 spacing check (its own violation `description` says
-     so) that cannot distinguish a real MiM capacitor's bottom plate from
-     ordinary Metal4 PDN stripes/routing -- this design has zero capacitor
-     devices anywhere.
-  3. **LVS** (pre-#100 GDS, see 1a): `klt lvs` reports `status: mismatch` (10 topology mismatches;
-     281/281 nets and 25/25 pins otherwise match) -- see
-     `layout/lvs_reports/tmds_encoder.lvs.json`/`.txt`. All 10 are P&R-inserted
-     filler/tap/endcap standard-cell *types* (`gf180mcu_fd_sc_mcu9t5v0__fill_*`,
-     `__filltie`, `__endcap`) that carry no logic and that the pre-P&R
-     reference netlist (built from the synthesized netlist, which never
-     instantiates them) has no counterpart for -- see
-     `layout/scripts/filter_pnr_utility_cells.py`'s own docstring for the
-     full accounting.
-  4. **Two real, fixed defects, not currently-open ones**: an earlier
-     version of this driver's GDS merge step (a) silently dropped most
-     Via1/Via2 cut geometry due to a DBU mismatch between
-     OpenROAD-flow-scripts' bundled gf180 KLayout tech file
-     (`<dbu>0.001</dbu>`) and this design's own tech LEF
-     (`DATABASE MICRONS 2000`), and (b), once (a) was fixed, corrupted the
-     merged standard-cell geometry's real-world scale by naively merging the
-     cell library (native DBU `0.001`) straight into the now-differently-scaled
-     top-level layout -- see `flow/pnr_tmds_encoder.py`'s "GDS streamout"
-     section for the full root-cause finding for both, the klayout-tools
-     issues filed for (a)
-     ([#1029](https://github.com/2AMLogic/klayout-tools/issues/1029),
-     [#1032](https://github.com/2AMLogic/klayout-tools/issues/1032)), why an
-     earlier, now-superseded issue
-     ([#1031](https://github.com/2AMLogic/klayout-tools/issues/1031))
-     carried the wrong initial diagnosis for (a), and why (b) was not filed
-     upstream (a caller-side integration bug in this driver's own first fix
-     attempt, not a `klt`/`klayout.db` defect). This driver now corrects
-     both before every merge, so the GDS this record cites does not carry
-     either defect -- TritonRoute's own internal DRC pass on the routed
-     design (see `{log_path.name}`) independently reported zero violations
-     throughout, corroborating that the P&R itself was always sound and
-     only the merge step was ever at fault.
+  2. **No physical-verification verdict is made here** -- this driver runs
+     OpenROAD and optionally merges the routed DEF into a GDS; P&R alone
+     establishes no DRC or LVS signoff verdict. Physical verification is the
+     job of the separate DRC and LVS reports -- see
+     `layout/drc_reports/tmds_encoder.drc.json`/`.txt` and
+     `layout/lvs_reports/tmds_encoder.lvs.json`/`.txt` -- read (or re-run)
+     against the layout revision being evaluated, never asserted by this
+     record.
 - **Reproducibility**: working tree {"DIRTY (uncommitted changes outside flow/tmds_encoder/ and layout/ at run time -- re-run against a clean checkout before trusting this record)" if dirty else "clean"} at commit `{sha}`.
 - **Links**:
   - Netlist (input, unmodified): `flow/tmds_encoder/netlist/tmds_encoder.synth.v`
