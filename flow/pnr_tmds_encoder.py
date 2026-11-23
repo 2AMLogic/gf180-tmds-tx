@@ -817,7 +817,7 @@ def main() -> int:
         status = synth.write_flow_record(
             rid,
             lambda sha, dirty: render_record(
-                rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+                rid, when, pdk, metrics, dirty, sha, gds_log
             ),
         )
         if status:
@@ -827,7 +827,7 @@ def main() -> int:
 
 
 def render_record(
-    rid, when, pdk, setup_liberty, nominal_liberty, metrics, dirty, sha, log_path, gds_log
+    rid, when, pdk, metrics, dirty, sha, gds_log
 ) -> str:
     return f"""\
 # Record {rid}
