@@ -151,6 +151,17 @@ MAX_UNITS_PER_JOB = 11
 NODE_REWRITES = (("xvhi.tail", "xvhi.xcore.tail"),)
 
 _M_REF_RE = re.compile(r"\bm_([A-Za-z_][A-Za-z0-9_]*)\b")
+
+
+def _node_re(node: str) -> re.Pattern[str]:
+    """Match ``node`` as a complete SPICE node name: case-insensitive (SPICE
+    node names are), and not embedded in a longer hierarchical name -- so
+    ``xvhi.tail`` matches ``XVHI.TAIL`` but not ``xxvhi.tail`` (a separate
+    instance's probe) or ``xvhi.tail2``."""
+    return re.compile(rf"(?<![\w.]){re.escape(node)}(?![\w.])", re.IGNORECASE)
+
+
+_NODE_REWRITE_RES = tuple((_node_re(old), old, new) for old, new in NODE_REWRITES)
 _INCLUDE_RE = re.compile(r"^\s*\.inc(lude)?\b", re.IGNORECASE)
 _SUBCKT_RE = re.compile(r"^\.subckt\s+(\S+)\s+(.*)$", re.IGNORECASE)
 
@@ -209,8 +220,8 @@ def _rewrite_expr(expr: str) -> str:
       an unknown vector);
     - the wrapper node translation (:data:`NODE_REWRITES`).
     """
-    for old, new in NODE_REWRITES:
-        expr = expr.replace(old, new)
+    for pattern, _old, new in _NODE_REWRITE_RES:
+        expr = pattern.sub(new, expr)
     return _M_REF_RE.sub(r"\1", expr)
 
 
@@ -236,6 +247,15 @@ def _translate_measurements(tb) -> list[dict]:
        evaluates ``expr`` entries in declared order inside one control
        block, so a dependency-respecting order (topological, stable) lets
        each formula reference its inputs by name.
+
+    Malformed shapes fail at generation time instead of emitting an entry
+    that evaluates against an unknown vector at run time: an unknown ``m_``
+    reference, a dependency cycle, an expression left in ``expr`` form
+    whose dependencies reach a ``.meas`` card result -- raw or PARAM form
+    (readable in neither form; the issue #371 fixture finding: a later
+    control-block expression could read neither spelling of a card
+    result) -- and an un-rewritten wrapper node reference, asserted over
+    every emitted form.
 
     Measurement names and dependency structure are preserved from the bench
     manifest; nothing is renamed except the ``m_`` prefix removal.
@@ -264,6 +284,26 @@ def _translate_measurements(tb) -> list[dict]:
         entries.append({"name": name, "spice": f".meas tran {name} PARAM='{rewritten}'"})
         del exprs[name]
 
+    # An expression left in expr form must depend only on OTHER expr-form
+    # names: a control-block expression reads a .meas card's result under
+    # neither spelling, raw card or PARAM card (the issue #371 fixture
+    # finding), so a dependency reaching either cannot be expressed in
+    # either klt sim form. Without this guard such an entry passes
+    # silently -- raw names never enter the topological pass below, and
+    # the PARAM names have just been removed from it -- and evaluates
+    # against an unknown vector at run time.
+    for name in exprs:
+        deps = _m_refs(exprs[name])
+        unreadable = sorted((deps & raw.keys()) | (deps & param_form.keys()))
+        if unreadable:
+            raise SystemExit(
+                f"{tb.name}: measurement {name!r} depends on {unreadable} "
+                "(.meas card results, raw or PARAM form), which a "
+                "control-block expression cannot read (issue #371 fixture "
+                "finding) -- the dependency cannot be expressed in either "
+                "klt sim form"
+            )
+
     # Topological order over remaining exprs (deps on other exprs), stable:
     # declared order wherever it already satisfies the dependencies.
     ordered: list[str] = []
@@ -281,13 +321,22 @@ def _translate_measurements(tb) -> list[dict]:
                 f"{tb.name}: cyclic measurement dependencies among {remaining}"
             )
     for name in ordered:
-        rewritten = _rewrite_expr(exprs[name])
-        for old, _ in NODE_REWRITES:
-            if old in rewritten:
+        entries.append({"name": name, "expr": _rewrite_expr(exprs[name])})
+
+    # The wrapper node rewrite must hold for every emitted form that can
+    # carry a node reference, not only expr entries: raw cards are emitted
+    # verbatim, so a card probing a wrapper-hidden node fails HERE instead
+    # of dying on an unknown node at run time, and a residual in a
+    # rewritten (PARAM or expr) entry means the NODE_REWRITES table did
+    # not cover it.
+    for entry in entries:
+        text = entry["spice"] if "spice" in entry else entry["expr"]
+        for pattern, old, _new in _NODE_REWRITE_RES:
+            if pattern.search(text):
                 raise SystemExit(
-                    f"{tb.name}: node rewrite for {old!r} incomplete in {name!r}"
+                    f"{tb.name}: node rewrite for {old!r} incomplete in "
+                    f"{entry['name']!r}"
                 )
-        entries.append({"name": name, "expr": rewritten})
 
     names = [entry["name"] for entry in entries]
     if len(names) != len(set(names)):
