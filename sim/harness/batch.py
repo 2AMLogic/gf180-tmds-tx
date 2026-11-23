@@ -482,20 +482,23 @@ def run_grid(
     return assemble(points, results)
 
 
+def _engine_version_summary(versions) -> str:
+    """Render ngspice version strings for the record: drop empty strings,
+    deduplicate, sort lexicographically, prefix digit-only strings with
+    ``ngspice-``, and join with a comma and a space."""
+    rendered = sorted(set(versions) - {""})
+    return ", ".join(f"ngspice-{v}" if v.isdigit() else v for v in rendered) or "unreported (batch)"
+
+
 def engine_summary(results: list[PointResult]) -> str:
     """The ngspice version(s) the batch runner reported, for the record."""
-    versions = sorted({r.engine_version for r in results if r.engine_version})
-    return ", ".join(f"ngspice-{v}" if v.isdigit() else v for v in versions) or "unreported (batch)"
+    return _engine_version_summary(r.engine_version for r in results)
 
 
 def engine_from_reports(reports: list[dict]) -> str:
     """Like :func:`engine_summary`, for raw ``klt sim`` reports: the ngspice
     version(s) their ``environment.engine_version`` fields state."""
-    versions = sorted(
-        {
-            str((r.get("environment") or {}).get("engine_version") or "")
-            for r in reports
-        }
-        - {""}
+    return _engine_version_summary(
+        str((r.get("environment") or {}).get("engine_version") or "")
+        for r in reports
     )
-    return ", ".join(f"ngspice-{v}" if v.isdigit() else v for v in versions) or "unreported (batch)"
