@@ -556,6 +556,22 @@ travel with it, not be left to the reader:
   that is actually drawn; it cannot answer the §4b realistic-bond-pad
   question directly, which is why that number is analytic instead (and
   explicitly marked as such).
+- **The `gf180mcu` deck curates no lateral (same-layer, sidewall) coupling
+  coefficient for any metal level** — its `PARASITICS.metal_sidewalls`
+  table is empty, so `klt extract --critical-net` reports zero lateral
+  coupling for every requested net regardless of geometry, as the run's own
+  `warnings[]` state
+  ([2AMLogic/klayout-tools#5742](https://github.com/2AMLogic/klayout-tools/issues/5742),
+  closed by [PR #6309](https://github.com/2AMLogic/klayout-tools/pull/6309),
+  which curates the coefficients for later `klt` runs). The committed
+  pad-pitch critical-net reports
+  (`layout/drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`,
+  produced by `klt` 0.3.0) therefore do **not** measure pad-to-strap
+  lateral coupling: their `cc_count: 0` /
+  `total_coupling_capacitance_ff: 0.0` is an artifact of the missing
+  coefficients, not a measurement of zero. §10.3 reading 1's 20-finger
+  agreement with §9.3 is accordingly agreement within the same extraction
+  model, not a lateral-coupling cross-check.
 - **No PDK/tool source in this repository's reach characterizes ESD
   failure current density, breakdown voltage, or snapback/trigger
   behavior for any device family** (§2a) — every number in §2 is either a
@@ -1002,20 +1018,28 @@ Three readings worth stating rather than leaving implicit:
 
 1. **The 20-finger row reproduces §9.3's 12.185 fF exactly.** The same
    geometry measures the same pad-node capacitance in a 350 µm ring slot
-   beside the straps as it does standing alone. That agreement was checked,
-   not assumed: re-running with `klt`'s lateral (same-layer, sidewall)
-   coupling pass explicitly enabled on both pad nets
-   (`--critical-net OUTP --critical-net OUTN`, committed as
-   `layout/drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`)
-   returns `cc_count: 0`, `total_coupling_capacitance_ff: 0.0`, and per-net
-   figures identical to the table above. The reason is geometric — the Metal5
-   pad plate sits 2.0 µm from the Metal5 supply straps, well outside the
-   layer's own minimum-spacing lookback that pass uses, and the two nowhere
-   vertically overlap (the coupling case `klt` computes unconditionally). So
-   the straps contribute no coupling term *under this extractor's
-   quasi-static per-net model at this separation*; that is not a claim that a
-   physical ring has no pad-to-strap coupling. §6's coverage limitations apply
-   unchanged, and a fuller field solve would only add to these numbers.
+   beside the straps as it does standing alone — agreement between two runs
+   of the same extraction model, not an independent one. The critical-net
+   re-run (`--critical-net OUTP --critical-net OUTN`, committed as
+   `layout/drc_reports/pad_pitch_fit_n{20,334}.parasitics_critical_net.json`,
+   `klt` 0.3.0) returns `cc_count: 0`,
+   `total_coupling_capacitance_ff: 0.0`, and per-net figures identical to
+   the table above — but that zero is **unmeasured**, not a measured
+   absence: the `gf180mcu` deck curates no lateral (same-layer, sidewall)
+   coupling coefficient for any metal level, so the pass reports zero for
+   every requested net regardless of geometry, as those reports' own
+   `warnings[]` record (§6). An earlier version of this reading explained
+   the zero geometrically — the Metal5 pad plate 2.0 µm from the Metal5
+   supply straps, outside the lateral pass's minimum-spacing lookback;
+   that explanation is retired (issue #326's operator ruling), since the
+   pass never ran a geometric test on this deck. Vertical (crossover)
+   coupling, which the deck does support and `klt` computes
+   unconditionally, genuinely contributed nothing here. Whether a physical
+   ring has pad-to-strap lateral coupling is therefore not settled by
+   these runs; §6's coverage limitations record the missing coefficients,
+   and a fuller field solve — or a re-run on a deck carrying the sidewall
+   coefficients upstream added in klayout-tools PR #6309 — would only add
+   to these numbers.
 2. **§9.3's wider-gather-bus caveat is now a number, not a caveat.** An 8.3×
    wider (4.0 µm) Metal1 gather bus at the top of the window costs **+100.6 fF**
    of pad-node capacitance and buys an **8.1× lower** gather-bus resistance
