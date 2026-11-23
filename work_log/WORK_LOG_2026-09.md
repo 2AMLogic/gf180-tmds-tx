@@ -2,6 +2,11 @@
 
 Sections moved byte-for-byte from [WORK_LOG.md](../WORK_LOG.md) by `loom-daemon work-docs archive`.
 
+### 2026-09-23
+
+- **Issue #196** (closed): README: embed the fleet burndown chart (one line)
+- **PR #197**: docs: embed fleet burndown chart in README
+
 ### 2026-09-21
 
 - **Issue #190** (closed): T1 item 11 digital column: tmds_encoder LVS power_connectivity verdict missing (graded only on gate-level-verilog compares)

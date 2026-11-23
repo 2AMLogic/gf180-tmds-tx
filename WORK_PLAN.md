@@ -7,7 +7,7 @@ outside the markers is touched. See `.claude/skills/loom-guide/guide.md`
 for the generation logic.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-23T15:45:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T21:26:21Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -31,7 +31,6 @@ _None._
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-- **#381**: Share ngspice version formatting between batch points and Monte Carlo reports
 - **#384**: Share the synth assignment check between P&R and the encoder LVS reference generator
 
 ## In Progress
@@ -66,9 +65,8 @@ Issues carrying `loom:curated`.
 - **#299**: sim/harness: add a `--backend batch` path that runs PVT points through `klt sim` *(curated)* *(held)*
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI *(curated)*
 - **#313**: docs: point the item 7 digital blocker at klayout-tools#5002 and complete the README repo-layout tree *(curated)* *(held)*
-- **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)*
+- **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)* *(held)*
 - **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure *(curated)* *(held)*
-- **#381**: Share ngspice version formatting between batch points and Monte Carlo reports *(curated)*
 - **#396**: flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level) *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -86,11 +84,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 2 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 3 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 11 |
+| Curated | 10 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

@@ -16,12 +16,14 @@ selected.
 - **PR #393**: docs: mark pad-to-strap lateral coupling unmeasured in the retained pad-pitch reports
 - **PR #392**: refactor: drop unused params from pnr render_record
 - **PR #391**: sim(pex): reject mixed card/expr measurement deps; check node rewrite on every emitted form
+- **PR #390**: refactor: share ngspice version rendering between batch and MC report paths
 - **PR #388**: fix(sim): regenerate pex eye requests with rise/fall UI measurements
 - **PR #386**: test(signoff): guard analog target text and closes_with liveness; add digital-spec map guard
 - **Issue #394** (closed): Share the temporary testbench fixture and keep its files alive through assertions
 - **Issue #385** (closed): lint step 4 fails on main: sim/pex requests stale after #379's tb.json edits
 - **Issue #383** (closed): Signoff spec maps: guard target text and closes_with liveness, and give digital-spec.json any guard at all
 - **Issue #382** (closed): sim/pex/gen_requests.py: a measurement depending on both a raw .meas card and an expr result is emitted as an unreadable expr (no guard, no test)
+- **Issue #381** (closed): Share ngspice version formatting between batch points and Monte Carlo reports
 - **Issue #378** (closed): render_record in flow/pnr_tmds_encoder.py takes three parameters it never uses
 - **Issue #326** (closed): Document unmeasured pad-to-strap lateral coupling in the retained pad-pitch reports
 
@@ -226,9 +228,4 @@ selected.
 
 - **Issue #199** (closed): Guard telemetry: worktree-write-confinement catastrophic denies on routine /tmp scratch writes during SPICE/klt sanity checks
 - **Issue #198** (closed): Guard telemetry: 'git clean -fd' ASK pattern fires on search strings and issue text, not actual clean invocations
-
-### 2026-09-23
-
-- **Issue #196** (closed): README: embed the fleet burndown chart (one line)
-- **PR #197**: docs: embed fleet burndown chart in README
 
