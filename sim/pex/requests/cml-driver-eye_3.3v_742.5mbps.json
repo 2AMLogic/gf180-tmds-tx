@@ -145,12 +145,36 @@
       "spice": ".meas tran spb_cmis TRIG v(vd_cmis) VAL=0 FALL=1 TARG v(vd_cmis) VAL=0 RISE=2"
     },
     {
+      "name": "trise_ui_c0",
+      "spice": ".meas tran trise_ui_c0 PARAM='trise_c0/ui_ref'"
+    },
+    {
+      "name": "tfall_ui_c0",
+      "spice": ".meas tran tfall_ui_c0 PARAM='tfall_c0/ui_ref'"
+    },
+    {
       "name": "dj_ui_c0",
       "spice": ".meas tran dj_ui_c0 PARAM='(max(max(spa_c0-spa_in,spb_c0-spb_in),0)-min(min(spa_c0-spa_in,spb_c0-spb_in),0))/ui_ref'"
     },
     {
+      "name": "trise_ui_c1",
+      "spice": ".meas tran trise_ui_c1 PARAM='trise_c1/ui_ref'"
+    },
+    {
+      "name": "tfall_ui_c1",
+      "spice": ".meas tran tfall_ui_c1 PARAM='tfall_c1/ui_ref'"
+    },
+    {
       "name": "dj_ui_c1",
       "spice": ".meas tran dj_ui_c1 PARAM='(max(max(spa_c1-spa_in,spb_c1-spb_in),0)-min(min(spa_c1-spa_in,spb_c1-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "trise_ui_c2",
+      "spice": ".meas tran trise_ui_c2 PARAM='trise_c2/ui_ref'"
+    },
+    {
+      "name": "tfall_ui_c2",
+      "spice": ".meas tran tfall_ui_c2 PARAM='tfall_c2/ui_ref'"
     },
     {
       "name": "dj_ui_c2",
