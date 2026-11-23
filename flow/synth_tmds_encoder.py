@@ -442,8 +442,6 @@ def render_record(
     counts: dict[str, int],
     dirty: bool,
     warnings: list[str],
-    log_path: Path,
-    ys_path: Path,
 ) -> str:
     total_cells = sum(counts.values())
     seq_cells = sum(n for t, n in counts.items() if "dff" in t or "lat" in t)
@@ -622,8 +620,6 @@ def main() -> int:
                 counts=counts,
                 dirty=dirty,
                 warnings=warnings,
-                log_path=log_path,
-                ys_path=ys_path,
             ),
         )
         if status:
