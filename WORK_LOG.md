@@ -10,6 +10,26 @@ selected.
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-23
+
+- **PR #395**: test: keep testbench fixture files alive through assertions
+- **PR #393**: docs: mark pad-to-strap lateral coupling unmeasured in the retained pad-pitch reports
+- **PR #392**: refactor: drop unused params from pnr render_record
+- **PR #391**: sim(pex): reject mixed card/expr measurement deps; check node rewrite on every emitted form
+- **PR #388**: fix(sim): regenerate pex eye requests with rise/fall UI measurements
+- **PR #386**: test(signoff): guard analog target text and closes_with liveness; add digital-spec map guard
+- **Issue #394** (closed): Share the temporary testbench fixture and keep its files alive through assertions
+- **Issue #385** (closed): lint step 4 fails on main: sim/pex requests stale after #379's tb.json edits
+- **Issue #383** (closed): Signoff spec maps: guard target text and closes_with liveness, and give digital-spec.json any guard at all
+- **Issue #382** (closed): sim/pex/gen_requests.py: a measurement depending on both a raw .meas card and an expr result is emitted as an unreadable expr (no guard, no test)
+- **Issue #378** (closed): render_record in flow/pnr_tmds_encoder.py takes three parameters it never uses
+- **Issue #326** (closed): Document unmeasured pad-to-strap lateral coupling in the retained pad-pitch reports
+
+### 2026-11-22
+
+- **PR #376**: flow: drop stale DRC/LVS verdicts from P&R record template
+- **Issue #373** (closed): Remove obsolete DRC and LVS verdicts from new place-and-route records
+
 ### 2026-11-21
 
 - **PR #380**: sim(pex): add generated klt pex requests, schematic assembly DUT, and extract-only report
