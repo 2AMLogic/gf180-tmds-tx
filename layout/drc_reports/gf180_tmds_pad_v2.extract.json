@@ -9,7 +9,7 @@
   "dbu_um": 0.001,
   "netlist_path": "gds/gf180_tmds_pad_v2.spice",
   "netlist_sha256": "157316cf29f884b8c0212bcf1a5a752c999f4fa23cf8568b88abcaba2bc0dd7d",
-  "netlist_normalized_sha256": "a7dc9d1a7e7c58004bc21232698f3aa242d78d287357970226750d47e53d1014",
+  "netlist_normalized_sha256": "38f355272128d862b07dea5ebca191b7d908c8dd7f70da37ee4c66090ea82d00",
   "status": "extracted",
   "device_count": 20,
   "net_count": 2,
@@ -353,6 +353,16 @@
           "text": "VSS",
           "x_um": 1.0,
           "y_um": -2.0
+        },
+        {
+          "text": "VSS",
+          "x_um": 25.7,
+          "y_um": -2.0
+        },
+        {
+          "text": "VSS",
+          "x_um": 50.4,
+          "y_um": -2.0
         }
       ]
     }
@@ -411,7 +421,7 @@
       "options_hash": "sha256:6a7dc7660a470994263c5ca8ace6d8ac8c605d77e6876a9c5490949de6e7cb05"
     },
     "input": {
-      "content_hash": "sha256:4150349c106b1b808ab8732842e4d388f2f305622976d2e6abf29da38b3d37ba",
+      "content_hash": "sha256:a21ae4f198fa4423fa7a42e6908da7aa628e9829828f9ddd3e4cc220f8d2df34",
       "role": "layout"
     }
   },
@@ -425,16 +435,16 @@
   },
   "timing": {
     "stages": {
-      "read_layout": 0.0,
-      "device_extraction": 0.005,
+      "read_layout": 0.001,
+      "device_extraction": 0.645,
       "diagnostics": 0.0,
       "unsupported_devices": 0.0,
       "unmodeled_marker_diagnostic": 0.0,
-      "netlist_write": 0.0,
+      "netlist_write": 0.003,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.014,
-    "unattributed_seconds": 0.008
+    "total_seconds": 0.7,
+    "unattributed_seconds": 0.051
   }
 }
