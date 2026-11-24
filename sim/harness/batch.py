@@ -57,6 +57,11 @@ CAPACITY_WAIT_S = 600
 #: the in-flight count modest anyway so a burst does not trip the vCPU budget.
 MAX_IN_FLIGHT = 2
 
+# gf180mcu's MOS models select bins by per-finger width (W/NF). A batch
+# worker can start ngspice without a host .spiceinit, so specify that rule
+# and the single-thread setting in the request's own startup file.
+GF180_NGSPICE_INIT = ("set wnflag=1", "set num_threads=1")
+
 _NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
@@ -124,8 +129,7 @@ def build_request(
     submitter's ``models.lib`` and its full ``.include``/``.lib`` closure
     ship with the job and the fleet executes the client's own models
     (klt docs/cli/sim.md, "Staging the request's model inputs") instead of
-    the fleet image's PDK tree. Default off: the printed request is
-    unchanged for existing callers.
+    the fleet image's PDK tree. The worker uses its image models by default.
     """
     kind, args = _analysis(tb)
     model_lib = Path(pdk.model_lib)
@@ -133,7 +137,11 @@ def build_request(
         lib_rel = str(model_lib.relative_to(pdk.path))
     except ValueError:
         lib_rel = str(model_lib)
-    options = {"timeout_s": timeout_s, "keep_artifacts": True}
+    options = {
+        "timeout_s": timeout_s,
+        "keep_artifacts": True,
+        "ngspice_init": list(GF180_NGSPICE_INIT),
+    }
     if stage_model_inputs:
         options["stage_model_inputs"] = True
     return {

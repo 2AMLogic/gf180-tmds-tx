@@ -74,6 +74,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SIM_DIR = REPO_ROOT / "sim"
 sys.path.insert(0, str(SIM_DIR))
 
+from harness.batch import GF180_NGSPICE_INIT  # noqa: E402
 from harness.corners import CORNER_SETS, CORNERS, PvtPoint, resolve_corners, supply_points  # noqa: E402
 from harness.runner import DEFAULT_TIMEOUT_S, _is_raw_meas_expr, _option_lines, _param_lines  # noqa: E402
 from harness.testbench import load as load_testbench  # noqa: E402
@@ -120,18 +121,6 @@ CAPACITY_WAIT_S = 600
 #: swing_c0 = 0.5065 V at 1e-3 vs 0.5066 V at 1e-6 (flat DUT). The
 #: harness's 1e-6 remains authoritative for its own records.
 PEX_RELTOL = "1e-3"
-
-#: The PDK's ngspice models bin on per-finger width (W/NF): the driver's
-#: W=128u nf=64 devices (2 u/finger) only resolve a model bin when ngspice's
-#: ``wnflag`` is 1 (distro builds set it via ``ngbehavior=hsa``; a bare build
-#: does not, and the deck dies with "could not find a valid modelname" --
-#: observed on the batch fleet's /usr/local/bin/ngspice-47, which reads no
-#: ambient init). Declaring it here makes each request self-contained on
-#: every backend (``options.ngspice_init`` REPLACES any $HOME/.spiceinit, so
-#: the lines must be complete -- ``num_threads=1`` pins the same
-#: single-threaded determinism this repo's host init files pin), and the
-#: report's ``environment.ngspice_init`` records what was actually read.
-NGSPICE_INIT = ("set wnflag=1", "set num_threads=1")
 
 #: Each request sweeps 15 units (5 process corners x 3 temperatures). The
 #: batch fleet's whole-job ceiling is 3600 s and a job's bound is
@@ -417,7 +406,7 @@ def _build_request(tb, vdd: float, rate: float, measurements: list[dict]) -> dic
         "options": {
             "timeout_s": DEFAULT_TIMEOUT_S,
             "keep_artifacts": True,
-            "ngspice_init": list(NGSPICE_INIT),
+            "ngspice_init": list(GF180_NGSPICE_INIT),
         },
         "batch": {"capacity_wait_s": CAPACITY_WAIT_S, "max_units_per_job": MAX_UNITS_PER_JOB},
     }

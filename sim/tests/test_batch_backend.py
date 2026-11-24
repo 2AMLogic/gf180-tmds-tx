@@ -140,6 +140,16 @@ class BatchBackendTests(unittest.TestCase):
         self.assertEqual(len(record["environment"]["batch_job_ids"]), 3)
         self.assertEqual(record["points"][0]["batch_job_id"], "job-tt_-40c_3.30v")
 
+    def test_batch_request_selects_per_finger_model_bins(self):
+        for stage_models in (False, True):
+            with self.subTest(stage_models=stage_models):
+                request = batch_mod.build_request(
+                    self.tb, _Pdk(), self.points[1], "b.spice", stage_model_inputs=stage_models
+                )
+                self.assertEqual(
+                    request["options"].get("ngspice_init"), ["set wnflag=1", "set num_threads=1"]
+                )
+
     def test_missing_point_is_not_pass(self):
         self.set_modes({"tt_27c_3.30v": "missing"})
         results = self.grid()

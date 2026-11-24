@@ -308,6 +308,14 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch             # submit one
 python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models  # ... with this client's model closure
 ```
 
+For a single-point fleet probe, select one process corner, temperature and
+supply. `--no-write` keeps the probe out of the evidence records.
+
+```sh
+python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models \
+    --corners tt --temps 27 --supply 3.30 --supply-tol 0 --no-write
+```
+
 - **One `klt sim` request per `PvtPoint`**, built from the same pieces
   `compose_deck` uses: the `.param` block, the PDK design include, the DUT and
   testbench includes and `tb.measure` go into a generated circuit body; the
@@ -316,6 +324,11 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models  # ... wi
   request and submits nothing (it needs no ngspice).
 - Every submit passes `--wait-for-capacity 600` (and sets
   `batch.capacity_wait_s`); at most two submits are in flight.
+- Each per-point request supplies `options.ngspice_init`, as the PEX
+  requests do. `set wnflag=1` selects gf180mcu MOS model bins by width per
+  finger. For the `w=222u nf=111` clamp, ngspice looks up the bin at 2 µm.
+  `set num_threads=1` runs the solver single-threaded. These settings apply
+  with either staged or image models.
 - **No local fallback.** A submit failure, an unparseable report, a missing
   or duplicate corner, or a missing measurement makes that point `error`/
   `failed`, so the record's status is `error` and never `pass`. A grid that
@@ -328,30 +341,19 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models  # ... wi
   request (per-point and Monte Carlo; `sim/cml-driver-mismatch/run_mc.py`
   takes the same flag), so the submitter's `models.lib` and its full
   `.include`/`.lib` closure ship with the job and the fleet executes this
-  client's own models instead of the fleet image's PDK tree. Default off —
-  without the flag the requests (and `--dry-run` output) are unchanged. A
+  client's own models. By default the worker uses the fleet image's PDK. A
   batch record notes what the *worker* reported (`environment.models_staged`,
   rendered as a "Model inputs" line): staged / image models / unknown for a
   receipt that predates the metadata. This is worker evidence, kept separate
   from the local PDK provenance the record also carries.
 - Limits: one analysis per testbench (the `klt sim` request contract); a
-  result reproduces the local one only if the fleet's ngspice/PDK resolve the
-  same models. Known gap: a binned `nfet_03v3` device with a large total
-  width can fail on the fleet with `could not find a valid modelname` while
-  the same deck passes locally (see issue #229). `--stage-models` was probed
-  once at `tt_27c_3.30v` (job `klt-sim-0521bf3eb1ac`, 2026-11-20): the worker
-  confirmed it ran the staged closure (`models_staged: true`), the staged and
-  runner-reported file digests matched by name and `sha256`, the PDK stamp
-  compared `match` and the ngspice version banners (what klt compares; not a
-  build identity) matched — and the identical abort reproduced on the same
-  `w=222u nf=111` instance. The observation is therefore that the abort
-  persisted with the submitted model closure and matching banners; staging
-  does not make this point pass. One *hypothesis*, not established by this
-  probe: the worker's ngspice ran with no compatibility mode selected
-  (`ngspice_init: None` in the receipt) where gf180mcu's HSPICE-style vendor
-  deck is known to need one (see `sim/cml-driver-mismatch/run_mc.py`'s
-  `NGSPICE_INIT`), i.e. a difference in deck/init assembly. Testing it
-  lives in #299/#229; staging is *not* a working route for this point.
+  result reproduces the local one only if ngspice resolves the same models.
+  The 2026-11-20 `tt_27c_3.30v` probe (job `klt-sim-0521bf3eb1ac`) shows
+  why model staging and engine startup both matter. The worker reported
+  `models_staged: true`, matching staged file digests and a matching ngspice
+  version banner. With `ngspice_init: None`, it still aborted on the
+  `w=222u nf=111` device with `could not find a valid modelname`. Issue #299
+  tracks the fleet comparison with explicit per-finger binning.
 
 ## Append-only rule
 
