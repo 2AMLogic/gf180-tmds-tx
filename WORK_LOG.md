@@ -12,6 +12,15 @@ selected.
 
 ### 2026-11-24
 
+- **PR #414**: docs(sim): record the per-finger-binning fleet probe receipt in the batch paragraph
+- **PR #412**: fix(sim): per-rate transient windows so cml-driver-eye-mask finishes 742.5 Mbps on Linux ngspice-47
+- **PR #411**: refactor: share DUT-translator SPICE-card parsing in _dut_translator_cli
+- **PR #387**: refactor: share the synth dead-tie assign check between P&R and the LVS reference generator
+- **Issue #409** (closed): Consolidate duplicated netlist-parsing helpers across the three DUT translators
+- **Issue #405** (closed): cml-driver-eye-mask aborts at 742.5 Mbps on Linux ngspice-47 (timestep too small at 300 x tbit, in the dead time after the pattern); the bench's records came from macOS builds
+- **Issue #402** (closed): Verify per-finger binning for the clamp probe on a batch submit worker
+- **Issue #384** (closed): Share the synth assignment check between P&R and the encoder LVS reference generator
+- **Issue #299** (closed): sim/harness: add a `--backend batch` path that runs PVT points through `klt sim`
 - **PR #403**: fix(sim): select GF180 MOS bins by finger width in batch requests
 - **PR #397**: refactor(flow): drop never-interpolated params from render_record
 - **Issue #396** (closed): flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level)
