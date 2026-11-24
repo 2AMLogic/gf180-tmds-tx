@@ -121,7 +121,9 @@ sim/
 > (limits from `checks`, `spec_row` tags from `signoff/analog-spec.json`),
 > and `verify <experiment> <ID>` holds the collected report to the same
 > contract a record must meet (`klt sim`'s verdict, the full grid exactly
-> once, and the harness's grid-level checks). A report that fails `verify`
+> once, and the harness's grid-level checks). For a rate-sliced bench, pass
+> all record IDs together, or omit them to check the manifest citations.
+> A report that fails `verify`
 > stays committed as evidence and is not cited. The mismatch campaign's
 > `klt yield` evidence lives the same way under
 > `sim/cml-driver-mismatch/yield/<record-id>/` (`run_yield.py`).

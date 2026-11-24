@@ -5,7 +5,7 @@
     klt sim sim/<experiment>/envelopes/<ID>.request.json --backend batch \
         --wait-for-capacity 600 --format json \
         --report-out sim/<experiment>/envelopes/<ID>.json -o sim/.work/envelopes/<ID>
-    python3 sim/run_envelope.py verify <experiment> <ID>
+    python3 sim/run_envelope.py verify <experiment> [<ID> ...]
 
 ``write`` derives a ``klt sim`` request (and its circuit body) from the
 experiment's existing testbench definition -- the same DUT, fragment,
@@ -117,8 +117,7 @@ def _write_one(tb, record_id: str, rate: float | None, slice_rate: bool) -> None
         "run from the repo root:\n"
         f"  klt sim {request_path.relative_to(REPO_ROOT)} --backend batch"
         f" --wait-for-capacity {CAPACITY_WAIT_S} --format json \\\n"
-        f"      --report-out {report.relative_to(REPO_ROOT)} -o {WORK_DIR.relative_to(REPO_ROOT)}/{record_id}\n"
-        f"then: python3 sim/run_envelope.py verify {tb.experiment} {record_id}"
+        f"      --report-out {report.relative_to(REPO_ROOT)} -o {WORK_DIR.relative_to(REPO_ROOT)}/{record_id}"
     )
 
 
@@ -131,12 +130,21 @@ def cmd_write(slug: str, record_id: str | None, rate: float | None) -> int:
             raise SystemExit(f"{slug}: {rate:g} Mbps is not one of its declared rates")
         if record_id is not None and len(rates) != 1:
             raise SystemExit("--record-id needs --rate: each rate slice is its own record")
+        ids = []
         for r in rates:
-            _write_one(tb, record_id or _mint_record_id(directory), r, slice_rate=True)
+            slice_id = record_id or _mint_record_id(directory)
+            _write_one(tb, slice_id, r, slice_rate=True)
+            ids.append(slice_id)
+        if len(rates) == len(tb.rates_mbps):
+            print(f"then: python3 sim/run_envelope.py verify {slug} {' '.join(ids)}")
+        else:
+            print(f"verify {slug} with the record IDs for all declared rates")
         return 0
     if rate is not None:
         raise SystemExit(f"{slug}: one request covers its whole grid; there is no --rate")
-    _write_one(tb, record_id or _mint_record_id(directory), None, slice_rate=False)
+    record_id = record_id or _mint_record_id(directory)
+    _write_one(tb, record_id, None, slice_rate=False)
+    print(f"then: python3 sim/run_envelope.py verify {slug} {record_id}")
     return 0
 
 
@@ -180,8 +188,7 @@ def _print_rows(report: dict, tb) -> None:
             )
 
 
-def cmd_verify(slug: str, record_id: str) -> int:
-    tb = load_testbench(SIM_DIR / slug)
+def _read_report(tb, record_id: str) -> tuple[float | None, dict]:
     path = _envelopes_dir(tb) / f"{record_id}.json"
     report = json.loads(path.read_text())
     environment = report.get("environment") or {}
@@ -200,7 +207,22 @@ def cmd_verify(slug: str, record_id: str) -> int:
     if slice_rate:
         print(f"rate slice {rate:g} Mbps/lane; analysis {klt_envelope.analysis_for(tb, rate)}")
     _print_rows(report, tb)
-    problems = klt_envelope.grid_problems(report, tb, rate, slice_rate=slice_rate)
+    return rate, report
+
+
+def cited_record_ids(manifest: dict, slug: str) -> list[str]:
+    directory = Path("sim") / slug / ENVELOPES_DIRNAME
+    paths = (Path(c["file"]) for c in manifest["evidence"]["5.analog"])
+    return [path.stem for path in paths if path.parent == directory]
+
+
+def cmd_verify(slug: str, record_ids: list[str]) -> int:
+    tb = load_testbench(SIM_DIR / slug)
+    if not record_ids:
+        manifest = json.loads((REPO_ROOT / "signoff" / "manifest.json").read_text())
+        record_ids = cited_record_ids(manifest, slug)
+    reports = [_read_report(tb, record_id) for record_id in record_ids]
+    problems = klt_envelope.grid_problems(reports, tb)
     for problem in problems[:MAX_PRINTED_PROBLEMS]:
         print(f"PROBLEM: {problem}")
     if len(problems) > MAX_PRINTED_PROBLEMS:
@@ -225,14 +247,17 @@ def main(argv: list[str] | None = None) -> int:
         "--rate", type=float, default=None,
         help="build only this rate's request (benches with per-rate transient windows)",
     )
-    verify = sub.add_parser("verify", help="check a collected <ID>.json against its bench")
+    verify = sub.add_parser("verify", help="check the complete set of reports against its bench")
     verify.add_argument("experiment", metavar="EXPERIMENT")
-    verify.add_argument("record_id", metavar="RECORD_ID")
+    verify.add_argument(
+        "record_ids", metavar="RECORD_ID", nargs="*",
+        help="all reports for the bench (default: item-5 citations)",
+    )
     args = parser.parse_args(argv)
     try:
         if args.command == "write":
             return cmd_write(args.experiment, args.record_id, args.rate)
-        return cmd_verify(args.experiment, args.record_id)
+        return cmd_verify(args.experiment, args.record_ids)
     except klt_envelope.EnvelopeError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

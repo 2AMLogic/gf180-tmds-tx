@@ -159,7 +159,8 @@ minting a record:
   shares), every `checks` bound becomes `limits`, and each graded check is
   tagged with its DR-0013 row. Run the request on the batch fleet with
   `--report-out` into `sim/<experiment>/envelopes/<ID>.json`, then
-  `verify <experiment> <ID>`.
+  `verify <experiment> <ID>`. For the eye mask, pass both record IDs together
+  to check UI spread across rates, or omit the IDs to check the cited pair.
 - `python3 sim/cml-driver-mismatch/run_yield.py write` re-expresses
   `run_mc.py`'s deck as a sized Monte Carlo campaign (a nominal and a
   negative-control request per process corner, plus the mismatch-off

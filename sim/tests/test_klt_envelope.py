@@ -270,16 +270,16 @@ class GridProblemTests(unittest.TestCase):
         for slug in BENCHES:
             tb = _TB_BY_NAME[slug]
             if slug in klt.TRANSIENT_WINDOWS:
-                for rate in tb.rates_mbps:
-                    self.assertEqual(klt.grid_problems(_synthetic_report(tb, rate, slice_rate=True), tb, rate, slice_rate=True), [], (slug, rate))
+                reports = [(r, _synthetic_report(tb, r, slice_rate=True)) for r in tb.rates_mbps]
             else:
-                self.assertEqual(klt.grid_problems(_synthetic_report(tb), tb), [], slug)
+                reports = [(None, _synthetic_report(tb))]
+            self.assertEqual(klt.grid_problems(reports, tb), [], slug)
 
     def test_non_passing_status_is_a_problem(self):
         tb = _TB_BY_NAME["cml-driver-eye"]
         report = _synthetic_report(tb, status="fail")
         report["corners"][3]["status"] = "fail"
-        problems = klt.grid_problems(report, tb)
+        problems = klt.grid_problems([(None, report)], tb)
         self.assertTrue(any(p.startswith("klt sim status 'fail'") for p in problems))
         self.assertTrue(any("tt_-40c_3.30v_270mbps" in p for p in problems), problems)
 
@@ -287,10 +287,10 @@ class GridProblemTests(unittest.TestCase):
         tb = _TB_BY_NAME["cml-driver-eye"]
         report = _synthetic_report(tb)
         gone = report["corners"].pop()
-        problems = klt.grid_problems(report, tb)
+        problems = klt.grid_problems([(None, report)], tb)
         self.assertTrue(any(p == f"point {gone['corner_id'].split('/', 1)[1]}: 0 report entries, expected exactly 1" for p in problems), problems)
         report["corners"].append(dict(gone, corner_id="x/zz_27c_3.30v_742p5mbps", process="zz"))
-        problems = klt.grid_problems(report, tb)
+        problems = klt.grid_problems([(None, report)], tb)
         self.assertTrue(any("does not map onto the bench grid" in p for p in problems), problems)
 
     def test_flat_rate_axis_fails_the_spread_check_klt_sim_cannot_grade(self):
@@ -298,13 +298,30 @@ class GridProblemTests(unittest.TestCase):
         report = _synthetic_report(
             tb, value_of=lambda name, point, tb: 1e-6 / 742.5e6 if name == "ui_ref" else _value(name, point, tb)
         )
-        problems = klt.grid_problems(report, tb)
+        problems = klt.grid_problems([(None, report)], tb)
         self.assertEqual(problems, ["check ui_ref min_spread_pct: observed 0.0 at grid (limit 50.0)"])
 
-    def test_rate_slice_carries_no_cross_rate_spread_check(self):
+    def test_rate_slices_must_cover_each_declared_rate_once(self):
         tb = _TB_BY_NAME["cml-driver-eye-mask"]
-        report = _synthetic_report(tb, 742.5, slice_rate=True)
-        self.assertEqual(klt.grid_problems(report, tb, 742.5, slice_rate=True), [])
+        fast = (742.5, _synthetic_report(tb, 742.5, slice_rate=True))
+        slow = (270.0, _synthetic_report(tb, 270.0, slice_rate=True))
+        for reports, problem in (
+            ([fast], "rate 270.0: 0 reports"),
+            ([fast, slow, fast], "rate 742.5: 2 reports"),
+            ([fast, (270.0, fast[1])], "unexpected point"),
+        ):
+            with self.subTest(problem=problem):
+                self.assertTrue(any(problem in p for p in klt.grid_problems(reports, tb)))
+
+    def test_flat_ui_across_passing_slices_fails(self):
+        tb = _TB_BY_NAME["cml-driver-eye-mask"]
+
+        def flat_ui(name, point, tb):
+            return 1.3468e-9 if name == "ui_ref" else _value(name, point, tb)
+
+        reports = [(r, _synthetic_report(tb, r, slice_rate=True, value_of=flat_ui)) for r in tb.rates_mbps]
+        self.assertEqual(klt.grid_problems(reports, tb),
+                         ["check ui_ref min_spread_pct: observed 0.0 at grid (limit 50.0)"])
 
     def test_harness_bounds_are_reapplied_to_reported_values(self):
         tb = _TB_BY_NAME["cml-driver-eye"]
@@ -317,7 +334,7 @@ class GridProblemTests(unittest.TestCase):
             for m in corner["measurements"]:
                 if m["name"] == "swing_c0":
                     m["status"] = "pass"  # klt sim's own verdict is not what is under test
-        problems = klt.grid_problems(report, tb)
+        problems = klt.grid_problems([(None, report)], tb)
         self.assertEqual(len(problems), 90)
         self.assertTrue(all(p.startswith("check swing_c0 min: observed 0.39") for p in problems))
 
@@ -329,6 +346,7 @@ class CitedEnvelopeTests(unittest.TestCase):
 
     def setUp(self):
         manifest = json.loads((REPO / "signoff" / "manifest.json").read_text())
+        self.manifest = manifest
         self.citations = (manifest.get("evidence") or {}).get("5.analog")
         self.rows = (manifest.get("spec_rows") or {}).get("5.analog")
         if not isinstance(self.citations, list):
@@ -369,14 +387,22 @@ class CitedEnvelopeTests(unittest.TestCase):
                 f"{slug}/{record_id}.request.json is stale against its bench",
             )
 
-    def test_cited_envelopes_pass_and_pin_their_body(self):
+    def test_cited_reports_cover_the_bench_and_pass_its_grid_checks(self):
+        slugs = {slug for slug, _, _ in self._cited()} | set(klt.TRANSIENT_WINDOWS)
+        for slug in sorted(slugs):
+            tb = load_tb(SIM_DIR / slug)
+            reports = []
+            for record_id in run_envelope.cited_record_ids(self.manifest, slug):
+                rate, _ = run_envelope._slice_of(tb, record_id)
+                path = SIM_DIR / slug / "envelopes" / f"{record_id}.json"
+                reports.append((rate, json.loads(path.read_text())))
+            self.assertEqual(klt.grid_problems(reports, tb), [], slug)
+
+    def test_cited_envelopes_pin_their_body(self):
         import hashlib
 
         for slug, record_id, citation in self._cited():
-            tb = load_tb(SIM_DIR / slug)
             report = json.loads((SIM_DIR / slug / "envelopes" / f"{record_id}.json").read_text())
-            rate, slice_rate = run_envelope._slice_of(tb, record_id)
-            self.assertEqual(klt.grid_problems(report, tb, rate, slice_rate=slice_rate), [], f"{slug}/{record_id}")
             self.assertEqual(report["netlist"], {"path": f"sim/{slug}/envelopes/{record_id}.body.spice", "scope": "repo"})
             body_hash = "sha256:" + hashlib.sha256((SIM_DIR / slug / "envelopes" / f"{record_id}.body.spice").read_bytes()).hexdigest()
             self.assertEqual(report["provenance"]["input"]["content_hash"], body_hash, f"{slug}/{record_id}")

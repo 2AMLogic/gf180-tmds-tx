@@ -57,6 +57,7 @@ import json
 import os
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -98,7 +99,7 @@ MEASUREMENTS = [
      "limits": {"min": 0.4, "max": 0.6}},
     {"name": "vcm_dc", "expr": "(v(outn)+v(outp))/2", "spec_row": "2",
      "limits": {"min": 2.8, "max": 3.3}},
-    {"name": "itail_dc", "expr": "i(vsens)", "spec_row": "9",
+    {"name": "itail_dc", "expr": "((v(avcc)-v(outp))+(v(avcc)-v(outn)))/50", "spec_row": "9",
      "limits": {"min": 8e-3, "max": 12e-3}},
 ]
 CONTROL_DESCRIPTION = (
@@ -225,14 +226,27 @@ def _run(klt: str, argv: list[str]) -> str:
 
 def report_problems(yield_report: dict, n: int) -> list[str]:
     """Why ``yield_report`` would not grade ``met`` for item 6 -- empty when
-    it would: every measurement sized ``sufficient``, its negative control
+    it would: exactly one result per requested measurement with the declared
+    limits, every measurement sized ``sufficient``, its negative control
     ``detected``, no errored or inconclusive draw, and its observed span
     inside the row's limits."""
     problems: list[str] = []
     if yield_report.get("status") not in ("pass", "reported"):
         problems.append(f"klt yield status {yield_report.get('status')!r}")
-    for m in yield_report.get("measurements") or []:
+    measurements = yield_report.get("measurements") or []
+    expected = {m["name"]: m["limits"] for m in MEASUREMENTS}
+    counts = Counter(m.get("name") for m in measurements)
+    for name in expected:
+        if counts[name] != 1:
+            problems.append(f"{name}: {counts[name]} results, expected exactly 1")
+    for m in measurements:
         name = m.get("name")
+        if name not in expected:
+            problems.append(f"unexpected measurement {name!r}")
+            continue
+        limits = expected[name]
+        if m.get("limits") != limits:
+            problems.append(f"{name}: reported limits {m.get('limits')!r}, expected {limits!r}")
         sample_size = m.get("sample_size") or {}
         if sample_size.get("verdict") != "sufficient":
             problems.append(f"{name}: sample_size.verdict {sample_size.get('verdict')!r}")
@@ -245,7 +259,6 @@ def report_problems(yield_report: dict, n: int) -> list[str]:
         control = m.get("negative_control") or {}
         if control.get("verdict") != "detected":
             problems.append(f"{name}: negative_control.verdict {control.get('verdict')!r}")
-        limits = m.get("limits") or {}
         dist = m.get("distribution") or {}
         low, high = limits.get("min"), limits.get("max")
         if low is not None and (dist.get("min") is None or dist["min"] < low):

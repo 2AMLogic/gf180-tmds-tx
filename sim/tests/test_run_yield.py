@@ -32,6 +32,8 @@ if str(SIM_DIR) not in sys.path:
 from harness.corners import CORNER_SETS, CORNERS  # noqa: E402
 
 YIELD_DIR = SIM_DIR / "cml-driver-mismatch" / "yield"
+# Immutable fleet record in which the ground sensor includes the bias reference.
+GROUND_SENSOR_CAMPAIGN = "20261124-052148-d358846"
 
 
 def _load_run_yield():
@@ -53,16 +55,17 @@ class _Pdk:
 
 def _yield_report(**overrides) -> dict:
     """A ``klt yield`` report for three measurements that would grade met."""
-    names = [m["name"] for m in run_yield.MEASUREMENTS]
     measurements = []
-    for name in names:
+    for spec in run_yield.MEASUREMENTS:
+        name, limits = spec["name"], spec["limits"]
+        mid = (limits["min"] + limits["max"]) / 2
         measurement = {
             "name": name,
             "n": 200,
             "errored": 0,
             "inconclusive": 0,
-            "limits": {"min": 0.0, "max": 1.0},
-            "distribution": {"mean": 0.5, "stddev": 0.001, "min": 0.49, "max": 0.51},
+            "limits": limits.copy(),
+            "distribution": {"mean": mid, "stddev": 0.0, "min": mid, "max": mid},
             "sample_size": {"verdict": "sufficient", "required_n": 183},
             "negative_control": {"verdict": "detected"},
         }
@@ -137,7 +140,7 @@ class CampaignFileTests(unittest.TestCase):
             [
                 {"name": "swing_dc", "expr": "v(outn)-v(outp)", "spec_row": "1", "limits": {"min": 0.4, "max": 0.6}},
                 {"name": "vcm_dc", "expr": "(v(outn)+v(outp))/2", "spec_row": "2", "limits": {"min": 2.8, "max": 3.3}},
-                {"name": "itail_dc", "expr": "i(vsens)", "spec_row": "9", "limits": {"min": 8e-3, "max": 12e-3}},
+                {"name": "itail_dc", "expr": "((v(avcc)-v(outp))+(v(avcc)-v(outn)))/50", "spec_row": "9", "limits": {"min": 8e-3, "max": 12e-3}},
             ],
         )
         self.assertEqual(mc["models"], {"pdk": "gf180mcuD", "lib": "libs.tech/ngspice/sm141064.ngspice", "param_file": "libs.tech/ngspice/design.ngspice"})
@@ -188,6 +191,24 @@ class ReportProblemTests(unittest.TestCase):
     def test_a_sized_detected_in_limit_report_has_no_problems(self):
         self.assertEqual(run_yield.report_problems(_yield_report(), 200), [])
 
+    def test_each_expected_measurement_is_required_exactly_once(self):
+        report = _yield_report()
+        report["measurements"][2] = report["measurements"][0]
+        self.assertEqual(run_yield.report_problems(report, 200), [
+            "swing_dc: 2 results, expected exactly 1", "itail_dc: 0 results, expected exactly 1",
+        ])
+        self.assertEqual(len(run_yield.report_problems(_yield_report() | {"measurements": []}, 200)), 3)
+
+    def test_missing_or_changed_limits_are_a_problem(self):
+        for limits in (None, {"min": 0.008}, {"min": 0.007, "max": 0.012}):
+            report = _yield_report(itail_dc={"limits": limits})
+            if limits is None:
+                del report["measurements"][2]["limits"]
+            with self.subTest(limits=limits):
+                problems = run_yield.report_problems(report, 200)
+                self.assertEqual(len(problems), 1)
+                self.assertIn("itail_dc: reported limits", problems[0])
+
     def test_undersized_sample_is_a_problem(self):
         report = _yield_report(vcm_dc={"sample_size": {"verdict": "insufficient", "required_n": 400}})
         self.assertEqual(run_yield.report_problems(report, 200), ["vcm_dc: sample_size.verdict 'insufficient'"])
@@ -213,7 +234,7 @@ class ReportProblemTests(unittest.TestCase):
         )
         self.assertEqual(
             run_yield.report_problems(report, 200),
-            ["swing_dc: min -0.39 below limit 0.0", "swing_dc: max 1.61 above limit 1.0"],
+            ["swing_dc: min -0.39 below limit 0.4", "swing_dc: max 1.61 above limit 0.6"],
         )
 
     def test_failing_status_is_a_problem(self):
@@ -245,8 +266,10 @@ class CitedYieldReportTests(unittest.TestCase):
             sorted(Path(c["file"]).name for c, _ in self._cited()),
             sorted(f"yield_{c}.json" for c in ("tt", "ff", "ss", "fs", "sf")),
         )
-        for citation, _path in self._cited():
-            self.assertEqual(citation["rows"], [r["id"] for r in self.rows])
+        self.assertEqual([r["id"] for r in self.rows], ["1", "2", "9"])
+        for citation, path in self._cited():
+            expected = ["1", "2"] if path.parent.name == GROUND_SENSOR_CAMPAIGN else ["1", "2", "9"]
+            self.assertEqual(citation["rows"], expected)
 
     def test_cited_reports_would_grade_and_pin_their_samples(self):
         for citation, path in self._cited():
@@ -275,14 +298,17 @@ class CitedYieldReportTests(unittest.TestCase):
             for measurement in derived["measurements"]:
                 self.assertEqual(measurement["negative_control"]["description"], run_yield.CONTROL_DESCRIPTION)
 
-    def test_cited_campaign_regenerates_byte_for_byte(self):
-        for citation, path in self._cited():
-            directory = path.parent
-            request = json.loads((directory / path.name.replace("yield_", "mc_").replace(".json", ".request.json")).read_text())
-            files = run_yield.campaign_files(directory.resolve(), request["monte_carlo"]["n"], _Pdk())
+    def test_campaign_inputs_regenerate_byte_for_byte(self):
+        for request_path in sorted(YIELD_DIR.glob("*/mc_tt.request.json")):
+            directory = request_path.parent
+            n = json.loads(request_path.read_text())["monte_carlo"]["n"]
+            files = run_yield.campaign_files(directory, n, _Pdk())
             committed = sorted(p.name for p in directory.iterdir() if p.name.endswith((".request.json", ".body.spice")))
             self.assertEqual(sorted(files), committed, str(directory))
             for name, text in files.items():
+                if directory.name == GROUND_SENSOR_CAMPAIGN:
+                    # Reproduce this archived input, including its known wiring error.
+                    text = text.replace("((v(avcc)-v(outp))+(v(avcc)-v(outn)))/50", "i(vsens)")
                 self.assertEqual((directory / name).read_text(), text, f"{directory.name}/{name} is stale")
 
     def test_monte_carlo_reports_ran_the_committed_bodies(self):
@@ -298,6 +324,15 @@ class CitedYieldReportTests(unittest.TestCase):
                     str(report_path),
                 )
                 self.assertEqual(report["environment"]["engine_host"], "worker", str(report_path))
+                for point in report["corners"]:
+                    measured = {m["name"]: m["value"] for m in point["measurements"]}
+                    # Sum of the two 50-ohm termination currents at AVCC=3.3 V.
+                    load_current = 2 * (3.3 - measured["vcm_dc"]) / 50
+                    # The archived campaign also sensed the 500 uA bias branch.
+                    bias = 500e-6 if directory.name == GROUND_SENSOR_CAMPAIGN else 0.0
+                    # ngspice prints common-mode voltage to the nearest microvolt.
+                    self.assertAlmostEqual(measured["itail_dc"], load_current + bias, delta=3e-8,
+                                           msg=f"{report_path.name} {point['corner_id']}")
                 for measurement in report["measurements"]:
                     self.assertIn(measurement["name"], [m["name"] for m in run_yield.MEASUREMENTS])
 

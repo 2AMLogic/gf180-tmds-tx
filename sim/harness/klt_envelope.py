@@ -537,26 +537,16 @@ def report_points(report: dict, tb: Testbench) -> list[PointResult]:
     return results
 
 
-def grid_problems(report: dict, tb: Testbench, rate: float | None = None, *, slice_rate: bool = False) -> list[str]:
-    """Why ``report`` is not a passing whole-grid envelope for ``tb`` -- an
-    empty list when it is.
-
-    Beyond ``klt sim``'s own verdict this holds the report to the contract
-    the harness holds a Markdown record to: every point of the bench's
-    mandated grid (or of its ``rate`` slice) present exactly once
-    (``batch.assemble``'s rule), and the harness's own ``checks`` --
-    including the grid-level spread checks ``klt sim`` cannot grade --
-    passing over the reported values. A rate slice carries no cross-rate
-    spread check: ``min_spread_pct`` exists to prove the rate axis moved,
-    which one rate cannot show."""
+def _report_grid(report: dict, tb: Testbench, rate: float | None) -> tuple[list[str], list[PointResult]]:
+    """Map one report onto exactly the grid its request declared."""
     problems: list[str] = []
     if report.get("status") != "pass":
         problems.append(f"klt sim status {report.get('status')!r}, not 'pass'")
     try:
         results = report_points(report, tb)
     except (EnvelopeError, KeyError, TypeError, ValueError) as exc:
-        return problems + [f"a corner entry does not map onto the bench grid: {exc}"]
-    expected = [p.corner_id for p in grid_points(tb, rate, slice_rate=slice_rate)]
+        return problems + [f"a corner entry does not map onto the bench grid: {exc}"], []
+    expected = [p.corner_id for p in grid_points(tb, rate, slice_rate=rate is not None)]
     counts = Counter(r.point.corner_id for r in results)
     grid = [
         f"point {cid}: {counts[cid]} report entries, expected exactly 1"
@@ -564,7 +554,7 @@ def grid_problems(report: dict, tb: Testbench, rate: float | None = None, *, sli
         if counts[cid] != 1
     ] + [f"unexpected point {cid}" for cid in sorted(set(counts) - set(expected))]
     if grid:
-        return problems + grid
+        return problems + grid, []
     by_id = {r.point.corner_id: r for r in results}
     ordered = [by_id[cid] for cid in expected]
     problems += [
@@ -573,16 +563,35 @@ def grid_problems(report: dict, tb: Testbench, rate: float | None = None, *, sli
         for r in ordered
         if r.status != "ok"
     ]
-    summary = summarize(ordered, list(tb.measure))
-    checks = tb.checks
-    if slice_rate:
-        checks = {
-            name: {k: v for k, v in spec.items() if not k.endswith("spread_pct")}
-            for name, spec in checks.items()
-        }
-    problems += [
+    return problems, ordered
+
+
+def grid_problems(reports: list[tuple[float | None, dict]], tb: Testbench) -> list[str]:
+    """Verify the complete bench, including checks that span rate slices.
+
+    Each pair names the request's rate (None for an unsliced request) and
+    its collected report. Check each report against its own grid before
+    applying the bench checks to the union of the measured points.
+    """
+    expected = list(tb.rates_mbps) if tb.experiment in TRANSIENT_WINDOWS else [None]
+    counts = Counter(rate for rate, _ in reports)
+    problems = [
+        f"rate {rate}: {counts[rate]} reports, expected exactly 1"
+        for rate in expected if counts[rate] != 1
+    ]
+    points = []
+    for rate, report in reports:
+        if rate not in expected:
+            problems.append(f"unexpected report rate {rate!r}")
+            continue
+        errors, ordered = _report_grid(report, tb, rate)
+        problems.extend(errors)
+        points.extend(ordered)
+    if problems:
+        return problems
+    summary = summarize(points, list(tb.measure))
+    return [
         f"check {f['measurement']} {f['kind']}: observed {f['value']!r} at {f['at']} "
         f"(limit {f['limit']!r})"
-        for f in evaluate_checks(checks, ordered, summary)
+        for f in evaluate_checks(tb.checks, points, summary)
     ]
-    return problems

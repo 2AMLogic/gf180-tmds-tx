@@ -20,7 +20,7 @@ klt signoff --manifest signoff/manifest.json --format json
 as emitted by the graded build pinned below. Exit code `3` is the tool's
 documented "rendered but not T1" signal, not an error: `tier` is `null`
 until every T1 item is met, which is the honest state for this block today.
-As of this commit the grade is **18/22 T1 items met** (per-partition rows,
+As of this commit the grade is **17/22 T1 items met** (per-partition rows,
 11 checklist items × `kind: mixed-signal`'s two partitions):
 
 | met | why (the record's own reason, where unmet) |
@@ -38,7 +38,7 @@ As of this commit the grade is **18/22 T1 items met** (per-partition rows,
 | #7 post-layout — digital | `no_evidence`. `klt functional-verification` with `options.sdf` aborts `vvp` (`NULL handle passed to vpi_scan`) on this netlist + post-route SDF (zero-delay run of the same sources passes; the repo's own `$sdf_annotate` loader in `flow/gate_level_sim_tmds_encoder.py` also passes, but its Markdown record is not a `klt` envelope). Filed as klayout-tools#3740; nothing fabricated to fill the row |
 | #6 statistical claims — digital | **`not_applicable`** (issue #296), not `met`: the digital partition has no statistical spec row. `klt` 0.8.0's recorded `not_applicable` form cites `signoff/digital-spec.json` (ratified rows from `spec/tmds-tx.md` §1, DR-0003, DR-0008/DR-0009 and DR-0016) and the statement `signoff/item6-digital-na.json` (one `{id, class, reason}` entry per row), both content-hash pinned in the manifest's `6.digital` entry. The grader's statistical scan passed without any row being reworded. Corner-bounded rows point at item 5.digital; functional rows at `verification/tmds_encoder`. Counted as `t1_not_applicable_count: 1`; `t1_met_count` unchanged |
 | #5 corner verification — analog | `unmet` / `partial_coverage` (issue #229), no longer `no_evidence`. Four `klt sim` envelopes are cited and every one grades `met` with `input_verified: true`; the grader derives their row coverage from the envelopes' own `spec_row` tags, so every DR-0013 row that is not a declared gap is covered: rows 1, 2, 4, 5, 8, 9 by `sim/cml-driver-eye/envelopes/20261124-052134-d358846.json` (90 corners), row 6 by the two `sim/cml-driver-eye-mask/envelopes/20261124-0521{38,39}-d358846.json` rate slices (45 + 45), row 8 again by `sim/tmds-final-mux-eye/envelopes/20261124-052135-d358846.json`. The item stays unmet because `spec_rows."5.analog"` declares the four gaps — row 3 (total jitter needs the PLL, DR-0017), row 7 (N/A by design, DR-0013), row 10 (pad capacitance, open under #222), row 11 (ESD, DR-0015) — and because rows 5 and 6 are Proposed (`ratified: false`). `sim/cml-driver-eye-realmux`'s envelope is committed but **not cited**: it fails its row-5 fall-time checks at 38 of 90 corners (#404). See "T1 items 5 and 6 (analog)" below |
-| #6 statistical claims — analog | **`met`** (issue #229), not `not_applicable`: rows 1, 2 and 9 are statistical — their DC levels are set by device matching, which the corner matrix cannot sample — and each of the five process corners carries its own `klt yield` report (`sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_<corner>.json`, never pooled). Each cites n = 200 mismatch samples with `sample_size.verdict: sufficient` (183 are needed), a negative control `klt yield` grades `detected` on every measurement, and Cpk / sigma-to-spec against the row's own limits; every citation grades `met` with `input_verified: true`. The report status is `reported`, because the ratified spec states no yield target to pass or fail against |
+| #6 statistical claims — analog | `unmet` / `partial_coverage` (#229). The five per-corner reports in `sim/cml-driver-mismatch/yield/20261124-052148-d358846/` support rows 1 and 2. Their ground-current measurement includes the 500 µA bias reference. Row 9 awaits a fleet campaign measuring the sum of the two output termination currents. |
 | #7 post-layout — analog | `no_evidence`. No `klt pex` report exists yet: the post-layout eye records under `sim/` are Markdown evidence the grader does not read, and the `klt pex`-shaped requests `sim/pex/` prepares for the pad-ring assembly (#371) have not been run on both legs (#230). Nothing fabricated to fill the row |
 
 ## Partition boundary (the `kind: "mixed-signal"` declaration)
@@ -161,6 +161,8 @@ klt sim sim/cml-driver-eye/envelopes/<ID>.request.json --backend batch \
     --wait-for-capacity 600 --format json \
     --report-out sim/cml-driver-eye/envelopes/<ID>.json -o sim/.work/envelopes/<ID>
 python3 sim/run_envelope.py verify cml-driver-eye <ID>
+# Validate all cited eye-mask slices together (or pass both record IDs explicitly).
+python3 sim/run_envelope.py verify cml-driver-eye-mask
 # then cite sim/<bench>/envelopes/<ID>.json in the manifest, pinning the
 # envelope's own provenance.input.content_hash, with `rows`
 
@@ -277,7 +279,10 @@ hash. `python3 sim/run_envelope.py verify <experiment> <ID>` then holds the
 collected report to the bench's contract: `klt sim`'s own verdict, every
 grid point exactly once, and the harness's own checks — including the
 grid-level `min_spread_pct` check that proves the rate axis reached the
-stimulus and that `klt sim` cannot grade per corner. The grader derives a
+stimulus and that `klt sim` cannot grade per corner. For the eye mask,
+`verify cml-driver-eye-mask` reads the manifest citations, requires one
+report per declared rate, and checks the 90-point union. The two cited
+slices have 93.33% UI spread against the 50% minimum. The grader derives a
 citation's row coverage from the tags, so the manifest's `rows` cannot
 claim more than the envelope shows, and `sim/tests/test_klt_envelope.py`
 fails the build when a cited envelope no longer regenerates byte for byte
@@ -352,17 +357,22 @@ mismatch mechanism), drawn from an independent seed offset — plus one
 five-corner mismatch-off reference. `derive` then runs `klt yield-samples`
 and `klt yield` per corner and refuses any report that would not grade.
 
-Per corner (n = 200, 95 % confidence, ±1 % target half-width; every
-measurement `sample_size.verdict: sufficient`, `required_n` 183;
-`negative_control.verdict: detected` on all three):
+The reports from `20261124-052148-d358846` support swing and common mode at
+each corner (n = 200, 95% confidence, required n = 183). For row 9 they
+measured the shared ground return, which includes the 500 µA bias reference.
+The row-9 column below is a diagnostic recalculation from the archived draws
+using `2 * (3.3 - vcm_dc) / 50`. Its last column counts negative-control
+draws within 8–12 mA. Row 9 remains uncovered pending the fleet run of
+`sim/cml-driver-mismatch/yield/20261124-101656-6f1607b/`, whose requests
+measure the current through both 50-ohm loads directly.
 
-| corner | `swing_dc` (row 1, 0.4–0.6 V) | `vcm_dc` (row 2, 2.8–3.3 V) | `itail_dc` (row 9, 8–12 mA) | control yield, swing / vcm / itail |
-| --- | --- | --- | --- | --- |
-| `tt` | 0.470144 V, σ 1.18 mV, Cpk 19.9 | 3.06493 V, σ 0.59 mV, Cpk 133 | 9.903 mA, σ 24 µA, Cpk 26.9 | 0.220 / 0.875 / 0.220 |
-| `ff` | 0.482753 V, σ 1.26 mV, Cpk 21.8 | 3.05862 V, σ 0.63 mV, Cpk 127 | 10.155 mA, σ 25 µA, Cpk 24.3 | 0.180 / 0.895 / 0.225 |
-| `ss` | 0.459196 V, σ 0.92 mV, Cpk 21.5 | 3.07040 V, σ 0.46 mV, Cpk 167 | 9.684 mA, σ 18 µA, Cpk 30.6 | 0.255 / 0.920 / 0.260 |
-| `fs` | 0.479723 V, σ 1.37 mV, Cpk 19.5 | 3.06014 V, σ 0.68 mV, Cpk 117 | 10.095 mA, σ 27 µA, Cpk 23.3 | 0.200 / 0.850 / 0.215 |
-| `sf` | 0.461531 V, σ 1.09 mV, Cpk 18.8 | 3.06923 V, σ 0.55 mV, Cpk 141 | 9.731 mA, σ 22 µA, Cpk 26.5 | 0.240 / 0.940 / 0.250 |
+| Corner | Swing (row 1) | Common mode (row 2) | Recalculated load current, mean ± SD | Control yield, swing / vcm | Load current controls in limits |
+| --- | --- | --- | --- | --- | --- |
+| `tt` | 0.470144 V, σ 1.18 mV, Cpk 19.9 | 3.06493 V, σ 0.59 mV, Cpk 133 | 9.403 mA ± 23.5 µA | 0.220 / 0.875 | 44/200 |
+| `ff` | 0.482753 V, σ 1.26 mV, Cpk 21.8 | 3.05862 V, σ 0.63 mV, Cpk 127 | 9.655 mA ± 25.3 µA | 0.180 / 0.895 | 36/200 |
+| `ss` | 0.459196 V, σ 0.92 mV, Cpk 21.5 | 3.07040 V, σ 0.46 mV, Cpk 167 | 9.184 mA ± 18.3 µA | 0.255 / 0.920 | 51/200 |
+| `fs` | 0.479723 V, σ 1.37 mV, Cpk 19.5 | 3.06014 V, σ 0.68 mV, Cpk 117 | 9.594 mA ± 27.3 µA | 0.200 / 0.850 | 40/200 |
+| `sf` | 0.461531 V, σ 1.09 mV, Cpk 18.8 | 3.06923 V, σ 0.55 mV, Cpk 141 | 9.231 mA ± 21.8 µA | 0.240 / 0.940 | 48/200 |
 
 Each nominal draw is 200/200 inside its limits (Clopper-Pearson lower bound
 98.2 %), and each control's interval lies entirely below it — the closest
