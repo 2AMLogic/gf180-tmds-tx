@@ -69,14 +69,11 @@ from __future__ import annotations
 
 import argparse
 
-from pad_ring_cells import (  # single source (issues #242, #262, #350)
+from pad_ring_cells import (  # single source (issues #242, #262, #350, #413)
     CONTACT_SIZE,
     DEFAULT_BUS_WIDTH_UM,
     DVDD_BAND,
     DVSS_BAND,
-    FINGER_DEPTH,
-    FINGER_L,
-    FINGER_PITCH,
     MAX_FINGERS_PER_ROW,
     PAD_PITCH_UM,
     PAD_SIDE,
@@ -84,6 +81,8 @@ from pad_ring_cells import (  # single source (issues #242, #262, #350)
     PAD_VIA_GAP_UM,
     RING_DEPTH_UM,
     VIA_HALF,
+    _array_height,
+    _draw_diode_clamp_array,
     _draw_production_pad,
     _draw_ring_strap,
     _draw_substrate_tap,
@@ -96,11 +95,11 @@ try:  # pragma: no cover -- exercised by whichever environment is present
     import klayout.db as db
 except ModuleNotFoundError:  # pragma: no cover
     # The pure arithmetic below (`clamp_rows`, `_row_span`, `_row_pitch`,
-    # `_struct_width_um`) is stdlib and unit-tested in layout/tests/, which
-    # runs in CI's deliberately PDK-free, KLayout-free job (same convention
-    # `pad_pitch_fit_study.py` established, issue #143). Only `build()` needs
-    # klayout.db, and it says so with a clean error rather than an import
-    # traceback.
+    # `_array_height`, `_struct_width_um`) is stdlib and unit-tested in
+    # layout/tests/, which runs in CI's deliberately PDK-free, KLayout-free
+    # job (same convention `pad_pitch_fit_study.py` established, issue #143).
+    # Only `build()` needs klayout.db, and it says so with a clean error
+    # rather than an import traceback.
     db = None
 
 # ---------------------------------------------------------------------------
@@ -111,8 +110,6 @@ from gf180_layers import (  # shared layer table (issue #255)
     COMP,
     CONTACT,
     DBU,
-    DIODE_MK,
-    DUALGATE,
     METAL1,
     METAL1_LABEL,
     METAL2,
@@ -130,10 +127,10 @@ from gf180_layers import (  # shared layer table (issue #255)
 # and the shared pad/strap constants (DVSS_BAND, DVDD_BAND,
 # STRAP_STITCH_PITCH_UM, PAD_SIDE, PAD_OPENING_MARGIN, PAD_VIA_GAP_UM,
 # FINGER_*, ROW_GAP_UM, DEFAULT_BUS_WIDTH_UM, MAX_FINGERS_PER_ROW), the fold
-# arithmetic (`clamp_rows`, `_row_span`, `_row_pitch`) and the strap /
-# substrate-tap / production-pad drawing helpers have one definition, in
-# pad_ring_cells.py (issues #262, #350; the fold itself was
-# pad_pitch_fit_study.py's, issue #143/#242), shared with
+# arithmetic (`clamp_rows`, `_row_span`, `_row_pitch`, `_array_height`) and
+# the strap / substrate-tap / clamp-array / production-pad drawing helpers
+# have one definition, in pad_ring_cells.py (issues #262, #350, #413; the
+# fold itself was pad_pitch_fit_study.py's, issue #143/#242), shared with
 # pad_pitch_fit_study.py and imported at the top of this module.
 
 # This driver's own as-drawn clamp size -- gf180_tmds_pad_v2's own 20-finger
@@ -156,9 +153,10 @@ NWELL_MARGIN_UM = 0.7  # Nwell overlap of the Pplus fingers (clears NW enclosure
 NWELL_TAP_X_UM = -3.4
 
 
-def _struct_width_um(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> float:
+def _struct_width_um(n_fingers: int) -> float:
     """Total x footprint (rows folded) of one production pad structure --
-    the number DR-0011's 350um pad-pitch slot has to hold."""
+    the number DR-0011's 350um pad-pitch slot has to hold. Row-span-driven
+    only: the Metal1 gather bus costs y, not x."""
     rows = clamp_rows(n_fingers)
     array_x = _row_span(max(rows))
     return array_x + PAD_VIA_GAP_UM + PAD_SIDE / 2
@@ -176,9 +174,11 @@ def _draw_vdd_clamp(
     """Draw one pad's VDD-side clamp: a folded `diode_pd2nw_06v0` finger
     array (Pplus/Dualgate/diode_mk Comp inside an Nwell -- anode = the pad
     net, cathode = the Nwell), plus an Nplus Comp Nwell tap that carries the
-    Nwell (the diode cathode) to VDD. Same finger geometry and row fold as
-    the VSS-side `_draw_production_pad` array so both legs present the same
-    area/periphery (`A=40P P=120U` at 20 fingers) to `klt extract`.
+    Nwell (the diode cathode) to VDD. The array itself is
+    `pad_ring_cells._draw_diode_clamp_array` with PPLUS (issue #413): the
+    same finger geometry and row fold as the VSS-side `_draw_production_pad`
+    array by construction, so both legs present the same area/periphery
+    (`A=40P P=120U` at 20 fingers) to `klt extract`.
 
     (ox, oy) is the array's own origin; the anode's Metal1 gather bus runs
     out to x = via_cx (this pad's cathode-spine column, `_draw_production_pad`
@@ -193,46 +193,15 @@ def _draw_vdd_clamp(
     def label(spec, text, x, y):
         top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
 
-    rows = clamp_rows(n_fingers)
-    array_x1 = _row_span(max(rows))
-    row_pitch = _row_pitch(bus_width)
-    array_y1 = (len(rows) - 1) * row_pitch + max(FINGER_DEPTH, bus_width)
-
-    contact_y_off = 0.39
-    bus_cy = contact_y_off + CONTACT_SIZE / 2
-    bus_dy0 = bus_cy - bus_width / 2
-    bus_dy1 = bus_cy + bus_width / 2
-    via_cx = array_x1 + PAD_VIA_GAP_UM
-
-    for r, count in enumerate(rows):
-        row_y0 = r * row_pitch
-        for i in range(count):
-            fx0 = i * FINGER_PITCH
-            rect(COMP, fx0, row_y0, fx0 + FINGER_L, row_y0 + FINGER_DEPTH)
-            cx = fx0 + FINGER_L / 2
-            rect(
-                CONTACT,
-                cx - CONTACT_SIZE / 2,
-                row_y0 + contact_y_off,
-                cx + CONTACT_SIZE / 2,
-                row_y0 + contact_y_off + CONTACT_SIZE,
-            )
-        rect(METAL1, -0.10, row_y0 + bus_dy0, via_cx + 0.60, row_y0 + bus_dy1)
-
-    margin = 0.16
-    rect(PPLUS, -margin, -margin, array_x1 + margin, array_y1 + margin)
-    dg = 0.30
-    rect(DUALGATE, -dg, -dg, array_x1 + dg, array_y1 + dg)
-    mk = 0.40
-    rect(DIODE_MK, -mk, -mk, array_x1 + mk, array_y1 + mk)
-
-    # Vertical Metal1 spine joining the rows' anode buses (also the column the
-    # caller's pad-net spine arrives on).
-    spine_half = max(0.60, bus_width / 2)
-    rect(METAL1, via_cx - spine_half, bus_dy0, via_cx + spine_half, (len(rows) - 1) * row_pitch + bus_dy1)
+    m = _draw_diode_clamp_array(top, L, ox, oy, PPLUS, n_fingers, bus_width)
+    array_x1 = m["array_x1"]
+    array_y1 = m["array_y1"]
+    via_cx = m["via_cx"]
+    bus_cy = m["bus_cy"]
 
     # Nwell tap: Nplus-covered 1x1 um Comp left of the array, inside the same
     # Nwell. No Dualgate / diode_mk -- a plain well tie, not a diode terminal.
+    margin = 0.16
     tap_x0 = NWELL_TAP_X_UM
     tap_x1 = tap_x0 + 1.0
     tap_y0, tap_y1 = 0.0, 1.0
@@ -323,7 +292,7 @@ def build(
     # and raise a hard error rather than silently overrunning the slot if the
     # requested clamp size cannot be folded to fit -- DR-0011 is ratified,
     # the fold widens (MAX_FINGERS_PER_ROW), never the pitch.
-    struct_width = _struct_width_um(n_fingers, bus_width)
+    struct_width = _struct_width_um(n_fingers)
     if struct_width > PAD_PITCH_UM:
         raise ValueError(
             f"a {n_fingers}-finger clamp needs {struct_width:.3f} um of x, which does "
@@ -355,7 +324,7 @@ def build(
     # label layer (34/10) -- the same convention gen_cml_driver_core.py's
     # `klt gen-compose` output and gen_pad_min.py/gen_pad_diode_draft.py's
     # hand-drawn labels both already use.
-    label_layer = L((34, 10))
+    label_layer = L(METAL1_LABEL)
     pins: dict[str, tuple[float, float]] = {}
     for shape in driver_top.shapes(label_layer).each():
         if shape.is_text():
@@ -403,8 +372,7 @@ def build(
     # sits above its pad's VSS-side array; a Metal1 spine ties its anode bus
     # to the pad net, and the Nwell tap's Metal2 runs down onto the DVDD
     # strap's Metal3 through one via2.
-    rows = clamp_rows(n_fingers)
-    array_top = (len(rows) - 1) * _row_pitch(bus_width) + max(FINGER_DEPTH, bus_width)
+    array_top = _array_height(clamp_rows(n_fingers), bus_width)
     vdd_oy = PAD_STRUCT_OY_UM + array_top + VDD_CLAMP_GAP_UM
     strap_cy = (DVDD_BAND[0] + DVDD_BAND[1]) / 2
     for slot_cx, net in ((pad0_cx, "OUTP"), (pad1_cx, "OUTN")):

@@ -84,12 +84,12 @@ except ModuleNotFoundError:  # pragma: no cover
 # ---------------------------------------------------------------------------
 from gf180_layers import DBU, layer_cache
 
-# Shared drawing helpers, fold arithmetic and pad/strap constants (issue #262).
+# Shared drawing helpers, fold arithmetic and pad/strap constants (issues
+# #262, #413).
 from pad_ring_cells import (
     DEFAULT_BUS_WIDTH_UM,
     DVDD_BAND,
     DVSS_BAND,
-    FINGER_DEPTH,
     FINGER_L,
     MAX_FINGERS_PER_ROW,
     PAD_PITCH_UM,
@@ -97,6 +97,7 @@ from pad_ring_cells import (
     PAD_STRUCT_OY_UM,
     PAD_VIA_GAP_UM,
     RING_DEPTH_UM,
+    _array_height,
     _draw_production_pad,
     _draw_ring_strap,
     _draw_substrate_tap,
@@ -125,7 +126,7 @@ def fit_report(n_fingers: int, bus_width: float = DEFAULT_BUS_WIDTH_UM) -> dict[
     (against its 75 um ring depth), folded and unfolded."""
     rows = clamp_rows(n_fingers)
     array_x = _row_span(max(rows))
-    array_y = (len(rows) - 1) * _row_pitch(bus_width) + max(FINGER_DEPTH, bus_width)
+    array_y = _array_height(rows, bus_width)
     struct_x = array_x + PAD_VIA_GAP_UM + PAD_SIDE / 2
     unfolded_x = _row_span(n_fingers) + PAD_VIA_GAP_UM + PAD_SIDE / 2
     plate_y0 = PAD_STRUCT_OY_UM + array_y / 2 - PAD_SIDE / 2
