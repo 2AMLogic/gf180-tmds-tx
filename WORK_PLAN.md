@@ -38,7 +38,6 @@ Human-approved issues (`loom:issue`) ready for implementation — excluding held
 Issues currently being built (`loom:building`).
 
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
-- **#396**: flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level)
 
 ## PRs Awaiting Review
 
@@ -46,7 +45,6 @@ PRs waiting on Judge (`loom:review-requested`).
 
 - **#368**: fix(signoff): stop README churn drifting item 10; add pin tripwire and re-attest *(held)*
 - **#387**: refactor: share the synth dead-tie assign check between P&R and the LVS reference generator
-- **#397**: refactor(flow): drop never-interpolated params from render_record
 
 ## Approved (Awaiting Merge)
 
@@ -67,7 +65,6 @@ Issues carrying `loom:curated`.
 - **#313**: docs: point the item 7 digital blocker at klayout-tools#5002 and complete the README repo-layout tree *(curated)* *(held)*
 - **#317**: Filter ngspice's 'Reference value :' progress trace out of harness logs: 96% of what survives .options noinit *(curated)* *(held)*
 - **#370**: sim/harness batch: opt in to options.stage_model_inputs and re-run the one-point fleet probe with the client's own model closure *(curated)* *(held)*
-- **#396**: flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -85,10 +82,10 @@ _None._
 | Very important | 1 |
 | Important | 2 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 3 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 10 |
+| Curated | 9 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
