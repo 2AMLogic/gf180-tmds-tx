@@ -326,6 +326,38 @@ Filed generically at
 Until it lands, `scripts/check_lvs_signoff.py` plus cheap-mode `--check` are
 the machine re-verification this repo relies on.
 
+**Regeneration episode: the committed GDS pair was one label stale, and the
+DRC deck has since gained coverage (issue #420, 2026-11-24).** Regenerating
+this pair with the current `scripts/gen_pad_v2.py` showed the committed
+files were missing one `PAD` text label (34/10 at 1.0, 0.5 µm) that the
+generator has emitted since the `_draw_production_pad` move into
+`pad_ring_cells.py` (#350 era) — every polygon layer XOR-clean, same bbox,
+same drawn layer set, so a provenance defect (committed artifact ≠
+generator output), not an electrical one. Both GDS were regenerated and
+every evidence report re-run (not hand-edited), so the recorded
+`layout_sha256`/`content_hash` pins track the new files; the pre-#420
+reports and GDS (`6fb14679…`/`38a7321d…`) remain recoverable in git
+history.
+
+Re-running signoff reproduced everything the geometry pins: extraction
+still finds 20 `diode_nd2ps_06v0` on the 2 real `PAD`/`VSS` nets, LVS is
+still `match` (intact) / `mismatch` with 4 error findings (`_shorted`
+control), and `extract --parasitics` still measures the `PAD` net at
+**12.185218 fF** (byte-identical capacitance; the `PAD` net's lumped
+resistance moved 10.38 → 10.36 Ω, engine-version rounding — klayout
+0.30.10 → 0.30.13). One thing did not reproduce, and it is deck-side:
+`klt drc` under every deck now available — the installed `klt`
+0.9.3.dev/klayout 0.30.13 (deck `sha256:778e9a4e…`) and the CI-pinned
+`klayout-tools` 0.8.0/klayout 0.30.14 (deck `sha256:0eb6df1b…`) — reports
+**17 violations** where the committed report (deck `sha256:79e71a1e…`)
+recorded `clean`: 13× `comp.tap_distance.psub.mv.1` and 1× each
+`via{1,2,3,4}.width.1`. The violations are identical on the
+pre-regeneration committed GDS (0-polygon XOR, so they could not not be):
+the deck gained coverage after this cell's signoff, the same
+known-regression pattern `gf180_tmds_pad_min` documents above. The re-run
+reports record the current deck's findings honestly; the geometry findings
+themselves are flagged, not fixed here, and tracked in #422.
+
 **Scope**: this cell answers the capacitance-budget question at a real pad
 size with a real DR-0011-ratified clamp; it does not draw pad-ring
 continuity straps (DVDD/DVSS at DR-0011's 350/75 µm pitch) or a second

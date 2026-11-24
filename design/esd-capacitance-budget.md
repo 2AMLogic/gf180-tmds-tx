@@ -736,6 +736,19 @@ not "is this the final integrated pad".
   same convention `gf180_tmds_pad_min_shorted`/`cml_driver_core_shorted`
   already established.
 
+**Re-signed-off (issue #420, 2026-11-24)** — the GDS pair was regenerated
+(one stale `PAD` label restored to match the generator's output; polygons
+XOR-clean) and every report cited above re-run, so the hash pins track the
+current files. Extraction, both LVS verdicts, and the 12.185218 fF `PAD`-net
+capacitance below reproduce exactly; the `PAD` net's lumped resistance
+moved 10.38 → 10.36 Ω (engine-version rounding, klayout 0.30.10 → 0.30.13).
+The DRC `clean` verdict above does **not** reproduce: every deck now
+available reports 17 violations (13× `comp.tap_distance.psub.mv.1`, 4×
+`via{1..4}.width.1`), identically on the pre-regeneration GDS — deck
+coverage gained after signoff, not a geometry change. Full account in
+`layout/README.md`'s pad_v2 regeneration episode; the geometry findings are
+tracked in #422 and do not affect this section's capacitance numbers.
+
 ### 9.3. Real pad-plate + interconnect parasitic capacitance
 
 `klt extract --parasitics` against the actual assembled
@@ -747,10 +760,14 @@ stack — i.e. real interconnect, not an idealized zero-length wire):
 $ klt extract --deck gf180mcu --parasitics --pdk gf180mcuD gds/gf180_tmds_pad_v2.gds --format json
 ...
 "nets": [
-  {"net": "PAD", "resistance_ohm": 10.38, "capacitance_ff": 12.185218},
+  {"net": "PAD", "resistance_ohm": 10.36, "capacitance_ff": 12.185218},
   {"net": "VSS", "resistance_ohm": 0.09,  "capacitance_ff": 0.109321}
 ]
 ```
+
+(Values per the #420 re-run, 2026-11-24 — klayout 0.30.13. The original
+signoff run, klayout 0.30.10, reported the identical capacitances and
+`PAD` resistance 10.38 Ω; only that rounding moved.)
 
 **`PAD`-net parasitic capacitance: 12.185 fF** — byte-identical against
 `--pdk gf180mcuD` (`layout/drc_reports/gf180_tmds_pad_v2.parasitics.json`),
