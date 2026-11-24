@@ -24,7 +24,7 @@
         "role": "testbench",
         "path": "sim/cml-driver-eye-mask/testbench/tb.json",
         "passed": true,
-        "content_hash": "sha256:c7402e69ecb261f078a32987bc24b5683b74a97be4647e8222378aa39ed198bf"
+        "content_hash": "sha256:14a0baea506a4281a65692a8a60164af578ba9f24c82c88e55e7daa6320088ce"
       },
       {
         "check": "present",
