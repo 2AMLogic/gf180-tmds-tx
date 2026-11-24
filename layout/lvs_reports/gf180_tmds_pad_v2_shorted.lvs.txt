@@ -1,6 +1,7 @@
-layout: ../gds/gf180_tmds_pad_v2_shorted.gds
-reference: gf180_tmds_pad_v2.ref.spice
+layout: layout/gds/gf180_tmds_pad_v2_shorted.gds
+reference: layout/lvs/gf180_tmds_pad_v2.ref.spice
 top: gf180_tmds_pad_v2_shorted
+reference top: GF180_TMDS_PAD_V2
 engine: klayout
 status: mismatch
 mismatches: 7
@@ -8,6 +9,8 @@ errors: 4
   nets: layout=1  reference=2  matched=0
   devices: layout=1  reference=1  matched=0
   pins: layout=1  reference=2  matched=3
+power_connectivity: unchecked
+  (reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply)
 
 category_counts:
   device.unmatched: 1
@@ -18,6 +21,6 @@ category_counts:
 [error] net.unmatched  (layout)  layout net has no reference counterpart
 [error] net.unmatched  (reference)  reference net has no layout counterpart
 [error] net.unmatched  (reference)  reference net has no layout counterpart
-[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
-[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
-[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'nfet'
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'pfet'
+[warning] topology  (layout)  device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'bjt'

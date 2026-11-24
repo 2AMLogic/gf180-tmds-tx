@@ -1,11 +1,67 @@
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "engine": "klayout",
-  "layout": "../gds/gf180_tmds_pad_v2_shorted.gds",
-  "reference": "gf180_tmds_pad_v2.ref.spice",
+  "layout": {
+    "path": "layout/gds/gf180_tmds_pad_v2_shorted.gds",
+    "scope": "repo"
+  },
+  "reference": {
+    "path": "layout/lvs/gf180_tmds_pad_v2.ref.spice",
+    "scope": "repo"
+  },
   "top": "gf180_tmds_pad_v2_shorted",
+  "reference_top": "GF180_TMDS_PAD_V2",
   "parameter_tolerance": null,
+  "options": {
+    "combine_devices": true,
+    "combine_devices_per_circuit": null,
+    "combine_devices_max_attempts": 5,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "anchor_top_level_pins": null,
+    "strict_top_level_pin_count": false,
+    "compare_mos_flavour": false,
+    "ignore_mos_bulk": false,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ],
+    "finfet_bulk": null
+  },
+  "hints_applied": null,
+  "constant_nets_applied": null,
   "status": "mismatch",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'plain-element', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "excluded_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "unchecked",
+    "reason": "no MOS device was eligible for the body check: the layout's top circuit extracted no 'nfet' or 'pfet' device, under either the deck's generic class names or their compare_mos_flavour-suffixed variants (e.g. 'nfet__<flavour>'), so there was no body terminal to inspect and this run verified nothing about the device bodies",
+    "device_classes": [],
+    "device_count": 0,
+    "inspected_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "device_parameter_coverage": [],
+  "mismatches_omitted": false,
   "mismatch_count": 7,
   "error_count": 4,
   "category_counts": {
@@ -34,31 +90,84 @@
       "matched": 3
     }
   },
+  "pin_set_difference": {
+    "deck_synthesized_layout_pins": [],
+    "layout_only_pins": [
+      "PAD,VSS"
+    ],
+    "layout_only_pins_count": 1,
+    "layout_only_pins_truncated": false,
+    "reference_only_pins": [
+      "PAD",
+      "VSS"
+    ],
+    "reference_only_pins_count": 2,
+    "reference_only_pins_truncated": false
+  },
+  "ignored_layers": [
+    {
+      "layer": 37,
+      "datatype": 0,
+      "shapes": 1
+    }
+  ],
+  "warnings": [],
   "device_classes": [
     "nfet",
     "pfet",
     "bjt",
     "cap_mim_2f0_m4m5_noshield",
+    "cap_nmos_03v3",
+    "cap_nmos_03v3_dn",
+    "cap_pmos_03v3",
+    "cap_pmos_03v3_dn",
+    "cap_nmos_06v0",
+    "cap_nmos_06v0_dn",
+    "cap_pmos_06v0",
+    "cap_pmos_06v0_dn",
+    "cap_nmos_03v3_b",
+    "cap_pmos_03v3_b",
+    "cap_nmos_06v0_b",
+    "cap_pmos_06v0_b",
     "resistor",
     "diode_nd2ps_06v0",
     "diode_pd2nw_06v0"
   ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.10",
-    "layout_sha256": "38a7321dabf4c06a98b5b46e71810b22c4ad77d03b3087a18cbd87f48bf0e7ed",
+    "engine_version": "0.30.13",
+    "netgen_binary": null,
+    "layout_sha256": "04cb939d97464253aea6d3025f702c28f1a9bc26f2b86b045f7c72d12a14ebb4",
     "reference_sha256": "55fc667478ba3aef712fcb75a1625262abe1a95ad2b51c1118a0b371e7fa2a9f",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.2.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.9.3.dev5396+g83764a3c6b6f",
+    "klt_git_commit": "83764a3c6b6f38478e59d36de9a2df60d5236122",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@83764a3c6b6f38478e59d36de9a2df60d5236122",
+    "klayout_version": "0.30.13",
     "pdk": null,
     "deck": {
       "name": "gf180mcu",
-      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0"
+      "content_hash": "sha256:778e9a4eba34b67a0427367917b4c9c2602d44ff085d663affd302a8d0f197cd",
+      "released": false,
+      "options": {
+        "metal_top": "9K",
+        "mim_cap": "cap_mim_2f0_m4m5_noshield",
+        "poly_res": "1k"
+      },
+      "options_explicit": {
+        "metal_top": false,
+        "mim_cap": false,
+        "poly_res": false
+      },
+      "options_hash": "sha256:6a7dc7660a470994263c5ca8ace6d8ac8c605d77e6876a9c5490949de6e7cb05"
     },
-    "input": null
+    "input": {
+      "content_hash": "sha256:04cb939d97464253aea6d3025f702c28f1a9bc26f2b86b045f7c72d12a14ebb4",
+      "role": "layout"
+    },
+    "klayout_version_mismatch": false
   },
   "mismatches": [
     {
@@ -85,7 +194,9 @@
       "side": "layout",
       "net": {
         "layout": "PAD|VSS",
-        "reference": null
+        "layout_id": 0,
+        "reference": null,
+        "reference_id": null
       },
       "device": null,
       "property": null,
@@ -101,7 +212,9 @@
       "side": "reference",
       "net": {
         "layout": null,
-        "reference": "PAD"
+        "layout_id": null,
+        "reference": "PAD",
+        "reference_id": 0
       },
       "device": null,
       "property": null,
@@ -117,7 +230,9 @@
       "side": "reference",
       "net": {
         "layout": null,
-        "reference": "VSS"
+        "layout_id": null,
+        "reference": "VSS",
+        "reference_id": 1
       },
       "device": null,
       "property": null,
@@ -129,10 +244,14 @@
     {
       "category": "topology",
       "severity": "warning",
-      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'nfet'",
       "side": "layout",
       "net": null,
-      "device": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "nfet"
+      },
       "property": null,
       "details": null,
       "circuit": null,
@@ -142,10 +261,14 @@
     {
       "category": "topology",
       "severity": "warning",
-      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'pfet'",
       "side": "layout",
       "net": null,
-      "device": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "pfet"
+      },
       "property": null,
       "details": null,
       "circuit": null,
@@ -155,10 +278,14 @@
     {
       "category": "topology",
       "severity": "warning",
-      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch",
+      "description": "device class has no counterpart on the other side, but no devices of this class were extracted either -- not a real topology mismatch: 'bjt'",
       "side": "layout",
       "net": null,
-      "device": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "bjt"
+      },
       "property": null,
       "details": null,
       "circuit": null,

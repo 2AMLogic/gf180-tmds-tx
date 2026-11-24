@@ -1,6 +1,32 @@
-file: gds/gf180_tmds_pad_v2.gds
+file: layout/gds/gf180_tmds_pad_v2.gds
 deck: gf180mcu
 dbu_um: 0.001
-status: clean
-violations: 0
-unchecked layers in stream: 5
+status: violations
+violations: 17
+unchecked layers in stream: 2
+warning: 210 foundry rule(s) not enforced by this deck: CO.6a, CO.6b, DF.15a_MV, DF.15b_MV, DF.16_MV, DF.17_MV, DF.19_MV, DF.1b_MV, ... (202 more) (see coverage.unmodeled_rules)
+
+rule_counts:
+  comp.tap_distance.psub.mv.1: 13
+  via1.width.1: 1
+  via2.width.1: 1
+  via3.width.1: 1
+  via4.width.1: 1
+
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (18200,0)-(20200,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (20800,0)-(22800,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (23400,0)-(25400,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (26000,0)-(28000,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (28600,0)-(30600,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (31200,0)-(33200,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (33800,0)-(35800,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (36400,0)-(38400,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (39000,0)-(41000,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (41600,0)-(43600,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (44200,0)-(46200,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (46800,0)-(48800,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+comp.tap_distance.psub.mv.1  gf180_tmds_pad_v2  Comp  (49400,0)-(51400,1000)  Max distance of a substrate tap (PCOMP outside Nwell) from NCOMP outside Nwell: 15um (5V/6V)
+via1.width.1  gf180_tmds_pad_v2  Via1  (52750,350)-(53050,650)  min/max via1 size (fixed 0.26 x 0.26 um square)
+via2.width.1  gf180_tmds_pad_v2  Via2  (52750,350)-(53050,650)  min/max via2 size (fixed 0.26 x 0.26 um square)
+via3.width.1  gf180_tmds_pad_v2  Via3  (52750,350)-(53050,650)  min/max via3 size (fixed 0.26 x 0.26 um square)
+via4.width.1  gf180_tmds_pad_v2  Via4  (52750,350)-(53050,650)  min/max via4 size (fixed 0.26 x 0.26 um square)
