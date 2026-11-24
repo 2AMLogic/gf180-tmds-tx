@@ -12,6 +12,10 @@ selected.
 
 ### 2026-11-24
 
+- **PR #423**: layout: regenerate stale pad_v2 GDS pair and re-run its evidence reports
+- **PR #421**: refactor: consolidate folded diode-clamp array drawing into pad_ring_cells
+- **Issue #420** (closed): layout: committed gf180_tmds_pad_v2 GDS pair is stale by one PAD label vs gen_pad_v2.py output
+- **Issue #413** (closed): Consolidate duplicated folded diode-clamp array drawing in gen_pad_ring_assembly.py and pad_ring_cells.py
 - **PR #416**: fix(sim): seed the local grid's .spiceinit from a shared GF180 startup tuple
 - **Issue #415** (closed): Initialize local ngspice runs with the shared GF180 settings before MOS model binding
 - **PR #414**: docs(sim): record the per-finger-binning fleet probe receipt in the batch paragraph
