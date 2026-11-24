@@ -589,6 +589,16 @@ def _operating_point_lines(record: dict) -> list[str]:
         f"abstol={_fmt(t.get('abstol'))}",
         f"vntol={_fmt(t.get('vntol'))}",
     ]
+    # Per-rate windows (issue #405): when a rate maps to its own tstop, the
+    # default tstop above no longer describes every point's deck, so each
+    # mapped rate's actual window is spelled out beside it.
+    tstop_by_rate = t.get("tstop_s_by_rate") or {}
+    if tstop_by_rate:
+        per_rate = ", ".join(
+            f"{_fmt(v)}s@{float(rate):g} Mbps"
+            for rate, v in sorted(tstop_by_rate.items(), key=lambda kv: -float(kv[0]))
+        )
+        settings.append(f"tstop-per-rate=({per_rate})")
     if t.get("pattern"):
         settings.append(f"pattern={t['pattern']}")
     lines.append("- **Transient settings**: " + " ".join(settings))

@@ -58,6 +58,26 @@ under-resolved ``.tran`` silently flatters an eye diagram, so the solver
 settings actually used are evidence, not incidental detail, and
 ``sim/harness/report.py``/``sim/harness/evidence_lint.py`` require them on
 every record whose corner-ids carry a rate token.
+
+## Per-rate transient windows (issue #405)
+
+A transient bench whose operating points need different ``.tran`` windows
+(``sim/cml-driver-eye-mask``: one ``tstop`` sized for the 270 Mbps fallback
+simulates hundreds of ns of dead time at 742.5 Mbps, where Linux ngspice-47
+aborts) may declare the window per rate instead of once::
+
+    "analyses_by_rate": {"742.5": "tran 20e-12 205e-9 0 40e-12"},
+    "transient": {
+        "tstep_s": 20e-12, "tstop_s": 560e-9,
+        "tstop_s_by_rate": {"742.5": 205e-9}, ...
+    }
+
+``analyses`` stays the default (used for every point whose rate is not
+mapped, and for DC benches); a mapped rate gets its own line. Both keys are
+cross-checked against ``transient`` exactly as the default line is
+(``validate_transient``): a mapped line's ``tstop`` must equal that rate's
+``tstop_s_by_rate`` entry (falling back to ``tstop_s``), so the record's
+captured solver settings keep describing the deck that actually ran.
 """
 
 from __future__ import annotations
@@ -114,6 +134,10 @@ class Testbench:
     temperatures_c: tuple[float, ...] = DEFAULT_TEMPERATURES_C
     corners: tuple[str, ...] = (DEFAULT_CORNER_SET,)
     analyses: tuple[str, ...] = ("op",)
+    #: Optional per-rate override of ``analyses`` (issue #405): maps a rate
+    #: from ``rates_mbps`` to the single analysis line that rate's points
+    #: run instead of the default list. Keys are the parsed float rates.
+    analyses_by_rate: dict[float, str] = field(default_factory=dict)
     measure: dict[str, str] = field(default_factory=dict)
     params: dict[str, str | float] = field(default_factory=dict)
     checks: dict[str, dict] = field(default_factory=dict)
@@ -128,6 +152,23 @@ class Testbench:
         ``sim/<experiment-slug>/testbench/tb.json`` -> ``<experiment-slug>``.
         """
         return self.directory.parent.name
+
+    def analyses_for_rate(self, rate_mbps: float | None) -> tuple[str, ...]:
+        """The analyses a point at ``rate_mbps`` runs (issue #405).
+
+        ``analyses_by_rate`` maps individual declared rates to their own
+        analysis line; every other point -- an unmapped rate, a DC bench's
+        ``rate_mbps=None`` -- runs the default ``analyses`` list unchanged.
+        The single backend composers (``runner.compose_deck``'s control
+        block, ``batch._analysis``'s one-analysis request contract, the pex
+        request generator) all pick their line through here, so a per-rate
+        window applies to every path at once.
+        """
+        if rate_mbps is not None:
+            mapped = self.analyses_by_rate.get(rate_mbps)
+            if mapped is not None:
+                return (mapped,)
+        return self.analyses
 
     @property
     def experiment_dir(self) -> Path:
@@ -282,6 +323,10 @@ def load(directory: str | Path, dut: str | Path | None = None) -> Testbench:
         ),
         corners=tuple(manifest.get("corners", (DEFAULT_CORNER_SET,))),
         analyses=tuple(manifest.get("analyses", ("op",))),
+        analyses_by_rate={
+            float(rate): line
+            for rate, line in manifest.get("analyses_by_rate", {}).items()
+        },
         measure=measure,
         params={k: v for k, v in manifest.get("params", {}).items()},
         checks=dict(manifest.get("checks", {})),
@@ -353,7 +398,19 @@ def validate_transient(tb: Testbench) -> None:
     testbench's own ``analyses`` actually runs a ``.tran`` consistent with
     the declared ``tstep_s``/``tstop_s`` -- a declared-but-unused solver
     setting is exactly the kind of drift this validation exists to catch.
+    Per-rate lines (``analyses_by_rate``, issue #405) get the same
+    cross-check against that rate's ``transient.tstop_s_by_rate`` entry
+    (falling back to ``tstop_s``), and every mapped rate must be one the
+    manifest actually declares -- an orphaned or mistyped rate key would
+    otherwise silently fall back to the default window at run time.
     """
+    if tb.analyses_by_rate and not tb.rates_mbps:
+        raise ValueError(
+            f"{tb.directory / MANIFEST_NAME}: 'analyses_by_rate' requires a "
+            "'rates_mbps' axis to map rates onto -- got "
+            f"{ {f'{r:g}': a for r, a in tb.analyses_by_rate.items()} !r} with "
+            f"rates_mbps={list(tb.rates_mbps)!r}"
+        )
     if bool(tb.rates_mbps) != bool(tb.transient):
         raise ValueError(
             f"{tb.directory / MANIFEST_NAME}: 'rates_mbps' and 'transient' must be "
@@ -369,29 +426,72 @@ def validate_transient(tb: Testbench) -> None:
             f"{tb.directory / MANIFEST_NAME}: 'transient' is missing required key(s) "
             f"{missing} (see sim/harness/testbench.py's module docstring)"
         )
-    tran_lines = [a for a in tb.analyses if a.strip().lower().startswith("tran ")]
+    _validate_tran_line(tb, tb.analyses, "analyses", float(tb.transient["tstop_s"]))
+    tstop_by_rate_raw = tb.transient.get("tstop_s_by_rate", {})
+    if not isinstance(tstop_by_rate_raw, dict):
+        raise ValueError(
+            f"{tb.directory / MANIFEST_NAME}: 'transient.tstop_s_by_rate' must be a "
+            "map of rate -> tstop (seconds), not "
+            f"{type(tstop_by_rate_raw).__name__}"
+        )
+    tstop_by_rate = {float(rate): float(v) for rate, v in tstop_by_rate_raw.items()}
+    for rate in sorted(set(tb.analyses_by_rate) | set(tstop_by_rate)):
+        _validate_rate_declared(tb, rate)
+        line = tb.analyses_by_rate.get(rate)
+        if line is None:
+            raise ValueError(
+                f"{tb.directory / MANIFEST_NAME}: 'transient.tstop_s_by_rate' names "
+                f"{rate:g} Mbps but 'analyses_by_rate' has no window for it -- a "
+                "declared per-rate tstop nothing runs is exactly the drift this "
+                "cross-check exists to catch"
+            )
+        _validate_tran_line(
+            tb,
+            (line,),
+            f"analyses_by_rate[{rate:g}]",
+            tstop_by_rate.get(rate, float(tb.transient["tstop_s"])),
+        )
+
+
+def _validate_rate_declared(tb: Testbench, rate: float) -> None:
+    if rate not in tb.rates_mbps:
+        raise ValueError(
+            f"{tb.directory / MANIFEST_NAME}: per-rate transient window for "
+            f"{rate:g} Mbps is not in 'rates_mbps' {list(tb.rates_mbps)!r} -- a "
+            "mistyped rate would silently fall back to the default window"
+        )
+
+
+def _validate_tran_line(
+    tb: Testbench, analyses: tuple[str, ...], where: str, tstop_s: float
+) -> None:
+    """Cross-check one analyses list against ``transient`` (see
+    ``validate_transient``): it must run a ``.tran`` whose ``tstep``/``tstop``
+    equal the declared ``tstep_s`` and the given expected ``tstop_s``.
+    """
+    manifest_path = tb.directory / MANIFEST_NAME
+    tran_lines = [a for a in analyses if a.strip().lower().startswith("tran ")]
     if not tran_lines:
         raise ValueError(
-            f"{tb.directory / MANIFEST_NAME}: declares 'transient' settings but "
-            "'analyses' contains no 'tran ...' line to apply them to"
+            f"{manifest_path}: declares 'transient' settings but {where!r} contains "
+            "no 'tran ...' line to apply them to"
         )
     tstep_s = float(tb.transient["tstep_s"])
-    tstop_s = float(tb.transient["tstop_s"])
     tokens = tran_lines[0].split()
     try:
         declared_tstep, declared_tstop = float(tokens[1]), float(tokens[2])
     except (IndexError, ValueError) as exc:
         raise ValueError(
-            f"{tb.directory / MANIFEST_NAME}: analyses line {tran_lines[0]!r} does not "
+            f"{manifest_path}: analyses line {tran_lines[0]!r} does not "
             "parse as 'tran <tstep> <tstop> ...'"
         ) from exc
-    for label, declared, from_transient in (
+    for label, declared, expected in (
         ("tstep_s", declared_tstep, tstep_s),
         ("tstop_s", declared_tstop, tstop_s),
     ):
-        if abs(declared - from_transient) > 1e-15 + 1e-9 * abs(from_transient):
+        if abs(declared - expected) > 1e-15 + 1e-9 * abs(expected):
             raise ValueError(
-                f"{tb.directory / MANIFEST_NAME}: 'transient.{label}'={from_transient!r} "
+                f"{manifest_path}: 'transient.{label}'={expected!r} "
                 f"does not match the 'tran' line's value {declared!r} in "
                 f"{tran_lines[0]!r} -- these must agree so the record's captured solver "
                 "settings actually describe the deck that ran"

@@ -381,7 +381,9 @@ def _compose_body(tb, vdd: float, rate: float, dut_rel: str) -> str:
 
 
 def _build_request(tb, vdd: float, rate: float, measurements: list[dict]) -> dict:
-    analysis = tb.analyses[0].split(None, 1)
+    # Per-rate transient windows (issue #405): this request's baked rate
+    # selects its own 'tran' line, exactly as the harness backends do.
+    analysis = tb.analyses_for_rate(rate)[0].split(None, 1)
     kind = analysis[0].lower()
     args = analysis[1] if len(analysis) > 1 else ""
     corners = resolve_corners(list(tb.corners))
