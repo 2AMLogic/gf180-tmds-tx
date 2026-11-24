@@ -1,0 +1,9 @@
+* cml-driver-mismatch -- klt yield campaign body (T1 item 6, run_yield.py)
+* sw_stat_mismatch=1 par_tail_val=0.0001 par_pair_val=64 par_mirror_val=10
+.param vdd_val=3.3
+.param par_pair_val=64
+.param par_tail_val=0.0001
+.param par_mirror_val=10
+.param sw_stat_mismatch=1
+.include "../../testbench/cml_driver_dut_mismatch.spice"
+.include "../../testbench/cml_driver_mismatch.spice"

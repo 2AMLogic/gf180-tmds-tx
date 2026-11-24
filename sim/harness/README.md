@@ -138,6 +138,38 @@ campaign is reproducible; a single-unit run (one corner, `n=1`) may use
 older locally-run record, so a migrated run mints a new record that states
 its seeding.
 
+## `klt sim` envelopes and `klt yield` reports (`klt_envelope.py`)
+
+A Markdown record is this repo's evidence format; the T1 signoff grader
+(`signoff/README.md`) reads only `klt`-native JSON envelopes. Two drivers
+produce those from the same bench definitions, without editing a bench or
+minting a record:
+
+- `python3 sim/run_envelope.py write <experiment>` builds one whole-grid
+  `klt sim` request per bench with `harness.klt_envelope` (one per rate for
+  a bench in `klt_envelope.TRANSIENT_WINDOWS`): the body is composed once
+  with nominal `.param` defaults and the request sweeps process ×
+  temperature × a zipped (supply, rate) `corners.params` axis over it, so
+  `alterparam` + `reset` re-times the PWL stimuli per corner (the
+  `min_spread_pct` check in `tb.json` proves it did — `verify` re-applies
+  it, since `klt sim` cannot grade a grid-level check). `measure` entries
+  take the form `klt sim` can evaluate (`translate_measurements`: raw
+  `.meas` cards, `PARAM` cards over raw-card results, then
+  dependency-ordered `expr`s — the translator `sim/pex/gen_requests.py`
+  shares), every `checks` bound becomes `limits`, and each graded check is
+  tagged with its DR-0013 row. Run the request on the batch fleet with
+  `--report-out` into `sim/<experiment>/envelopes/<ID>.json`, then
+  `verify <experiment> <ID>`. For the eye mask, pass both record IDs together
+  to check UI spread across rates, or omit the IDs to check the cited pair.
+- `python3 sim/cml-driver-mismatch/run_yield.py write` re-expresses
+  `run_mc.py`'s deck as a sized Monte Carlo campaign (a nominal and a
+  negative-control request per process corner, plus the mismatch-off
+  reference); `derive <ID>` runs `klt yield-samples` and `klt yield` per
+  corner and refuses a report that would not grade.
+
+`batch._measurements` (the per-point `--backend batch` path) is not this
+translator; see #406.
+
 ## Staging the client's model inputs (`--stage-models`)
 
 By default a batch request names only the PDK variant and the model library

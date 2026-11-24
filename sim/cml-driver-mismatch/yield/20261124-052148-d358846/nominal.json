@@ -1,0 +1,536 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/nominal.body.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 5,
+  "passed": 5,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 5,
+    "sim__corner__passed_count": 5,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******",
+      "binary_sha256": "e12148baf532d879d2e2053cecc5b498680bd4156a0dc3f69ce4f83e741e1314",
+      "probe": "ok",
+      "reason": null
+    },
+    "ngspice_init": {
+      "source": "runner",
+      "lines": null,
+      "sha256": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "5b0ac268b2a06ad44870af240e1367f0f21f4ca1ed91702b605b5570f0b2b3ee",
+    "netlist_sha256_scope": "staged",
+    "models_param_file": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_param_file_sha256": "7e222f050318388f37543a64fbd0be55cc15e4b93f57501a09f7c159c4c9e561",
+    "netlist_closure": [
+      {
+        "path": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/nominal.body.spice",
+        "scope": "repo",
+        "sha256": "5b0ac268b2a06ad44870af240e1367f0f21f4ca1ed91702b605b5570f0b2b3ee"
+      },
+      {
+        "path": "sim/cml-driver-mismatch/testbench/cml_driver_dut_mismatch.spice",
+        "scope": "repo",
+        "sha256": "06f5739292327b97b4caafd3cecb960e4cbfd30479e0490d34c90954478372b8"
+      },
+      {
+        "path": "sim/cml-driver-mismatch/testbench/cml_driver_mismatch.spice",
+        "scope": "repo",
+        "sha256": "10a5bbce4abfcc22b18be9146a96707ac3bc53ac434b6e472b668e5b7032ed04"
+      }
+    ],
+    "netlist_identity": "sha256:9e930d5208ef791c71da7e91b6e3a5be850be732565b49ac3bc56e9f0d9a016d",
+    "netlist_source": "schematic",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-9354599acc2e",
+      "region": "us-east-1",
+      "instance_id": "i-090cd5b83efcdbe11",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1a",
+      "ami_id": "ami-09c14f55df4958cbd",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 7,
+      "client_submitted_at": "2026-11-24T05:27:33.233777Z",
+      "client_launched_at": "2026-11-24T05:27:56.573363Z",
+      "client_status_terminal_at": "2026-11-24T05:28:28.460216Z",
+      "client_collected_at": "2026-11-24T05:28:29.595148Z",
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.3.dev4954+g093d4f7a60a9",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "measurements[].expr",
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******\n",
+          "version_probe": "ok",
+          "binary_sha256": "e12148baf532d879d2e2053cecc5b498680bd4156a0dc3f69ce4f83e741e1314"
+        },
+        "pdk": {
+          "variant": "gf180mcuD",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "match"
+        },
+        "ngspice_init": null,
+        "threads_per_worker": 1,
+        "engine_build_comparison": {
+          "status": "match"
+        }
+      },
+      "runner_model_inputs": null,
+      "runner_models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "runner_corner_section_libs": null,
+      "runner_osdi_preload": null,
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 5,
+        "per_unit_timeout_s": 15,
+        "overhead_s": 120.0,
+        "job_bound_s": 195.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": false,
+        "check": "split",
+        "max_units_per_job": 232,
+        "recommended_hosts": 1,
+        "split": false,
+        "effective_hosts": 1
+      },
+      "models_lib_comparison": {
+        "status": "match"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "client_engine_build": {
+      "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******",
+      "binary_sha256": "39ca1adb826660324c3626f72bd946ec40704f0f3fc8e243c623f76e24b3eee2",
+      "probe": "ok",
+      "reason": null
+    },
+    "backend": {
+      "resolved": "batch",
+      "source": "flag",
+      "requested": "batch"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 5,
+    "measurements_declared": 3,
+    "measurements_with_limits": 3,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "limit:[0,\"tt/novdd/27C\",\"itail_dc\",\"max\"]",
+      "limit:[0,\"tt/novdd/27C\",\"itail_dc\",\"min\"]",
+      "limit:[0,\"tt/novdd/27C\",\"swing_dc\",\"max\"]",
+      "limit:[0,\"tt/novdd/27C\",\"swing_dc\",\"min\"]",
+      "limit:[0,\"tt/novdd/27C\",\"vcm_dc\",\"max\"]",
+      "limit:[0,\"tt/novdd/27C\",\"vcm_dc\",\"min\"]",
+      "limit:[1,\"ff/novdd/27C\",\"itail_dc\",\"max\"]",
+      "limit:[1,\"ff/novdd/27C\",\"itail_dc\",\"min\"]",
+      "limit:[1,\"ff/novdd/27C\",\"swing_dc\",\"max\"]",
+      "limit:[1,\"ff/novdd/27C\",\"swing_dc\",\"min\"]",
+      "limit:[1,\"ff/novdd/27C\",\"vcm_dc\",\"max\"]",
+      "limit:[1,\"ff/novdd/27C\",\"vcm_dc\",\"min\"]",
+      "limit:[2,\"ss/novdd/27C\",\"itail_dc\",\"max\"]",
+      "limit:[2,\"ss/novdd/27C\",\"itail_dc\",\"min\"]",
+      "limit:[2,\"ss/novdd/27C\",\"swing_dc\",\"max\"]",
+      "limit:[2,\"ss/novdd/27C\",\"swing_dc\",\"min\"]",
+      "limit:[2,\"ss/novdd/27C\",\"vcm_dc\",\"max\"]",
+      "limit:[2,\"ss/novdd/27C\",\"vcm_dc\",\"min\"]",
+      "limit:[3,\"fs/novdd/27C\",\"itail_dc\",\"max\"]",
+      "limit:[3,\"fs/novdd/27C\",\"itail_dc\",\"min\"]",
+      "limit:[3,\"fs/novdd/27C\",\"swing_dc\",\"max\"]",
+      "limit:[3,\"fs/novdd/27C\",\"swing_dc\",\"min\"]",
+      "limit:[3,\"fs/novdd/27C\",\"vcm_dc\",\"max\"]",
+      "limit:[3,\"fs/novdd/27C\",\"vcm_dc\",\"min\"]",
+      "limit:[4,\"sf/novdd/27C\",\"itail_dc\",\"max\"]",
+      "limit:[4,\"sf/novdd/27C\",\"itail_dc\",\"min\"]",
+      "limit:[4,\"sf/novdd/27C\",\"swing_dc\",\"max\"]",
+      "limit:[4,\"sf/novdd/27C\",\"swing_dc\",\"min\"]",
+      "limit:[4,\"sf/novdd/27C\",\"vcm_dc\",\"max\"]",
+      "limit:[4,\"sf/novdd/27C\",\"vcm_dc\",\"min\"]"
+    ],
+    "skipped": [],
+    "inapplicable": [],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.9.3.dev4954+g093d4f7a60a9",
+    "klt_git_commit": "093d4f7a60a9387eb67ba6423571f0a4ebb4fe59",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@093d4f7a60a9387eb67ba6423571f0a4ebb4fe59",
+    "klayout_version": "0.30.13",
+    "pdk": {
+      "name": "gf180mcuD",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:5b0ac268b2a06ad44870af240e1367f0f21f4ca1ed91702b605b5570f0b2b3ee",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "swing_dc",
+      "unit": null,
+      "limits": {
+        "min": 0.4,
+        "max": 0.6
+      },
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/novdd/27C",
+        "value": 0.4592235,
+        "margin": 0.059223499999999984
+      },
+      "min": {
+        "corner_id": "ss/novdd/27C",
+        "value": 0.4592235
+      },
+      "max": {
+        "corner_id": "ff/novdd/27C",
+        "value": 0.4827686
+      },
+      "spec_row": "1"
+    },
+    {
+      "name": "vcm_dc",
+      "unit": null,
+      "limits": {
+        "min": 2.8,
+        "max": 3.3
+      },
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/novdd/27C",
+        "value": 3.070383,
+        "margin": 0.22961699999999974
+      },
+      "min": {
+        "corner_id": "ff/novdd/27C",
+        "value": 3.058615
+      },
+      "max": {
+        "corner_id": "ss/novdd/27C",
+        "value": 3.070383
+      },
+      "spec_row": "2"
+    },
+    {
+      "name": "itail_dc",
+      "unit": null,
+      "limits": {
+        "min": 0.008,
+        "max": 0.012
+      },
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/novdd/27C",
+        "value": 0.009684666,
+        "margin": 0.0016846659999999996
+      },
+      "min": {
+        "corner_id": "ss/novdd/27C",
+        "value": 0.009684666
+      },
+      "max": {
+        "corner_id": "ff/novdd/27C",
+        "value": 0.01015539
+      },
+      "spec_row": "9"
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/27C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 0.22,
+      "peak_rss_bytes": 49569792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "swing_dc",
+          "value": 0.470169,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.07016899999999998
+        },
+        {
+          "name": "vcm_dc",
+          "value": 3.064914,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.2350859999999999
+        },
+        {
+          "name": "itail_dc",
+          "value": 0.009903431,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.0019034310000000006
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/27C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 0.217,
+      "peak_rss_bytes": 49569792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "swing_dc",
+          "value": 0.4827686,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.08276859999999997
+        },
+        {
+          "name": "vcm_dc",
+          "value": 3.058615,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.24138499999999974
+        },
+        {
+          "name": "itail_dc",
+          "value": 0.01015539,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.00184461
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/27C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 0.216,
+      "peak_rss_bytes": 49569792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "swing_dc",
+          "value": 0.4592235,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.059223499999999984
+        },
+        {
+          "name": "vcm_dc",
+          "value": 3.070383,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.22961699999999974
+        },
+        {
+          "name": "itail_dc",
+          "value": 0.009684666,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.0016846659999999996
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/27C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 0.216,
+      "peak_rss_bytes": 49569792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "swing_dc",
+          "value": 0.4797588,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.07975879999999996
+        },
+        {
+          "name": "vcm_dc",
+          "value": 3.06012,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.23987999999999987
+        },
+        {
+          "name": "itail_dc",
+          "value": 0.0100952,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.0019048
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/27C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 0.215,
+      "peak_rss_bytes": 49569792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "swing_dc",
+          "value": 0.4615257,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.06152569999999996
+        },
+        {
+          "name": "vcm_dc",
+          "value": 3.069234,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.23076600000000003
+        },
+        {
+          "name": "itail_dc",
+          "value": 0.009730623,
+          "unit": null,
+          "status": "pass",
+          "margin": 0.0017306230000000006
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "batch_ngspice_init_unverified",
+      "severity": "warning",
+      "feature": "options.ngspice_init",
+      "simulator_application": "unverified",
+      "jobs": [
+        {
+          "job_id": "klt-sim-9354599acc2e",
+          "fleet_index": null,
+          "request_identity": "unverified"
+        }
+      ],
+      "message": "Worker reports do not confirm that ngspice applied options.ngspice_init. Jobs marked digest_reported reported the requested init contents. For jobs marked unverified, the request identity is also unknown."
+    }
+  ]
+}

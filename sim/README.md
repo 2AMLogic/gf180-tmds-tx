@@ -107,7 +107,26 @@ sim/
                                       # or tt_27c_3.30v_742p5mbps.log (transient)
     records/
       <record-id>.md                 # append-only summary record
+    envelopes/                       # (some benches) klt sim evidence for the T1
+      <record-id>.body.spice         # signoff, not a record: request + body +
+      <record-id>.request.json       # the klt sim report itself (append-only;
+      <record-id>.json               # written by `klt sim --report-out`). See
+                                      # sim/run_envelope.py and signoff/README.md
 ```
+
+> **`envelopes/` is `klt`-native evidence, not a record.** The Markdown
+> record is this repo's own format; `klt signoff` reads only `klt` JSON
+> envelopes. `python3 sim/run_envelope.py write <experiment>` derives one
+> whole-grid `klt sim` request from the experiment's unchanged `tb.json`
+> (limits from `checks`, `spec_row` tags from `signoff/analog-spec.json`),
+> and `verify <experiment> <ID>` holds the collected report to the same
+> contract a record must meet (`klt sim`'s verdict, the full grid exactly
+> once, and the harness's grid-level checks). For a rate-sliced bench, pass
+> all record IDs together, or omit them to check the manifest citations.
+> A report that fails `verify`
+> stays committed as evidence and is not cited. The mismatch campaign's
+> `klt yield` evidence lives the same way under
+> `sim/cml-driver-mismatch/yield/<record-id>/` (`run_yield.py`).
 
 > **What a per-corner log contains (issue #305).** From this point on the
 > harness emits `.options noinit`, so ngspice no longer prints its

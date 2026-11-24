@@ -75,7 +75,8 @@ SIM_DIR = REPO_ROOT / "sim"
 sys.path.insert(0, str(SIM_DIR))
 
 from harness.corners import CORNER_SETS, CORNERS, PvtPoint, resolve_corners, supply_points  # noqa: E402
-from harness.runner import DEFAULT_TIMEOUT_S, _is_raw_meas_expr, _option_lines, _param_lines  # noqa: E402
+from harness.klt_envelope import EnvelopeError, translate_measurements as _translate  # noqa: E402
+from harness.runner import DEFAULT_TIMEOUT_S, _option_lines, _param_lines  # noqa: E402
 from harness.testbench import load as load_testbench  # noqa: E402
 
 PEX_DIR = SIM_DIR / "pex"
@@ -150,18 +151,6 @@ MAX_UNITS_PER_JOB = 11
 #: ``xvhi.xcore.tail`` exists on BOTH legs and the row 8 probes survive.
 NODE_REWRITES = (("xvhi.tail", "xvhi.xcore.tail"),)
 
-_M_REF_RE = re.compile(r"\bm_([A-Za-z_][A-Za-z0-9_]*)\b")
-
-
-def _node_re(node: str) -> re.Pattern[str]:
-    """Match ``node`` as a complete SPICE node name: case-insensitive (SPICE
-    node names are), and not embedded in a longer hierarchical name -- so
-    ``xvhi.tail`` matches ``XVHI.TAIL`` but not ``xxvhi.tail`` (a separate
-    instance's probe) or ``xvhi.tail2``."""
-    return re.compile(rf"(?<![\w.]){re.escape(node)}(?![\w.])", re.IGNORECASE)
-
-
-_NODE_REWRITE_RES = tuple((_node_re(old), old, new) for old, new in NODE_REWRITES)
 _INCLUDE_RE = re.compile(r"^\s*\.inc(lude)?\b", re.IGNORECASE)
 _SUBCKT_RE = re.compile(r"^\.subckt\s+(\S+)\s+(.*)$", re.IGNORECASE)
 
@@ -202,146 +191,16 @@ def _wrapper_block(dut_rel: str) -> list[str]:
     ]
 
 
-def _m_refs(expr: str) -> set[str]:
-    """Harness measurement names an expression references via ``m_<name>``."""
-    return set(_M_REF_RE.findall(expr))
-
-
-def _rewrite_expr(expr: str) -> str:
-    """One harness ``measure`` expression -> a ``klt sim`` expression.
-
-    Two mechanical translations, both dictated by how ``klt sim`` evaluates
-    measurements (the fixture results recorded on issue #371):
-
-    - ``m_<name>`` -> ``<name>``: the harness prefixes every measurement
-      vector with ``m_``; a ``klt sim`` measurement is declared under its
-      bare name, and both a later ``.meas ... PARAM`` card and a later
-      ``expr`` reference results by that bare name (``m_<name>`` errors as
-      an unknown vector);
-    - the wrapper node translation (:data:`NODE_REWRITES`).
-    """
-    for pattern, _old, new in _NODE_REWRITE_RES:
-        expr = pattern.sub(new, expr)
-    return _M_REF_RE.sub(r"\1", expr)
-
-
 def _translate_measurements(tb) -> list[dict]:
-    """The bench's ``measure`` map as an ordered ``klt sim`` measurements list.
-
-    Three forms, in emission order (order is load-bearing):
-
-    1. Raw ``TRIG ... TARG ...`` entries become verbatim top-level
-       ``.meas tran <name> <expr>`` cards (``spice`` form) -- the same
-       translation ``sim/harness/batch._measurements`` performs.
-    2. An expression whose ``m_`` references are ALL raw-card results (the
-       row 4 ``dj_ui_*`` determinstic-jitter formulas over ``spa_*``/
-       ``spb_*``/``ui_ref``) cannot be a control-block ``expr`` -- a later
-       expression cannot read a ``.meas`` card's result under either
-       spelling -- so it is emitted as a FOLLOWING ``.meas tran <name>
-       PARAM='<formula>'`` card, which does read earlier card results by
-       bare name. Both behaviours are the fixture-verified patterns recorded
-       on issue #371.
-    3. Everything else (vector expressions, and expressions over OTHER
-       expression results -- the row 6 ``height_*`` -> ``eyeh_max_*``/
-       ``eyemask_margin_*`` chain) becomes an ``expr`` entry; ``klt sim``
-       evaluates ``expr`` entries in declared order inside one control
-       block, so a dependency-respecting order (topological, stable) lets
-       each formula reference its inputs by name.
-
-    Malformed shapes fail at generation time instead of emitting an entry
-    that evaluates against an unknown vector at run time: an unknown ``m_``
-    reference, a dependency cycle, an expression left in ``expr`` form
-    whose dependencies reach a ``.meas`` card result -- raw or PARAM form
-    (readable in neither form; the issue #371 fixture finding: a later
-    control-block expression could read neither spelling of a card
-    result) -- and an un-rewritten wrapper node reference, asserted over
-    every emitted form.
-
-    Measurement names and dependency structure are preserved from the bench
-    manifest; nothing is renamed except the ``m_`` prefix removal.
-    """
-    raw: dict[str, str] = {}
-    exprs: dict[str, str] = {}
-    for name, expr in tb.measure.items():
-        (raw if _is_raw_meas_expr(expr) else exprs)[name] = expr
-
-    entries: list[dict] = [
-        {"name": name, "spice": f".meas tran {name} {raw[name]}"} for name in raw
-    ]
-
-    param_form: dict[str, str] = {}
-    for name, expr in exprs.items():
-        deps = _m_refs(expr)
-        unknown = deps - raw.keys() - exprs.keys()
-        if unknown:
-            raise SystemExit(
-                f"{tb.name}: measurement {name!r} references unknown "
-                f"measurement(s) {sorted(unknown)}"
-            )
-        if deps and deps <= raw.keys():
-            param_form[name] = _rewrite_expr(expr)
-    for name, rewritten in param_form.items():
-        entries.append({"name": name, "spice": f".meas tran {name} PARAM='{rewritten}'"})
-        del exprs[name]
-
-    # An expression left in expr form must depend only on OTHER expr-form
-    # names: a control-block expression reads a .meas card's result under
-    # neither spelling, raw card or PARAM card (the issue #371 fixture
-    # finding), so a dependency reaching either cannot be expressed in
-    # either klt sim form. Without this guard such an entry passes
-    # silently -- raw names never enter the topological pass below, and
-    # the PARAM names have just been removed from it -- and evaluates
-    # against an unknown vector at run time.
-    for name in exprs:
-        deps = _m_refs(exprs[name])
-        unreadable = sorted((deps & raw.keys()) | (deps & param_form.keys()))
-        if unreadable:
-            raise SystemExit(
-                f"{tb.name}: measurement {name!r} depends on {unreadable} "
-                "(.meas card results, raw or PARAM form), which a "
-                "control-block expression cannot read (issue #371 fixture "
-                "finding) -- the dependency cannot be expressed in either "
-                "klt sim form"
-            )
-
-    # Topological order over remaining exprs (deps on other exprs), stable:
-    # declared order wherever it already satisfies the dependencies.
-    ordered: list[str] = []
-    remaining = list(exprs)
-    while remaining:
-        progressed = False
-        for name in list(remaining):
-            deps = _m_refs(exprs[name]) & exprs.keys()
-            if deps <= set(ordered):
-                ordered.append(name)
-                remaining.remove(name)
-                progressed = True
-        if not progressed:
-            raise SystemExit(
-                f"{tb.name}: cyclic measurement dependencies among {remaining}"
-            )
-    for name in ordered:
-        entries.append({"name": name, "expr": _rewrite_expr(exprs[name])})
-
-    # The wrapper node rewrite must hold for every emitted form that can
-    # carry a node reference, not only expr entries: raw cards are emitted
-    # verbatim, so a card probing a wrapper-hidden node fails HERE instead
-    # of dying on an unknown node at run time, and a residual in a
-    # rewritten (PARAM or expr) entry means the NODE_REWRITES table did
-    # not cover it.
-    for entry in entries:
-        text = entry["spice"] if "spice" in entry else entry["expr"]
-        for pattern, old, _new in _NODE_REWRITE_RES:
-            if pattern.search(text):
-                raise SystemExit(
-                    f"{tb.name}: node rewrite for {old!r} incomplete in "
-                    f"{entry['name']!r}"
-                )
-
-    names = [entry["name"] for entry in entries]
-    if len(names) != len(set(names)):
-        raise SystemExit(f"{tb.name}: duplicate measurement name after translation")
-    return entries
+    """The bench's ``measure`` map as ``klt sim`` measurement entries --
+    ``harness.klt_envelope.translate_measurements`` (raw ``.meas`` cards,
+    then ``PARAM`` cards over raw-card results, then dependency-ordered
+    ``expr`` entries) with this generator's wrapper node rewrites. A
+    ``SystemExit``, like every other generation failure here."""
+    try:
+        return _translate(tb, node_rewrites=NODE_REWRITES)
+    except EnvelopeError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def _compose_body(tb, vdd: float, rate: float, dut_rel: str) -> str:

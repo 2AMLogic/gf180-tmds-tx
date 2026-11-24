@@ -34,6 +34,41 @@
       "file": "layout/lvs_reports/tmds_encoder.lvs.json",
       "content_hash": "sha256:8e69f5ea99cfcd4c2aeeeb70b71d29bace462e1e81c26c3404879d7f6eb4a5fa"
     },
+    "5.analog": [
+      {
+        "file": "sim/cml-driver-eye/envelopes/20261124-052134-d358846.json",
+        "content_hash": "sha256:7db6a2d64d0ebd4fe917e0ba9d87ba3b4d8c4b55f15477c6bff104f566627521",
+        "rows": [
+          "1",
+          "2",
+          "4",
+          "5",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-eye-mask/envelopes/20261124-052138-d358846.json",
+        "content_hash": "sha256:e4f00199e8f623236d7f4f43e9b61b634e6554ed58efaa77e587fa2c359e7f01",
+        "rows": [
+          "6"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-eye-mask/envelopes/20261124-052139-d358846.json",
+        "content_hash": "sha256:da580b6b5f4199b7c0cb7284d103a00a70e80b1cd7abcfa618787ec1d8e03999",
+        "rows": [
+          "6"
+        ]
+      },
+      {
+        "file": "sim/tmds-final-mux-eye/envelopes/20261124-052135-d358846.json",
+        "content_hash": "sha256:e35bf4c7290eedfd48e1ffb4741467384b178bb249ed18842ca405fbf430d9ee",
+        "rows": [
+          "8"
+        ]
+      }
+    ],
     "5.digital": [
       {
         "file": "flow/tmds_encoder/klt_sta.json",
@@ -41,6 +76,48 @@
       },
       {
         "file": "flow/tmds_encoder/klt_fv_zero_delay.json"
+      }
+    ],
+    "6.analog": [
+      {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_tt.json",
+        "content_hash": "sha256:e03cd179b1aae039c2cc70205fc346800eaae30825aecd637653065c9c6793fd",
+        "rows": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ff.json",
+        "content_hash": "sha256:1d752fd21030bd7dcfa1cceeac415d264cf8997bbe9076e0fa8a285c92a43c42",
+        "rows": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ss.json",
+        "content_hash": "sha256:7cf54c58c6891a7b900abad27cb8c3a50e29221a694c8a69f0c5c1590abc66f5",
+        "rows": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_fs.json",
+        "content_hash": "sha256:b75cf14863c50693ba57f21b716b6b6cda21918d39d682576a18f442a5450605",
+        "rows": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_sf.json",
+        "content_hash": "sha256:332b644ffaaa9629e7a17f8e661dd6e84c2481b36a89f5d8a3cc3d8098084d2e",
+        "rows": [
+          "1",
+          "2"
+        ]
       }
     ],
     "6.digital": {
@@ -93,6 +170,60 @@
       {
         "file": "layout/lvs_reports/gf180_tmds_pad_ring_assembly.lvs.json",
         "content_hash": "sha256:136ec1a3db4af9b039fde47595eedc71d60079bdf65b517a6c64b2cec15f3fb2"
+      }
+    ]
+  },
+  "spec_rows": {
+    "5.analog": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3",
+        "gap": "No end-to-end measurement route: total TMDS output jitter includes the PLL's contribution and the PLL is outside this repository (DR-0017); this block's own contribution is row 4. No open issue in this repository closes this row."
+      },
+      {
+        "id": "4"
+      },
+      {
+        "id": "5",
+        "ratified": false
+      },
+      {
+        "id": "6",
+        "ratified": false
+      },
+      {
+        "id": "7",
+        "gap": "N/A by design, not a missing number (DR-0013 section 3 row 7): the output is current-mode open-drain, intentionally not source-matched, so a transmitter-reference-plane return-loss row grades the wrong physics; no klt sim check exists or is wanted for it. Whether a row no tool can evidence is a gap or a third disposition is an operator question signoff/analog-spec.json records as undecided."
+      },
+      {
+        "id": "8"
+      },
+      {
+        "id": "9"
+      },
+      {
+        "id": "10",
+        "gap": "No graded bench check: the <= 2 pF pad-capacitance budget is a design-document computation (design/esd-capacitance-budget.md) over measured clamp C-V; the VDD-side pd2nw clamp C-V and the assembly's pad geometry are open under #222."
+      },
+      {
+        "id": "11",
+        "gap": "Accepted pre-silicon limitation (DR-0015): the gf180mcu PDK characterizes no ESD failure or breakdown behaviour, so HBM/CDM qualification cannot happen before silicon or a PDK-sourced ESD dataset exists. No open issue in this repository closes this row."
+      }
+    ],
+    "6.analog": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "9"
       }
     ]
   }

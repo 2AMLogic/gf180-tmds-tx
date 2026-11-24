@@ -12,9 +12,13 @@ on both partitions, with T1 item 11 met; its post-layout eye was simulated
 across all five process corners on the earlier, pre-#210 (VDD-less) revision
 and has not been re-run on the current assembly (#222), so
 T1 item 7 (post-layout verification) is graded `no_evidence` on both
-partitions. Verdict of record:
-[`signoff/signoff.json`](signoff/signoff.json), 17/22 T1 items met at
-`69c859a`. The serializer/final-mux stage joining the digital and analog partitions is
+partitions. Item 6 (analog, statistical claims) has partial coverage for
+swing and common mode. Row 9 awaits the corrected tail-current campaign.
+Item 5 (analog, corner verification) covers every DR-0013 row outside
+the declared gaps (rows 3, 7, 10, 11) with passing `klt sim` envelopes.
+Rows 5 and 6 are still Proposed (#229). Verdict of record:
+[`signoff/signoff.json`](signoff/signoff.json), 17/22 T1 items met. The
+serializer/final-mux stage joining the digital and analog partitions is
 designed, analog-verified across all five process corners, and laid out and
 DRC/LVS-signed-off (post-layout re-simulation of this cell remains open).**
 The TMDS encoder RTL is

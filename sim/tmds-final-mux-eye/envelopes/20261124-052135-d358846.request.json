@@ -1,0 +1,226 @@
+{
+  "netlist": "20261124-052135-d358846.body.spice",
+  "engine": "ngspice",
+  "backend": "batch",
+  "models": {
+    "pdk": "gf180mcuD",
+    "lib": "libs.tech/ngspice/sm141064.ngspice",
+    "param_file": "libs.tech/ngspice/design.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "bjt_ff",
+          "diode_ff",
+          "moscap_ff",
+          "mimcap_ff"
+        ]
+      },
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "bjt_ss",
+          "diode_ss",
+          "moscap_ss",
+          "mimcap_ss"
+        ]
+      },
+      {
+        "name": "fs",
+        "sections": [
+          "fs",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "sf",
+        "sections": [
+          "sf",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ],
+    "params": {
+      "vdd_val": [
+        2.97,
+        2.97,
+        3.3,
+        3.3,
+        3.63,
+        3.63
+      ],
+      "rate_val": [
+        742.5,
+        270.0,
+        742.5,
+        270.0,
+        742.5,
+        270.0
+      ]
+    },
+    "temperature_param": "temp_c"
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "10e-12 61e-9 0 20e-12"
+  },
+  "measurements": [
+    {
+      "name": "ui_ref",
+      "spice": ".meas tran ui_ref TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=5"
+    },
+    {
+      "name": "spa_in",
+      "spice": ".meas tran spa_in TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 FALL=7"
+    },
+    {
+      "name": "spb_in",
+      "spice": ".meas tran spb_in TRIG v(ckref) VAL=0 FALL=5 TARG v(ckref) VAL=0 RISE=6"
+    },
+    {
+      "name": "spa_m",
+      "spice": ".meas tran spa_m TRIG v(vd_m) VAL=0 FALL=1 TARG v(vd_m) VAL=0 FALL=3"
+    },
+    {
+      "name": "spb_m",
+      "spice": ".meas tran spb_m TRIG v(vd_m) VAL=0 FALL=1 TARG v(vd_m) VAL=0 RISE=2"
+    },
+    {
+      "name": "trise_m",
+      "spice": ".meas tran trise_m TRIG v(vdg_m) VAL=-0.6 RISE=1 TARG v(vdg_m) VAL=0.6 RISE=2"
+    },
+    {
+      "name": "tfall_m",
+      "spice": ".meas tran tfall_m TRIG v(vdg_m) VAL=0.6 FALL=1 TARG v(vdg_m) VAL=-0.6 FALL=1"
+    },
+    {
+      "name": "trise_n",
+      "spice": ".meas tran trise_n TRIG v(vdg_n) VAL=-0.6 RISE=1 TARG v(vdg_n) VAL=0.6 RISE=2"
+    },
+    {
+      "name": "dj_ui_m",
+      "spice": ".meas tran dj_ui_m PARAM='(max(max(spa_m-spa_in,spb_m-spb_in),0)-min(min(spa_m-spa_in,spb_m-spb_in),0))/ui_ref'"
+    },
+    {
+      "name": "vih_m",
+      "expr": "vecmax(v(outp_m)*v(winc))"
+    },
+    {
+      "name": "vil_m",
+      "expr": "vecmin(v(outp_m)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vswing_m",
+      "expr": "vecmax(v(outp_m)*v(winc))-vecmin(v(outp_m)+10*(1-v(winc)))",
+      "limits": {
+        "min": 0.8
+      }
+    },
+    {
+      "name": "vih_m_frac",
+      "expr": "vecmax(v(outp_m)*v(winc))/vecmax(v(vdd))"
+    },
+    {
+      "name": "vil_m_frac",
+      "expr": "vecmin(v(outp_m)+10*(1-v(winc)))/vecmax(v(vdd))"
+    },
+    {
+      "name": "vcm_m_frac",
+      "expr": "(vecmax(v(outp_m)*v(winc))+vecmin(v(outp_m)+10*(1-v(winc)))+vecmax(v(outn_m)*v(winc))+vecmin(v(outn_m)+10*(1-v(winc))))/(4*vecmax(v(vdd)))"
+    },
+    {
+      "name": "vswing_s",
+      "expr": "vecmax(v(outp_s)*v(winc))-vecmin(v(outp_s)+10*(1-v(winc)))",
+      "limits": {
+        "min": 0.8
+      }
+    },
+    {
+      "name": "vglitch_m",
+      "expr": "vecmin(v(vdn_m)+10*(1-v(winr)))"
+    },
+    {
+      "name": "vswing_n",
+      "expr": "vecmax(v(outp_n)*v(winc))-vecmin(v(outp_n)+10*(1-v(winc)))"
+    },
+    {
+      "name": "vswing_dc",
+      "expr": "vecmax(v(outn_z))-vecmax(v(outp_z))"
+    },
+    {
+      "name": "vcm_dc_frac",
+      "expr": "(vecmax(v(outn_z))+vecmax(v(outp_z)))/(2*vecmax(v(vdd)))"
+    },
+    {
+      "name": "icell_dc",
+      "expr": "vecmax(abs(i(vsens_z)))"
+    },
+    {
+      "name": "vgs_mu_max",
+      "expr": "vecmax((v(d0p)-v(xmux_m.sa))*v(win))",
+      "limits": {
+        "max": 3.63
+      },
+      "spec_row": "8"
+    },
+    {
+      "name": "vds_mu_max",
+      "expr": "vecmax((v(outp_m)-v(xmux_m.sa))*v(win))",
+      "limits": {
+        "max": 3.63
+      },
+      "spec_row": "8"
+    },
+    {
+      "name": "vds_mt_max",
+      "expr": "vecmax(v(xmux_m.tail)*v(win))",
+      "limits": {
+        "max": 3.63
+      },
+      "spec_row": "8"
+    }
+  ],
+  "options": {
+    "timeout_s": 60,
+    "keep_artifacts": false,
+    "ngspice_init": [
+      "set wnflag=1",
+      "set num_threads=1"
+    ]
+  },
+  "batch": {
+    "capacity_wait_s": 600,
+    "job_ceiling_check": "split"
+  },
+  "netlist_source": "schematic"
+}

@@ -1,0 +1,390 @@
+{
+  "samples": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/samples_ff.json",
+  "limits": null,
+  "source": {
+    "kind": "sample-set",
+    "netlist": null,
+    "monte_carlo": null,
+    "sample_count": 600
+  },
+  "schema_version": 1,
+  "confidence": 0.95,
+  "target_ci_halfwidth": 0.01,
+  "min_samples": 2,
+  "status": "reported",
+  "measurement_count": 3,
+  "measurements": [
+    {
+      "name": "swing_dc",
+      "unit": null,
+      "n": 200,
+      "errored": 0,
+      "failed_unmeasurable": 0,
+      "censored": 0,
+      "inconclusive": 0,
+      "limits": {
+        "min": 0.4,
+        "max": 0.6
+      },
+      "source_corners": [
+        "ff/novdd/27C"
+      ],
+      "distribution": {
+        "model": "normal",
+        "mean": 0.48275316499999993,
+        "stddev": 0.0012633179300305534,
+        "min": 0.4794385,
+        "max": 0.485758,
+        "median": 0.4827108,
+        "skewness": 0.04694407922177159,
+        "excess_kurtosis": -0.41785916969560066,
+        "normality": {
+          "test": "anderson-darling",
+          "statistic": 0.27132184859374164,
+          "critical_value": 0.787,
+          "significance": 0.05,
+          "verdict": "consistent"
+        }
+      },
+      "yield": {
+        "empirical": {
+          "method": "clopper-pearson",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 0.9817246596448637,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "normal": {
+          "method": "normal-delta",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 1.0,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "variance_reduced": null
+      },
+      "capability": {
+        "cp": 26.385545982496392,
+        "cpk": 21.83487440304609,
+        "cpk_confidence_interval": {
+          "low": 19.689229063455215,
+          "high": 23.980519742636965
+        },
+        "sigma_to_spec": 65.50462320913827,
+        "sigma_to_spec_confidence_interval": {
+          "low": 59.067687190365646,
+          "high": 71.94155922791089
+        },
+        "limiting_side": "lower"
+      },
+      "sample_size": {
+        "n": 200,
+        "observed_ci_halfwidth": 0.009137670177568169,
+        "target_ci_halfwidth": 0.01,
+        "required_n": 183,
+        "required_n_for_target": null,
+        "verdict": "sufficient",
+        "method": "clopper-pearson-zero-failures",
+        "variance_reduced": null
+      },
+      "negative_control": {
+        "description": "par_tail_val=1e-4 (nominal 200): an artificially tiny Pelgrom area term on the tail-mirror device, through gf180mcu's own unmodified nfet_03v3_dss mismatch mechanism; seed independent of the nominal campaign",
+        "n": 200,
+        "errored": 0,
+        "failed_unmeasurable": 0,
+        "censored": 0,
+        "yield": {
+          "empirical": {
+            "method": "clopper-pearson",
+            "estimate": 0.18,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.1293689283483967,
+              "high": 0.24038109688400927
+            },
+            "n": 200
+          },
+          "normal": {
+            "method": "normal-delta",
+            "estimate": 0.2453650851753807,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.22209249513135904,
+              "high": 0.26863767521940235
+            },
+            "n": 200
+          },
+          "variance_reduced": null
+        },
+        "nominal_empirical_estimate": 1.0,
+        "degradation_detected": true,
+        "verdict": "detected"
+      },
+      "analytic_cross_check": null,
+      "sampling": {
+        "strategy": "plain_random",
+        "replicates": null,
+        "effective_sample_size": null
+      },
+      "status": "reported",
+      "warnings": [
+        "measurement 'swing_dc': no sample fell outside the limits, so the empirical yield is bounded only from below -- \"at least 98.1725% at 95% confidence, N = 200\" is the honest statement, not \"100% yield\""
+      ]
+    },
+    {
+      "name": "vcm_dc",
+      "unit": null,
+      "n": 200,
+      "errored": 0,
+      "failed_unmeasurable": 0,
+      "censored": 0,
+      "inconclusive": 0,
+      "limits": {
+        "min": 2.8,
+        "max": 3.3
+      },
+      "source_corners": [
+        "ff/novdd/27C"
+      ],
+      "distribution": {
+        "model": "normal",
+        "mean": 3.0586229899999995,
+        "stddev": 0.0006316897017495882,
+        "min": 3.057121,
+        "max": 3.06028,
+        "median": 3.0586444999999998,
+        "skewness": -0.04690598115096096,
+        "excess_kurtosis": -0.41795864448516173,
+        "normality": {
+          "test": "anderson-darling",
+          "statistic": 0.27143585582687557,
+          "critical_value": 0.787,
+          "significance": 0.05,
+          "verdict": "consistent"
+        }
+      },
+      "yield": {
+        "empirical": {
+          "method": "clopper-pearson",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 0.9817246596448637,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "normal": {
+          "method": "normal-delta",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 1.0,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "variance_reduced": null
+      },
+      "capability": {
+        "cp": 131.92131057784442,
+        "cpk": 127.371086010246,
+        "cpk_confidence_interval": {
+          "low": 114.85754082159785,
+          "high": 139.88463119889417
+        },
+        "sigma_to_spec": 382.113258030738,
+        "sigma_to_spec_confidence_interval": {
+          "low": 344.57262246479354,
+          "high": 419.6538935966825
+        },
+        "limiting_side": "upper"
+      },
+      "sample_size": {
+        "n": 200,
+        "observed_ci_halfwidth": 0.009137670177568169,
+        "target_ci_halfwidth": 0.01,
+        "required_n": 183,
+        "required_n_for_target": null,
+        "verdict": "sufficient",
+        "method": "clopper-pearson-zero-failures",
+        "variance_reduced": null
+      },
+      "negative_control": {
+        "description": "par_tail_val=1e-4 (nominal 200): an artificially tiny Pelgrom area term on the tail-mirror device, through gf180mcu's own unmodified nfet_03v3_dss mismatch mechanism; seed independent of the nominal campaign",
+        "n": 200,
+        "errored": 0,
+        "failed_unmeasurable": 0,
+        "censored": 0,
+        "yield": {
+          "empirical": {
+            "method": "clopper-pearson",
+            "estimate": 0.895,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.8439812944524954,
+              "high": 0.933818772971289
+            },
+            "n": 200
+          },
+          "normal": {
+            "method": "normal-delta",
+            "estimate": 0.830779301574928,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.7889963511884773,
+              "high": 0.8725622519613786
+            },
+            "n": 200
+          },
+          "variance_reduced": null
+        },
+        "nominal_empirical_estimate": 1.0,
+        "degradation_detected": true,
+        "verdict": "detected"
+      },
+      "analytic_cross_check": null,
+      "sampling": {
+        "strategy": "plain_random",
+        "replicates": null,
+        "effective_sample_size": null
+      },
+      "status": "reported",
+      "warnings": [
+        "measurement 'vcm_dc': no sample fell outside the limits, so the empirical yield is bounded only from below -- \"at least 98.1725% at 95% confidence, N = 200\" is the honest statement, not \"100% yield\""
+      ]
+    },
+    {
+      "name": "itail_dc",
+      "unit": null,
+      "n": 200,
+      "errored": 0,
+      "failed_unmeasurable": 0,
+      "censored": 0,
+      "inconclusive": 0,
+      "limits": {
+        "min": 0.008,
+        "max": 0.012
+      },
+      "source_corners": [
+        "ff/novdd/27C"
+      ],
+      "distribution": {
+        "model": "normal",
+        "mean": 0.010155080699999994,
+        "stddev": 2.5266970485150906e-05,
+        "min": 0.01008879,
+        "max": 0.01021518,
+        "median": 0.010154235000000001,
+        "skewness": 0.046944519982870705,
+        "excess_kurtosis": -0.4178470225405566,
+        "normality": {
+          "test": "anderson-darling",
+          "statistic": 0.27131827012838045,
+          "critical_value": 0.787,
+          "significance": 0.05,
+          "verdict": "consistent"
+        }
+      },
+      "yield": {
+        "empirical": {
+          "method": "clopper-pearson",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 0.9817246596448637,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "normal": {
+          "method": "normal-delta",
+          "estimate": 1.0,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 1.0,
+            "high": 1.0
+          },
+          "n": 200
+        },
+        "variance_reduced": null
+      },
+      "capability": {
+        "cp": 26.38490700966539,
+        "cpk": 24.339012085418563,
+        "cpk_confidence_interval": {
+          "low": 21.947401112577243,
+          "high": 26.730623058259884
+        },
+        "sigma_to_spec": 73.0170362562557,
+        "sigma_to_spec_confidence_interval": {
+          "low": 65.84220333773173,
+          "high": 80.19186917477965
+        },
+        "limiting_side": "upper"
+      },
+      "sample_size": {
+        "n": 200,
+        "observed_ci_halfwidth": 0.009137670177568169,
+        "target_ci_halfwidth": 0.01,
+        "required_n": 183,
+        "required_n_for_target": null,
+        "verdict": "sufficient",
+        "method": "clopper-pearson-zero-failures",
+        "variance_reduced": null
+      },
+      "negative_control": {
+        "description": "par_tail_val=1e-4 (nominal 200): an artificially tiny Pelgrom area term on the tail-mirror device, through gf180mcu's own unmodified nfet_03v3_dss mismatch mechanism; seed independent of the nominal campaign",
+        "n": 200,
+        "errored": 0,
+        "failed_unmeasurable": 0,
+        "censored": 0,
+        "yield": {
+          "empirical": {
+            "method": "clopper-pearson",
+            "estimate": 0.225,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.16910254712982314,
+              "high": 0.28923960596876686
+            },
+            "n": 200
+          },
+          "normal": {
+            "method": "normal-delta",
+            "estimate": 0.21521608684012716,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.19464131380039068,
+              "high": 0.23579085987986365
+            },
+            "n": 200
+          },
+          "variance_reduced": null
+        },
+        "nominal_empirical_estimate": 1.0,
+        "degradation_detected": true,
+        "verdict": "detected"
+      },
+      "analytic_cross_check": null,
+      "sampling": {
+        "strategy": "plain_random",
+        "replicates": null,
+        "effective_sample_size": null
+      },
+      "status": "reported",
+      "warnings": [
+        "measurement 'itail_dc': no sample fell outside the limits, so the empirical yield is bounded only from below -- \"at least 98.1725% at 95% confidence, N = 200\" is the honest statement, not \"100% yield\""
+      ]
+    }
+  ],
+  "warnings": [
+    "no measurement declared a target_yield, so no yield claim was checked -- the estimates below are reported, never failed"
+  ]
+}
