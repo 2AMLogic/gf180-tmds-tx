@@ -398,9 +398,10 @@ net capacitance, total 12.294539 → 12.513181 fF — the two extra taps'
 own Metal1/Comp), which is not a term of the ≤2 pF pad-node budget
 (`design/esd-capacitance-budget.md` Sec.9). The substrate-spreading
 resistors in the extracted netlist moved accordingly (e.g. `RVSS_t0`
-0.00855 → 0.02565 Ω: three taps in parallel spread over the same
-substrate model, so per-leg resistance to the promoted `VSS` net rises
-while total tie conductance improves).
+0.00855 → 0.02565 Ω; all twenty legs rise by a uniform ×3, with no extra
+parallel legs in the extracted model). That is the extractor's lumped
+substrate model only, not a tie-resistance measurement: total tie
+conductance was not measured here, so no improvement is claimed.)
 
 **Scope**: this cell answers the capacitance-budget question at a real pad
 size with a real DR-0011-ratified clamp; it does not draw pad-ring

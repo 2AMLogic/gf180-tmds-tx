@@ -106,6 +106,16 @@ TAP_WIDTH_UM = 2.0
 TAP_MAX_PITCH_UM = 25.0  # worst finger point lands ~11.4um from a tap (rule: 15um)
 
 
+def tap_count(row_span: float) -> int:
+    """Taps needed so adjacent-tap pitch never exceeds ``TAP_MAX_PITCH_UM``.
+
+    Taps span ``row_span - TAP_WIDTH_UM`` (first tap's left edge to last tap's
+    left edge) in ``n - 1`` equal gaps, so the pitch bound needs
+    ``ceil(span / pitch) + 1`` taps, not ``ceil(row_span / pitch)``.
+    """
+    return max(2, ceil((row_span - TAP_WIDTH_UM) / TAP_MAX_PITCH_UM) + 1)
+
+
 def build(shorted: bool = False) -> db.Layout:
     layout = db.Layout()
     layout.dbu = DBU
@@ -125,9 +135,10 @@ def build(shorted: bool = False) -> db.Layout:
     # NCOMP-to-PCOMP reach, issue #422), each contacted and VSS-labelled so
     # the deck's substrate global stays promoted onto a real, verified net.
     row_span = _row_span(max(clamp_rows(N_FINGERS)))
-    n_taps = max(2, ceil(row_span / TAP_MAX_PITCH_UM))
+    n_taps = tap_count(row_span)
     tap_y0, tap_y1 = -3.0, -1.0  # >=1.0um clear of the diode array (y=0..FINGER_DEPTH)
     tap_m1_half = 0.31
+    bridge_cx = bridge_cy = 0.0  # anchor of the _shorted bridge: the LAST tap
     for i in range(n_taps):
         tap_x0 = array_x0 + i * (row_span - TAP_WIDTH_UM) / (n_taps - 1)
         tap_x1 = tap_x0 + TAP_WIDTH_UM
@@ -150,18 +161,20 @@ def build(shorted: bool = False) -> db.Layout:
             tap_cy + tap_m1_half,
         )
         label(METAL1_LABEL, "VSS", tap_cx, tap_cy)
+        bridge_cx, bridge_cy = tap_cx, tap_cy  # last iteration wins, by intent
 
     # -- Negative control: short PAD to VSS with one extra Metal1 bridge ----
-    # Genuinely overlaps (not just edge-touches) both the tap's own Metal1
+    # Anchored explicitly on the LAST tap (bridge_cx/cy). Genuinely overlaps
+    # (not just edge-touches) both that tap's own Metal1
     # square and the cathode bus -- an edge-touching rect here previously
     # produced a degenerate zero-width DRC violation at the seam.
     if shorted:
         overlap = 0.10
         rect(
             METAL1,
-            tap_cx - tap_m1_half - overlap,
-            tap_cy + tap_m1_half - overlap,
-            tap_cx + tap_m1_half + overlap,
+            bridge_cx - tap_m1_half - overlap,
+            bridge_cy + tap_m1_half - overlap,
+            bridge_cx + tap_m1_half + overlap,
             bus_y0 + overlap,
         )
 
