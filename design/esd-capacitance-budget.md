@@ -873,9 +873,12 @@ survive the corrected arithmetic or the new measurement.
 
 - **Redesigned pad/ESD structure achieves ≤2 pF at a realistic pad size,
   measured the same way**: yes — Sec.9.2's `gf180_tmds_pad_v2` (DRC-clean at its
-  original `klt` 0.2.0 signoff — the current deck reports 17 deck-drift
-  violations on unchanged geometry, see Sec.9.2 and #422; LVS-matched, real 25×25 µm pad, DR-0011's diode clamp, real substrate
-  tap) plus Sec.9.4's PVT-swept SPICE sizing sweep total 0.225–0.652 pF
+  original `klt` 0.2.0 signoff — a 2026-11-24 deck-drift re-run reported 17
+  violations on the unchanged pre-redraw geometry, see Sec.9.2 and #422;
+  resolved by the #422 redraw (2026-11-24), which restored DRC `clean` — 0
+  violations on the redrawn geometry under the current deck, per Sec.9.2's
+  re-signoff; LVS-matched, real 25×25 µm pad, DR-0011's diode clamp, real
+  substrate tap) plus Sec.9.4's PVT-swept SPICE sizing sweep total 0.225–0.652 pF
   across the full HBM-sizing window (Sec.9.5), reproducing Sec.1–5's own
   split methodology (real-tool pad/interconnect measurement +
   PVT-swept SPICE clamp sweep, summed) rather than inventing a new one.
