@@ -12,6 +12,8 @@ selected.
 
 ### 2026-11-24
 
+- **PR #416**: fix(sim): seed the local grid's .spiceinit from a shared GF180 startup tuple
+- **Issue #415** (closed): Initialize local ngspice runs with the shared GF180 settings before MOS model binding
 - **PR #414**: docs(sim): record the per-finger-binning fleet probe receipt in the batch paragraph
 - **PR #412**: fix(sim): per-rate transient windows so cml-driver-eye-mask finishes 742.5 Mbps on Linux ngspice-47
 - **PR #411**: refactor: share DUT-translator SPICE-card parsing in _dut_translator_cli
