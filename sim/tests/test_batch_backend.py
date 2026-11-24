@@ -371,6 +371,65 @@ class BatchBackendTests(unittest.TestCase):
         self.assertNotIn("stage_model_inputs", local_request["options"])
 
 
+class PerRateAnalysisSelectionTests(unittest.TestCase):
+    """Issue #405: the batch request picks the analysis for the point's own
+    rate through the same ``analyses_for_rate`` the local backend's deck
+    uses -- a per-rate ``.tran`` window reaches both backends at once, and a
+    rateless point stays on the default ``analyses``.
+    """
+
+    DEFAULT_LINE = "tran 2e-12 20e-9"
+    SHORT_LINE = "tran 2e-12 5e-9"
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        directory = Path(self._tmp.name) / "exp" / "testbench"
+        directory.mkdir(parents=True)
+        (directory / "frag.spice").write_text("* fragment\n")
+        (directory / tb_mod.MANIFEST_NAME).write_text(
+            json.dumps(
+                {
+                    "name": "per-rate-bench",
+                    "netlist": "frag.spice",
+                    "measure": {"x": "v(x)"},
+                    "rates_mbps": [742.5, 270.0],
+                    "transient": {
+                        "tstep_s": 2e-12,
+                        "tstop_s": 20e-9,
+                        "tstop_s_by_rate": {"742.5": 5e-9},
+                    },
+                    "analyses": [self.DEFAULT_LINE],
+                    "analyses_by_rate": {"742.5": self.SHORT_LINE},
+                }
+            )
+        )
+        self.tb = tb_mod.load(directory)
+
+    def _point(self, rate_mbps=None):
+        return corners_mod.PvtPoint(
+            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
+        )
+
+    def test_request_analysis_follows_the_point_rate(self):
+        fast = batch_mod.build_request(self.tb, _Pdk(), self._point(742.5), "b.spice")
+        self.assertEqual(fast["analysis"], {"kind": "tran", "args": "2e-12 5e-9"})
+        slow = batch_mod.build_request(self.tb, _Pdk(), self._point(270.0), "b.spice")
+        self.assertEqual(slow["analysis"], {"kind": "tran", "args": "2e-12 20e-9"})
+
+    def test_rateless_point_runs_the_default_analysis(self):
+        request = batch_mod.build_request(self.tb, _Pdk(), self._point(), "b.spice")
+        self.assertEqual(request["analysis"], {"kind": "tran", "args": "2e-12 20e-9"})
+
+    def test_preflight_accepts_per_rate_windows_across_the_grid(self):
+        # One analysis per request still holds when different rates map to
+        # different windows, as long as every line agrees on its kind.
+        kinds = batch_mod._preflight_kinds(
+            self.tb, [self._point(742.5), self._point(270.0)]
+        )
+        self.assertEqual(kinds, {"tran"})
+
+
 def _deck_shared_lines(deck: str) -> list[str]:
     """The directives of a full local deck that the batch body must also carry.
 

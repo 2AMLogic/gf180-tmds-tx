@@ -411,7 +411,10 @@ def compose_deck(tb: Testbench, pdk: Pdk, point: PvtPoint) -> str:
     save_targets = _measure_vector_refs(tb)
     if save_targets:
         lines.append("  save " + " ".join(save_targets))
-    lines += [f"  {analysis}" for analysis in tb.analyses]
+    # Per-rate transient windows (issue #405): a bench may map individual
+    # rates to their own 'tran' line; unmapped rates and DC benches run the
+    # default `analyses` list unchanged.
+    lines += [f"  {analysis}" for analysis in tb.analyses_for_rate(point.rate_mbps)]
     for name, expr in tb.measure.items():
         if _is_raw_meas_expr(expr):
             # A raw ngspice `meas` fragment (threshold-crossing measurements

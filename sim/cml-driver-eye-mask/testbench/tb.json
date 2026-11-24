@@ -14,6 +14,10 @@
   "transient": {
     "tstep_s": 2e-11,
     "tstop_s": 5.6e-07,
+    "tstop_s_by_rate": {
+      "742.5": 2.05e-07,
+      "270": 5.6e-07
+    },
     "tmax_s": 4e-11,
     "reltol": 1e-06,
     "abstol": 1e-09,
@@ -23,6 +27,10 @@
   "analyses": [
     "tran 20e-12 560e-9 0 40e-12"
   ],
+  "analyses_by_rate": {
+    "742.5": "tran 20e-12 205e-9 0 40e-12",
+    "270": "tran 20e-12 560e-9 0 40e-12"
+  },
   "measure": {
     "ui_ref": "TRIG v(inref) VAL=0 FALL=1 TARG v(inref) VAL=0 RISE=1",
     "height_c0_0": "vecmin(v(vd_c0)+10*(1-v(comb1_0)))-vecmax(v(vd_c0)-10*(1-v(comb0_0)))",

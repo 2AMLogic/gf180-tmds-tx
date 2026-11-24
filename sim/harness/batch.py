@@ -69,14 +69,44 @@ class BatchError(RuntimeError):
     """The grid cannot be expressed or assembled as a batch run."""
 
 
-def _analysis(tb: Testbench) -> tuple[str, str]:
-    if len(tb.analyses) != 1:
+def _analysis(tb: Testbench, point: PvtPoint) -> tuple[str, str]:
+    # Per-rate transient windows (issue #405) select through the point's own
+    # rate, exactly as the local backend's compose_deck does.
+    analyses = tb.analyses_for_rate(point.rate_mbps)
+    if len(analyses) != 1:
         raise BatchError(
             f"{tb.name}: the batch backend supports exactly one analysis per "
-            f"request (klt sim contract); this testbench declares {len(tb.analyses)}"
+            f"request (klt sim contract); {point.corner_id} runs "
+            f"{len(analyses)}"
         )
-    parts = tb.analyses[0].split(None, 1)
+    parts = analyses[0].split(None, 1)
     return parts[0].lower(), parts[1] if len(parts) > 1 else ""
+
+
+def _preflight_kinds(tb: Testbench, points: list[PvtPoint]) -> set[str]:
+    """Analysis kinds this grid will run, refusing an inexpressible bench
+    before anything is submitted: the default ``analyses`` and every
+    per-rate window the grid will run (issue #405) must each be exactly one
+    line (the ``klt sim`` one-analysis-per-request contract), and all of
+    them must agree on their kind -- one measurements rendering is shared
+    across the grid.
+    """
+    kinds: set[str] = set()
+    for analyses in [tb.analyses] + [tb.analyses_for_rate(p.rate_mbps) for p in points]:
+        if len(analyses) != 1:
+            raise BatchError(
+                f"{tb.name}: the batch backend supports exactly one analysis per "
+                f"request (klt sim contract); this testbench declares {len(analyses)}"
+            )
+        parts = analyses[0].split(None, 1)
+        kinds.add(parts[0].lower())
+    if len(kinds) > 1:
+        raise BatchError(
+            f"{tb.name}: a batch grid must run one analysis kind across all its "
+            f"points (one measurements rendering serves the whole grid); got "
+            f"{sorted(kinds)}"
+        )
+    return kinds
 
 
 def _measurements(tb: Testbench, kind: str) -> list[dict]:
@@ -131,7 +161,7 @@ def build_request(
     (klt docs/cli/sim.md, "Staging the request's model inputs") instead of
     the fleet image's PDK tree. The worker uses its image models by default.
     """
-    kind, args = _analysis(tb)
+    kind, args = _analysis(tb, point)
     model_lib = Path(pdk.model_lib)
     try:
         lib_rel = str(model_lib.relative_to(pdk.path))
@@ -469,8 +499,7 @@ def run_grid(
     stage_model_inputs: bool = False,
 ) -> list[PointResult]:
     """Submit every point; results come back in grid order."""
-    _analysis(tb)  # refuse an inexpressible bench before submitting anything
-    _measurements(tb, _analysis(tb)[0])
+    _measurements(tb, _preflight_kinds(tb, points).pop())
     jobs = max(1, min(jobs, MAX_IN_FLIGHT))
 
     def _one(point):

@@ -73,7 +73,7 @@
   },
   "analysis": {
     "kind": "tran",
-    "args": "20e-12 560e-9 0 40e-12"
+    "args": "20e-12 205e-9 0 40e-12"
   },
   "measurements": [
     {

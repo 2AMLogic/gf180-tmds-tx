@@ -280,6 +280,140 @@ class TestbenchTransientValidationTests(unittest.TestCase):
         self.assertEqual(tb.transient, {})
 
 
+class PerRateTransientWindowTests(unittest.TestCase):
+    """Issue #405: a transient bench may map individual rates to their own
+    ``.tran`` window (one ``tstop`` sized for the 270 Mbps fallback simulates
+    dead time at 742.5 Mbps that Linux ngspice-47 aborts inside). The mapped
+    line must reach the composed deck for that rate's points, leave every
+    unmapped rate / DC point on the default ``analyses``, and stay
+    cross-checked against ``transient`` exactly as the default line is.
+    """
+
+    DEFAULT_LINE = "tran 2e-12 20e-9"
+    SHORT_LINE = "tran 2e-12 5e-9"
+
+    def _pdk(self) -> pdk_mod.Pdk:
+        # Text-only composition: compose_deck renders but never reads these.
+        return pdk_mod.Pdk(
+            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
+        )
+
+    def _point(self, rate_mbps=None) -> corners_mod.PvtPoint:
+        return corners_mod.PvtPoint(
+            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
+        )
+
+    def _tb(self, **extra) -> tb_mod.Testbench:
+        manifest = {
+            "netlist": "frag.spice",
+            "measure": {"x": "v(x)"},
+            "rates_mbps": [742.5, 270.0],
+            "transient": {
+                "tstep_s": 2e-12,
+                "tstop_s": 20e-9,
+                "tstop_s_by_rate": {"742.5": 5e-9},
+            },
+            "analyses": [self.DEFAULT_LINE],
+            "analyses_by_rate": {"742.5": self.SHORT_LINE},
+        }
+        manifest.update(extra)
+        return _load_testbench(self, manifest)
+
+    def _deck(self, tb, rate_mbps=None) -> list[str]:
+        return runner_mod.compose_deck(tb, self._pdk(), self._point(rate_mbps)).splitlines()
+
+    def test_mapped_rate_runs_its_own_window_in_the_deck(self):
+        deck = self._deck(self._tb(), rate_mbps=742.5)
+        self.assertIn(f"  {self.SHORT_LINE}", deck)
+        self.assertNotIn(f"  {self.DEFAULT_LINE}", deck)
+
+    def test_unmapped_rate_runs_the_default_window(self):
+        deck = self._deck(self._tb(), rate_mbps=270.0)
+        self.assertIn(f"  {self.DEFAULT_LINE}", deck)
+        self.assertNotIn(f"  {self.SHORT_LINE}", deck)
+
+    def test_rateless_point_runs_the_default_window(self):
+        deck = self._deck(self._tb(), rate_mbps=None)
+        self.assertIn(f"  {self.DEFAULT_LINE}", deck)
+
+    def test_real_eye_mask_manifest_windows(self):
+        # The bench this scheme exists for: 742.5 Mbps gets the bit-count
+        # derived 205e-9 window (Linux ngspice-47 aborts inside the dead
+        # time of the old 560e-9 one), 270 Mbps keeps 560e-9 byte-identical
+        # so its committed records stay reproducible (issue #405).
+        tb = tb_mod.load(SIM_DIR / "cml-driver-eye-mask")
+        self.assertEqual(
+            tb.analyses_for_rate(742.5), ("tran 20e-12 205e-9 0 40e-12",)
+        )
+        self.assertEqual(
+            tb.analyses_for_rate(270.0), ("tran 20e-12 560e-9 0 40e-12",)
+        )
+        self.assertEqual(tb.analyses, ("tran 20e-12 560e-9 0 40e-12",))
+
+    def test_mapped_tstop_disagreeing_with_the_tran_line_is_rejected(self):
+        with self.assertRaises(ValueError):
+            self._tb(
+                transient={"tstep_s": 2e-12, "tstop_s": 20e-9},
+            )
+
+    def test_orphan_rate_key_is_rejected(self):
+        with self.assertRaises(ValueError):
+            self._tb(
+                analyses_by_rate={
+                    "742.5": self.SHORT_LINE,
+                    "148.5": self.SHORT_LINE,
+                },
+                transient={
+                    "tstep_s": 2e-12,
+                    "tstop_s": 20e-9,
+                    "tstop_s_by_rate": {"742.5": 5e-9, "148.5": 5e-9},
+                },
+            )
+
+    def test_analyses_by_rate_without_a_rate_axis_is_rejected(self):
+        with self.assertRaises(ValueError):
+            _load_testbench(
+                self,
+                {
+                    "netlist": "frag.spice",
+                    "measure": {"x": "v(x)"},
+                    "analyses": [self.DEFAULT_LINE],
+                    "analyses_by_rate": {"742.5": self.SHORT_LINE},
+                },
+            )
+
+    def test_tstop_s_by_rate_entry_without_a_matching_line_is_rejected(self):
+        # A per-rate tstop with no analyses_by_rate entry for that rate is a
+        # manifest that declares a window nothing runs -- same drift class
+        # the default cross-check exists to catch.
+        with self.assertRaises(ValueError):
+            self._tb(
+                transient={
+                    "tstep_s": 2e-12,
+                    "tstop_s": 20e-9,
+                    "tstop_s_by_rate": {"742.5": 5e-9, "270": 9e-9},
+                },
+            )
+
+    def test_record_transient_settings_spell_out_per_rate_tstops(self):
+        lines = report_mod._operating_point_lines(
+            {
+                "grid": {"rates_mbps": [742.5, 270.0]},
+                "testbench": {
+                    "transient": {
+                        "tstep_s": 20e-12,
+                        "tstop_s": 560e-9,
+                        "tstop_s_by_rate": {"742.5": 205e-9, "270": 560e-9},
+                    }
+                },
+            }
+        )
+        settings = [ln for ln in lines if ln.startswith("- **Transient settings**")][0]
+        self.assertIn("tstop=5.600000e-07s", settings)
+        self.assertIn("2.050000e-07s@742.5 Mbps", settings)
+        self.assertIn("5.600000e-07s@270 Mbps", settings)
+
+
 class MatrixConformanceRateAxisTests(unittest.TestCase):
     def _tb(self, rates_mbps=()):
         manifest = {"netlist": "frag.spice", "measure": {"x": "v(x)"}}

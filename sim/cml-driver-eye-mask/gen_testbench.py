@@ -74,6 +74,7 @@ N_PHASES for that corner specifically rather than paying the cost everywhere.
 from __future__ import annotations
 
 import json
+import math
 import textwrap
 from pathlib import Path
 
@@ -140,6 +141,51 @@ TEDGE_PS = 80  # matches sim/cml-driver-eye/testbench/cml_driver_eye.spice
 # matched to the solver's own print step does not ask the solver to resolve
 # anything finer than it already tracks.
 COMB_EDGE_S = 20e-12
+
+# ---------------------------------------------------------------------------
+# Per-rate transient windows (issue #405)
+# ---------------------------------------------------------------------------
+#: The manifest's single historical window, sized for the 270 Mbps fallback
+#: (pattern end 555.6 ns there). Kept verbatim for the default ``analyses``
+#: entry and the 270 Mbps rate so the committed records' decks stay
+#: byte-reproducible.
+TRAN_TSTEP = "20e-12"
+TRAN_TMAX = "40e-12"
+HISTORICAL_TRAN_LINE = "tran 20e-12 560e-9 0 40e-12"
+HISTORICAL_TRAN_TSTOP_S = 560e-9
+#: Dead-time margin (bit periods) simulated past the last driven bit at
+#: rates whose window is derived rather than historical. The final comb-gate
+#: edge completes AT ``N_TOTAL_BITS x tbit`` (see ``_t``'s ``edge_sign=0``
+#: form), so any positive margin covers every ``.meas``/``expr`` window;
+#: two bit periods also leave room for the tail of the driver's response
+#: without approaching the Linux ngspice-47 solver abort this per-rate
+#: scheme exists to avoid (observed at 300 x tbit, far past the pattern).
+TRAN_STOP_MARGIN_BITS = 2.0
+
+
+def tran_line(rate_mbps: float) -> str:
+    """The ``.tran`` analysis line for ``rate_mbps`` (see ``tran_tstop_s``):
+    ``ceil((N_TOTAL_BITS + margin) x tbit)`` nanoseconds."""
+    if rate_mbps == 270.0:
+        return HISTORICAL_TRAN_LINE
+    derived_ns = (N_TOTAL_BITS + TRAN_STOP_MARGIN_BITS) * 1e3 / rate_mbps
+    return f"tran {TRAN_TSTEP} {math.ceil(derived_ns)}e-9 0 {TRAN_TMAX}"
+
+
+def tran_tstop_s(rate_mbps: float) -> float:
+    """The transient stop time for ``rate_mbps`` (seconds).
+
+    270 Mbps keeps the manifest's historical 560e-9 (its derived value,
+    ceil(152 x tbit) = 563e-9, would change a byte-reproduced window for no
+    measurement benefit -- every measurement ends by 150 x tbit = 555.6 ns).
+    Every other rate gets ``(N_TOTAL_BITS + margin) x tbit`` rounded up to
+    the next whole nanosecond. Returned as the float the emitted line's own
+    tstop token parses to, so the manifest value and the deck line agree
+    exactly (``validate_transient`` cross-checks them).
+    """
+    if rate_mbps == 270.0:
+        return HISTORICAL_TRAN_TSTOP_S
+    return float(tran_line(rate_mbps).split()[2])
 
 
 def fmt(x: float) -> str:
@@ -425,6 +471,18 @@ def gen_tbjson() -> dict:
         "transient": {
             "tstep_s": 20e-12,
             "tstop_s": 560e-9,
+            # Per-rate windows (issue #405): the 560e-9 default is sized for
+            # the 270 Mbps fallback; at 742.5 Mbps it simulates ~358 ns of
+            # static circuit after the pattern ends and Linux ngspice-47
+            # aborts inside that dead time ("Timestep too small" at
+            # 300 x tbit = 404.04 ns), so the 742.5 Mbps slice runs a window
+            # derived from the bit count instead. Every measurement (comb
+            # gates, exprs, the ui_ref .meas card) ends by N_TOTAL_BITS x
+            # tbit = 202.0 ns at 742.5 Mbps; the shorter window changes no
+            # measured value, it only stops simulating dead time.
+            "tstop_s_by_rate": {
+                f"{rate:g}": tran_tstop_s(rate) for rate in (742.5, 270.0)
+            },
             "tmax_s": 40e-12,
             "reltol": 1e-6,
             "abstol": 1e-9,
@@ -438,6 +496,9 @@ def gen_tbjson() -> dict:
             ),
         },
         "analyses": ["tran 20e-12 560e-9 0 40e-12"],
+        "analyses_by_rate": {
+            f"{rate:g}": tran_line(rate) for rate in (742.5, 270.0)
+        },
         "measure": measure,
         "checks": checks,
     }
