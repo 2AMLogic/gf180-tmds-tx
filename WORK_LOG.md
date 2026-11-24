@@ -12,6 +12,7 @@ selected.
 
 ### 2026-11-24
 
+- **PR #403**: fix(sim): select GF180 MOS bins by finger width in batch requests
 - **PR #397**: refactor(flow): drop never-interpolated params from render_record
 - **Issue #396** (closed): flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level)
 
