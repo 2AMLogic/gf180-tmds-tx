@@ -1,0 +1,117 @@
+{
+  "netlist": "nominal.body.spice",
+  "engine": "ngspice",
+  "backend": "batch",
+  "models": {
+    "pdk": "gf180mcuD",
+    "lib": "libs.tech/ngspice/sm141064.ngspice",
+    "param_file": "libs.tech/ngspice/design.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "bjt_ff",
+          "diode_ff",
+          "moscap_ff",
+          "mimcap_ff"
+        ]
+      },
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "bjt_ss",
+          "diode_ss",
+          "moscap_ss",
+          "mimcap_ss"
+        ]
+      },
+      {
+        "name": "fs",
+        "sections": [
+          "fs",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      },
+      {
+        "name": "sf",
+        "sections": [
+          "sf",
+          "res_typical",
+          "bjt_typical",
+          "diode_typical",
+          "moscap_typical",
+          "mimcap_typical"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27.0
+    ]
+  },
+  "analysis": {
+    "kind": "op",
+    "args": ""
+  },
+  "measurements": [
+    {
+      "name": "swing_dc",
+      "expr": "v(outn)-v(outp)",
+      "spec_row": "1",
+      "limits": {
+        "min": 0.4,
+        "max": 0.6
+      }
+    },
+    {
+      "name": "vcm_dc",
+      "expr": "(v(outn)+v(outp))/2",
+      "spec_row": "2",
+      "limits": {
+        "min": 2.8,
+        "max": 3.3
+      }
+    },
+    {
+      "name": "itail_dc",
+      "expr": "i(vsens)",
+      "spec_row": "9",
+      "limits": {
+        "min": 0.008,
+        "max": 0.012
+      }
+    }
+  ],
+  "options": {
+    "timeout_s": 15,
+    "keep_artifacts": false,
+    "ngspice_init": [
+      "set ngbehavior=hsa"
+    ]
+  },
+  "batch": {
+    "capacity_wait_s": 600,
+    "job_ceiling_check": "split"
+  },
+  "netlist_source": "schematic"
+}

@@ -5,7 +5,7 @@
   "tier": null,
   "t1_item_count": 22,
   "build_t1_item_count": 22,
-  "t1_met_count": 17,
+  "t1_met_count": 18,
   "t1_not_applicable_count": 1,
   "source_doc": "docs/design-evidence-tiers.md",
   "source_doc_content_hash": "sha256:a26b90262320d0fbd32b3f549a02b6300832706041797a559d8bf6bdb62efdc7",
@@ -310,9 +310,83 @@
         "Both require the spec table itself to be ratified \u2014 verdicts against a draft spec are provisional by construction."
       ],
       "status": "unmet",
-      "reason": "no_evidence",
+      "reason": "partial_coverage",
       "graded_by_build": true,
-      "citation": null
+      "citation": null,
+      "citations_graded": [
+        {
+          "citation": "sim/cml-driver-eye/envelopes/20261124-052134-d358846.json",
+          "rows": [
+            "1",
+            "2",
+            "4",
+            "5",
+            "8",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-eye-mask/envelopes/20261124-052138-d358846.json",
+          "rows": [
+            "6"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-eye-mask/envelopes/20261124-052139-d358846.json",
+          "rows": [
+            "6"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/tmds-final-mux-eye/envelopes/20261124-052135-d358846.json",
+          "rows": [
+            "8"
+          ],
+          "status": "met",
+          "reason": null
+        }
+      ],
+      "detail": {
+        "failed_rows": [],
+        "uncovered_rows": [],
+        "declared_gaps": [
+          {
+            "id": "3",
+            "gap": "No end-to-end measurement route: total TMDS output jitter includes the PLL's contribution and the PLL is outside this repository (DR-0017); this block's own contribution is row 4. No open issue in this repository closes this row."
+          },
+          {
+            "id": "7",
+            "gap": "N/A by design, not a missing number (DR-0013 section 3 row 7): the output is current-mode open-drain, intentionally not source-matched, so a transmitter-reference-plane return-loss row grades the wrong physics; no klt sim check exists or is wanted for it. Whether a row no tool can evidence is a gap or a third disposition is an operator question signoff/analog-spec.json records as undecided."
+          },
+          {
+            "id": "10",
+            "gap": "No graded bench check: the <= 2 pF pad-capacitance budget is a design-document computation (design/esd-capacitance-budget.md) over measured clamp C-V; the VDD-side pd2nw clamp C-V and the assembly's pad geometry are open under #222."
+          },
+          {
+            "id": "11",
+            "gap": "Accepted pre-silicon limitation (DR-0015): the gf180mcu PDK characterizes no ESD failure or breakdown behaviour, so HBM/CDM qualification cannot happen before silicon or a PDK-sourced ESD dataset exists. No open issue in this repository closes this row."
+          }
+        ],
+        "unratified_rows": [
+          "5",
+          "6"
+        ],
+        "row_sources": {
+          "1": "derived",
+          "2": "derived",
+          "4": "derived",
+          "5": "derived",
+          "6": "derived",
+          "8": "derived",
+          "9": "derived"
+        }
+      }
     },
     {
       "tier": "T1",
@@ -375,10 +449,170 @@
       "partition": "analog",
       "text": "any accuracy, offset, or matching spec row is statistical; a corner matrix (or STA corner sweep) cannot validate it. This applies to whichever spec rows are actually statistical, regardless of block kind \u2014 most digital spec rows (functional correctness, Fmax, timing closure) are not, and a block whose spec has no statistical row must say so explicitly rather than omit the item. Where it does apply, MC runs need a recorded seed, sample count, a deterministic negative control, and results combined with (not instead of) process corners (#344). A `klt yield` JSON report \u2014 a yield estimate with its confidence interval, sample-size verdict, and Cpk/sigma-to-spec against the row's own limits \u2014 is the machine-checkable evidence for this item (`klt signoff`'s tier-verdict mode grades it the same way it grades the deterministic items above). **The campaign's own self-report is a grading input, not just a footnote** (issue #2467): a cited report whose `sample_size.verdict` is `insufficient` on any measurement renders `unmet` with `reason: \"undersized_sample\"`, and one whose declared negative control did not show the seeded degradation renders `unmet` with `reason: \"negative_control_not_detected\"` \u2014 the report's passing `status` answers only \"did every declared `target_yield` hold\", which a campaign declaring none can never fail. A campaign that declared **no** negative control at all is still `met`, but says so: `citation.yield_campaign.negative_control` reads `\"not_declared\"`, since `klt yield` itself treats that as a warning rather than a failure and whether it is acceptable for a given spec row is the claimant's call. See [`cli/signoff.md`](cli/signoff.md)'s \"Campaign discipline on item 6\". **This item's evidence verb needs the `yield` extra.** Unlike every other T1 item's evidence verb (`drc`, `lvs`, `extract`, `sim`, `pex`, `sta`, `functional-verification`, `erc`, `place-and-route`), `klt yield` requires the `klt_yield_native` Rust extension. It is published as the prebuilt `klt-yield-native` wheel (Linux x86_64, macOS arm64), reached by `pip install 'klayout-tools[yield]'`; a bare `pip install klayout-tools` and the git-pinned form do not include it. A consumer pinning a release that predates the first `klt-yield-native` publication, or on another platform, still needs a repo checkout with a Rust toolchain; see `docs/cli/yield.md`'s \"What the extra does and does not reach\" callout and `docs/releasing-native.md`. **When \"not applicable\" is legitimate** (issue #2865): a block whose ratified spec has *no* statistical row passes this item by a recorded \"not applicable\", not by a waiver at grant time and not by inventing a statistical claim. That holds only when the spec is ratified, a committed statement accounts for every spec row with the reason its row class is not statistical (for example \"timing rows are corner-bounded by STA at the PDK's characterised corners\"), and both are bound by content hash so editing either invalidates the claim. Any accuracy, offset, matching or yield row is statistical by definition: a spec carrying one \u2014 or a sigma, yield, Cpk or `3\u03c3`-style bound \u2014 cannot use the outcome and needs `klt yield` evidence for that row. The outcome is available to a digital partition only; an analog partition (including the analog half of a mixed-signal block) always requires Monte Carlo evidence. `klt signoff` reports it as `not_applicable`, never as `met`. **Several statistical rows, only some evidenced** (issue #2908): item 6 is a claim about *every* statistical row, so a manifest may declare the row set under `spec_rows.\"6\"` and cite one `klt yield` report per row set (`rows` on each citation). Item 6 grades `met` only when every declared row is covered by a passing citation against a ratified target. A row with no citation (`uncovered_rows`), a row declared a `gap` because no evidence can exist yet (`declared_gaps`), or a row declared `ratified: false` (`unratified_rows`, evidence against a proposed limit is provisional) grades `unmet` / `partial_coverage`, never `met`. Without a declaration the item grades as before; a `not_applicable` entry contradicts a declared row set and is `invalid_evidence`.",
       "notes": [],
-      "status": "unmet",
-      "reason": "no_evidence",
+      "status": "met",
+      "reason": null,
       "graded_by_build": true,
-      "citation": null
+      "citation": {
+        "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_tt.json",
+        "command": null,
+        "kind": "yield",
+        "check_status": "reported",
+        "content_hash": "sha256:e03cd179b1aae039c2cc70205fc346800eaae30825aecd637653065c9c6793fd",
+        "input_verified": true,
+        "exit_status": 0,
+        "yield_campaign": {
+          "sample_size": "sufficient",
+          "undersized_measurements": [],
+          "negative_control": "detected",
+          "measurements_without_negative_control": [],
+          "undetected_negative_controls": []
+        }
+      },
+      "citations_graded": [
+        {
+          "citation": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_tt.json",
+          "rows": [
+            "1",
+            "2",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ff.json",
+          "rows": [
+            "1",
+            "2",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ss.json",
+          "rows": [
+            "1",
+            "2",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_fs.json",
+          "rows": [
+            "1",
+            "2",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_sf.json",
+          "rows": [
+            "1",
+            "2",
+            "9"
+          ],
+          "status": "met",
+          "reason": null
+        }
+      ],
+      "row_coverage": {
+        "failed_rows": [],
+        "uncovered_rows": [],
+        "declared_gaps": [],
+        "unratified_rows": [],
+        "row_sources": {
+          "1": "asserted",
+          "2": "asserted",
+          "9": "asserted"
+        }
+      },
+      "citations": [
+        {
+          "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_tt.json",
+          "command": null,
+          "kind": "yield",
+          "check_status": "reported",
+          "content_hash": "sha256:e03cd179b1aae039c2cc70205fc346800eaae30825aecd637653065c9c6793fd",
+          "input_verified": true,
+          "exit_status": 0,
+          "yield_campaign": {
+            "sample_size": "sufficient",
+            "undersized_measurements": [],
+            "negative_control": "detected",
+            "measurements_without_negative_control": [],
+            "undetected_negative_controls": []
+          }
+        },
+        {
+          "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ff.json",
+          "command": null,
+          "kind": "yield",
+          "check_status": "reported",
+          "content_hash": "sha256:1d752fd21030bd7dcfa1cceeac415d264cf8997bbe9076e0fa8a285c92a43c42",
+          "input_verified": true,
+          "exit_status": 0,
+          "yield_campaign": {
+            "sample_size": "sufficient",
+            "undersized_measurements": [],
+            "negative_control": "detected",
+            "measurements_without_negative_control": [],
+            "undetected_negative_controls": []
+          }
+        },
+        {
+          "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_ss.json",
+          "command": null,
+          "kind": "yield",
+          "check_status": "reported",
+          "content_hash": "sha256:7cf54c58c6891a7b900abad27cb8c3a50e29221a694c8a69f0c5c1590abc66f5",
+          "input_verified": true,
+          "exit_status": 0,
+          "yield_campaign": {
+            "sample_size": "sufficient",
+            "undersized_measurements": [],
+            "negative_control": "detected",
+            "measurements_without_negative_control": [],
+            "undetected_negative_controls": []
+          }
+        },
+        {
+          "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_fs.json",
+          "command": null,
+          "kind": "yield",
+          "check_status": "reported",
+          "content_hash": "sha256:b75cf14863c50693ba57f21b716b6b6cda21918d39d682576a18f442a5450605",
+          "input_verified": true,
+          "exit_status": 0,
+          "yield_campaign": {
+            "sample_size": "sufficient",
+            "undersized_measurements": [],
+            "negative_control": "detected",
+            "measurements_without_negative_control": [],
+            "undetected_negative_controls": []
+          }
+        },
+        {
+          "file": "sim/cml-driver-mismatch/yield/20261124-052148-d358846/yield_sf.json",
+          "command": null,
+          "kind": "yield",
+          "check_status": "reported",
+          "content_hash": "sha256:332b644ffaaa9629e7a17f8e661dd6e84c2481b36a89f5d8a3cc3d8098084d2e",
+          "input_verified": true,
+          "exit_status": 0,
+          "yield_campaign": {
+            "sample_size": "sufficient",
+            "undersized_measurements": [],
+            "negative_control": "detected",
+            "measurements_without_negative_control": [],
+            "undetected_negative_controls": []
+          }
+        }
+      ]
     },
     {
       "tier": "T1",
