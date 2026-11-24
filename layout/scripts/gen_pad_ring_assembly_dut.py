@@ -97,7 +97,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from _dut_translator_cli import TranslationError, run_cli, sha256  # noqa: F401 -- re-export consumed by sim/tests via attribute access
+from _dut_translator_cli import (  # noqa: F401 -- sha256 re-export consumed by sim/tests via attribute access
+    TranslationError,
+    ends_card,
+    run_cli,
+    sha256,
+    subckt_header,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -130,8 +136,6 @@ KNOWN_D_MODELS = ("diode_nd2ps_06v0", "diode_pd2nw_06v0")
 #: cathodes floating.
 VDD_NET = "VDD"
 
-_SUBCKT_RE = re.compile(r"^\.SUBCKT\s+(?P<name>\S+)\s+(?P<pins>.*)$", re.IGNORECASE)
-_ENDS_RE = re.compile(r"^\.ENDS\b", re.IGNORECASE)
 _X_RE = re.compile(r"^X\S+\s+(?:\S+\s+){4}(?P<model>\S+)\b")
 _D_RE = re.compile(
     r"^D(?P<name>\S+)\s+(?P<a>\S+)\s+(?P<c>\S+)\s+(?P<model>\S+)\s*(?P<params>.*)$"
@@ -166,18 +170,15 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
             body.append(line)
             continue
 
-        subckt = _SUBCKT_RE.match(stripped)
-        if subckt:
-            if subckt.group("name") != CORE_SUBCKT:
-                raise TranslationError(
-                    f"expected .SUBCKT {CORE_SUBCKT}, found {subckt.group('name')!r}"
-                )
-            core_pins = subckt.group("pins").split()
-            body.append(f".SUBCKT {CORE_SUBCKT} {' '.join(core_pins)}")
+        header = subckt_header(stripped, CORE_SUBCKT)
+        if header is not None:
+            core_pins, card = header
+            body.append(card)
             continue
 
-        if _ENDS_RE.match(stripped):
-            body.append(f".ENDS {CORE_SUBCKT}")
+        ends = ends_card(stripped, CORE_SUBCKT)
+        if ends is not None:
+            body.append(ends)
             continue
 
         if _BARE_DECK_CLASS_RE.search(stripped) and not stripped.upper().startswith(

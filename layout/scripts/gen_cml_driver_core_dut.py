@@ -77,10 +77,16 @@ The committed output is checked against a fresh regeneration by
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
-from _dut_translator_cli import TranslationError, run_cli, sha256  # noqa: F401 -- re-export consumed by sim/tests via attribute access
+from _dut_translator_cli import (  # noqa: F401 -- sha256 re-export consumed by sim/tests via attribute access
+    TranslationError,
+    bind_mos_card,
+    ends_card,
+    run_cli,
+    sha256,
+    subckt_header,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -99,15 +105,6 @@ CORE_SUBCKT = "cml_driver_core"
 WRAPPER_SUBCKT = "cml_driver"
 WRAPPER_PINS = ("OUTP", "OUTN", "INP", "INN", "IBIAS", "VSS")
 
-#: `M<name> <d> <g> <s> <b> <class> <params...>`
-_MOS_RE = re.compile(
-    r"^M(?P<name>\S+)\s+"
-    r"(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
-    r"(?P<cls>\S+)\s*(?P<params>.*)$"
-)
-_SUBCKT_RE = re.compile(r"^\.SUBCKT\s+(?P<name>\S+)\s+(?P<pins>.*)$", re.IGNORECASE)
-_ENDS_RE = re.compile(r"^\.ENDS\b", re.IGNORECASE)
-
 
 def translate(text: str, source_label: str, source_sha256: str) -> str:
     """Return the DUT fragment for one extracted `cml_driver_core` netlist."""
@@ -125,33 +122,20 @@ def translate(text: str, source_label: str, source_sha256: str) -> str:
             body.append(line)
             continue
 
-        subckt = _SUBCKT_RE.match(stripped)
-        if subckt:
-            if subckt.group("name") != CORE_SUBCKT:
-                raise TranslationError(
-                    f"expected .SUBCKT {CORE_SUBCKT}, found {subckt.group('name')!r}"
-                )
-            core_pins = subckt.group("pins").split()
-            body.append(f".SUBCKT {CORE_SUBCKT} {' '.join(core_pins)}")
+        header = subckt_header(stripped, CORE_SUBCKT)
+        if header is not None:
+            core_pins, card = header
+            body.append(card)
             continue
 
-        if _ENDS_RE.match(stripped):
-            body.append(f".ENDS {CORE_SUBCKT}")
+        ends = ends_card(stripped, CORE_SUBCKT)
+        if ends is not None:
+            body.append(ends)
             continue
 
-        mos = _MOS_RE.match(stripped)
-        if mos:
-            if mos.group("cls") != DEVICE_CLASS:
-                raise TranslationError(
-                    f"unknown device class {mos.group('cls')!r} on card {stripped!r}; "
-                    f"this script only binds {DEVICE_CLASS!r} -> {PDK_SUBCKT!r}"
-                )
-            params = mos.group("params").strip()
-            body.append(
-                f"XM{mos.group('name')} {mos.group('d')} {mos.group('g')} "
-                f"{mos.group('s')} {mos.group('b')} {PDK_SUBCKT}"
-                + (f" {params}" if params else "")
-            )
+        xm = bind_mos_card(stripped, DEVICE_CLASS, PDK_SUBCKT)
+        if xm is not None:
+            body.append(xm)
             devices += 1
             continue
 
