@@ -11,6 +11,13 @@ Synthesis and place-and-route recipes (Yosys, OpenROAD) driven through `klt`.
   corner), and writes a gate-level netlist plus an append-only evidence
   record. See the module's own docstring for the full recipe and the
   cross-checks it runs.
+- `synth_assign_check.py` -- the shared, text-only validator (issue #384)
+  proving every top-level continuous assignment in the synthesized netlist
+  is the recognized bit-select dead-tie form whose driven bits nothing
+  reads, before those assigns are dropped. Run by both consumers of that
+  preprocessing: `pnr_tmds_encoder.py` (before stripping assignments for
+  OpenROAD) and `layout/scripts/gen_tmds_encoder_ref.py` (synth mode only,
+  before translating the netlist into an LVS reference). Stdlib only.
 - `pnr_tmds_encoder.py` -- OpenROAD place-and-route driver for the netlist
   `synth_tmds_encoder.py` produced (issue #84). Floorplan, tap/endcap, power
   distribution network, placement, and routing via OpenROAD, then an

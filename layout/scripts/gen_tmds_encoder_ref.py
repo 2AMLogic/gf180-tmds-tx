@@ -75,11 +75,17 @@ Two mechanical, zero-semantic-impact preprocessing deltas from the committed
 `tmds_encoder.synth.v` are also carried over unchanged from the P&R input
 copy (see `flow/pnr_tmds_encoder.py`'s docstring): `wire signed` -> `wire`
 (a type-only annotation OpenROAD's simplified Verilog reader rejects), and
-the single dead `assign cnt[0] = 1'h0;` (zero fanout, verified by this
-script re-deriving the same fanout check `flow/pnr_tmds_encoder.py` runs)
-dropped rather than translated to an unconnected reference net -- since
-neither ever reaches P&R, neither should appear in the *reference* either;
-representing physically-absent logic would be the actual netlist deviation.
+the dead top-level `assign` ties dropped rather than translated to
+unconnected reference nets -- since neither ever reaches P&R, neither should
+appear in the *reference* either; representing physically-absent logic
+would be the actual netlist deviation. The zero-fanout precondition is not
+privately re-derived here: since issue #384, synth mode (no `--from-pnr`)
+runs the same shared dead-tie validator as the P&R preprocessing
+(`flow/synth_assign_check.py`), which rejects any netlist whose cells
+actually read an assign-driven bit *before* this script drops the tie --
+the private occurrence-counting checker it replaces could not see an
+instance connection (no word boundary between `]` and `)`) and checked one
+bit only.
 
 Usage (signoff path):
 
@@ -104,6 +110,11 @@ import argparse
 import re
 import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "flow"))
+
+import synth_assign_check  # noqa: E402  (shared dead-tie validation, issue #384)
 
 _PORT_RE = re.compile(r"^\s*(input|output|inout)\s+(\[(\d+):(\d+)\])?\s*(\w+)\s*;", re.MULTILINE)
 # One instance card, in either supported writer's layout (see `--from-pnr`):
@@ -151,17 +162,6 @@ def parse_subckt_headers(text: str) -> dict[str, list[str]]:
         if name.startswith("gf180mcu_fd_sc_mcu9t5v0__"):
             headers[name] = pins.split()
     return headers
-
-
-def check_dead_net(text: str, net: str) -> bool:
-    """True if `net` (e.g. 'cnt[0]') is never read by any instance connection
-    or continuous assignment RHS -- the same "genuinely unused" check this
-    script's docstring claims for the dropped `assign cnt[0] = 1'h0;` line."""
-    # Every reference to the net other than its own declaration/assignment.
-    refs = re.findall(re.escape(net) + r"\b", text)
-    # 1 wire declaration + 1 assign LHS use are expected; anything more means
-    # some instance reads it.
-    return len(refs) <= 2
 
 
 def render(top: str, ports: list[str], instances: list[tuple[str, str, dict[str, str]]],
@@ -262,7 +262,7 @@ def break_one_net(text: str) -> tuple[str, str]:
     )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--netlist", required=True, type=Path)
     ap.add_argument("--subckt-headers-from", required=True, type=Path)
@@ -272,8 +272,9 @@ def main() -> int:
         action="store_true",
         help="the --netlist is the post-P&R netlist written from the routed DEF "
         "(flow/tmds_encoder/netlist/tmds_encoder.pnr.v) rather than the pre-P&R "
-        "synthesized netlist. Skips the synth-only `cnt[0]` dead-tie check, whose "
-        "preprocessing has already been applied upstream of P&R.",
+        "synthesized netlist. Skips the synth-mode dead-tie assignment check "
+        "(flow/synth_assign_check.py, shared with flow/pnr_tmds_encoder.py): the "
+        "post-P&R netlist already went through that preprocessing upstream.",
     )
     ap.add_argument(
         "--negative-control",
@@ -282,16 +283,15 @@ def main() -> int:
         "merged) that `klt lvs` must report as a mismatch. See break_one_net().",
     )
     ap.add_argument("-o", "--output", required=True, type=Path)
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     text = args.netlist.read_text()
 
-    if not args.from_pnr and not check_dead_net(text, "cnt[0]"):
-        raise SystemExit(
-            "ERROR: cnt[0] is no longer dead (read by some instance) -- "
-            "the 'drop the dead tie' preprocessing this script documents no "
-            "longer applies; investigate before trusting this reference"
-        )
+    if not args.from_pnr:
+        try:
+            synth_assign_check.validate_dead_tie_assigns(text)
+        except synth_assign_check.SynthAssignError as exc:
+            raise SystemExit(f"ERROR: {exc}")
 
     ports = parse_ports(text)
     instances = parse_instances(text)
