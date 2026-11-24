@@ -295,6 +295,20 @@ A testbench is free to name a different pattern string; these two are simply
 the ones this convention gives a name to so future testbenches do not each
 invent their own vocabulary.
 
+## Local backend (`--backend local`, the default)
+
+The default backend runs each PVT point with `ngspice -b` from the grid's
+git-ignored scratch directory (`sim/.work/<experiment-slug>/<record-id>/`).
+That directory is also where the local backend pins engine startup: before
+any point launches, the runner writes the PDK's `.spiceinit` there, from the
+one shared `harness.pdk.GF180_NGSPICE_INIT` tuple the batch and PEX requests
+already ship as `options.ngspice_init`. `set wnflag=1` selects gf180mcu MOS
+model bins by width per finger; `set num_threads=1` runs the solver
+single-threaded. ngspice applies a working-directory `.spiceinit` before it
+opens the deck — the same `set` inside the deck's `.control` block is too
+late for model binding — so a local run needs no `~/.spiceinit` on the host
+(measured on ngspice-47, issue #415).
+
 ## Batch backend (`--backend batch`)
 
 Dispatch workers must not hand-launch `ngspice -b` grids, so the harness can

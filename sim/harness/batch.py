@@ -35,7 +35,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .corners import PvtPoint
-from .pdk import Pdk
+from .pdk import GF180_NGSPICE_INIT, Pdk
 from .runner import (
     DEFAULT_TIMEOUT_S,
     PointResult,
@@ -56,11 +56,6 @@ CAPACITY_WAIT_S = 600
 #: Submits are cheap (they wait on the fleet, they do not simulate here); keep
 #: the in-flight count modest anyway so a burst does not trip the vCPU budget.
 MAX_IN_FLIGHT = 2
-
-# gf180mcu's MOS models select bins by per-finger width (W/NF). A batch
-# worker can start ngspice without a host .spiceinit, so specify that rule
-# and the single-thread setting in the request's own startup file.
-GF180_NGSPICE_INIT = ("set wnflag=1", "set num_threads=1")
 
 _NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
