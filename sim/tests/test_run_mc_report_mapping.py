@@ -11,7 +11,6 @@ reports (see their ``_provenance`` key). No PDK, ngspice or network.
 from __future__ import annotations
 
 import copy
-import importlib.util
 import json
 import sys
 import unittest
@@ -19,25 +18,17 @@ from pathlib import Path
 
 SIM_DIR = Path(__file__).resolve().parents[1]
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
-if str(SIM_DIR) not in sys.path:
-    sys.path.insert(0, str(SIM_DIR))
+TESTS_DIR = Path(__file__).resolve().parent
+for _dir in (SIM_DIR, TESTS_DIR):
+    if str(_dir) not in sys.path:
+        sys.path.insert(0, str(_dir))
 
+from _harness_fixtures import load_run_mc  # noqa: E402
 from harness import batch  # noqa: E402
 from harness import evidence_lint  # noqa: E402
 from harness.corners import CORNER_SETS, CORNERS  # noqa: E402
 
-
-def _load_run_mc():
-    path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
-    name = "cml_driver_mismatch_run_mc_mapping"
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module  # dataclass processing resolves annotations via sys.modules
-    spec.loader.exec_module(module)
-    return module
-
-
-run_mc = _load_run_mc()
+run_mc = load_run_mc("cml_driver_mismatch_run_mc_mapping")
 
 
 def _fixture(name: str) -> dict:

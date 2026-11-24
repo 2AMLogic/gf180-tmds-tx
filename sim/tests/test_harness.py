@@ -15,7 +15,6 @@ still behaves identically to the source harness.
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import shutil
@@ -27,39 +26,24 @@ from pathlib import Path
 from unittest import mock
 
 SIM_DIR = Path(__file__).resolve().parents[1]
-if str(SIM_DIR) not in sys.path:
-    sys.path.insert(0, str(SIM_DIR))
+TESTS_DIR = Path(__file__).resolve().parent
+for _dir in (SIM_DIR, TESTS_DIR):
+    if str(_dir) not in sys.path:
+        sys.path.insert(0, str(_dir))
 
-from harness import batch as batch_mod  # noqa: E402
+from _harness_fixtures import (  # noqa: E402
+    both_options_lines,
+    fake_pdk,
+    init_git_repo,
+    load_testbench,
+    make_point,
+    options_testbench,
+)
 from harness import corners as corners_mod  # noqa: E402
 from harness import evidence_lint as lint_mod  # noqa: E402
-from harness import pdk as pdk_mod  # noqa: E402
 from harness import report as report_mod  # noqa: E402
 from harness import runner as runner_mod  # noqa: E402
 from harness import testbench as tb_mod  # noqa: E402
-
-
-def _load_testbench(
-    case: unittest.TestCase, manifest: dict, netlist_body: str = "* fragment\n"
-) -> tb_mod.Testbench:
-    """Write ``manifest`` and its netlist fragment into a fresh temporary
-    directory, register that directory's removal with the calling test's
-    ``addCleanup``, and load a Testbench with the real loader (issue #394).
-
-    The directory outlives the call: unlike a Testbench returned from inside
-    a ``TemporaryDirectory`` context manager -- whose files are deleted
-    before any assertion runs -- the loaded Testbench's netlist file and its
-    ``netlist_sha256``/``manifest_sha256`` stay readable until the calling
-    test's own cleanup. Tests needing two fixtures in one method simply call
-    this twice; each call gets its own directory.
-    """
-    tmp = tempfile.mkdtemp()
-    case.addCleanup(shutil.rmtree, tmp, True)
-    directory = Path(tmp) / "exp" / "testbench"
-    directory.mkdir(parents=True)
-    (directory / "frag.spice").write_text(netlist_body)
-    (directory / tb_mod.MANIFEST_NAME).write_text(json.dumps(manifest))
-    return tb_mod.load(directory)
 
 
 class CornerIdRateAxisTests(unittest.TestCase):
@@ -190,7 +174,7 @@ class OperatingPointCheckTests(unittest.TestCase):
 class TestbenchTransientValidationTests(unittest.TestCase):
     def test_rates_without_transient_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -201,7 +185,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
 
     def test_transient_without_rates_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -213,7 +197,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
 
     def test_transient_missing_required_key_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -226,7 +210,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
 
     def test_transient_with_no_tran_analysis_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -239,7 +223,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
 
     def test_transient_settings_disagreeing_with_tran_line_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -251,7 +235,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
             )
 
     def test_valid_transient_testbench_loads(self):
-        tb = _load_testbench(
+        tb = load_testbench(
             self,
             {
                 "netlist": "frag.spice",
@@ -271,7 +255,7 @@ class TestbenchTransientValidationTests(unittest.TestCase):
     def test_dc_testbench_with_no_rate_axis_loads_unchanged(self):
         """A manifest with neither `rates_mbps` nor `transient` behaves
         exactly like the un-adapted gf180-bandgap harness."""
-        tb = _load_testbench(
+        tb = load_testbench(
             self,
             {
                 "netlist": "frag.spice",
@@ -294,17 +278,6 @@ class PerRateTransientWindowTests(unittest.TestCase):
     DEFAULT_LINE = "tran 2e-12 20e-9"
     SHORT_LINE = "tran 2e-12 5e-9"
 
-    def _pdk(self) -> pdk_mod.Pdk:
-        # Text-only composition: compose_deck renders but never reads these.
-        return pdk_mod.Pdk(
-            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
-        )
-
-    def _point(self, rate_mbps=None) -> corners_mod.PvtPoint:
-        return corners_mod.PvtPoint(
-            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
-        )
-
     def _tb(self, **extra) -> tb_mod.Testbench:
         manifest = {
             "netlist": "frag.spice",
@@ -319,10 +292,12 @@ class PerRateTransientWindowTests(unittest.TestCase):
             "analyses_by_rate": {"742.5": self.SHORT_LINE},
         }
         manifest.update(extra)
-        return _load_testbench(self, manifest)
+        return load_testbench(self, manifest)
 
     def _deck(self, tb, rate_mbps=None) -> list[str]:
-        return runner_mod.compose_deck(tb, self._pdk(), self._point(rate_mbps)).splitlines()
+        return runner_mod.compose_deck(
+            tb, fake_pdk(), make_point(rate_mbps=rate_mbps)
+        ).splitlines()
 
     def test_mapped_rate_runs_its_own_window_in_the_deck(self):
         deck = self._deck(self._tb(), rate_mbps=742.5)
@@ -374,7 +349,7 @@ class PerRateTransientWindowTests(unittest.TestCase):
 
     def test_analyses_by_rate_without_a_rate_axis_is_rejected(self):
         with self.assertRaises(ValueError):
-            _load_testbench(
+            load_testbench(
                 self,
                 {
                     "netlist": "frag.spice",
@@ -423,7 +398,7 @@ class MatrixConformanceRateAxisTests(unittest.TestCase):
             manifest["rates_mbps"] = list(rates_mbps)
             manifest["transient"] = {"tstep_s": 2e-12, "tstop_s": 20e-9}
             manifest["analyses"] = ["tran 2e-12 20e-9"]
-        return _load_testbench(self, manifest)
+        return load_testbench(self, manifest)
 
     def test_full_dc_matrix_has_no_missing_axes(self):
         tb = self._tb()
@@ -480,12 +455,7 @@ class GitProvenanceTests(unittest.TestCase):
     """
 
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
-        self.addCleanup(self.tmp.cleanup)
-        self.git("init", "--quiet")
-        self.git("config", "user.email", "test@example.invalid")
-        self.git("config", "user.name", "test")
+        self.root, self.git = init_git_repo(self)
         (self.root / "README.md").write_text("seed\n")
         # Pre-track the evidence directory itself (empty via .gitkeep) so a
         # later *new file inside it* is reported by git as an individual
@@ -497,16 +467,6 @@ class GitProvenanceTests(unittest.TestCase):
         (evidence_dir / ".gitkeep").write_text("")
         self.git("add", "-A")
         self.git("commit", "--quiet", "-m", "seed")
-
-    def git(self, *args: str):
-        return subprocess.run(
-            ("git", *args),
-            cwd=str(self.root),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
 
     def test_git_provenance_reports_clean_tree_at_head(self):
         expected_commit = self.git("rev-parse", "HEAD").stdout.strip()
@@ -560,21 +520,8 @@ class ComposeDeckSaveLineTests(unittest.TestCase):
     fragment/PDK files it names.
     """
 
-    def _pdk(self) -> pdk_mod.Pdk:
-        # A nonexistent path is fine -- compose_deck only ever renders
-        # pdk.variant/pdk.version/pdk.design_include/pdk.model_lib into
-        # `.include`/`.lib` *text*, it never reads these files itself.
-        return pdk_mod.Pdk(
-            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
-        )
-
-    def _point(self, rate_mbps=None) -> corners_mod.PvtPoint:
-        return corners_mod.PvtPoint(
-            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
-        )
-
     def _tb(self, measure: dict) -> tb_mod.Testbench:
-        return _load_testbench(
+        return load_testbench(
             self, {"netlist": "frag.spice", "measure": measure, "analyses": ["op"]}
         )
 
@@ -611,14 +558,14 @@ class ComposeDeckSaveLineTests(unittest.TestCase):
 
     def test_compose_deck_emits_save_line_naming_every_referenced_vector(self):
         tb = self._tb({"swing": "v(outp)-v(outn)"})
-        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        deck = runner_mod.compose_deck(tb, fake_pdk(), make_point())
         self.assertIn("save v(outp) v(outn)", deck)
 
     def test_compose_deck_save_line_precedes_the_analysis_line(self):
         # ngspice's `save` must be issued before the `.tran`/`.op`/etc.
         # analysis it applies to, or nothing is actually restricted.
         tb = self._tb({"swing": "v(outp)-v(outn)"})
-        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        deck = runner_mod.compose_deck(tb, fake_pdk(), make_point())
         lines = deck.splitlines()
         save_idx = next(i for i, line in enumerate(lines) if line.strip().startswith("save "))
         op_idx = next(i for i, line in enumerate(lines) if line.strip() == "op")
@@ -634,7 +581,7 @@ class ComposeDeckSaveLineTests(unittest.TestCase):
                 "trise": "TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1",
             }
         )
-        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        deck = runner_mod.compose_deck(tb, fake_pdk(), make_point())
         self.assertIn("let m_swing = v(outp)-v(outn)", deck)
         self.assertIn(
             "meas tran m_trise TRIG v(vdiff) VAL=-0.4 RISE=1 TARG v(vdiff) VAL=0.4 RISE=1",
@@ -658,45 +605,15 @@ class NoinitOptionTests(unittest.TestCase):
     invoke ngspice or read the PDK/netlist files they name.
     """
 
-    def _pdk(self) -> pdk_mod.Pdk:
-        return pdk_mod.Pdk(
-            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
-        )
-
-    def _point(self) -> corners_mod.PvtPoint:
-        return corners_mod.PvtPoint(
-            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3
-        )
-
-    def _tb(self, **extra) -> tb_mod.Testbench:
-        manifest = {
-            "netlist": "frag.spice",
-            "measure": {"vout": "v(out)"},
-            "analyses": ["op"],
-        }
-        manifest.update(extra)
-        return _load_testbench(self, manifest)
-
-    def _both(self, **extra) -> tuple[list[str], list[str]]:
-        """The ``.options`` lines each backend renders for the same testbench."""
-        tb = self._tb(**extra)
-        pdk, point = self._pdk(), self._point()
-        deck = runner_mod.compose_deck(tb, pdk, point)
-        body = batch_mod.compose_body(tb, pdk, point)
-        return (
-            [ln.strip() for ln in deck.splitlines() if ln.strip().startswith(".options")],
-            [ln.strip() for ln in body.splitlines() if ln.strip().startswith(".options")],
-        )
-
     def test_both_backends_emit_noinit_by_default(self):
-        deck_opts, body_opts = self._both()
+        deck_opts, body_opts = both_options_lines(self)
         self.assertIn(".options noinit", deck_opts)
         self.assertIn(".options noinit", body_opts)
 
     def test_both_backends_emit_the_same_options_block(self):
         # The anti-drift assertion: one helper feeds both paths, so a deck and
         # a batch body can never disagree about what they ask ngspice for.
-        deck_opts, body_opts = self._both(
+        deck_opts, body_opts = both_options_lines(self, 
             rates_mbps=[742.5],
             transient={
                 "tstep_s": 1e-11,
@@ -713,7 +630,7 @@ class NoinitOptionTests(unittest.TestCase):
     def test_noinit_follows_the_declared_transient_tolerances(self):
         # The directive is appended after the tolerances, so the existing
         # reltol/abstol/vntol provenance lines are unchanged and still present.
-        deck_opts, body_opts = self._both(
+        deck_opts, body_opts = both_options_lines(self, 
             rates_mbps=[742.5],
             transient={
                 "tstep_s": 1e-11,
@@ -737,7 +654,7 @@ class NoinitOptionTests(unittest.TestCase):
             )
 
     def test_a_manifest_options_entry_keeps_its_place_and_wording(self):
-        deck_opts, body_opts = self._both(options=["gmin=1e-13", "method=gear"])
+        deck_opts, body_opts = both_options_lines(self, options=["gmin=1e-13", "method=gear"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(
                 opts,
@@ -748,35 +665,36 @@ class NoinitOptionTests(unittest.TestCase):
         # ngspice's `noinit` is a presence-only flag -- `.options noinit=0`
         # suppresses the table exactly as `.options noinit` does -- so the
         # opt-out has to be consumed by the harness, never passed through.
-        deck_opts, body_opts = self._both(options=["noinit=0"])
+        deck_opts, body_opts = both_options_lines(self, options=["noinit=0"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [])
 
     def test_noinit_zero_opt_out_is_whitespace_and_case_insensitive(self):
-        deck_opts, body_opts = self._both(options=[" NoInit = 0 "])
+        deck_opts, body_opts = both_options_lines(self, options=[" NoInit = 0 "])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [])
 
     def test_noinit_zero_opt_out_leaves_other_declared_options_alone(self):
-        deck_opts, body_opts = self._both(options=["gmin=1e-13", "noinit=0"])
+        deck_opts, body_opts = both_options_lines(self, options=["gmin=1e-13", "noinit=0"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [".options gmin=1e-13"])
 
     def test_a_testbench_wording_noinit_itself_is_not_given_a_second_one(self):
-        deck_opts, body_opts = self._both(options=["noinit"])
+        deck_opts, body_opts = both_options_lines(self, options=["noinit"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [".options noinit"])
 
     def test_noinit_does_not_change_which_measurements_are_printed(self):
         # The suppression must be invisible to every `let`/`print`/`meas`
         # line -- the `m_*` lines are what `_MEASURE_RE` parses out of the log.
-        tb = self._tb(
+        tb = options_testbench(
+            self,
             measure={
                 "swing": "v(outp)-v(outn)",
                 "trise": "TRIG v(vd) VAL=-0.4 RISE=1 TARG v(vd) VAL=0.4 RISE=1",
-            }
+            },
         )
-        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        deck = runner_mod.compose_deck(tb, fake_pdk(), make_point())
         self.assertIn("let m_swing = v(outp)-v(outn)", deck)
         self.assertIn("print m_swing", deck)
         self.assertIn(
@@ -787,8 +705,8 @@ class NoinitOptionTests(unittest.TestCase):
     def test_noinit_precedes_the_control_block(self):
         # `.options` is a deck-level directive: it must land before `.control`,
         # not inside it.
-        tb = self._tb()
-        deck = runner_mod.compose_deck(tb, self._pdk(), self._point())
+        tb = options_testbench(self)
+        deck = runner_mod.compose_deck(tb, fake_pdk(), make_point())
         lines = deck.splitlines()
         noinit_idx = lines.index(".options noinit")
         self.assertLess(noinit_idx, lines.index(".control"))
@@ -914,50 +832,27 @@ class ProgressTraceOptionTests(unittest.TestCase):
     escape hatches share the one mechanism: a manifest ``options`` entry.
     """
 
-    def _tb(self, **extra) -> tb_mod.Testbench:
-        manifest = {
-            "netlist": "frag.spice",
-            "measure": {"vout": "v(out)"},
-            "analyses": ["op"],
-        }
-        manifest.update(extra)
-        return _load_testbench(self, manifest)
-
-    def _both(self, **extra) -> tuple[list[str], list[str]]:
-        """The ``.options`` lines each backend renders for the same testbench."""
-        tb = self._tb(**extra)
-        pdk = pdk_mod.Pdk(
-            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
-        )
-        point = corners_mod.PvtPoint(
-            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3
-        )
-        deck = runner_mod.compose_deck(tb, pdk, point)
-        body = batch_mod.compose_body(tb, pdk, point)
-        return (
-            [ln.strip() for ln in deck.splitlines() if ln.strip().startswith(".options")],
-            [ln.strip() for ln in body.splitlines() if ln.strip().startswith(".options")],
-        )
-
     def test_reftrace_entry_is_consumed_not_emitted(self):
-        deck_opts, body_opts = self._both(options=["reftrace=1"])
+        deck_opts, body_opts = both_options_lines(self, options=["reftrace=1"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [".options noinit"])
 
     def test_reftrace_entry_is_whitespace_and_case_insensitive(self):
-        deck_opts, body_opts = self._both(options=[" RefTrace = 1 "])
+        deck_opts, body_opts = both_options_lines(self, options=[" RefTrace = 1 "])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [".options noinit"])
 
     def test_reftrace_composes_with_the_noinit_zero_hatch(self):
-        deck_opts, body_opts = self._both(options=["noinit=0", "reftrace=1"])
+        deck_opts, body_opts = both_options_lines(self, options=["noinit=0", "reftrace=1"])
         for opts in (deck_opts, body_opts):
             self.assertEqual(opts, [])
 
     def test_wants_progress_trace_follows_the_manifest(self):
-        self.assertFalse(runner_mod._wants_progress_trace(self._tb()))
+        self.assertFalse(runner_mod._wants_progress_trace(options_testbench(self)))
         self.assertTrue(
-            runner_mod._wants_progress_trace(self._tb(options=["reftrace=1"]))
+            runner_mod._wants_progress_trace(
+                options_testbench(self, options=["reftrace=1"])
+            )
         )
 
 
@@ -1052,15 +947,8 @@ class LocalGridStartupTests(unittest.TestCase):
 
     _STARTUP_TEXT = "set wnflag=1\nset num_threads=1\n"
 
-    def _pdk(self) -> pdk_mod.Pdk:
-        # A nonexistent path is fine -- the ngspice call itself is stubbed,
-        # and compose_deck only renders pdk fields into deck text.
-        return pdk_mod.Pdk(
-            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
-        )
-
     def _tb(self) -> tb_mod.Testbench:
-        return _load_testbench(
+        return load_testbench(
             self,
             {"netlist": "frag.spice", "measure": {"swing": "v(a)"}, "analyses": ["op"]},
         )
@@ -1079,18 +967,14 @@ class LocalGridStartupTests(unittest.TestCase):
 
         with mock.patch.object(runner_mod.subprocess, "run", side_effect=fake_run):
             results = runner_mod.run_grid(
-                self._tb(), self._pdk(), points, Path(workdir), jobs=jobs
+                self._tb(), fake_pdk(), points, Path(workdir), jobs=jobs
             )
         return results, startup_at_launch
 
     def test_ngspice_launches_with_the_pdk_startup_file_in_its_cwd(self):
         tmp = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmp, True)
-        points = [
-            corners_mod.PvtPoint(
-                corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3
-            )
-        ]
+        points = [make_point()]
         results, startup_at_launch = self._run_grid_with_stub_ngspice(
             tmp, points=points, jobs=1
         )
@@ -1102,10 +986,7 @@ class LocalGridStartupTests(unittest.TestCase):
         self.addCleanup(shutil.rmtree, tmp, True)
         home = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, home, True)
-        points = [
-            corners_mod.PvtPoint(corner=corners_mod.CORNERS[name], temp_c=27.0, vdd=3.3)
-            for name in ("tt", "ss")
-        ]
+        points = [make_point(corner=name) for name in ("tt", "ss")]
         with mock.patch.dict(os.environ, {"HOME": str(home)}):
             results, startup_at_launch = self._run_grid_with_stub_ngspice(
                 tmp, points=points, jobs=2

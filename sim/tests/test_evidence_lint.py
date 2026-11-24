@@ -21,7 +21,6 @@ import contextlib
 import io
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -31,7 +30,9 @@ from unittest import mock
 SIM_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from _harness_fixtures import init_git_repo  # noqa: E402
 from harness import evidence_lint  # noqa: E402
 
 RECORD_ID = "20260731-112754-861c7a8"
@@ -338,26 +339,11 @@ class AppendOnlyTests(unittest.TestCase):
     """The half of the checker that git, not the filesystem, can answer."""
 
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
-        self.addCleanup(self.tmp.cleanup)
-        self.git("init", "--quiet")
-        self.git("config", "user.email", "test@example.invalid")
-        self.git("config", "user.name", "test")
+        self.root, self.git = init_git_repo(self)
         write_experiment(self.root)
         self.git("add", "-A")
         self.git("commit", "--quiet", "-m", "seed evidence")
         self.base = self.git("rev-parse", "HEAD").stdout.strip()
-
-    def git(self, *args: str):
-        return subprocess.run(
-            ("git", *args),
-            cwd=str(self.root),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
 
     def check(self):
         problems, skipped = evidence_lint.check_append_only(self.root, self.base)
@@ -435,26 +421,11 @@ class MergeGroupBaseTests(unittest.TestCase):
     """
 
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
-        self.addCleanup(self.tmp.cleanup)
-        self.git("init", "--quiet")
-        self.git("config", "user.email", "test@example.invalid")
-        self.git("config", "user.name", "test")
+        self.root, self.git = init_git_repo(self)
         write_experiment(self.root)
         self.git("add", "-A")
         self.git("commit", "--quiet", "-m", "seed evidence")
         self.base = self.git("rev-parse", "HEAD").stdout.strip()
-
-    def git(self, *args: str):
-        return subprocess.run(
-            ("git", *args),
-            cwd=str(self.root),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
 
     @staticmethod
     def merge_group_env(base_sha: str) -> dict:
