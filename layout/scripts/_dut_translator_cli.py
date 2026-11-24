@@ -1,14 +1,18 @@
-"""CLI/IO scaffolding shared by the extracted-netlist -> DUT translators.
+"""CLI/IO and SPICE-card scaffolding shared by the extracted-netlist -> DUT
+translators.
 
-`gen_cml_driver_core_dut.py` and `gen_pad_ring_assembly_dut.py` differ only in
-their `translate()`; the argument parsing, source-label derivation, stale-output
-check and write path live here so a fix lands once.
+`gen_cml_driver_core_dut.py`, `gen_pad_ring_assembly_dut.py` and
+`gen_tmds_final_mux_dut.py` differ only in their `translate()`; the argument
+parsing, source-label derivation, stale-output check, write path, and the
+`.SUBCKT` / `.ENDS` / MOS-card handling every `translate()` starts from live
+here so a fix lands once.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -20,6 +24,64 @@ class TranslationError(RuntimeError):
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+#: `M<name> <d> <g> <s> <b> <class> <params...>` -- the card `bind_mos_card` rewrites.
+_MOS_RE = re.compile(
+    r"^M(?P<name>\S+)\s+"
+    r"(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+"
+    r"(?P<cls>\S+)\s*(?P<params>.*)$"
+)
+_SUBCKT_RE = re.compile(r"^\.SUBCKT\s+(?P<name>\S+)\s+(?P<pins>.*)$", re.IGNORECASE)
+_ENDS_RE = re.compile(r"^\.ENDS\b", re.IGNORECASE)
+
+
+def subckt_header(
+    stripped: str, extracted_name: str, emitted_name: str | None = None
+) -> tuple[list[str], str] | None:
+    """Validate a `.SUBCKT` card; return `(pins, header_line)` for the one
+    declaring `extracted_name` (`emitted_name` defaults to it --
+    `gen_tmds_final_mux_dut.py` renames the extracted cell), else `None`.
+    Any other name is a `TranslationError`: a translator handed the wrong
+    extraction must fail loudly, not silently translate a foreign cell."""
+    match = _SUBCKT_RE.match(stripped)
+    if match is None:
+        return None
+    if match.group("name") != extracted_name:
+        raise TranslationError(
+            f"expected .SUBCKT {extracted_name}, found {match.group('name')!r}"
+        )
+    pins = match.group("pins").split()
+    return pins, f".SUBCKT {emitted_name or extracted_name} {' '.join(pins)}"
+
+
+def ends_card(stripped: str, emitted_name: str) -> str | None:
+    """Return the `.ENDS` card closing `emitted_name`, if `stripped` is one."""
+    if _ENDS_RE.match(stripped):
+        return f".ENDS {emitted_name}"
+    return None
+
+
+def bind_mos_card(stripped: str, device_class: str, pdk_subckt: str) -> str | None:
+    """Rewrite an extraction-deck `M`-card naming `device_class` as the
+    `X`-subcircuit call against `pdk_subckt`, carrying every extracted
+    parameter -- including the AS/AD/PS/PD junction geometry -- through
+    unchanged; `None` for any non-MOS card. Any other class is a
+    `TranslationError`, per each translator's own `DEVICE_CLASS` note."""
+    mos = _MOS_RE.match(stripped)
+    if mos is None:
+        return None
+    if mos.group("cls") != device_class:
+        raise TranslationError(
+            f"unknown device class {mos.group('cls')!r} on card {stripped!r}; "
+            f"this script only binds {device_class!r} -> {pdk_subckt!r}"
+        )
+    params = mos.group("params").strip()
+    return (
+        f"XM{mos.group('name')} {mos.group('d')} {mos.group('g')} "
+        f"{mos.group('s')} {mos.group('b')} {pdk_subckt}"
+        + (f" {params}" if params else "")
+    )
 
 
 def run_cli(
