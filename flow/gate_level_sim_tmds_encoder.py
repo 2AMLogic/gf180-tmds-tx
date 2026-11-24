@@ -364,7 +364,7 @@ def main() -> int:
 
     if not args.no_record:
         status = synth.write_flow_record(
-            rid, lambda sha, dirty: render_record(rid, when, pdk, n, f, passed, dirty, sha)
+            rid, lambda sha, dirty: render_record(rid, when, n, f, passed, dirty, sha)
         )
         if status:
             return status
@@ -372,7 +372,7 @@ def main() -> int:
     return 0 if passed else 1
 
 
-def render_record(rid, when, pdk: Pdk, n_tests: int, n_failed: int, passed: bool, dirty: bool, sha: str) -> str:
+def render_record(rid, when, n_tests: int, n_failed: int, passed: bool, dirty: bool, sha: str) -> str:
     outcome = (
         f"PASS -- {n_tests} of {n_tests} cocotb test(s) passed, 0 failed"
         if passed
