@@ -4,10 +4,15 @@
 Both generators draw the same DR-0011 pad structure -- DVDD/DVSS ring straps,
 a substrate tap, and the `gen_pad_v2.py`-geometry production bond pad with its
 folded `diode_nd2ps_06v0` clamp -- and each used to carry its own copy of the
-three drawing helpers and the constants they depend on. They now live here
+drawing helpers and the constants they depend on. They now live here
 once, so a DRC-driven geometry fix reaches both the fit-study GDS and the
 assembly GDS (same relationship `gf180_layers.py` gave the layer table,
-issue #255).
+issue #255). The folded finger array itself has one drawing,
+`_draw_diode_clamp_array`, parameterised only by the implant layer: the
+VSS-side `diode_nd2ps_06v0` leg and the assembly's VDD-side
+`diode_pd2nw_06v0` leg (`gen_pad_ring_assembly._draw_vdd_clamp`, issue #210)
+share it, so the area/periphery symmetry `klt extract` sees cannot drift
+(issue #413).
 
 The fold arithmetic (`clamp_rows`, `_row_span`, `_row_pitch`) and its
 constants moved here from `pad_pitch_fit_study.py` (issue #242's single
@@ -134,6 +139,14 @@ def _row_pitch(bus_width: float) -> float:
     return max(FINGER_DEPTH, bus_width) + ROW_GAP_UM
 
 
+def _array_height(rows: list[int], bus_width: float) -> float:
+    """y extent of a folded finger array: every full row's pitch plus the
+    taller of the diode finger and its Metal1 gather bus. Single source for
+    the array-height formula (issue #413), shared by both generators' clamp
+    drawing and fit arithmetic."""
+    return (len(rows) - 1) * _row_pitch(bus_width) + max(FINGER_DEPTH, bus_width)
+
+
 def _draw_ring_strap(
     top, L, x0: float, x1: float, y0: float, y1: float, via_half: float = VIA_HALF
 ) -> None:
@@ -207,38 +220,39 @@ def _draw_substrate_tap(top, L, ox: float, oy: float, net_name: str, via_half: f
     rect(VIA2, vcx - via_half, vcy - via_half, vcx + via_half, vcy + via_half)
 
 
-def _draw_production_pad(
+def _draw_diode_clamp_array(
     top,
     L,
     ox: float,
     oy: float,
-    net_name: str,
+    implant_spec,
     n_fingers: int,
     bus_width: float = DEFAULT_BUS_WIDTH_UM,
-    via_half: float = VIA_HALF,
 ) -> dict[str, float]:
-    """Draw one `gf180_tmds_pad_v2`-geometry bond pad at origin (ox, oy):
-    a folded `diode_nd2ps_06v0` finger array, a shared Metal1 cathode bus
-    per row plus a vertical Metal1 spine tying the rows together, a
-    Metal1-Metal5 via stack, and the 25x25 um Metal5 plate / 20x20 um
-    opening on top (issue #87 geometry, folded per issue #143).
+    """Draw the folded diode-clamp finger array shared by both clamp legs:
+    per row, `COMP` fingers with their `CONTACT` cuts gathered onto a
+    horizontal Metal1 bus; the implant/markers (`DUALGATE`, `DIODE_MK` and
+    `implant_spec` -- NPLUS for the VSS-side `diode_nd2ps_06v0`, PPLUS for
+    the VDD-side `diode_pd2nw_06v0`) enclosing the whole array; and the
+    vertical Metal1 spine tying every row's bus onto one terminal net.
 
-    Returns the absolute (x, y) of row 0's own Metal1 gather-bus centre, for
-    the assembly's top-level router to connect the driver's output pin to
-    (scope item 5: "land the driver->pad Metal2 routes on the row-0 Metal1
-    bus centre"); the fit study ignores it.
+    One drawing, parameterised only by the implant layer (issue #413): the
+    two legs keep identical finger geometry and row fold by construction, so
+    both present the same area/periphery to `klt extract`.
+
+    Returns the array metrics the callers' own terminal work needs:
+    `array_x1`/`array_y1` (array extents), `via_cx` (the spine column, where
+    the pad's via stack lands), and row 0's gather-bus `bus_cy`/`bus_dy0`/
+    `bus_dy1`.
     """
 
     def rect(spec, x0, y0, x1, y1):
         top.shapes(L(spec)).insert(_box(top.layout(), ox + x0, oy + y0, ox + x1, oy + y1))
 
-    def label(spec, text, x, y):
-        top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
-
     rows = clamp_rows(n_fingers)
     array_x1 = _row_span(max(rows))
     row_pitch = _row_pitch(bus_width)
-    array_y1 = (len(rows) - 1) * row_pitch + max(FINGER_DEPTH, bus_width)
+    array_y1 = _array_height(rows, bus_width)
 
     contact_y_off = 0.39  # gen_pad_v2.py's own within-finger contact offset
     bus_cy = contact_y_off + CONTACT_SIZE / 2
@@ -264,16 +278,64 @@ def _draw_production_pad(
     # Implants/markers enclose the whole (possibly multi-row) array: only
     # Comp defines the diffusion, so one rectangle per layer is equivalent to
     # per-row rectangles and introduces no sliver spacing between rows.
-    margin = 0.16  # NPLUS-over-COMP margin (gen_pad_v2.py convention)
-    rect(NPLUS, -margin, -margin, array_x1 + margin, array_y1 + margin)
+    margin = 0.16  # implant-over-COMP margin (gen_pad_v2.py convention)
+    rect(implant_spec, -margin, -margin, array_x1 + margin, array_y1 + margin)
     dg = 0.30
     rect(DUALGATE, -dg, -dg, array_x1 + dg, array_y1 + dg)
     mk = 0.40
     rect(DIODE_MK, -mk, -mk, array_x1 + mk, array_y1 + mk)
 
-    # Vertical Metal1 spine: ties every row's bus onto one cathode net.
+    # Vertical Metal1 spine: ties every row's gather bus onto one terminal
+    # net (and, on the VSS leg, is the column the via stack lands on).
     spine_half = max(0.60, bus_width / 2)
     rect(METAL1, via_cx - spine_half, bus_dy0, via_cx + spine_half, (len(rows) - 1) * row_pitch + bus_dy1)
+
+    return {
+        "array_x1": array_x1,
+        "array_y1": array_y1,
+        "via_cx": via_cx,
+        "bus_cy": bus_cy,
+        "bus_dy0": bus_dy0,
+        "bus_dy1": bus_dy1,
+    }
+
+
+def _draw_production_pad(
+    top,
+    L,
+    ox: float,
+    oy: float,
+    net_name: str,
+    n_fingers: int,
+    bus_width: float = DEFAULT_BUS_WIDTH_UM,
+    via_half: float = VIA_HALF,
+) -> dict[str, float]:
+    """Draw one `gf180_tmds_pad_v2`-geometry bond pad at origin (ox, oy):
+    a folded `diode_nd2ps_06v0` finger array (`_draw_diode_clamp_array` with
+    NPLUS), a shared Metal1 cathode bus per row plus a vertical Metal1 spine
+    tying the rows together, a Metal1-Metal5 via stack, and the 25x25 um
+    Metal5 plate / 20x20 um opening on top (issue #87 geometry, folded per
+    issue #143).
+
+    Returns the absolute (x, y) of row 0's own Metal1 gather-bus centre, for
+    the assembly's top-level router to connect the driver's output pin to
+    (scope item 5: "land the driver->pad Metal2 routes on the row-0 Metal1
+    bus centre"); the fit study ignores it.
+    """
+
+    def rect(spec, x0, y0, x1, y1):
+        top.shapes(L(spec)).insert(_box(top.layout(), ox + x0, oy + y0, ox + x1, oy + y1))
+
+    def label(spec, text, x, y):
+        top.shapes(L(spec)).insert(db.DText(text, db.DTrans(db.DPoint(ox + x, oy + y))))
+
+    m = _draw_diode_clamp_array(top, L, ox, oy, NPLUS, n_fingers, bus_width)
+    array_y1 = m["array_y1"]
+    via_cx = m["via_cx"]
+    bus_cy = m["bus_cy"]
+    bus_dy0 = m["bus_dy0"]
+    bus_dy1 = m["bus_dy1"]
+
     label(METAL1_LABEL, net_name, 1.0, (bus_dy0 + bus_dy1) / 2)
 
     stack_cy = array_y1 / 2

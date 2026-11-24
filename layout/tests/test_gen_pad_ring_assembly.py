@@ -138,6 +138,50 @@ class ClampRowsTest(unittest.TestCase):
             self.assertIs(getattr(study, name), getattr(cells, name), name)
 
 
+class SharedClampArrayTest(unittest.TestCase):
+    """Issue #413: the folded diode-clamp finger array has one drawing --
+    `pad_ring_cells._draw_diode_clamp_array`, parameterised only by the
+    implant layer (NPLUS on the VSS-side `diode_nd2ps_06v0` leg, PPLUS on
+    the VDD-side `diode_pd2nw_06v0` leg) -- and one array-height formula,
+    `_array_height`. The drawn geometry is judged by `klt drc`/`klt lvs` and
+    the committed GDS; what those cannot see is a second copy of either
+    quietly growing back (the exact hand-maintained drift the consolidation
+    removed)."""
+
+    def test_array_drawing_and_height_are_the_single_implementation(self):
+        # gen re-exports the array drawing for `_draw_vdd_clamp`'s PPLUS leg;
+        # the study reaches it only through `_draw_production_pad`, so its
+        # single-source anchor is the height formula both generators use.
+        self.assertIs(gen._draw_diode_clamp_array, cells._draw_diode_clamp_array)
+        for module in (gen, study):
+            self.assertIs(module._array_height, cells._array_height)
+
+    def test_array_height_is_the_bus_limited_row_stack(self):
+        # Default bus (0.48 um) is finger-limited: one row is exactly
+        # FINGER_DEPTH tall, each further row adds the 1.6 um row pitch.
+        self.assertAlmostEqual(cells._array_height([20], gen.DEFAULT_BUS_WIDTH_UM), 1.0)
+        self.assertAlmostEqual(cells._array_height([120, 20], gen.DEFAULT_BUS_WIDTH_UM), 2.6)
+        # A 4 um gather bus is bus-limited: the row pitch and the final row
+        # both follow the bus, not the 1.0 um finger.
+        self.assertAlmostEqual(cells._array_height([334], 4.0), 4.0)
+        self.assertAlmostEqual(cells._array_height([120, 94], 4.0), 4.0 + 4.6)
+
+    def test_array_height_agrees_with_the_committed_fit_reports(self):
+        # fit_report's Metal5-plate y window is derived from the array
+        # height; re-deriving it here pins `_array_height` against the
+        # committed `pad_pitch_fit_*.fit.json` arithmetic (which
+        # CommittedReportsTest separately re-derives against the files).
+        for n in (gen.N_FINGERS,) + HBM_WINDOW_FINGERS:
+            for w in (gen.DEFAULT_BUS_WIDTH_UM, 4.0):
+                plate_y0 = float(study.fit_report(n, bus_width=w)["pad_plate_y_um"][0])
+                self.assertAlmostEqual(
+                    cells._array_height(gen.clamp_rows(n), w),
+                    2.0 * (plate_y0 - gen.PAD_STRUCT_OY_UM) + gen.PAD_SIDE,
+                    places=3,
+                    msg=f"{n} fingers, {w} um bus",
+                )
+
+
 class StructWidthTest(unittest.TestCase):
     def test_as_drawn_clamp_matches_the_committed_65_4um_reading(self):
         # design/esd-capacitance-budget.md §10.2's own committed table.
