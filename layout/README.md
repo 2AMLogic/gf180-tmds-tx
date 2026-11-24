@@ -352,7 +352,7 @@ resistance moved 10.38 → 10.36 Ω, engine-version rounding — klayout
 **17 violations** where the committed report (deck `sha256:79e71a1e…`)
 recorded `clean`: 13× `comp.tap_distance.psub.mv.1` and 1× each
 `via{1,2,3,4}.width.1`. The violations are identical on the
-pre-regeneration committed GDS (0-polygon XOR, so they could not not be):
+pre-regeneration committed GDS (0-polygon XOR, so they cannot differ):
 the deck gained coverage after this cell's signoff, the same
 known-regression pattern `gf180_tmds_pad_min` documents above. The re-run
 reports record the current deck's findings honestly; the geometry findings

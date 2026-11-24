@@ -863,8 +863,9 @@ survive the corrected arithmetic or the new measurement.
 ### 9.6. Acceptance criteria and #65 item 5
 
 - **Redesigned pad/ESD structure achieves ≤2 pF at a realistic pad size,
-  measured the same way**: yes — Sec.9.2's `gf180_tmds_pad_v2` (DRC-clean,
-  LVS-matched, real 25×25 µm pad, DR-0011's diode clamp, real substrate
+  measured the same way**: yes — Sec.9.2's `gf180_tmds_pad_v2` (DRC-clean at its
+  original `klt` 0.2.0 signoff — the current deck reports 17 deck-drift
+  violations on unchanged geometry, see Sec.9.2 and #422; LVS-matched, real 25×25 µm pad, DR-0011's diode clamp, real substrate
   tap) plus Sec.9.4's PVT-swept SPICE sizing sweep total 0.225–0.652 pF
   across the full HBM-sizing window (Sec.9.5), reproducing Sec.1–5's own
   split methodology (real-tool pad/interconnect measurement +
