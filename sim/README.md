@@ -352,8 +352,15 @@ python3 sim/run_corners.py esd-clamp-cv --backend batch --stage-models \
   why model staging and engine startup both matter. The worker reported
   `models_staged: true`, matching staged file digests and a matching ngspice
   version banner. With `ngspice_init: None`, it still aborted on the
-  `w=222u nf=111` device with `could not find a valid modelname`. Issue #299
-  tracks the fleet comparison with explicit per-finger binning.
+  `w=222u nf=111` device with `could not find a valid modelname`. The
+  2026-11-24 follow-up probe with `ngspice_init` per-finger binning
+  (`wnflag=1`, job `klt-sim-a13fa2be342c`, `--stage-models --no-write`,
+  submitted through the `batch-runner-submit` profile) closed the fleet
+  comparison tracked by #299: the worker ran ngspice-47 with
+  `models_staged: true` and a `match` PDK stamp comparison (open_pdks
+  `f6eeac7d`), and all 12 `tt_27c_3.30v` capacitances of
+  `sim/esd-clamp-cv/records/20260814-193222-dd48630.md` reproduced exactly,
+  including `cap_w444_opv` = `5.140844e-13 F`.
 
 ## Append-only rule
 
