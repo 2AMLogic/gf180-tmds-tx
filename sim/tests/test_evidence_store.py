@@ -10,7 +10,6 @@ No PDK, ngspice, klt or broker required: a fake ``klt`` stands in for
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 import os
 import shutil
@@ -26,6 +25,7 @@ SIM_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SIM_DIR))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from _harness_fixtures import load_run_mc  # noqa: E402
 from harness import evidence_lint, evidence_store, pdk as pdk_mod, report  # noqa: E402
 from test_evidence_lint import RECORD_ID, valid_record, write_experiment  # noqa: E402
 
@@ -202,23 +202,6 @@ class ManifestBackedLintTests(StoreCase):
         self.assertTrue(any("no raw per-corner logs" in p for p in problems), problems)
 
 
-def _load_run_mc():
-    """Import ``sim/cml-driver-mismatch/run_mc.py`` as a module object.
-
-    Loading it runs only imports and constant definitions -- no PDK
-    discovery, ngspice probe or sweep -- so the evidence path is exercised
-    with the fake ``klt`` and a stubbed ``run_all``, never a real
-    simulation and never the real evidence tree.
-    """
-    path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
-    name = "cml_driver_mismatch_run_mc"
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module  # dataclass processing resolves annotations via sys.modules
-    spec.loader.exec_module(module)
-    return module
-
-
 class RunMcEvidencePathTests(StoreCase):
     """Issue #345: ``run_mc.py``'s raw logs are manifest-forward like every
     harness bench. The sweep is stubbed out -- only the evidence path is
@@ -246,7 +229,7 @@ class RunMcEvidencePathTests(StoreCase):
              "-c", "user.name=fleet", "commit", "--allow-empty", "-m", "init"],
             cwd=self.root, check=True, capture_output=True,
         )
-        self.run_mc = _load_run_mc()
+        self.run_mc = load_run_mc("cml_driver_mismatch_run_mc")
         # Re-point the bench at the throwaway repo root: repo root, records,
         # snapshots and stage root all live in the fake tree, so the real
         # evidence tree is never touched and nothing real is committed.

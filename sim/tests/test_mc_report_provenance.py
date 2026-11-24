@@ -7,25 +7,22 @@ No PDK, ngspice or network: canned ``klt sim`` report dicts only.
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 import unittest
 from pathlib import Path
 
 SIM_DIR = Path(__file__).resolve().parents[1]
-if str(SIM_DIR) not in sys.path:
-    sys.path.insert(0, str(SIM_DIR))
+TESTS_DIR = Path(__file__).resolve().parent
+for _dir in (SIM_DIR, TESTS_DIR):
+    if str(_dir) not in sys.path:
+        sys.path.insert(0, str(_dir))
 
+from _harness_fixtures import load_run_mc  # noqa: E402
 from harness import batch  # noqa: E402
 from harness.corners import CORNERS, PvtPoint  # noqa: E402
 from harness.runner import PointResult  # noqa: E402
 
-_spec = importlib.util.spec_from_file_location(
-    "run_mc", SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
-)
-run_mc = importlib.util.module_from_spec(_spec)
-sys.modules["run_mc"] = run_mc
-_spec.loader.exec_module(run_mc)
+run_mc = load_run_mc("run_mc")
 
 
 def _entry(cid, mc=None):

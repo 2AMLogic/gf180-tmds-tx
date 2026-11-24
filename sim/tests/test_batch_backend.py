@@ -10,7 +10,6 @@ with a canned ``klt sim`` JSON envelope (or a failure) per point.
 from __future__ import annotations
 
 import contextlib
-import importlib.util
 import io
 import json
 import stat
@@ -21,16 +20,23 @@ from pathlib import Path
 from unittest import mock
 
 SIM_DIR = Path(__file__).resolve().parents[1]
-if str(SIM_DIR) not in sys.path:
-    sys.path.insert(0, str(SIM_DIR))
+TESTS_DIR = Path(__file__).resolve().parent
+for _dir in (SIM_DIR, TESTS_DIR):
+    if str(_dir) not in sys.path:
+        sys.path.insert(0, str(_dir))
 
+from _harness_fixtures import (  # noqa: E402
+    fake_pdk,
+    load_run_mc,
+    load_testbench,
+    make_point,
+)
 from harness import batch as batch_mod  # noqa: E402
 from harness import cli as cli_mod  # noqa: E402
 from harness import corners as corners_mod  # noqa: E402
 from harness import report as report_mod  # noqa: E402
 from harness import runner as runner_mod  # noqa: E402
 from harness import testbench as tb_mod  # noqa: E402
-from harness.pdk import Pdk  # noqa: E402
 
 STUB = '''#!{python}
 import json, sys
@@ -60,38 +66,13 @@ print(json.dumps({{"status": "pass", "corners": corners, "environment": env}}))
 '''
 
 
-def _point(corner="tt", temp=27.0, vdd=3.3):
-    return corners_mod.PvtPoint(corner=corners_mod.CORNERS[corner], temp_c=temp, vdd=vdd)
-
-
-class _Pdk:
-    variant = "gf180mcuD"
-    version = "test"
-    path = Path("/pdk/gf180mcuD")
-    model_lib = "/pdk/gf180mcuD/libs.tech/ngspice/sm141064.ngspice"
-    design_include = "/pdk/gf180mcuD/libs.tech/ngspice/design.ngspice"
-
-
-def _load_run_mc():
-    """Load sim/cml-driver-mismatch/run_mc.py under its own module name (the
-    same loader trick test_run_mc_report_mapping.py uses; a distinct name so
-    the two test modules do not share sys.modules state)."""
-    path = SIM_DIR / "cml-driver-mismatch" / "run_mc.py"
-    name = "cml_driver_mismatch_run_mc_batch"
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module  # dataclass processing resolves annotations via sys.modules
-    spec.loader.exec_module(module)
-    return module
-
-
 class BatchBackendTests(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
         self.tmp = Path(self._tmp.name)
         self.tb = tb_mod.load(SIM_DIR / "esd-clamp-cv")
-        self.points = [_point(temp=t) for t in (-40.0, 27.0, 125.0)]
+        self.points = [make_point(temp_c=t) for t in (-40.0, 27.0, 125.0)]
         self.modes = self.tmp / "modes.json"
         self.set_modes({})
         self.klt = self.tmp / "klt-stub"
@@ -103,7 +84,7 @@ class BatchBackendTests(unittest.TestCase):
 
     def grid(self, points=None):
         return batch_mod.run_grid(
-            self.tb, _Pdk(), points or self.points, self.tmp / "work",
+            self.tb, fake_pdk(), points or self.points, self.tmp / "work",
             jobs=2, klt=str(self.klt), log_dir=self.tmp / "logs",
         )
 
@@ -117,14 +98,14 @@ class BatchBackendTests(unittest.TestCase):
         return record
 
     def test_request_is_well_formed(self):
-        request = batch_mod.build_request(self.tb, _Pdk(), self.points[1], "b.spice")
+        request = batch_mod.build_request(self.tb, fake_pdk(), self.points[1], "b.spice")
         self.assertEqual(request["backend"], "batch")
         self.assertEqual(request["models"], {"pdk": "gf180mcuD", "lib": "libs.tech/ngspice/sm141064.ngspice"})
         self.assertEqual(request["corners"]["temperature_c"], [27.0])
         self.assertEqual(request["analysis"], {"kind": "ac", "args": "lin 1 100meg 100meg"})
         self.assertEqual([m["name"] for m in request["measurements"]], list(self.tb.measure))
         self.assertEqual(request["batch"]["capacity_wait_s"], 600)
-        body = batch_mod.compose_body(self.tb, _Pdk(), self.points[1])
+        body = batch_mod.compose_body(self.tb, fake_pdk(), self.points[1])
         self.assertIn(".param vdd_val=3.3", body)
         self.assertNotIn(".control", body)
         self.assertNotIn(".end\n", body)
@@ -144,7 +125,7 @@ class BatchBackendTests(unittest.TestCase):
         for stage_models in (False, True):
             with self.subTest(stage_models=stage_models):
                 request = batch_mod.build_request(
-                    self.tb, _Pdk(), self.points[1], "b.spice", stage_model_inputs=stage_models
+                    self.tb, fake_pdk(), self.points[1], "b.spice", stage_model_inputs=stage_models
                 )
                 self.assertEqual(
                     request["options"].get("ngspice_init"), ["set wnflag=1", "set num_threads=1"]
@@ -181,7 +162,7 @@ class BatchBackendTests(unittest.TestCase):
 
     def test_missing_klt_is_an_error_not_a_local_run(self):
         results = batch_mod.run_grid(
-            self.tb, _Pdk(), self.points[:1], self.tmp / "w", klt=str(self.tmp / "nope")
+            self.tb, fake_pdk(), self.points[:1], self.tmp / "w", klt=str(self.tmp / "nope")
         )
         self.assertEqual(results[0].status, "error")
         self.assertIn("no local fallback", results[0].message)
@@ -199,7 +180,7 @@ class BatchBackendTests(unittest.TestCase):
     def test_dry_run_prints_every_request_and_submits_nothing(self):
         out, err = io.StringIO(), io.StringIO()
         with mock.patch("subprocess.run") as run, mock.patch.object(
-            cli_mod, "find_pdk", return_value=_Pdk()
+            cli_mod, "find_pdk", return_value=fake_pdk()
         ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = cli_mod.main(["esd-clamp-cv", "--backend", "batch", "--dry-run"])
         self.assertEqual(code, 0)
@@ -221,7 +202,7 @@ class BatchBackendTests(unittest.TestCase):
     def test_local_default_unchanged(self):
         args = cli_mod.build_parser().parse_args(["esd-clamp-cv"])
         self.assertEqual(args.backend, "local")
-        point = _point()
+        point = make_point()
         from harness.runner import PointResult
         d = PointResult(point=point, status="ok").as_dict()
         self.assertNotIn("backend", d)
@@ -229,10 +210,10 @@ class BatchBackendTests(unittest.TestCase):
         self.assertNotIn("models_staged", d)
 
     def test_stage_model_inputs_off_by_default(self):
-        request = batch_mod.build_request(self.tb, _Pdk(), self.points[1], "b.spice")
+        request = batch_mod.build_request(self.tb, fake_pdk(), self.points[1], "b.spice")
         self.assertNotIn("stage_model_inputs", request["options"])
         mc = batch_mod.build_mc_request(
-            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            fake_pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
             measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
             temp_c=27.0, n=3, seed=1,
         )
@@ -240,11 +221,11 @@ class BatchBackendTests(unittest.TestCase):
 
     def test_stage_model_inputs_flag_sets_the_option(self):
         request = batch_mod.build_request(
-            self.tb, _Pdk(), self.points[1], "b.spice", stage_model_inputs=True
+            self.tb, fake_pdk(), self.points[1], "b.spice", stage_model_inputs=True
         )
         self.assertIs(request["options"]["stage_model_inputs"], True)
         mc = batch_mod.build_mc_request(
-            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            fake_pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
             measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
             temp_c=27.0, n=3, seed=1, stage_model_inputs=True,
         )
@@ -252,7 +233,7 @@ class BatchBackendTests(unittest.TestCase):
         # A local single-unit request never stages: it already runs this
         # host's own models (run_mc.py's negative control).
         local = batch_mod.build_mc_request(
-            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            fake_pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
             measurements=[{"name": "swing_dc", "expr": "v(outn)-v(outp)"}],
             temp_c=27.0, n=1, seed=7, backend="local", stage_model_inputs=True,
         )
@@ -261,7 +242,7 @@ class BatchBackendTests(unittest.TestCase):
     def _dry_run_output(self, extra):
         out, err = io.StringIO(), io.StringIO()
         with mock.patch("subprocess.run") as run, mock.patch.object(
-            cli_mod, "find_pdk", return_value=_Pdk()
+            cli_mod, "find_pdk", return_value=fake_pdk()
         ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = cli_mod.main(["esd-clamp-cv", "--backend", "batch", "--dry-run", *extra])
         self.assertEqual(code, 0)
@@ -280,7 +261,7 @@ class BatchBackendTests(unittest.TestCase):
             corners_mod.supply_points(self.tb.nominal_supply_v, self.tb.supply_tolerance),
             None,
         )
-        self.assertEqual(text, batch_mod.dry_run_text(self.tb, _Pdk(), points))
+        self.assertEqual(text, batch_mod.dry_run_text(self.tb, fake_pdk(), points))
 
     def test_dry_run_with_stage_models_prints_the_option(self):
         text = self._dry_run_output(["--stage-models"])
@@ -344,7 +325,7 @@ class BatchBackendTests(unittest.TestCase):
         self.assertIn(f"`{pts[2]}` -- model inputs: unknown", text)
 
     def test_run_mc_passes_stage_models_to_the_fleet_requests(self):
-        run_mc = _load_run_mc()
+        run_mc = load_run_mc("cml_driver_mismatch_run_mc_batch")
         seen = []
 
         def fake_submit(request_path, out_dir, *, backend="batch"):
@@ -354,12 +335,12 @@ class BatchBackendTests(unittest.TestCase):
         workdir = self.tmp / "mcwork"
         with mock.patch.object(batch_mod, "submit_request", fake_submit):
             run_mc._run(
-                _Pdk(), workdir, "mc_tt", [corners_mod.CORNERS["tt"]],
+                fake_pdk(), workdir, "mc_tt", [corners_mod.CORNERS["tt"]],
                 sw_stat_mismatch=1, par_tail=run_mc.PAR_TAIL_NOMINAL,
                 n=3, seed=1, backend="batch", stage_model_inputs=True,
             )
             run_mc._run(
-                _Pdk(), workdir, "mcneg", [corners_mod.CORNERS["tt"]],
+                fake_pdk(), workdir, "mcneg", [corners_mod.CORNERS["tt"]],
                 sw_stat_mismatch=1, par_tail=run_mc.NEG_CTRL_PAR_TAIL,
                 n=1, seed=7, backend="local", stage_model_inputs=True,
             )
@@ -382,50 +363,42 @@ class PerRateAnalysisSelectionTests(unittest.TestCase):
     SHORT_LINE = "tran 2e-12 5e-9"
 
     def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        directory = Path(self._tmp.name) / "exp" / "testbench"
-        directory.mkdir(parents=True)
-        (directory / "frag.spice").write_text("* fragment\n")
-        (directory / tb_mod.MANIFEST_NAME).write_text(
-            json.dumps(
-                {
-                    "name": "per-rate-bench",
-                    "netlist": "frag.spice",
-                    "measure": {"x": "v(x)"},
-                    "rates_mbps": [742.5, 270.0],
-                    "transient": {
-                        "tstep_s": 2e-12,
-                        "tstop_s": 20e-9,
-                        "tstop_s_by_rate": {"742.5": 5e-9},
-                    },
-                    "analyses": [self.DEFAULT_LINE],
-                    "analyses_by_rate": {"742.5": self.SHORT_LINE},
-                }
-            )
-        )
-        self.tb = tb_mod.load(directory)
-
-    def _point(self, rate_mbps=None):
-        return corners_mod.PvtPoint(
-            corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3, rate_mbps=rate_mbps
+        self.tb = load_testbench(
+            self,
+            {
+                "name": "per-rate-bench",
+                "netlist": "frag.spice",
+                "measure": {"x": "v(x)"},
+                "rates_mbps": [742.5, 270.0],
+                "transient": {
+                    "tstep_s": 2e-12,
+                    "tstop_s": 20e-9,
+                    "tstop_s_by_rate": {"742.5": 5e-9},
+                },
+                "analyses": [self.DEFAULT_LINE],
+                "analyses_by_rate": {"742.5": self.SHORT_LINE},
+            },
         )
 
     def test_request_analysis_follows_the_point_rate(self):
-        fast = batch_mod.build_request(self.tb, _Pdk(), self._point(742.5), "b.spice")
+        fast = batch_mod.build_request(
+            self.tb, fake_pdk(), make_point(rate_mbps=742.5), "b.spice"
+        )
         self.assertEqual(fast["analysis"], {"kind": "tran", "args": "2e-12 5e-9"})
-        slow = batch_mod.build_request(self.tb, _Pdk(), self._point(270.0), "b.spice")
+        slow = batch_mod.build_request(
+            self.tb, fake_pdk(), make_point(rate_mbps=270.0), "b.spice"
+        )
         self.assertEqual(slow["analysis"], {"kind": "tran", "args": "2e-12 20e-9"})
 
     def test_rateless_point_runs_the_default_analysis(self):
-        request = batch_mod.build_request(self.tb, _Pdk(), self._point(), "b.spice")
+        request = batch_mod.build_request(self.tb, fake_pdk(), make_point(), "b.spice")
         self.assertEqual(request["analysis"], {"kind": "tran", "args": "2e-12 20e-9"})
 
     def test_preflight_accepts_per_rate_windows_across_the_grid(self):
         # One analysis per request still holds when different rates map to
         # different windows, as long as every line agrees on its kind.
         kinds = batch_mod._preflight_kinds(
-            self.tb, [self._point(742.5), self._point(270.0)]
+            self.tb, [make_point(rate_mbps=742.5), make_point(rate_mbps=270.0)]
         )
         self.assertEqual(kinds, {"tran"})
 
@@ -509,7 +482,7 @@ class SharedCompositionTests(unittest.TestCase):
         )
 
     def test_every_bench_and_point_agrees_on_shared_directives(self):
-        pdk = _Pdk()
+        pdk = fake_pdk()
         benches = list(self._benches())
         self.assertGreaterEqual(len(benches), 2, "expected several benches to check")
         checked = 0
@@ -571,7 +544,7 @@ class SharedCompositionTests(unittest.TestCase):
         """
         tb = tb_mod.load(SIM_DIR / "esd-clamp-cv")
         point = self._grid(tb)[0]
-        pdk = _Pdk()
+        pdk = fake_pdk()
         real = runner_mod._option_lines
 
         with mock.patch.object(
@@ -598,7 +571,7 @@ class SharedCompositionTests(unittest.TestCase):
         """
         tb = tb_mod.load(SIM_DIR / "cml-driver-eye")
         point = self._grid(tb)[0]
-        pdk = _Pdk()
+        pdk = fake_pdk()
         real = runner_mod._dut_lines
 
         def tampered_comment(t):
@@ -626,7 +599,7 @@ class McRequestTests(unittest.TestCase):
 
     def build(self, **kw):
         return batch_mod.build_mc_request(
-            _Pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
+            fake_pdk(), [corners_mod.CORNERS["ff"]], "b.spice",
             measurements=self.MEAS, temp_c=27.0, **kw,
         )
 
