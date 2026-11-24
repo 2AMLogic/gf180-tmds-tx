@@ -57,7 +57,7 @@
     },
     "8": {
       "file": "signoff/characterization-envelope.json",
-      "content_hash": "sha256:1e97888b7399fa9d65707fc06c49396c08bdb213a86bad2397d315ff18f33e4d"
+      "content_hash": "sha256:7ccb7cd6323297af78f2a4654ccdeacf2f59551d6a1a4cab42f27697a9da2b29"
     },
     "9.analog": {
       "file": "signoff/envelopes/item9-analog.json",
