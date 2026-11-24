@@ -74,8 +74,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SIM_DIR = REPO_ROOT / "sim"
 sys.path.insert(0, str(SIM_DIR))
 
-from harness.batch import GF180_NGSPICE_INIT  # noqa: E402
 from harness.corners import CORNER_SETS, CORNERS, PvtPoint, resolve_corners, supply_points  # noqa: E402
+from harness.pdk import GF180_NGSPICE_INIT  # noqa: E402
 from harness.runner import DEFAULT_TIMEOUT_S, _is_raw_meas_expr, _option_lines, _param_lines  # noqa: E402
 from harness.testbench import load as load_testbench  # noqa: E402
 

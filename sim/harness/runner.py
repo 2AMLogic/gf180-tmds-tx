@@ -57,6 +57,14 @@ lever, and it carries no measurement anyway. See
 ``filter_progress_trace`` for what is dropped and what provably is not
 (every other byte survives unchanged), the two raw-ngspice-text write sites
 it is applied at, and the manifest escape hatch that keeps the trace.
+
+A sixth adaptation, added for issue #415: ``run_grid`` seeds the grid work
+directory's ``.spiceinit`` from ``pdk.GF180_NGSPICE_INIT`` before any point
+launches, so the local backend binds gf180mcu MOS model bins by width per
+finger without depending on a host ``~/.spiceinit`` -- the same startup the
+batch and PEX request builders already ship as ``options.ngspice_init``.
+See ``_ensure_local_startup`` for why the file must exist before ngspice
+opens the deck (and why the deck's own ``.control`` block is too late).
 """
 
 from __future__ import annotations
@@ -70,7 +78,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .corners import PvtPoint
-from .pdk import Pdk
+from .pdk import GF180_NGSPICE_INIT, Pdk
 from .testbench import Testbench
 
 NGSPICE = "ngspice"
@@ -583,6 +591,25 @@ def run_point(
     )
 
 
+def _ensure_local_startup(workdir: Path) -> None:
+    """Create the local grid's scratch directory and seed its ``.spiceinit``.
+
+    ngspice reads interactive ``set`` commands from a ``.spiceinit`` in the
+    working directory *before* it opens the deck, and gf180mcu's MOS models
+    need ``wnflag`` set that early: the same setting as the first command of
+    the deck's ``.control`` block is too late -- model binding has already
+    failed by then (issue #415, measured on ngspice-47: 0/31 measurements
+    with no startup file, 0/31 with the setting in ``.control``, 31/31 with
+    the working directory's ``.spiceinit``). Writing the host-independent
+    startup file here is what makes ``--backend local`` run on a host with
+    no ``~/.spiceinit``. Called once per grid, before any point launches,
+    so serial and parallel workers alike inherit a complete file and no
+    concurrent child ever truncates it.
+    """
+    workdir.mkdir(parents=True, exist_ok=True)
+    (workdir / ".spiceinit").write_text("\n".join(GF180_NGSPICE_INIT) + "\n")
+
+
 def run_grid(
     tb: Testbench,
     pdk: Pdk,
@@ -594,6 +621,7 @@ def run_grid(
     log_dir: Path | None = None,
 ) -> list[PointResult]:
     """Run every PVT point; results come back in grid order regardless of jobs."""
+    _ensure_local_startup(workdir)
     results: list[PointResult | None] = [None] * len(points)
 
     def _one(index_point):

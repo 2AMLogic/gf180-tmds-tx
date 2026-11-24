@@ -16,6 +16,7 @@ still behaves identically to the source harness.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -23,6 +24,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SIM_DIR = Path(__file__).resolve().parents[1]
 if str(SIM_DIR) not in sys.path:
@@ -1034,6 +1036,87 @@ class DeviceEvidenceAppendOnlyTests(unittest.TestCase):
         report_mod.write_device_netlist_snapshot(self.snapshot_dir, record, self.deck)
         with self.assertRaises(report_mod.RecordExists):
             report_mod.write_device_netlist_snapshot(self.snapshot_dir, record, self.deck)
+
+
+class LocalGridStartupTests(unittest.TestCase):
+    """Issue #415: ``run_grid`` seeds the grid work directory's
+    ``.spiceinit`` from ``pdk.GF180_NGSPICE_INIT`` before any ngspice child
+    launches, so the local backend binds gf180mcu MOS model bins by width
+    per finger on a host with no ``~/.spiceinit``. No PDK, no ngspice: the
+    subprocess is a stub that records the startup file's contents at the
+    moment ngspice would start, which is the only moment that matters --
+    ngspice applies a working-directory ``.spiceinit`` before opening the
+    deck, and a ``set`` inside the deck's ``.control`` block is too late
+    for model binding.
+    """
+
+    _STARTUP_TEXT = "set wnflag=1\nset num_threads=1\n"
+
+    def _pdk(self) -> pdk_mod.Pdk:
+        # A nonexistent path is fine -- the ngspice call itself is stubbed,
+        # and compose_deck only renders pdk fields into deck text.
+        return pdk_mod.Pdk(
+            path=Path("/nonexistent/gf180mcuD"), variant="gf180mcuD", source="test"
+        )
+
+    def _tb(self) -> tb_mod.Testbench:
+        return _load_testbench(
+            self,
+            {"netlist": "frag.spice", "measure": {"swing": "v(a)"}, "analyses": ["op"]},
+        )
+
+    def _run_grid_with_stub_ngspice(self, workdir, *, points, jobs):
+        startup_at_launch = []
+
+        def fake_run(cmd, **kwargs):
+            startup = Path(kwargs["cwd"]) / ".spiceinit"
+            startup_at_launch.append(
+                startup.read_text() if startup.is_file() else None
+            )
+            return subprocess.CompletedProcess(
+                cmd, 0, stdout="m_swing = 6.9043645202e-01\n", stderr=""
+            )
+
+        with mock.patch.object(runner_mod.subprocess, "run", side_effect=fake_run):
+            results = runner_mod.run_grid(
+                self._tb(), self._pdk(), points, Path(workdir), jobs=jobs
+            )
+        return results, startup_at_launch
+
+    def test_ngspice_launches_with_the_pdk_startup_file_in_its_cwd(self):
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, True)
+        points = [
+            corners_mod.PvtPoint(
+                corner=corners_mod.CORNERS["tt"], temp_c=27.0, vdd=3.3
+            )
+        ]
+        results, startup_at_launch = self._run_grid_with_stub_ngspice(
+            tmp, points=points, jobs=1
+        )
+        self.assertEqual([r.status for r in results], ["ok"])
+        self.assertEqual(startup_at_launch, [self._STARTUP_TEXT])
+
+    def test_parallel_points_share_one_startup_file_and_leave_home_alone(self):
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, True)
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, True)
+        points = [
+            corners_mod.PvtPoint(corner=corners_mod.CORNERS[name], temp_c=27.0, vdd=3.3)
+            for name in ("tt", "ss")
+        ]
+        with mock.patch.dict(os.environ, {"HOME": str(home)}):
+            results, startup_at_launch = self._run_grid_with_stub_ngspice(
+                tmp, points=points, jobs=2
+            )
+        self.assertEqual([r.status for r in results], ["ok", "ok"])
+        # Both parallel children saw the complete two-line startup in order,
+        # never a truncated file -- run_grid writes it once, before the pool.
+        self.assertEqual(startup_at_launch, [self._STARTUP_TEXT] * 2)
+        # The host's home directory is never the lever: the startup file is
+        # the grid work directory's, and nothing is written under $HOME.
+        self.assertEqual(list(home.iterdir()), [])
 
 
 if __name__ == "__main__":

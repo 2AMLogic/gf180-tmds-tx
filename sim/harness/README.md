@@ -351,8 +351,14 @@ converge · `3` environment problem (no ngspice, no PDK, bad manifest,
 unjustified PVT subset).
 
 Generated decks land in `sim/.work/<experiment-slug>/<record-id>/` and are
-git-ignored, so a failing corner can be reproduced by hand with
-`ngspice -b sim/.work/<slug>/<record-id>/<corner-id>.spice`.
+git-ignored. That directory also holds the grid's `.spiceinit` — the PDK
+startup file the runner writes there before any point launches (issue #415;
+`harness.pdk.GF180_NGSPICE_INIT`, the same lines the batch/PEX requests ship
+as `options.ngspice_init`). ngspice applies a working-directory `.spiceinit`
+before it opens the deck, so a failing corner is reproduced by hand by
+running from that directory, with the startup file in place:
+
+    cd sim/.work/<slug>/<record-id> && ngspice -b <corner-id>.spice
 
 ## sim/smoke-cml-pair
 

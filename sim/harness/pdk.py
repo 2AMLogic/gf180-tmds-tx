@@ -40,6 +40,21 @@ SIM_DIR = REPO_ROOT / "sim"
 
 DEFAULT_VARIANT = "gf180mcuD"
 
+#: gf180mcu's MOS models select bins by per-finger width (W/NF), so ngspice
+#: must start with ``wnflag`` set, and the solver is pinned single-threaded
+#: for reproducible point-to-point runs. ngspice reads these interactive
+#: ``set`` commands from a ``.spiceinit`` in the working directory (then
+#: ``~/.spiceinit``) *before* it opens the deck -- a ``set`` inside the
+#: deck's own ``.control`` block runs only after model binding has already
+#: failed (measured on ngspice-47, issue #415: 0/31 measurements with no
+#: startup file and 0/31 with the setting first in ``.control``, 31/31 with
+#: it in the working directory's ``.spiceinit``). Every path that starts
+#: ngspice therefore seeds its startup from this one tuple instead of
+#: relying on the host: the batch and PEX request builders ship it as
+#: ``options.ngspice_init``, and the local runner writes it into the grid's
+#: work directory as ``.spiceinit``.
+GF180_NGSPICE_INIT = ("set wnflag=1", "set num_threads=1")
+
 # Search roots used when nothing else pins the PDK down. Each is a directory
 # that is expected to *contain* variant directories (gf180mcuA..D).
 BUILTIN_SEARCH_ROOTS = (
