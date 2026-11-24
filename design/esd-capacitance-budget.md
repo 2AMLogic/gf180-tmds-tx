@@ -749,6 +749,15 @@ coverage gained after signoff, not a geometry change. Full account in
 `layout/README.md`'s pad_v2 regeneration episode; the geometry findings are
 tracked in #422 and do not affect this section's capacitance numbers.
 
+**Re-signed-off (issue #422, 2026-11-24)** — the #422 geometry redraw
+(via cuts back to the deck-fixed 0.26 µm square, substrate taps
+distributed along the finger row) restored the DRC `clean` verdict above
+under both the installed and the CI-pinned deck, and re-measured the
+`PAD`-net parasitic capacitance at the same **12.185218 fF** (0.00 %
+delta; the redraw's only parasitic movement is on the `VSS` rail itself,
+not a term of this budget). Full account in `layout/README.md`'s pad_v2
+redraw episode.
+
 ### 9.3. Real pad-plate + interconnect parasitic capacitance
 
 `klt extract --parasitics` against the actual assembled

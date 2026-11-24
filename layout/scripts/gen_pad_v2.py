@@ -39,16 +39,21 @@ draft), both required to close the capacitance-budget gap
    `gf180_tmds_pad_min`/`sim/esd-clamp-cv` already established for the
    GGNMOS clamp -- see `design/esd-capacitance-budget.md` Sec.1-3).
 
-3. **A real substrate tap** (Pplus-covered Comp outside every Nwell, tied
+3. **Real substrate taps** (Pplus-covered Comp outside every Nwell, tied
    to a `VSS` net through Metal1), addressing DR-0011's flagged
    requirement ("the eventual driver-integrated pad ... must draw a real
    tap" -- `gf180_tmds_pad_min` and `gf180_tmds_pad_diode_draft` both
    deliberately omit one and both carry an LVS `device.body_unverified`
-   warning as a result). `klt`'s gf180mcu deck derives an equivalent tap
-   region from `tap_pplus`/`tap_nplus` implants (issue #1084) rather than
+   warning as a result). Distributed along the finger row, one per
+   `TAP_MAX_PITCH_UM`: DRM DF.14_MV's 15um NCOMP-to-PCOMP reach
+   (`comp.tap_distance.psub.mv.1`) gained deck coverage after this cell's
+   signoff, and the single one-end tap the cell originally drew left 13 of
+   the 20 fingers beyond it (issue #422). `klt`'s gf180mcu deck derives
+   an equivalent tap region from `tap_pplus`/`tap_nplus` implants
+   (issue #1084) rather than
    needing a dedicated tap mask, and globally connects it to the same
    `substrate_net` (`vsubs`) global every unconnected device body/anode in
-   this deck already uses -- so wiring this tap's own Metal1 to a real
+   this deck already uses -- so wiring each tap's own Metal1 to a real
    `VSS`-labelled net promotes that global from an anonymous synthesized
    node into a real, verified net.
 
@@ -68,6 +73,7 @@ convention `gen_pad_min.py`/`gen_pad_diode_draft.py` already established.
 from __future__ import annotations
 
 import argparse
+from math import ceil
 
 import klayout.db as db
 
@@ -85,10 +91,29 @@ from gf180_layers import (
     PPLUS,
     make_drawers,
 )
-from pad_ring_cells import _draw_production_pad
+from pad_ring_cells import _draw_production_pad, _row_span, clamp_rows
 
 N_FINGERS = 20  # this cell's clamp size; pad/clamp geometry lives in pad_ring_cells
-VIA_HALF_UM = 0.15  # 0.30um vias as recorded; helper default is 0.26um
+
+# DRM DF.14_MV (`comp.tap_distance.psub.mv.1`): NCOMP outside Nwell must stay
+# within 15um of a PCOMP substrate tap. The rule gained deck coverage after
+# this cell's signoff (issue #422) and flagged 13 of the 20 fingers against
+# the single one-end tap the cell originally drew, so taps are now
+# distributed along the finger row instead. Via cuts come from the shared
+# helper's 0.26um `via*.width.1`-fixed default for the same reason: this
+# cell's old 0.30um override violated the max side of that very rule.
+TAP_WIDTH_UM = 2.0
+TAP_MAX_PITCH_UM = 25.0  # worst finger point lands ~11.4um from a tap (rule: 15um)
+
+
+def tap_count(row_span: float) -> int:
+    """Taps needed so adjacent-tap pitch never exceeds ``TAP_MAX_PITCH_UM``.
+
+    Taps span ``row_span - TAP_WIDTH_UM`` (first tap's left edge to last tap's
+    left edge) in ``n - 1`` equal gaps, so the pitch bound needs
+    ``ceil(span / pitch) + 1`` taps, not ``ceil(row_span / pitch)``.
+    """
+    return max(2, ceil((row_span - TAP_WIDTH_UM) / TAP_MAX_PITCH_UM) + 1)
 
 
 def build(shorted: bool = False) -> db.Layout:
@@ -100,46 +125,56 @@ def build(shorted: bool = False) -> db.Layout:
     L, rect, label = make_drawers(layout, top)
 
     # -- diode_nd2ps_06v0 clamp + 25x25um bond pad (shared with the ring) ---
-    _draw_production_pad(top, L, 0.0, 0.0, "PAD", N_FINGERS, via_half=VIA_HALF_UM)
+    _draw_production_pad(top, L, 0.0, 0.0, "PAD", N_FINGERS)
     array_x0 = 0.0
     margin = 0.16  # PPLUS-over-COMP margin (same convention as the clamp's NPLUS)
     bus_y0 = 0.39 - 0.13  # bottom edge of the clamp's Metal1 bus (DEFAULT_BUS_WIDTH_UM)
 
-    # -- Substrate tap: Pplus-covered Comp outside every Nwell, tied to VSS -
-    tap_x0, tap_x1 = array_x0, array_x0 + 2.0
+    # -- Substrate taps: Pplus-covered Comp outside every Nwell, tied to VSS -
+    # One tap per TAP_MAX_PITCH_UM of finger row (DRM DF.14_MV's 15um
+    # NCOMP-to-PCOMP reach, issue #422), each contacted and VSS-labelled so
+    # the deck's substrate global stays promoted onto a real, verified net.
+    row_span = _row_span(max(clamp_rows(N_FINGERS)))
+    n_taps = tap_count(row_span)
     tap_y0, tap_y1 = -3.0, -1.0  # >=1.0um clear of the diode array (y=0..FINGER_DEPTH)
-    rect(COMP, tap_x0, tap_y0, tap_x1, tap_y1)
-    rect(PPLUS, tap_x0 - margin, tap_y0 - margin, tap_x1 + margin, tap_y1 + margin)
-    tap_cx = (tap_x0 + tap_x1) / 2
-    tap_cy = (tap_y0 + tap_y1) / 2
-    rect(
-        CONTACT,
-        tap_cx - CONTACT_SIZE / 2,
-        tap_cy - CONTACT_SIZE / 2,
-        tap_cx + CONTACT_SIZE / 2,
-        tap_cy + CONTACT_SIZE / 2,
-    )
     tap_m1_half = 0.31
-    rect(
-        METAL1,
-        tap_cx - tap_m1_half,
-        tap_cy - tap_m1_half,
-        tap_cx + tap_m1_half,
-        tap_cy + tap_m1_half,
-    )
-    label(METAL1_LABEL, "VSS", tap_cx, tap_cy)
+    bridge_cx = bridge_cy = 0.0  # anchor of the _shorted bridge: the LAST tap
+    for i in range(n_taps):
+        tap_x0 = array_x0 + i * (row_span - TAP_WIDTH_UM) / (n_taps - 1)
+        tap_x1 = tap_x0 + TAP_WIDTH_UM
+        rect(COMP, tap_x0, tap_y0, tap_x1, tap_y1)
+        rect(PPLUS, tap_x0 - margin, tap_y0 - margin, tap_x1 + margin, tap_y1 + margin)
+        tap_cx = (tap_x0 + tap_x1) / 2
+        tap_cy = (tap_y0 + tap_y1) / 2
+        rect(
+            CONTACT,
+            tap_cx - CONTACT_SIZE / 2,
+            tap_cy - CONTACT_SIZE / 2,
+            tap_cx + CONTACT_SIZE / 2,
+            tap_cy + CONTACT_SIZE / 2,
+        )
+        rect(
+            METAL1,
+            tap_cx - tap_m1_half,
+            tap_cy - tap_m1_half,
+            tap_cx + tap_m1_half,
+            tap_cy + tap_m1_half,
+        )
+        label(METAL1_LABEL, "VSS", tap_cx, tap_cy)
+        bridge_cx, bridge_cy = tap_cx, tap_cy  # last iteration wins, by intent
 
     # -- Negative control: short PAD to VSS with one extra Metal1 bridge ----
-    # Genuinely overlaps (not just edge-touches) both the tap's own Metal1
+    # Anchored explicitly on the LAST tap (bridge_cx/cy). Genuinely overlaps
+    # (not just edge-touches) both that tap's own Metal1
     # square and the cathode bus -- an edge-touching rect here previously
     # produced a degenerate zero-width DRC violation at the seam.
     if shorted:
         overlap = 0.10
         rect(
             METAL1,
-            tap_cx - tap_m1_half - overlap,
-            tap_cy + tap_m1_half - overlap,
-            tap_cx + tap_m1_half + overlap,
+            bridge_cx - tap_m1_half - overlap,
+            bridge_cy + tap_m1_half - overlap,
+            bridge_cx + tap_m1_half + overlap,
             bus_y0 + overlap,
         )
 

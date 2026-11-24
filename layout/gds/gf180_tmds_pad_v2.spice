@@ -94,47 +94,47 @@ RPAD_t19 PAD__t19 PAD 0.0518
 * device instance PAD r0 *1 0,0 
 CPAD PAD vsubs 1.2185218e-14
 * device instance VSS_t0 r0 *1 0,0 
-RVSS_t0 VSS__t0 VSS 0.00855
+RVSS_t0 VSS__t0 VSS 0.02565
 * device instance VSS_t1 r0 *1 0,0 
-RVSS_t1 VSS__t1 VSS 0.00765
+RVSS_t1 VSS__t1 VSS 0.02295
 * device instance VSS_t2 r0 *1 0,0 
-RVSS_t2 VSS__t2 VSS 0.00675
+RVSS_t2 VSS__t2 VSS 0.02025
 * device instance VSS_t3 r0 *1 0,0 
-RVSS_t3 VSS__t3 VSS 0.00585
+RVSS_t3 VSS__t3 VSS 0.01755
 * device instance VSS_t4 r0 *1 0,0 
-RVSS_t4 VSS__t4 VSS 0.00495
+RVSS_t4 VSS__t4 VSS 0.01485
 * device instance VSS_t5 r0 *1 0,0 
-RVSS_t5 VSS__t5 VSS 0.00405
+RVSS_t5 VSS__t5 VSS 0.01215
 * device instance VSS_t6 r0 *1 0,0 
-RVSS_t6 VSS__t6 VSS 0.00315
+RVSS_t6 VSS__t6 VSS 0.00945
 * device instance VSS_t7 r0 *1 0,0 
-RVSS_t7 VSS__t7 VSS 0.00225
+RVSS_t7 VSS__t7 VSS 0.00675
 * device instance VSS_t8 r0 *1 0,0 
-RVSS_t8 VSS__t8 VSS 0.00135
+RVSS_t8 VSS__t8 VSS 0.00405
 * device instance VSS_t9 r0 *1 0,0 
-RVSS_t9 VSS__t9 VSS 0.001
+RVSS_t9 VSS__t9 VSS 0.00135
 * device instance VSS_t10 r0 *1 0,0 
-RVSS_t10 VSS__t10 VSS 0.001
+RVSS_t10 VSS__t10 VSS 0.00135
 * device instance VSS_t11 r0 *1 0,0 
-RVSS_t11 VSS__t11 VSS 0.00135
+RVSS_t11 VSS__t11 VSS 0.00405
 * device instance VSS_t12 r0 *1 0,0 
-RVSS_t12 VSS__t12 VSS 0.00225
+RVSS_t12 VSS__t12 VSS 0.00675
 * device instance VSS_t13 r0 *1 0,0 
-RVSS_t13 VSS__t13 VSS 0.00315
+RVSS_t13 VSS__t13 VSS 0.00945
 * device instance VSS_t14 r0 *1 0,0 
-RVSS_t14 VSS__t14 VSS 0.00405
+RVSS_t14 VSS__t14 VSS 0.01215
 * device instance VSS_t15 r0 *1 0,0 
-RVSS_t15 VSS__t15 VSS 0.00495
+RVSS_t15 VSS__t15 VSS 0.01485
 * device instance VSS_t16 r0 *1 0,0 
-RVSS_t16 VSS__t16 VSS 0.00585
+RVSS_t16 VSS__t16 VSS 0.01755
 * device instance VSS_t17 r0 *1 0,0 
-RVSS_t17 VSS__t17 VSS 0.00675
+RVSS_t17 VSS__t17 VSS 0.02025
 * device instance VSS_t18 r0 *1 0,0 
-RVSS_t18 VSS__t18 VSS 0.00765
+RVSS_t18 VSS__t18 VSS 0.02295
 * device instance VSS_t19 r0 *1 0,0 
-RVSS_t19 VSS__t19 VSS 0.00855
+RVSS_t19 VSS__t19 VSS 0.02565
 * device instance VSS r0 *1 0,0 
-CVSS VSS vsubs 1.09321e-16
+CVSS VSS vsubs 3.27963e-16
 * device instance vsubs_dctie r0 *1 0,0 
 Rvsubs_dctie vsubs 0 1e+12
 .ENDS gf180_tmds_pad_v2

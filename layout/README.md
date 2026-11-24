@@ -207,7 +207,9 @@ python3 scripts/check_lvs_signoff.py --list   # verdicts must still be match / m
 Signoff status: **DRC-clean** (0 violations, including the
 `pad.enclosing.metal5.1`/`via*.width.1` rules DR-0011 flagged as a
 regression on the older `gf180_tmds_pad_min` cell — this cell is sized to
-clear both from the start), **extraction finds 20 real
+clear both from the start; the `via*.width.1` half of that claim did not
+survive deck coverage gaining the max-side check, see the redraw episode
+below), **extraction finds 20 real
 `diode_nd2ps_06v0` devices** on 2 real nets (`PAD`, `VSS` — no
 `body_unverified` warning), and **LVS-clean** (`status: match`, via
 `options.combine_devices` folding the 20-finger array back to one combined
@@ -357,6 +359,49 @@ the deck gained coverage after this cell's signoff, the same
 known-regression pattern `gf180_tmds_pad_min` documents above. The re-run
 reports record the current deck's findings honestly; the geometry findings
 themselves are flagged, not fixed here, and tracked in #422.
+
+**Redraw episode: the #422 findings were fixed in geometry, not waived
+(issue #422, 2026-11-24).** Two changes in `scripts/gen_pad_v2.py`, both
+sized against the now-covered rules rather than argued around them (a
+waiver is a human decision-record call, and both findings were real):
+
+- **Via cuts 0.30 → 0.26 µm**: the cell's own `VIA_HALF_UM = 0.15`
+  override (a "0.30 µm vias as recorded" artifact of the pre-#262 split)
+  was itself the `via{1,2,3,4}.width.1` finding — the rule is a fixed
+  0.26 × 0.26 µm square, min *and* max, so the cut was genuinely
+  oversize. The override is gone and the pad's via stack now takes the
+  shared `pad_ring_cells` 0.26 µm default. Re-checked after the redraw:
+  the rule's min/max semantics are consistent (0 violations on 0.26 µm
+  cuts), so no klayout-tools issue was warranted on it.
+- **One substrate tap → three**, distributed along the 51.4 µm finger
+  row (tap x-origins 0 / 24.7 / 49.4 µm, one per ≤ 25 µm of row): the
+  single one-end tap left 13 of the 20 `diode_nd2ps_06v0` fingers beyond
+  DRM DF.14_MV's 15 µm NCOMP-to-PCOMP reach. Worst finger point is now
+  ~11.4 µm from a tap. The taps keep this cell's own Metal1-only,
+  `VSS`-labelled idiom — `pad_ring_cells._draw_substrate_tap` was *not*
+  reused because it lands via1/via2 + Metal2 on a caller-drawn Metal3
+  ring strap this cell deliberately does not draw (its scope note below),
+  which would trade the tap-distance findings for via2-enclosure ones.
+
+Both GDS were regenerated and every evidence report re-run: `klt drc` is
+**clean (0 violations)** under both the installed `klt`
+0.9.3.dev5396/klayout 0.30.13 (deck `sha256:778e9a4e…`) and the CI-pinned
+`klayout-tools` 0.8.0/klayout 0.30.14 (deck `sha256:0eb6df1b…`);
+extraction still finds 20 `diode_nd2ps_06v0` on the 2 real `PAD`/`VSS`
+nets; LVS is still `match` (intact) / `mismatch` with 4 error findings
+(`_shorted` control), and cheap-mode `klt lvs --check` is `[OK]` on all
+three hashes for both reports. `extract --parasitics` measures the
+**`PAD` net unchanged at 12.185218 fF** (0.00 % delta — the ≤5 %
+C-V-grid re-run trigger in #422's criteria is not met); the redraw's only
+parasitic movement is on the `VSS` rail itself (0.109321 → 0.327963 fF
+net capacitance, total 12.294539 → 12.513181 fF — the two extra taps'
+own Metal1/Comp), which is not a term of the ≤2 pF pad-node budget
+(`design/esd-capacitance-budget.md` Sec.9). The substrate-spreading
+resistors in the extracted netlist moved accordingly (e.g. `RVSS_t0`
+0.00855 → 0.02565 Ω; all twenty legs rise by a uniform ×3, with no extra
+parallel legs in the extracted model). That is the extractor's lumped
+substrate model only, not a tie-resistance measurement: total tie
+conductance was not measured here, so no improvement is claimed.)
 
 **Scope**: this cell answers the capacitance-budget question at a real pad
 size with a real DR-0011-ratified clamp; it does not draw pad-ring
