@@ -10,6 +10,11 @@ selected.
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-24
+
+- **PR #397**: refactor(flow): drop never-interpolated params from render_record
+- **Issue #396** (closed): flow: four never-referenced params remain in sibling render_record() signatures (sdf, synth, gate-level)
+
 ### 2026-11-23
 
 - **PR #395**: test: keep testbench fixture files alive through assertions
