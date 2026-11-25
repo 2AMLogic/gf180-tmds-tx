@@ -12,6 +12,10 @@ selected.
 
 ### 2026-11-24
 
+- **Issue #429** (closed): docs: retire post-#422 pad_v2 deck-drift caveats in characterization and budget §9.6
+- **PR #431**: docs: resolve stale pad_v2 DRC caveats and refresh signoff envelope
+- **Issue #424** (closed): Consolidate duplicated harness, Monte Carlo, and git test fixtures across sim/tests
+- **PR #426**: refactor: consolidate duplicated sim/tests fixtures into _harness_fixtures.py
 - **PR #425**: layout: fix pad_v2 DRC findings from new deck coverage (0.26um via cuts, distributed substrate taps)
 - **Issue #422** (closed): layout: current gf180mcu DRC decks flag 17 violations on gf180_tmds_pad_v2 (coverage gained since signoff)
 - **PR #423**: layout: regenerate stale pad_v2 GDS pair and re-run its evidence reports
