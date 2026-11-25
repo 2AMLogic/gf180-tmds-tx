@@ -13,6 +13,10 @@ serializer plus a custom CML driver — so both flows apply.
   its ESD structure must be drawn and must satisfy pad-pitch and ESD rules.
   Nothing in the fleet has done this. Expect the tools to be weakest here and
   file accordingly.
+- **Hash-pinned hygiene files**: `README.md`, `spec/tmds-tx.md`, `LICENSE` and
+  `.github/workflows/ci.yml` are pinned by T1 item 10; editing one drifts it
+  (see `signoff/README.md`). Put volatile status prose in `WORK_PLAN.md` /
+  `WORK_LOG.md`, never `README.md`.
 - **Scope discipline.** The PLL comes from a sibling canary. Do not design one
   here. Specify the interface to it — including the jitter budget this block
   requires — and stop.

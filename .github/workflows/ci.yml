@@ -162,6 +162,11 @@ jobs:
           fi
           .github/scripts/lint.sh --require-shellcheck --require-append-only
 
+      - name: Attestation envelopes match the files they pin
+        # Its own step, not part of lint.sh: lint.sh is an attested item-10
+        # check, so a hash tripwire inside it would be unregenerable.
+        run: python3 scripts/check_attest_files.py
+
   signoff:
     name: T1 signoff manifest (klt re-grade vs committed record)
     runs-on: ubuntu-latest
