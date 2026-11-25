@@ -7,7 +7,7 @@ outside the markers is touched. See `.claude/skills/loom-guide/guide.md`
 for the generation logic.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-24T15:10:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-25T22:29:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -26,6 +26,7 @@ _None._
 
 - **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
+- **#406**: sim/harness batch per-point path: UI-normalised measures (trise_ui_*, tfall_ui_*, dj_ui_*) come back error in klt sim reports -- batch._measurements emits exprs that read .meas results
 
 ## Ready
 
@@ -37,10 +38,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210)
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI
-- **#413**: Consolidate duplicated folded diode-clamp array drawing in gen_pad_ring_assembly.py and pad_ring_cells.py
 
 ## PRs Awaiting Review
 
@@ -59,7 +58,7 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#158**: Champion: Merge-Risk Hold Digest *(curated)* *(held)*
-- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)*
+- **#222**: Re-run post-layout eye records and measure pd2nw clamp C-V after VDD-side clamp (#210) *(curated)* *(held)*
 - **#229**: T1 items 5 and 6 (analog): klt sim envelopes per spec row and a klt yield report for the mismatch campaign *(curated)*
 - **#254**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)* *(held)*
 - **#306**: Guide docs passes that touch README.md drift T1 item 10 and red-line CI *(curated)*
@@ -82,9 +81,9 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 2 |
+| Important | 3 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
-| In Progress (`loom:building`) | 4 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 9 |
