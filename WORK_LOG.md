@@ -12,6 +12,8 @@ selected.
 
 ### 2026-11-24
 
+- **PR #425**: layout: fix pad_v2 DRC findings from new deck coverage (0.26um via cuts, distributed substrate taps)
+- **Issue #422** (closed): layout: current gf180mcu DRC decks flag 17 violations on gf180_tmds_pad_v2 (coverage gained since signoff)
 - **PR #423**: layout: regenerate stale pad_v2 GDS pair and re-run its evidence reports
 - **PR #421**: refactor: consolidate folded diode-clamp array drawing into pad_ring_cells
 - **Issue #420** (closed): layout: committed gf180_tmds_pad_v2 GDS pair is stale by one PAD label vs gen_pad_v2.py output
